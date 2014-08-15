@@ -1,0 +1,5 @@
+<settings>
+	<setting id="username" type="text" label="Username" default=""/>
+	<setting id="password" type="text" label="Password" default="" option="hidden"/>
+    <setting id="use_https" type="bool" label="Use HTTPS" default="false"/>
+</settings>
