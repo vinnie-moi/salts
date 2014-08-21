@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
-import urllib
 import time
 import xbmc
 import xbmcvfs
@@ -113,6 +112,15 @@ class DB_Connection():
                 html=rows[0][1]
         return html
     
+    def set_related_url(self, video_type, title, year, source, rel_url, season='', episode=''):
+        sql = 'REPLACE INTO rel_url (video_type, title, year, season, episode, source, rel_url) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        self.__execute(sql, (video_type, title, year, season, episode, source, rel_url))
+        
+    def get_related_url(self, video_type, title, year, source, season='', episode=''):
+        sql = 'SELECT rel_url FROM rel_url WHERE video_type=? and title=? and year=? and season=? and episode=? and source=?'
+        rows=self.__execute(sql, (video_type, title, year, season, episode, source))
+        return rows
+                       
     def execute_sql(self, sql):
         self.__execute(sql)
 
@@ -128,6 +136,9 @@ class DB_Connection():
             self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, response, timestamp, PRIMARY KEY(url))')
             self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255), value TEXT, PRIMARY KEY(setting))')
             self.__execute('CREATE TABLE IF NOT EXISTS new_bkmark (url TEXT NOT NULL, resumepoint DOUBLE NOT NULL, PRIMARY KEY(url))')
+            self.__execute('CREATE TABLE IF NOT EXISTS rel_url \
+            (video_type TEXT NOT NULL, title TEXT NOT NULL, year TEXT NOT NULL, season TEXT NOT NULL, episode TEXT NOT NULL, source TEXT NOT NULL, rel_url TEXT, \
+            PRIMARY KEY(video_type, title, year, season, episode, source))')
         
         sql = 'REPLACE INTO db_info (setting, value) VALUES(?,?)'
         self.__execute(sql, ('version', _SALTS.get_version()))

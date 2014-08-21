@@ -27,6 +27,7 @@ from salts_lib.utils import VIDEO_TYPES
 USER_AGENT = ("User-Agent:Mozilla/5.0 (Windows NT 6.2; WOW64)"
               "AppleWebKit/537.17 (KHTML, like Gecko)"
               "Chrome/24.0.1312.56")
+db_connection = DB_Connection()
 
 class PW_Scraper(scraper.Scraper):
     def __init__(self):
@@ -85,9 +86,28 @@ class PW_Scraper(scraper.Scraper):
         return hosters
 
     def __get_url(self, video_type, title, year, season='', episode=''):
-        url = self.__search(video_type, title, year)
-        if url and video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE]:
-            url = self.__get_episode_url(url, season, episode)
+        temp_video_type=video_type
+        if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
+
+        result = db_connection.get_related_url(temp_video_type, title, year, self.get_name())
+        if result:
+            url=result[0][0]
+            utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
+        else:
+            url = self.__search(temp_video_type, title, year)
+            if url:
+                db_connection.set_related_url(temp_video_type, title, year, self.get_name(), url)
+
+        if url and video_type==VIDEO_TYPES.EPISODE:
+            result = db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
+            if result:
+                url=result[0][0]
+                utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
+            else:
+                show_url = url
+                url = self.__get_episode_url(show_url, season, episode)
+                if url:
+                    db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
         
         return url
     
