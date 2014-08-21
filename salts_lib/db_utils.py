@@ -116,6 +116,14 @@ class DB_Connection():
         sql = 'REPLACE INTO rel_url (video_type, title, year, season, episode, source, rel_url) VALUES (?, ?, ?, ?, ?, ?, ?)'
         self.__execute(sql, (video_type, title, year, season, episode, source, rel_url))
         
+    def clear_related_url(self, video_type, title, year, source, season='', episode=''):
+        sql = 'DELETE FROM rel_url WHERE video_type=? and title=? and year=? and source=?'
+        params=[video_type, title, year,  source]
+        if season and episode:
+            sql += ' and season=? and episode=?'
+            params += [season, episode]
+        self.__execute(sql, params)
+
     def get_related_url(self, video_type, title, year, source, season='', episode=''):
         sql = 'SELECT rel_url FROM rel_url WHERE video_type=? and title=? and year=? and season=? and episode=? and source=?'
         rows=self.__execute(sql, (video_type, title, year, season, episode, source))

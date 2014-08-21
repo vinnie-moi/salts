@@ -22,9 +22,8 @@ import sha
 import utils
 import xbmc
 from utils import SECTIONS
+from utils import TRAKT_SECTIONS
 from db_utils import DB_Connection
-
-TRAKT_SECTIONS = {SECTIONS.TV: 'shows', SECTIONS.MOVIES: 'movies'}
 
 class TraktError(Exception):
     pass

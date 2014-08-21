@@ -19,6 +19,7 @@ import scraper
 import re
 import urllib2
 import urllib
+import urlparse
 import xbmc
 from salts_lib.db_utils import DB_Connection
 from salts_lib import utils
@@ -45,7 +46,7 @@ class PW_Scraper(scraper.Scraper):
         return label
     
     def get_sources(self, video_type, title, year, season='', episode=''):
-        url = self.base_url + self.__get_url(video_type, title, year, season, episode)
+        url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
         html = self.__http_get(url, cache_limit=.5)
         adultregex = '<div class="offensive_material">.+<a href="(.+)">I understand'
         adult = re.search(adultregex, html, re.DOTALL)
@@ -85,7 +86,7 @@ class PW_Scraper(scraper.Scraper):
      
         return hosters
 
-    def __get_url(self, video_type, title, year, season='', episode=''):
+    def get_url(self, video_type, title, year, season='', episode=''):
         temp_video_type=video_type
         if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
 
@@ -112,7 +113,7 @@ class PW_Scraper(scraper.Scraper):
         return url
     
     def __search(self, video_type, title, year):
-        search_url = self.base_url + '/index.php?search_keywords='
+        search_url = urlparse.urljoin(self.base_url, '/index.php?search_keywords=')
         search_url += urllib.quote_plus(title)
         search_url += '&year=' + urllib.quote_plus(year)
         if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE]:
@@ -131,7 +132,7 @@ class PW_Scraper(scraper.Scraper):
             return match.group(1)
     
     def __get_episode_url(self, show_url, season, episode):
-        url = self.base_url + show_url
+        url = urlparse.urljoin(self.base_url, show_url)
         html = self.__http_get(url, cache_limit=2)
         pattern = '"tv_episode_item".+?href="(.+?)">.*?</a>'
         episodes = re.finditer(pattern, html, re.DOTALL)

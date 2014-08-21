@@ -37,3 +37,6 @@ class Scraper(object):
     def get_sources(self, video_type, title, year, season='', episode=''):
         pass
 
+    @abc.abstractmethod 
+    def get_url(self, video_type, title, year, season='', episode=''):
+        pass

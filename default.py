@@ -17,6 +17,7 @@
 """
 import sys
 import time
+import os
 import xbmcplugin
 import xbmcgui
 import xbmc
@@ -28,15 +29,19 @@ from salts_lib import utils
 from salts_lib.utils import MODES
 from salts_lib.utils import SECTIONS
 from salts_lib.utils import VIDEO_TYPES
+from salts_lib.utils import TRAKT_SECTIONS
 from scrapers import * # import all scrapers into this namespace
 
-url_dispatcher=URL_Dispatcher()
-db_connection=DB_Connection()
+
 _SALTS = Addon('plugin.video.salts', sys.argv)
 username=_SALTS.get_setting('username')
 password=_SALTS.get_setting('password')
 use_https=_SALTS.get_setting('use_https')=='true'
+ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
+
 trakt_api=Trakt_API(username,password, use_https)
+url_dispatcher=URL_Dispatcher()
+db_connection=DB_Connection()
 
 @url_dispatcher.register(MODES.MAIN)
 def main_menu():
@@ -86,7 +91,7 @@ def browse_friends(section):
     totalItems=len(activities)
     
     for activity in activities['activity']:
-        liz, liz_url =make_item(section_params, activity[section_params['video_type']])
+        liz, liz_url =make_item(section_params, activity[TRAKT_SECTIONS[section][:-1]])
 
         label=liz.getLabel()
         label += ' (%s %s' % (activity['user']['username'], activity['action'])
@@ -201,6 +206,12 @@ def get_sources(video_type, title, year, season='', episode=''):
     for cls in classes:
         hosters  += cls().get_sources(video_type, title, year, season, episode)
     
+    if not hosters:
+        utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
+        builtin = 'XBMC.Notification(%s, No Sources Found, 5000, %s)'
+        xbmc.executebuiltin(builtin % (_SALTS.get_name(), ICON_PATH))
+        return
+        
     sources=[]
     for item in hosters:
         try:
@@ -220,7 +231,7 @@ def get_sources(video_type, title, year, season='', episode=''):
     if source:
         url=source.get_url()
     else:
-        return
+        return True
     
     utils.log('Attempting to play url: %s' % url)
     stream_url = urlresolver.HostedMediaFile(url=url).resolve()
@@ -235,6 +246,38 @@ def get_sources(video_type, title, year, season='', episode=''):
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
     return True
     
+@url_dispatcher.register(MODES.SET_URL, ['video_type', 'title', 'year'], ['season', 'episode'])
+def set_related_url(video_type, title, year, season='', episode=''):
+    classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
+    related_list=[]
+    for cls in classes:
+        related={}
+        related['class']=cls()
+        url=related['class'].get_url(video_type, title, year, season, episode)
+        if not url: url=''
+        related['url']=url
+        related['name']=related['class'].get_name()
+        related['label'] = '[%s] %s' % (related['name'], related['url'])
+        related_list.append(related)
+    
+    dialog=xbmcgui.Dialog()
+    index = dialog.select('Set Related Url', [related['label'] for related in related_list])
+    if index>-1:
+        keyboard = xbmc.Keyboard()
+        keyboard.setHeading('Related Url at %s for %s (%s)' % (related_list[index]['name'], title, year))
+        keyboard.setDefault(related_list[index]['url'])
+        keyboard.doModal()
+        if keyboard.isConfirmed():
+            new_url = keyboard.getText()
+            if new_url:
+                db_connection.set_related_url(video_type, title, year, related_list[index]['name'], keyboard.getText(), season, episode)
+            else:
+                db_connection.clear_related_url(video_type, title, year, related_list[index]['name'], season, episode)
+
+            # clear all episode local urls if tvshow url changes
+            if video_type == VIDEO_TYPES.TVSHOW and new_url != related_list[index]['url']:
+                db_connection.clear_related_url(VIDEO_TYPES.EPISODE, title, year, related_list[index]['name'])
+                
 def make_season_item(season, fanart):
     label = 'Season %s' % (season['season'])
     season['images']['fanart']=fanart
@@ -259,6 +302,8 @@ def make_episode_item(show, episode, fanart):
     
     menu_items=[]
     menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
+    queries = {'mode': MODES.SET_URL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num}
+    menu_items.append(('Set Related Url', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     liz.addContextMenuItems(menu_items, replaceItems=True)
     return liz
 
@@ -270,16 +315,18 @@ def make_item(section_params, show):
     if not section_params['folder']:
         liz.setProperty('IsPlayable', 'true')
 
-    menu_items=[]
-    menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
-    liz.addContextMenuItems(menu_items, replaceItems=True)
-
     if section_params['section']==SECTIONS.TV:
         queries = {'mode': section_params['next_mode'], 'slug': liz.getProperty('slug'), 'fanart': liz.getProperty('fanart_image')}
     else:
         queries = {'mode': section_params['next_mode'], 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
 
     liz_url = _SALTS.build_plugin_url(queries)
+
+    menu_items=[]
+    menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
+    queries = {'mode': MODES.SET_URL, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
+    menu_items.append(('Set Related Url', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+    liz.addContextMenuItems(menu_items, replaceItems=True)
 
     return liz, liz_url
 
@@ -337,11 +384,11 @@ def get_section_params(section):
     if section==SECTIONS.TV:
         section_params['next_mode']=MODES.SEASONS
         section_params['folder']=True
-        section_params['video_type']='show'
+        section_params['video_type']=VIDEO_TYPES.TVSHOW
     else:
         section_params['next_mode']=MODES.GET_SOURCES
         section_params['folder']=False
-        section_params['video_type']='movie'
+        section_params['video_type']=VIDEO_TYPES.MOVIE
     return section_params
         
 def main(argv=None):

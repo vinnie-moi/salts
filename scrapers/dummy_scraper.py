@@ -16,6 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
+from salts_lib.db_utils import DB_Connection
+
+db_connection = DB_Connection()
 
 class Dummy_Scraper(scraper.Scraper):
     def __init__(self):
@@ -32,3 +35,8 @@ class Dummy_Scraper(scraper.Scraper):
     
     def get_sources(self, video_type, title, year, season='', episode=''):
         return []
+
+    def get_url(self, video_type, title, year, season='', episode=''):
+        result=db_connection.get_related_url(video_type, title, year, self.get_name(), season, episode)
+        if result:
+            return result[0][0]
