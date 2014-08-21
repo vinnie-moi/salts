@@ -51,8 +51,8 @@ def browse_menu(section):
     _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': 'Trending %s' % (section_label)})
     _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
     _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'})
-    _SALTS.add_directory({'mode': MODES.LISTS}, {'title': 'Lists'})
-    _SALTS.add_directory({'mode': MODES.SEARCH}, {'title': 'Search'})
+    _SALTS.add_directory({'mode': MODES.LISTS}, {'title': 'My Lists'})
+    _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'})
     if section==SECTIONS.TV:
         _SALTS.add_directory({'mode': MODES.MANAGE_SUBS}, {'title': 'Manage Subscriptions'})
         _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'Calendar'})
@@ -86,7 +86,7 @@ def browse_friends(section):
     totalItems=len(activities)
     
     for activity in activities['activity']:
-        liz=make_item(activity[section_params['video_type']])
+        liz, liz_url =make_item(section_params, activity[section_params['video_type']])
 
         label=liz.getLabel()
         label += ' (%s %s' % (activity['user']['username'], activity['action'])
@@ -94,8 +94,6 @@ def browse_friends(section):
         label += ')'
         liz.setLabel(label)
         
-        queries = {'mode': section_params['next_mode'], 'slug': liz.getProperty('slug'), 'fanart': liz.getProperty('fanart_image')}
-        liz_url = _SALTS.build_plugin_url(queries)
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=section_params['folder'],totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
@@ -145,6 +143,32 @@ def browse_my_calendar():
 def browse_lists():
     pass
 
+@url_dispatcher.register(MODES.SEARCH, ['section'])
+def search(section):
+    keyboard = xbmc.Keyboard()
+    keyboard.setHeading('Search %s' % (section))
+    while True:
+        keyboard.doModal()
+        if keyboard.isConfirmed():
+            search_text = keyboard.getText()
+            if not search_text:
+                _SALTS.show_ok_dialog(['Blank searches are not allowed'], title=_SALTS.get_name())
+                continue
+            else:
+                break
+        else:
+            break
+    
+    if keyboard.isConfirmed():
+        section_params=get_section_params(section)
+        results = trakt_api.search(section, keyboard.getText())
+        totalItems=len(results)
+        for result in results:
+            liz, liz_url =make_item(section_params, result)
+            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
+        xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+    
 @url_dispatcher.register(MODES.SEASONS, ['slug', 'fanart'])
 def browse_seasons(slug, fanart):
     seasons=trakt_api.get_seasons(slug)
@@ -213,6 +237,7 @@ def get_sources(video_type, title, year, season='', episode=''):
     
 def make_season_item(season, fanart):
     label = 'Season %s' % (season['season'])
+    season['images']['fanart']=fanart
     liz=make_list_item(label, season)
     liz.setInfo('video', {'season': season['season']})
 

@@ -17,11 +17,14 @@
 """
 import json
 import urllib2
+import urllib
 import sha
 import utils
 import xbmc
 from utils import SECTIONS
 from db_utils import DB_Connection
+
+TRAKT_SECTIONS = {SECTIONS.TV: 'shows', SECTIONS.MOVIES: 'movies'}
 
 class TraktError(Exception):
     pass
@@ -54,24 +57,15 @@ class Trakt_API():
         return self.__manage_list('delete', slug, item)
     
     def get_trending(self, section):
-        if section==SECTIONS.TV:
-            url='/shows/trending.json/%s' % (API_KEY)
-        else:
-            url='/movies/trending.json/%s' % (API_KEY)
+        url='/%s/trending.json/%s' % (TRAKT_SECTIONS[section], API_KEY)
         return self.__call_trakt(url)
     
     def get_recommendations(self, section):
-        if section==SECTIONS.TV:
-            url='/recommendations/shows/%s' % (API_KEY)
-        else:
-            url='/recommendations/movies/%s' % (API_KEY)
+        url='/recommendations/%s/%s' % (TRAKT_SECTIONS[section], API_KEY)
         return self.__call_trakt(url)
         
     def get_friends_activity(self, section):
-        if section==SECTIONS.TV:
-            url='/activity/friends.json/%s/show' % (API_KEY)
-        else:
-            url='/activity/friends.json/%s/movie' % (API_KEY)
+        url='/activity/friends.json/%s/%s' % (API_KEY, TRAKT_SECTIONS[section][:-1])
         return self.__call_trakt(url)
         
     def get_calendar(self):
@@ -94,6 +88,10 @@ class Trakt_API():
         url = '/show/summary.json/%s/%s' % (API_KEY, slug)
         return self.__call_trakt(url, cache_limit=8)
         pass
+    
+    def search(self, section, query):
+        url='/search/%s.json/%s?query=%s' % (TRAKT_SECTIONS[section], API_KEY, urllib.quote_plus(query))
+        return self.__call_trakt(url)
     
     def get_slug(self, url):
         show_url = self.protocol+'trakt.tv/show/'
