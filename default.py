@@ -108,7 +108,7 @@ def browse_my_calendar():
     make_dir_from_cal(days)
 
 @url_dispatcher.register(MODES.PREMIERES)
-def browse_premieres():
+def browse_premiere_cal():
     days=trakt_api.get_premieres()
     make_dir_from_cal(days)
 
@@ -334,6 +334,8 @@ def make_dir_from_cal(days):
             liz_url = _SALTS.build_plugin_url(queries)
             label=liz.getLabel()
             label = '[%s] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
+            if episode['season']==1 and episode['number']==1:
+                label = '[COLOR green]%s[/COLOR]' % (label)
             liz.setLabel(label)
             xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
