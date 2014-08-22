@@ -18,6 +18,7 @@
 import sys
 import time
 import os
+import re
 import xbmcplugin
 import xbmcgui
 import xbmc
@@ -246,8 +247,9 @@ def get_sources(video_type, title, year, season='', episode=''):
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
     return True
     
-@url_dispatcher.register(MODES.SET_URL, ['video_type', 'title', 'year'], ['season', 'episode'])
-def set_related_url(video_type, title, year, season='', episode=''):
+@url_dispatcher.register(MODES.SET_URL_MANUAL, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
+@url_dispatcher.register(MODES.SET_URL_SEARCH, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
+def set_related_url(mode, video_type, title, year, season='', episode=''):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     related_list=[]
     for cls in classes:
@@ -261,23 +263,61 @@ def set_related_url(video_type, title, year, season='', episode=''):
         related_list.append(related)
     
     dialog=xbmcgui.Dialog()
-    index = dialog.select('Set Related Url', [related['label'] for related in related_list])
+    index = dialog.select('Url To Change (%s)' % (video_type), [related['label'] for related in related_list])
     if index>-1:
-        keyboard = xbmc.Keyboard()
-        keyboard.setHeading('Related Url at %s for %s (%s)' % (related_list[index]['name'], title, year))
-        keyboard.setDefault(related_list[index]['url'])
-        keyboard.doModal()
-        if keyboard.isConfirmed():
-            new_url = keyboard.getText()
-            if new_url:
-                db_connection.set_related_url(video_type, title, year, related_list[index]['name'], keyboard.getText(), season, episode)
-            else:
-                db_connection.clear_related_url(video_type, title, year, related_list[index]['name'], season, episode)
-
-            # clear all episode local urls if tvshow url changes
-            if video_type == VIDEO_TYPES.TVSHOW and new_url != related_list[index]['url']:
-                db_connection.clear_related_url(VIDEO_TYPES.EPISODE, title, year, related_list[index]['name'])
+        if mode == MODES.SET_URL_MANUAL:
+            keyboard = xbmc.Keyboard()
+            keyboard.setHeading('Related %s url at %s' % (video_type, related_list[index]['name']))
+            keyboard.setDefault(related_list[index]['url'])
+            keyboard.doModal()
+            if keyboard.isConfirmed():
+                new_url = keyboard.getText()
+                update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], new_url, season, episode)
+        elif mode == MODES.SET_URL_SEARCH:
+            temp_title = title
+            temp_year = year
+            while True:
+                dialog=xbmcgui.Dialog()
+                choices = ['Manual Search']
+                try:
+                    utils.log('Searching for: |%s|%s|' % (temp_title, temp_year), xbmc.LOGDEBUG)
+                    results = related_list[index]['class'].search(video_type, temp_title, temp_year)
+                    for result in results:
+                        choice = '%s (%s)' % (result['title'], result['year'])
+                        choices.append(choice)
+                    results_index = dialog.select('Select Related', choices)
+                    if results_index==0:
+                        keyboard = xbmc.Keyboard()
+                        keyboard.setHeading('Enter Search')
+                        text = temp_title
+                        if temp_year: text = '%s (%s)' % (text, temp_year)
+                        keyboard.setDefault(text)
+                        keyboard.doModal()
+                        if keyboard.isConfirmed():
+                            match = re.match('([^\(]+)\s*\(*(\d{4})?\)*', keyboard.getText())
+                            temp_title = match.group(1).strip()
+                            temp_year = match.group(2) if match.group(2) else '' 
+                    elif results_index>0:
+                        update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], results[results_index-1]['url'], season, episode)
+                        break
+                    else:
+                        break
+                except NotImplementedError:
+                    utils.log('%s does not support searching.' % (related_list[index]['class'].get_name()))
+                    builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
+                    xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
                 
+def update_url(video_type, title, year, source, old_url, new_url, season, episode):
+    utils.log('Setting Url: |%s|%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, source, old_url, new_url, season, episode), xbmc.LOGDEBUG)
+    if new_url:
+        db_connection.set_related_url(video_type, title, year, source, new_url, season, episode)
+    else:
+        db_connection.clear_related_url(video_type, title, year, source, season, episode)
+
+    # clear all episode local urls if tvshow url changes
+    if video_type == VIDEO_TYPES.TVSHOW and new_url != old_url:
+        db_connection.clear_related_url(VIDEO_TYPES.EPISODE, title, year, source)
+    
 def make_season_item(season, fanart):
     label = 'Season %s' % (season['season'])
     season['images']['fanart']=fanart
@@ -302,8 +342,8 @@ def make_episode_item(show, episode, fanart):
     
     menu_items=[]
     menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
-    queries = {'mode': MODES.SET_URL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num}
-    menu_items.append(('Set Related Url', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+    queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num}
+    menu_items.append(('Set Related Url (Manual)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     liz.addContextMenuItems(menu_items, replaceItems=True)
     return liz
 
@@ -324,8 +364,10 @@ def make_item(section_params, show):
 
     menu_items=[]
     menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
-    queries = {'mode': MODES.SET_URL, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
-    menu_items.append(('Set Related Url', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+    queries = {'mode': MODES.SET_URL_SEARCH, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
+    menu_items.append(('Set Related Url (Search)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+    queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
+    menu_items.append(('Set Related Url (Manual)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     liz.addContextMenuItems(menu_items, replaceItems=True)
 
     return liz, liz_url

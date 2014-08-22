@@ -23,20 +23,27 @@ class Scraper(object):
     
     @abc.abstractmethod 
     def get_name(self):
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod 
     def resolve_link(self, link):
-        return link
+        raise NotImplementedError
 
     @abc.abstractmethod 
     def format_source_label(self, item):
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod 
     def get_sources(self, video_type, title, year, season='', episode=''):
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod 
     def get_url(self, video_type, title, year, season='', episode=''):
-        pass
+        raise NotImplementedError
+
+    @abc.abstractmethod 
+    def search(self, video_type, title, year):
+        """
+        Method must be provided, but can throw NotImplementedError if not available
+        """
+        raise NotImplementedError

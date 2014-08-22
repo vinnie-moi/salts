@@ -40,3 +40,6 @@ class Dummy_Scraper(scraper.Scraper):
         result=db_connection.get_related_url(video_type, title, year, self.get_name(), season, episode)
         if result:
             return result[0][0]
+
+    def search(self, video_type, title, year):
+        raise NotImplementedError

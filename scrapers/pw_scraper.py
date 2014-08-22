@@ -89,14 +89,16 @@ class PW_Scraper(scraper.Scraper):
     def get_url(self, video_type, title, year, season='', episode=''):
         temp_video_type=video_type
         if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
+        url = None
 
         result = db_connection.get_related_url(temp_video_type, title, year, self.get_name())
         if result:
             url=result[0][0]
             utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
         else:
-            url = self.__search(temp_video_type, title, year)
-            if url:
+            results = self.search(temp_video_type, title, year)
+            if results:
+                url = results[0]['url']
                 db_connection.set_related_url(temp_video_type, title, year, self.get_name(), url)
 
         if url and video_type==VIDEO_TYPES.EPISODE:
@@ -112,7 +114,7 @@ class PW_Scraper(scraper.Scraper):
         
         return url
     
-    def __search(self, video_type, title, year):
+    def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/index.php?search_keywords=')
         search_url += urllib.quote_plus(title)
         search_url += '&year=' + urllib.quote_plus(year)
@@ -126,10 +128,16 @@ class PW_Scraper(scraper.Scraper):
         search_url += '&key=' + r
         
         html = self.__http_get(search_url, cache_limit=.25)
-        pattern = r'class="index_item.+?href="(.+?)" title="Watch (.+?)"?\(?([0-9]{4})?\)?"?>.+?src="(.+?)"'
-        match=re.search(pattern, html)
-        if match:
-            return match.group(1)
+        pattern = r'class="index_item.+?href="(.+?)" title="Watch (.+?)"?\(?([0-9]{4})?\)?"?>'
+        results=[]
+        for match in re.finditer(pattern, html):
+            result={}
+            url, title, year = match.groups()
+            result['url']=url
+            result['title']=title
+            result['year']=year
+            results.append(result)
+        return results
     
     def __get_episode_url(self, show_url, season, episode):
         url = urlparse.urljoin(self.base_url, show_url)
