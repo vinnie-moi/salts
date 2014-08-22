@@ -58,7 +58,8 @@ def browse_menu(section):
     _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
     _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES}, {'title': 'My Favorites'})
     _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': 'My Watchlist'})
-    _SALTS.add_directory({'mode': MODES.LISTS, 'section': section}, {'title': 'My Lists'})
+    _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'})
+    _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': 'Other Lists'})
     if section==SECTIONS.TV:
         _SALTS.add_directory({'mode': MODES.MANAGE_SUBS}, {'title': 'My Subscriptions'})
         _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
@@ -111,17 +112,43 @@ def browse_premieres():
     days=trakt_api.get_premieres()
     make_dir_from_cal(days)
 
-@url_dispatcher.register(MODES.LISTS, ['section'])
+@url_dispatcher.register(MODES.MY_LISTS, ['section'])
 def browse_lists(section):
     lists = trakt_api.get_lists()
     for user_list in lists:
         _SALTS.add_directory({'mode': MODES.SHOW_LIST, 'section': section, 'slug': user_list['slug']}, {'title': user_list['name']})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-@url_dispatcher.register(MODES.SHOW_LIST, ['section', 'slug'])
-def show_list(section, slug):
-    list_data = trakt_api.show_list(slug, section)
-    make_dir_from_list(section, list_data)
+@url_dispatcher.register(MODES.OTHER_LISTS, ['section'])
+def browse_other_lists(section):
+    liz = xbmcgui.ListItem(label='Add another user\'s list')
+    liz_url = _SALTS.build_plugin_url({'mode': MODES.ADD_OTHER_LIST, 'section': section})
+    xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)    
+    
+    lists = db_connection.get_other_lists(section)
+    for other_list in lists:
+        header, items = trakt_api.show_list(other_list[1], section, other_list[0])
+        _SALTS.add_directory({'mode': MODES.SHOW_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}, {'title': header['name']})
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    
+@url_dispatcher.register(MODES.ADD_OTHER_LIST, ['section'])
+def add_other_list(section):
+    keyboard = xbmc.Keyboard()
+    keyboard.setHeading('Enter username of list owner')
+    keyboard.doModal()
+    if keyboard.isConfirmed():
+        username=keyboard.getText()
+        lists = trakt_api.get_lists(username)
+        dialog=xbmcgui.Dialog()
+        index = dialog.select('Choose List to Add', [other_list['name'] for other_list in lists])
+        if index>-1:
+            db_connection.add_other_list(section, username, lists[index]['slug'])
+    xbmc.executebuiltin("XBMC.Container.Refresh")
+
+@url_dispatcher.register(MODES.SHOW_LIST, ['section', 'slug'], ['username'])
+def show_list(section, slug, username=None):
+    header, items = trakt_api.show_list(slug, section, username)
+    make_dir_from_list(section, items)
 
 @url_dispatcher.register(MODES.SHOW_WATCHLIST, ['section'])
 def show_watchlist(section):

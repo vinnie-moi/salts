@@ -32,8 +32,8 @@ BASE_URL = 'api.trakt.tv'
 API_KEY='db2aa092680518505621a5ddc007611c'
     
 class Trakt_API():
-    def __init__(self, user_name, password, use_https=False):
-        self.user_name=user_name
+    def __init__(self, username, password, use_https=False):
+        self.username=username
         self.sha1password=sha.new(password).hexdigest()
         self.protocol='https://' if use_https else 'http://'
         
@@ -41,21 +41,29 @@ class Trakt_API():
         url='/account/test/%s' % (API_KEY)
         return self.__call_trakt(url, cache_limit=0)
         
-    def show_list(self, slug, section):
-        url='/user/list.json/%s/%s/%s' % (API_KEY, self.user_name, slug)
-        list_data=self.__call_trakt(url, cache_limit=0)
+    def show_list(self, slug, section, username=None):
+        if not username: 
+            username = self.username
+            cache_limit=0 # don't cache user's own lists at all
+        else:
+            cache_limit=1 # cache other user's list for one hour
+        url='/user/list.json/%s/%s/%s' % (API_KEY, username, slug)
+        list_data=self.__call_trakt(url, cache_limit=cache_limit)
+        list_header = list_data.copy()
+        del(list_header['items'])
         items=[]
         for item in list_data['items']:
             if item['type']==TRAKT_SECTIONS[section][:-1]:
                 items.append(item[item['type']])
-        return items
+        return (list_header, items)
     
     def show_watchlist(self, section):
-        url='/user/watchlist/%s.json/%s/%s' % (TRAKT_SECTIONS[section], API_KEY, self.user_name)
+        url='/user/watchlist/%s.json/%s/%s' % (TRAKT_SECTIONS[section], API_KEY, self.username)
         return self.__call_trakt(url, cache_limit=0)
     
-    def get_lists(self):
-        url='/user/lists.json/%s/%s' % (API_KEY, self.user_name)
+    def get_lists(self, username=None):
+        if not username: username = self.username
+        url='/user/lists.json/%s/%s' % (API_KEY, username)
         return self.__call_trakt(url, cache_limit=0)
     
     def add_to_list(self, slug, item):
@@ -85,7 +93,7 @@ class Trakt_API():
         return self.__call_trakt(url)
     
     def get_my_calendar(self):
-        url='/user/calendar/shows.json/%s/%s' % (API_KEY, self.user_name)
+        url='/user/calendar/shows.json/%s/%s' % (API_KEY, self.username)
         return self.__call_trakt(url)
         
     def get_seasons(self, slug):
@@ -118,7 +126,7 @@ class Trakt_API():
         return self.__call_trakt(url, extra_data, cache_limit=0)
     
     def __call_trakt(self, url, extra_data=None, cache_limit=.25):
-        data={'username': self.user_name, 'password': self.sha1password}
+        data={'username': self.username, 'password': self.sha1password}
         if extra_data: data.update(extra_data)
         url = '%s%s%s' % (self.protocol, BASE_URL, url)
         utils.log('Trakt Call: %s, data: %s' % (url, data), xbmc.LOGDEBUG)

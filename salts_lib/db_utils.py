@@ -112,6 +112,19 @@ class DB_Connection():
                 html=rows[0][1]
         return html
     
+    def add_other_list(self, section, username, slug):
+        sql = 'REPLACE INTO other_lists (section, username, slug) VALUES (?, ?, ?)'
+        self.__execute(sql, (section, username, slug))
+        
+    def delete_other_list(self, section, username, slug):
+        sql = 'DELETE FROM other_lists WHERE section=? AND username=? and slug=?'
+        self.__execute(sql, (section, username, slug))
+
+    def get_other_lists(self, section):
+        sql = 'SELECT username, slug FROM other_lists WHERE section=?'
+        rows=self.__execute(sql, (section,))
+        return rows
+
     def set_related_url(self, video_type, title, year, source, rel_url, season='', episode=''):
         sql = 'REPLACE INTO rel_url (video_type, title, year, season, episode, source, rel_url) VALUES (?, ?, ?, ?, ?, ?, ?)'
         self.__execute(sql, (video_type, title, year, season, episode, source, rel_url))
@@ -147,6 +160,8 @@ class DB_Connection():
             self.__execute('CREATE TABLE IF NOT EXISTS rel_url \
             (video_type TEXT NOT NULL, title TEXT NOT NULL, year TEXT NOT NULL, season TEXT NOT NULL, episode TEXT NOT NULL, source TEXT NOT NULL, rel_url TEXT, \
             PRIMARY KEY(video_type, title, year, season, episode, source))')
+            self.__execute('CREATE TABLE IF NOT EXISTS other_lists (section TEXT NOT NULL, username TEXT NOT NULL, slug TEXT NOT NULL, PRIMARY KEY(section, username, slug))')
+            
         
         sql = 'REPLACE INTO db_info (setting, value) VALUES(?,?)'
         self.__execute(sql, ('version', _SALTS.get_version()))
