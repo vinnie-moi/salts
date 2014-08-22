@@ -23,6 +23,9 @@ class Scraper(object):
     
     @classmethod
     def provides(cls):
+        """
+        Can not easily combine classmethod and abstract method, but must method be provided as a class method
+        """
         raise NotImplementedError
         
     @abc.abstractmethod 
