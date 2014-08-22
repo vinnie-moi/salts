@@ -56,9 +56,9 @@ def browse_menu(section):
     section_label='TV Shows' if section==SECTIONS.TV else 'Movies'
     _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': 'Trending %s' % (section_label)})
     _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
-    _SALTS.add_directory({'mode': MODES.BROWSE_FAVORITES}, {'title': 'My Favorites'})
-    _SALTS.add_directory({'mode': MODES.BROWSE_WATCHLIST}, {'title': 'My Watchlist'})
-    _SALTS.add_directory({'mode': MODES.LISTS}, {'title': 'My Lists'})
+    _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES}, {'title': 'My Favorites'})
+    _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': 'My Watchlist'})
+    _SALTS.add_directory({'mode': MODES.LISTS, 'section': section}, {'title': 'My Lists'})
     if section==SECTIONS.TV:
         _SALTS.add_directory({'mode': MODES.MANAGE_SUBS}, {'title': 'My Subscriptions'})
         _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
@@ -70,23 +70,13 @@ def browse_menu(section):
 
 @url_dispatcher.register(MODES.TRENDING, ['section'])
 def browse_trending(section):
-    section_params=get_section_params(section)
-    shows=trakt_api.get_trending(section)
-    totalItems=len(shows)
-    for show in shows:
-        liz, liz_url =make_item(section_params, show)
-        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    list_data = trakt_api.get_trending(section)
+    make_dir_from_list(section, list_data)
 
 @url_dispatcher.register(MODES.RECOMMEND, ['section'])
 def browse_recommendations(section):
-    section_params=get_section_params(section)
-    shows=trakt_api.get_recommendations(section)
-    totalItems=len(shows)
-    for show in shows:
-        liz, liz_url =make_item(section_params, show)
-        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=section_params['folder'],totalItems=totalItems)
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    list_data = trakt_api.get_recommendations(section)
+    make_dir_from_list(section, list_data)
 
 @url_dispatcher.register(MODES.FRIENDS, ['section'])
 def browse_friends(section):
@@ -109,48 +99,34 @@ def browse_friends(section):
 @url_dispatcher.register(MODES.CAL)
 def browse_calendar():
     days=trakt_api.get_calendar()
-    totalItems=len(days)
-    for day in days:
-        date=day['date']
-        for episode_elem in day['episodes']:
-            show=episode_elem['show']
-            episode=episode_elem['episode']
-            fanart=show['images']['fanart']
-            liz=make_episode_item(show, episode, fanart)
-            slug=trakt_api.get_slug(show['url'])
-            queries = {'mode': MODES.GET_SOURCES, 'slug': slug, 'season': episode['season'], 'episode': episode['number']}
-            liz_url = _SALTS.build_plugin_url(queries)
-            label=liz.getLabel()
-            print date,label
-            label = '[%s] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
-            liz.setLabel(label)
-            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    make_dir_from_cal(days)
 
 @url_dispatcher.register(MODES.MY_CAL)
 def browse_my_calendar():
     days=trakt_api.get_my_calendar()
-    totalItems=len(days)
-    for day in days:
-        date=day['date']
-        for episode_elem in day['episodes']:
-            show=episode_elem['show']
-            episode=episode_elem['episode']
-            fanart=show['images']['fanart']
-            liz=make_episode_item(show, episode, fanart)
-            slug=trakt_api.get_slug(show['url'])
-            queries = {'mode': MODES.GET_SOURCES, 'slug': slug, 'season': episode['season'], 'episode': episode['number']}
-            liz_url = _SALTS.build_plugin_url(queries)
-            label=liz.getLabel()
-            print date,label
-            label = '[%s] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
-            liz.setLabel(label)
-            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
+    make_dir_from_cal(days)
+
+@url_dispatcher.register(MODES.PREMIERES)
+def browse_premieres():
+    days=trakt_api.get_premieres()
+    make_dir_from_cal(days)
+
+@url_dispatcher.register(MODES.LISTS, ['section'])
+def browse_lists(section):
+    lists = trakt_api.get_lists()
+    for user_list in lists:
+        _SALTS.add_directory({'mode': MODES.SHOW_LIST, 'section': section, 'slug': user_list['slug']}, {'title': user_list['name']})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-@url_dispatcher.register(MODES.LISTS)
-def browse_lists():
-    pass
+@url_dispatcher.register(MODES.SHOW_LIST, ['section', 'slug'])
+def show_list(section, slug):
+    list_data = trakt_api.show_list(slug, section)
+    make_dir_from_list(section, list_data)
+
+@url_dispatcher.register(MODES.SHOW_WATCHLIST, ['section'])
+def show_watchlist(section):
+    list_data = trakt_api.show_watchlist(section)
+    make_dir_from_list(section, list_data)
 
 @url_dispatcher.register(MODES.SEARCH, ['section'])
 def search(section):
@@ -310,6 +286,31 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                     builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
                     xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
                 
+def make_dir_from_list(section, list_data):
+    section_params=get_section_params(section)
+    totalItems=len(list_data)
+    for show in list_data:
+        liz, liz_url =make_item(section_params, show)
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+def make_dir_from_cal(days):
+    totalItems=len(days)
+    for day in days:
+        date=day['date']
+        for episode_elem in day['episodes']:
+            show=episode_elem['show']
+            episode=episode_elem['episode']
+            fanart=show['images']['fanart']
+            liz=make_episode_item(show, episode, fanart)
+            queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['number']}
+            liz_url = _SALTS.build_plugin_url(queries)
+            label=liz.getLabel()
+            label = '[%s] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
+            liz.setLabel(label)
+            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
 def update_url(video_type, title, year, source, old_url, new_url, season, episode):
     utils.log('Setting Url: |%s|%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, source, old_url, new_url, season, episode), xbmc.LOGDEBUG)
     if new_url:

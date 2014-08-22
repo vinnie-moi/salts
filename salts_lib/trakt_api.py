@@ -41,8 +41,17 @@ class Trakt_API():
         url='/account/test/%s' % (API_KEY)
         return self.__call_trakt(url, cache_limit=0)
         
-    def show_list(self, slug):
+    def show_list(self, slug, section):
         url='/user/list.json/%s/%s/%s' % (API_KEY, self.user_name, slug)
+        list_data=self.__call_trakt(url, cache_limit=0)
+        items=[]
+        for item in list_data['items']:
+            if item['type']==TRAKT_SECTIONS[section][:-1]:
+                items.append(item[item['type']])
+        return items
+    
+    def show_watchlist(self, section):
+        url='/user/watchlist/%s.json/%s/%s' % (TRAKT_SECTIONS[section], API_KEY, self.user_name)
         return self.__call_trakt(url, cache_limit=0)
     
     def get_lists(self):
@@ -69,6 +78,10 @@ class Trakt_API():
         
     def get_calendar(self):
         url='/calendar/shows.json/%s' % (API_KEY)
+        return self.__call_trakt(url)
+    
+    def get_premieres(self):
+        url='/calendar/premieres.json/%s' % (API_KEY)
         return self.__call_trakt(url)
     
     def get_my_calendar(self):
