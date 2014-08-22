@@ -56,13 +56,16 @@ def browse_menu(section):
     section_label='TV Shows' if section==SECTIONS.TV else 'Movies'
     _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': 'Trending %s' % (section_label)})
     _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
-    _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'})
+    _SALTS.add_directory({'mode': MODES.BROWSE_FAVORITES}, {'title': 'My Favorites'})
+    _SALTS.add_directory({'mode': MODES.BROWSE_WATCHLIST}, {'title': 'My Watchlist'})
     _SALTS.add_directory({'mode': MODES.LISTS}, {'title': 'My Lists'})
-    _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'})
     if section==SECTIONS.TV:
-        _SALTS.add_directory({'mode': MODES.MANAGE_SUBS}, {'title': 'Manage Subscriptions'})
-        _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'Calendar'})
+        _SALTS.add_directory({'mode': MODES.MANAGE_SUBS}, {'title': 'My Subscriptions'})
         _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
+        _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'General Calendar'})
+        _SALTS.add_directory({'mode': MODES.PREMIERES}, {'title': 'Premiere Calendar'})
+    _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'})
+    _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.TRENDING, ['section'])
