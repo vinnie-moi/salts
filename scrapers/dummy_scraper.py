@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
+from salts_lib.utils import VIDEO_TYPES
+
 from salts_lib.db_utils import DB_Connection
 
 db_connection = DB_Connection()
@@ -23,6 +25,10 @@ db_connection = DB_Connection()
 class Dummy_Scraper(scraper.Scraper):
     def __init__(self):
         pass
+    
+    @classmethod
+    def provides(cls):
+        return [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIES]
     
     def get_name(self):
         return 'Dummy'

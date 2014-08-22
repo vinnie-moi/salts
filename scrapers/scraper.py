@@ -21,6 +21,10 @@ abstractstaticmethod = abc.abstractmethod
 class Scraper(object):
     __metaclass__ = abc.ABCMeta
     
+    @classmethod
+    def provides(cls):
+        raise NotImplementedError
+        
     @abc.abstractmethod 
     def get_name(self):
         raise NotImplementedError

@@ -34,6 +34,10 @@ class PW_Scraper(scraper.Scraper):
     def __init__(self):
         self.base_url = 'http://www.primewire.ag'
     
+    @classmethod
+    def provides(cls):
+        return [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIES]
+    
     def get_name(self):
         return 'PrimeWire'
     
