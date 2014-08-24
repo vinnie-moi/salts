@@ -163,7 +163,7 @@ def show_list(section, slug, username=None):
         items = trakt_api.show_watchlist(section)
     else:
         _, items = trakt_api.show_list(slug, section, username)
-    make_dir_from_list(section, items)
+    make_dir_from_list(section, items, slug)
 
 @url_dispatcher.register(MODES.SHOW_WATCHLIST, ['section'])
 def show_watchlist(section):
@@ -365,6 +365,29 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                     builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
                     xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
                 
+@url_dispatcher.register(MODES.REM_FROM_LIST, ['slug', 'section', 'id_type', 'show_id'])
+def remove_from_list(slug, section, id_type, show_id):
+    item={'type': TRAKT_SECTIONS[section][:-1], id_type: show_id}
+    if slug==WATCHLIST_SLUG:
+        trakt_api.remove_from_watchlist(section, item)
+    else:
+        trakt_api.remove_from_list(slug, item)
+    xbmc.executebuiltin("XBMC.Container.Refresh")
+    
+@url_dispatcher.register(MODES.ADD_TO_LIST, ['section', 'id_type', 'show_id'], ['slug'])
+def add_to_list(section, id_type, show_id, slug=None):
+    item={'type': TRAKT_SECTIONS[section][:-1], id_type: show_id}
+    if not slug: slug=choose_list()
+    if slug==WATCHLIST_SLUG:
+        trakt_api.add_to_watchlist(section, item)
+    else:
+        trakt_api.add_to_list(slug, item)
+    xbmc.executebuiltin("XBMC.Container.Refresh")
+
+@url_dispatcher.register(MODES.ADD_TO_LIST, ['video_type', 'title', 'year'])
+def add_to_library(video_type, title, year):
+    pass
+
 def show_pickable_list(slug, pick_label, pick_mode, section):
     if not slug:
         liz = xbmcgui.ListItem(label=pick_label)
@@ -382,14 +405,42 @@ def choose_list(username=None):
     if index>-1:
         return lists[index]['slug']
 
-def make_dir_from_list(section, list_data):
+def make_dir_from_list(section, list_data, slug=None):
     section_params=get_section_params(section)
     totalItems=len(list_data)
     for show in list_data:
-        liz, liz_url =make_item(section_params, show)
+
+        menu_items=[]
+        if slug:
+            queries = {'mode': MODES.REM_FROM_LIST, 'slug': slug, 'section': section}
+            queries.update(show_id(show))
+            menu_items.append(('Remove from List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        sub_slug=_SALTS.get_setting('%s_sub_slug' % (section))
+        if sub_slug and sub_slug != slug:
+            queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section'], 'slug': sub_slug}
+            queries.update(show_id(show))
+            menu_items.append(('Subscribe', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+            
+
+        liz, liz_url =make_item(section_params, show, menu_items)
+        
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
+def show_id(show):
+    queries={}
+    if 'imdb_id' in show:
+        queries['id_type']='imdb_id'
+        queries['show_id']=show['imdb_id']
+    elif 'tvdb_id' in show:
+        queries['id_type']='tvdb_id'
+        queries['show_id']=show['tvdb_id']
+    elif 'tmdb_id' in show:
+        queries['id_type']='tmdb_id'
+        queries['show_id']=show['tmdb_id']
+    return queries
+    
+    
 def make_dir_from_cal(days):
     totalItems=len(days)
     for day in days:
@@ -449,7 +500,8 @@ def make_episode_item(show, episode, fanart):
     liz.addContextMenuItems(menu_items, replaceItems=True)
     return liz
 
-def make_item(section_params, show):
+def make_item(section_params, show, menu_items=None):
+    if menu_items is None: menu_items=[]
     label = '%s (%s)' % (show['title'], show['year'])
     liz=make_list_item(label, show)
     liz.setProperty('slug', trakt_api.get_slug(show['url']))
@@ -464,8 +516,12 @@ def make_item(section_params, show):
 
     liz_url = _SALTS.build_plugin_url(queries)
 
-    menu_items=[]
-    menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
+    menu_items.insert(0, ('Show Information', 'XBMC.Action(Info)'), )
+    queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section']}
+    queries.update(show_id(show))
+    menu_items.append(('Add to List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+    queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
+    menu_items.append(('Add to Library', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     queries = {'mode': MODES.SET_URL_SEARCH, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
     menu_items.append(('Set Related Url (Search)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}

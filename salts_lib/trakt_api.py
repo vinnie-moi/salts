@@ -72,6 +72,12 @@ class Trakt_API():
     def remove_from_list(self, slug, item):
         return self.__manage_list('delete', slug, item)
     
+    def add_to_watchlist(self, section, item):
+        return self.__manage_watchlist('watchlist', section, item)
+        
+    def remove_from_watchlist(self, section, item):
+        return self.__manage_watchlist('unwatchlist', section, item)
+    
     def get_trending(self, section):
         url='/%s/trending.json/%s' % (TRAKT_SECTIONS[section], API_KEY)
         return self.__call_trakt(url)
@@ -123,6 +129,11 @@ class Trakt_API():
     def __manage_list(self, action, slug, item):
         url='/lists/items/%s/%s' % (action, API_KEY)
         extra_data={'slug': slug, 'items': [item]}
+        return self.__call_trakt(url, extra_data, cache_limit=0)
+    
+    def __manage_watchlist(self, action, section, item):
+        url='/%s/%s/%s' % (TRAKT_SECTIONS[section][:-1], action, API_KEY)
+        extra_data={TRAKT_SECTIONS[section]: [item]}
         return self.__call_trakt(url, extra_data, cache_limit=0)
     
     def __call_trakt(self, url, extra_data=None, cache_limit=.25):
