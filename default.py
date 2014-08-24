@@ -39,6 +39,7 @@ username=_SALTS.get_setting('username')
 password=_SALTS.get_setting('password')
 use_https=_SALTS.get_setting('use_https')=='true'
 ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
+WATCHLIST_SLUG = 'watchlist_slug'
 
 trakt_api=Trakt_API(username,password, use_https)
 url_dispatcher=URL_Dispatcher()
@@ -56,12 +57,12 @@ def browse_menu(section):
     section_label='TV Shows' if section==SECTIONS.TV else 'Movies'
     _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': 'Trending %s' % (section_label)})
     _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
-    _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES}, {'title': 'My Favorites'})
+    _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES, 'section': section}, {'title': 'My Favorites'})
+    _SALTS.add_directory({'mode': MODES.MANAGE_SUBS, 'section': section}, {'title': 'My Subscriptions'})
     _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': 'My Watchlist'})
     _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'})
     _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': 'Other Lists'})
     if section==SECTIONS.TV:
-        _SALTS.add_directory({'mode': MODES.MANAGE_SUBS}, {'title': 'My Subscriptions'})
         _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
         _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'General Calendar'})
         _SALTS.add_directory({'mode': MODES.PREMIERES}, {'title': 'Premiere Calendar'})
@@ -115,8 +116,21 @@ def browse_premiere_cal():
 @url_dispatcher.register(MODES.MY_LISTS, ['section'])
 def browse_lists(section):
     lists = trakt_api.get_lists()
+    lists.insert(0, {'name': 'watchlist', 'slug': WATCHLIST_SLUG})
+    totalItems=len(lists)
     for user_list in lists:
-        _SALTS.add_directory({'mode': MODES.SHOW_LIST, 'section': section, 'slug': user_list['slug']}, {'title': user_list['name']})
+        liz = xbmcgui.ListItem(label=user_list['name'])
+        queries = {'mode': MODES.SHOW_LIST, 'section': section, 'slug': user_list['slug']}
+        liz_url = _SALTS.build_plugin_url(queries)
+        
+        menu_items=[]
+        queries={'mode': MODES.SET_FAV_LIST, 'slug': user_list['slug'], 'section': section}
+        menu_items.append(('Set as Favorites List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        queries={'mode': MODES.SET_SUB_LIST, 'slug': user_list['slug'], 'section': section}
+        menu_items.append(('Set as Subscription List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        liz.addContextMenuItems(menu_items, replaceItems=True)
+        
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=True,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.OTHER_LISTS, ['section'])
@@ -127,7 +141,7 @@ def browse_other_lists(section):
     
     lists = db_connection.get_other_lists(section)
     for other_list in lists:
-        header, items = trakt_api.show_list(other_list[1], section, other_list[0])
+        header, _ = trakt_api.show_list(other_list[1], section, other_list[0])
         _SALTS.add_directory({'mode': MODES.SHOW_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}, {'title': header['name']})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
     
@@ -138,22 +152,60 @@ def add_other_list(section):
     keyboard.doModal()
     if keyboard.isConfirmed():
         username=keyboard.getText()
-        lists = trakt_api.get_lists(username)
-        dialog=xbmcgui.Dialog()
-        index = dialog.select('Choose List to Add', [other_list['name'] for other_list in lists])
-        if index>-1:
-            db_connection.add_other_list(section, username, lists[index]['slug'])
+        slug=pick_list(username)
+        if slug:
+            db_connection.add_other_list(section, username, slug)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.SHOW_LIST, ['section', 'slug'], ['username'])
 def show_list(section, slug, username=None):
-    header, items = trakt_api.show_list(slug, section, username)
+    if slug == WATCHLIST_SLUG:
+        items = trakt_api.show_watchlist(section)
+    else:
+        _, items = trakt_api.show_list(slug, section, username)
     make_dir_from_list(section, items)
 
 @url_dispatcher.register(MODES.SHOW_WATCHLIST, ['section'])
 def show_watchlist(section):
-    list_data = trakt_api.show_watchlist(section)
-    make_dir_from_list(section, list_data)
+    show_list(section, WATCHLIST_SLUG)
+    
+@url_dispatcher.register(MODES.MANAGE_SUBS, ['section'])
+def manage_subscriptions(section):
+    slug=_SALTS.get_setting('%s_sub_slug' % (section))
+    if slug:
+        liz = xbmcgui.ListItem(label='Update Subscriptions')
+        liz_url = _SALTS.build_plugin_url({'mode': MODES.UPDATE_SUBS, 'section': section})
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)    
+        if section == SECTIONS.TV:
+            liz = xbmcgui.ListItem(label='Clean-Up Subscriptions')
+            liz_url = _SALTS.build_plugin_url({'mode': MODES.CLEAN_SUBS})
+            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)    
+    show_pickable_list(slug, 'Pick a list to use for Subscriptions', MODES.PICK_SUB_LIST, section)
+
+@url_dispatcher.register(MODES.SHOW_FAVORITES, ['section'])
+def show_favorites(section):
+    slug=_SALTS.get_setting('%s_fav_slug' % (section))
+    show_pickable_list(slug, 'Pick a list to use for Favorites', MODES.PICK_FAV_LIST, section)
+
+@url_dispatcher.register(MODES.PICK_SUB_LIST, ['mode', 'section'])
+@url_dispatcher.register(MODES.PICK_FAV_LIST, ['mode', 'section'])
+def pick_list(mode, section):
+    slug=choose_list()
+    if slug:
+        if mode == MODES.PICK_FAV_LIST:
+            set_list(MODES.SET_FAV_LIST, slug, section)
+        elif mode == MODES.PICK_SUB_LIST:
+            set_list(MODES.SET_SUB_LIST, slug, section)
+        xbmc.executebuiltin("XBMC.Container.Refresh")
+
+@url_dispatcher.register(MODES.SET_SUB_LIST, ['mode', 'slug', 'section'])
+@url_dispatcher.register(MODES.SET_FAV_LIST, ['mode', 'slug', 'section'])
+def set_list(mode, slug, section):
+    if mode == MODES.SET_FAV_LIST:
+        setting='%s_fav_slug' % (section)
+    elif mode == MODES.SET_SUB_LIST:
+        setting='%s_sub_slug' % (section)
+    _SALTS.set_setting(setting, slug)
 
 @url_dispatcher.register(MODES.SEARCH, ['section'])
 def search(section):
@@ -313,6 +365,23 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                     builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
                     xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
                 
+def show_pickable_list(slug, pick_label, pick_mode, section):
+    if not slug:
+        liz = xbmcgui.ListItem(label=pick_label)
+        liz_url = _SALTS.build_plugin_url({'mode': pick_mode, 'section': section})
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)    
+        xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    else:
+        show_list(section, slug)
+
+def choose_list(username=None):
+    lists = trakt_api.get_lists(username)
+    lists.insert(0, {'name': 'watchlist', 'slug': WATCHLIST_SLUG})
+    dialog=xbmcgui.Dialog()
+    index = dialog.select('Pick a list', [list_data['name'] for list_data in lists])
+    if index>-1:
+        return lists[index]['slug']
+
 def make_dir_from_list(section, list_data):
     section_params=get_section_params(section)
     totalItems=len(list_data)
