@@ -1,1 +1,1 @@
-__all__ = ['scraper', 'dummy_scraper', 'pw_scraper']
+__all__ = ['scraper', 'dummy_scraper', 'pw_scraper', 'uflix_scraper']

@@ -24,10 +24,8 @@ import xbmc
 from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import USER_AGENT
 
-USER_AGENT = ("User-Agent:Mozilla/5.0 (Windows NT 6.2; WOW64)"
-              "AppleWebKit/537.17 (KHTML, like Gecko)"
-              "Chrome/24.0.1312.56")
 db_connection = DB_Connection()
 
 class PW_Scraper(scraper.Scraper):
@@ -36,7 +34,7 @@ class PW_Scraper(scraper.Scraper):
     
     @classmethod
     def provides(cls):
-        return [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE]
+        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
     
     def get_name(self):
         return 'PrimeWire'
