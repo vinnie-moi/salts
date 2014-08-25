@@ -20,7 +20,7 @@ import time
 import xbmc
 import xbmcvfs
 from addon.common.addon import Addon
-import utils
+import log_utils
 
 def enum(**enums):
     return type('Enum', (), enums)
@@ -42,18 +42,18 @@ class DB_Connection():
             if self.address is not None and self.username is not None \
             and self.password is not None and self.dbname is not None:
                 import mysql.connector as db_lib
-                utils.log('Loading MySQL as DB engine')
+                log_utils.log('Loading MySQL as DB engine')
                 self.db_type = DB_TYPES.MYSQL
             else:
-                utils.log('MySQL is enabled but not setup correctly', xbmc.LOGERROR)
+                log_utils.log('MySQL is enabled but not setup correctly', xbmc.LOGERROR)
                 raise ValueError('MySQL enabled but not setup correctly')
         else:
             try:
                 from sqlite3 import dbapi2 as db_lib
-                utils.log('Loading sqlite3 as DB engine')
+                log_utils.log('Loading sqlite3 as DB engine')
             except:
                 from pysqlite2 import dbapi2 as db_lib
-                utils.log('pysqlite2 as DB engine')
+                log_utils.log('pysqlite2 as DB engine')
             self.db_type = DB_TYPES.SQLITE
             db_dir = xbmc.translatePath("special://database")
             self.db_path = os.path.join(db_dir, 'saltscache.db')
@@ -147,7 +147,7 @@ class DB_Connection():
 
     # intended to be a common method for creating a db from scratch
     def init_database(self):
-        utils.log('Building PrimeWire Database', xbmc.LOGDEBUG)
+        log_utils.log('Building PrimeWire Database', xbmc.LOGDEBUG)
         if self.db_type == DB_TYPES.MYSQL:
             self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url))')
             self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255) NOT NULL, value TEXT, PRIMARY KEY(setting)')
@@ -195,7 +195,7 @@ class DB_Connection():
         rows=None
         sql=self.__format(sql)
         cur = self.db.cursor()
-        #utils.log('Running: %s with %s' % (sql, params), xbmc.LOGDEBUG)
+        #log_utils.log('Running: %s with %s' % (sql, params), xbmc.LOGDEBUG)
         cur.execute(sql, params)
         if sql[:6].upper() == 'SELECT' or sql[:4].upper() == 'SHOW':
             rows=cur.fetchall()

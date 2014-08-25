@@ -19,11 +19,10 @@ import json
 import urllib2
 import urllib
 import sha
-import utils
 import xbmc
-from utils import SECTIONS
-from utils import TRAKT_SECTIONS
+import log_utils
 from db_utils import DB_Connection
+from constants import TRAKT_SECTIONS
 
 class TraktError(Exception):
     pass
@@ -113,7 +112,14 @@ class Trakt_API():
     def get_show_details(self, slug):
         url = '/show/summary.json/%s/%s' % (API_KEY, slug)
         return self.__call_trakt(url, cache_limit=8)
-        pass
+    
+    def get_episode_details(self, slug, season, episode):
+        url = '/show/episode/summary.json/%s/%s/%s/%s' % (API_KEY, slug, season, episode)
+        return self.__call_trakt(url, cache_limit=8)
+    
+    def get_movie_details(self, slug):
+        url = '/movie/summary.json/%s/%s' % (API_KEY, slug)
+        return self.__call_trakt(url, cache_limit=8)
     
     def search(self, section, query):
         url='/search/%s.json/%s?query=%s' % (TRAKT_SECTIONS[section], API_KEY, urllib.quote_plus(query))
@@ -140,19 +146,19 @@ class Trakt_API():
         data={'username': self.username, 'password': self.sha1password}
         if extra_data: data.update(extra_data)
         url = '%s%s%s' % (self.protocol, BASE_URL, url)
-        utils.log('Trakt Call: %s, data: %s' % (url, data), xbmc.LOGDEBUG)
+        log_utils.log('Trakt Call: %s, data: %s' % (url, data), xbmc.LOGDEBUG)
 
         try:
             db_connection = DB_Connection()
             result = db_connection.get_cached_url(url, cache_limit)
             if result:
-                utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
+                log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
             else: 
                 f=urllib2.urlopen(url, json.dumps(data))
                 result=f.read()
                 db_connection.cache_url(url, result)
             response=json.loads(result)
-                    
+
             if 'status' in response and response['status']=='failure':
                 raise TraktError(response['message'])
             else:

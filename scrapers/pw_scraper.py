@@ -22,8 +22,8 @@ import urllib
 import urlparse
 import xbmc
 from salts_lib.db_utils import DB_Connection
-from salts_lib import utils
-from salts_lib.utils import VIDEO_TYPES
+from salts_lib import log_utils
+from salts_lib.constants import VIDEO_TYPES
 
 USER_AGENT = ("User-Agent:Mozilla/5.0 (Windows NT 6.2; WOW64)"
               "AppleWebKit/537.17 (KHTML, like Gecko)"
@@ -55,7 +55,7 @@ class PW_Scraper(scraper.Scraper):
         adultregex = '<div class="offensive_material">.+<a href="(.+)">I understand'
         adult = re.search(adultregex, html, re.DOTALL)
         if adult:
-            utils.log('Adult content url detected')
+            log_utils.log('Adult content url detected')
             adulturl = self.base_url + adult.group(1)
             headers = {'Referer': url}
             html = self.__get_url(adulturl, headers=headers, login=True)
@@ -98,7 +98,7 @@ class PW_Scraper(scraper.Scraper):
         result = db_connection.get_related_url(temp_video_type, title, year, self.get_name())
         if result:
             url=result[0][0]
-            utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
+            log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
         else:
             results = self.search(temp_video_type, title, year)
             if results:
@@ -109,7 +109,7 @@ class PW_Scraper(scraper.Scraper):
             result = db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
             if result:
                 url=result[0][0]
-                utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
+                log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
             else:
                 show_url = url
                 url = self.__get_episode_url(show_url, season, episode)
@@ -156,11 +156,11 @@ class PW_Scraper(scraper.Scraper):
                 return ep_url
         
     def __http_get(self, url, cache_limit=8):
-        utils.log('Getting Url: %s' % (url))
+        log_utils.log('Getting Url: %s' % (url))
         db_connection=DB_Connection()
         html = db_connection.get_cached_url(url, cache_limit)
         if html:
-            utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
+            log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
             return html
         
         request = urllib2.Request(url)

@@ -16,30 +16,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
-import time
 import os
 import re
 import xbmcplugin
 import xbmcgui
 import xbmc
+import xbmcvfs
 from addon.common.addon import Addon
 from salts_lib.db_utils import DB_Connection
 from salts_lib.url_dispatcher import URL_Dispatcher
 from salts_lib.trakt_api import Trakt_API
 from salts_lib import utils
-from salts_lib.utils import MODES
-from salts_lib.utils import SECTIONS
-from salts_lib.utils import VIDEO_TYPES
-from salts_lib.utils import TRAKT_SECTIONS
+from salts_lib import log_utils
+from salts_lib.constants import *
 from scrapers import * # import all scrapers into this namespace
 
 
 _SALTS = Addon('plugin.video.salts', sys.argv)
+ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
 username=_SALTS.get_setting('username')
 password=_SALTS.get_setting('password')
 use_https=_SALTS.get_setting('use_https')=='true'
-ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
-WATCHLIST_SLUG = 'watchlist_slug'
 
 trakt_api=Trakt_API(username,password, use_https)
 url_dispatcher=URL_Dispatcher()
@@ -82,12 +79,12 @@ def browse_recommendations(section):
 
 @url_dispatcher.register(MODES.FRIENDS, ['section'])
 def browse_friends(section):
-    section_params=get_section_params(section)
+    section_params=utils.get_section_params(section)
     activities=trakt_api.get_friends_activity(section)
     totalItems=len(activities)
     
     for activity in activities['activity']:
-        liz, liz_url =make_item(section_params, activity[TRAKT_SECTIONS[section][:-1]])
+        liz, liz_url = make_item(section_params, activity[TRAKT_SECTIONS[section][:-1]])
 
         label=liz.getLabel()
         label += ' (%s %s' % (activity['user']['username'], activity['action'])
@@ -116,7 +113,7 @@ def browse_premiere_cal():
 @url_dispatcher.register(MODES.MY_LISTS, ['section'])
 def browse_lists(section):
     lists = trakt_api.get_lists()
-    lists.insert(0, {'name': 'watchlist', 'slug': WATCHLIST_SLUG})
+    lists.insert(0, {'name': 'watchlist', 'slug': utils.WATCHLIST_SLUG})
     totalItems=len(lists)
     for user_list in lists:
         liz = xbmcgui.ListItem(label=user_list['name'])
@@ -159,7 +156,7 @@ def add_other_list(section):
 
 @url_dispatcher.register(MODES.SHOW_LIST, ['section', 'slug'], ['username'])
 def show_list(section, slug, username=None):
-    if slug == WATCHLIST_SLUG:
+    if slug == utils.WATCHLIST_SLUG:
         items = trakt_api.show_watchlist(section)
     else:
         _, items = trakt_api.show_list(slug, section, username)
@@ -167,7 +164,7 @@ def show_list(section, slug, username=None):
 
 @url_dispatcher.register(MODES.SHOW_WATCHLIST, ['section'])
 def show_watchlist(section):
-    show_list(section, WATCHLIST_SLUG)
+    show_list(section, utils.WATCHLIST_SLUG)
     
 @url_dispatcher.register(MODES.MANAGE_SUBS, ['section'])
 def manage_subscriptions(section):
@@ -190,7 +187,7 @@ def show_favorites(section):
 @url_dispatcher.register(MODES.PICK_SUB_LIST, ['mode', 'section'])
 @url_dispatcher.register(MODES.PICK_FAV_LIST, ['mode', 'section'])
 def pick_list(mode, section):
-    slug=choose_list()
+    slug=utils.choose_list()
     if slug:
         if mode == MODES.PICK_FAV_LIST:
             set_list(MODES.SET_FAV_LIST, slug, section)
@@ -224,11 +221,11 @@ def search(section):
             break
     
     if keyboard.isConfirmed():
-        section_params=get_section_params(section)
+        section_params=utils.get_section_params(section)
         results = trakt_api.search(section, keyboard.getText())
         totalItems=len(results)
         for result in results:
-            liz, liz_url =make_item(section_params, result)
+            liz, liz_url = make_item(section_params, result)
             xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
@@ -238,7 +235,7 @@ def browse_seasons(slug, fanart):
     seasons=trakt_api.get_seasons(slug)
     totalItems=len(seasons)
     for season in reversed(seasons):
-        liz=make_season_item(season, fanart)
+        liz=utils.make_season_item(season, fanart)
         queries = {'mode': MODES.EPISODES, 'slug': slug, 'season': season['season'], 'fanart': fanart}
         liz_url = _SALTS.build_plugin_url(queries)
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=True,totalItems=totalItems)
@@ -251,14 +248,14 @@ def browse_episodes(slug, season, fanart):
     totalItems=len(episodes)
     for episode in episodes:
         liz=make_episode_item(show, episode, fanart)
-        queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['episode']}
+        queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['episode'], 'slug': slug}
         liz_url = _SALTS.build_plugin_url(queries)
         liz.setProperty('IsPlayable', 'true')
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-@url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year'], ['season', 'episode'])
-def get_sources(video_type, title, year, season='', episode=''):
+@url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode'])
+def get_sources(video_type, title, year, slug, season='', episode=''):
     import urlresolver
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     hosters=[]
@@ -266,7 +263,7 @@ def get_sources(video_type, title, year, season='', episode=''):
         hosters  += cls().get_sources(video_type, title, year, season, episode)
     
     if not hosters:
-        utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
+        log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
         builtin = 'XBMC.Notification(%s, No Sources Found, 5000, %s)'
         xbmc.executebuiltin(builtin % (_SALTS.get_name(), ICON_PATH))
         return
@@ -284,7 +281,7 @@ def get_sources(video_type, title, year, season='', episode=''):
             hosted_media = urlresolver.HostedMediaFile(url=url, title=label)
             sources.append(hosted_media)
         except Exception as e:
-            utils.log('Error (%s) while trying to resolve %s' % (str(e), item['url']), xbmc.LOGERROR)
+            log_utils.log('Error (%s) while trying to resolve %s' % (str(e), item['url']), xbmc.LOGERROR)
     
     source = urlresolver.choose_source(sources)
     if source:
@@ -292,16 +289,29 @@ def get_sources(video_type, title, year, season='', episode=''):
     else:
         return True
     
-    utils.log('Attempting to play url: %s' % url)
+    log_utils.log('Attempting to play url: %s' % url)
     stream_url = urlresolver.HostedMediaFile(url=url).resolve()
 
     #If urlresolver returns false then the video url was not resolved.
     if not stream_url or not isinstance(stream_url, basestring):
         return False
 
-    listitem = xbmcgui.ListItem(path=url, iconImage='', thumbnailImage='')
+    if video_type == VIDEO_TYPES.EPISODE:
+        details = trakt_api.get_episode_details(slug, season, episode)
+        info = utils.make_info(details['episode'], details['show'])
+        art=utils.make_art(details['episode'], details['show']['images']['fanart'])
+    else:
+        item = trakt_api.get_movie_details(slug)
+        info = utils.make_info(item)
+        art=utils.make_art(item)
+
+    listitem = xbmcgui.ListItem(path=url, iconImage=art['thumb'], thumbnailImage=art['thumb'])
+    listitem.setProperty('fanart_image', art['fanart'])
+    try: listitem.setArt(art)
+    except:pass
     listitem.setProperty('IsPlayable', 'true')
     listitem.setPath(stream_url)
+    listitem.setInfo('video', info)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
     return True
     
@@ -330,7 +340,7 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
             keyboard.doModal()
             if keyboard.isConfirmed():
                 new_url = keyboard.getText()
-                update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], new_url, season, episode)
+                utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], new_url, season, episode)
         elif mode == MODES.SET_URL_SEARCH:
             temp_title = title
             temp_year = year
@@ -338,7 +348,7 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                 dialog=xbmcgui.Dialog()
                 choices = ['Manual Search']
                 try:
-                    utils.log('Searching for: |%s|%s|' % (temp_title, temp_year), xbmc.LOGDEBUG)
+                    log_utils.log('Searching for: |%s|%s|' % (temp_title, temp_year), xbmc.LOGDEBUG)
                     results = related_list[index]['class'].search(video_type, temp_title, temp_year)
                     for result in results:
                         choice = '%s (%s)' % (result['title'], result['year'])
@@ -356,19 +366,19 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                             temp_title = match.group(1).strip()
                             temp_year = match.group(2) if match.group(2) else '' 
                     elif results_index>0:
-                        update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], results[results_index-1]['url'], season, episode)
+                        utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], results[results_index-1]['url'], season, episode)
                         break
                     else:
                         break
                 except NotImplementedError:
-                    utils.log('%s does not support searching.' % (related_list[index]['class'].get_name()))
+                    log_utils.log('%s does not support searching.' % (related_list[index]['class'].get_name()))
                     builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
                     xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
                 
 @url_dispatcher.register(MODES.REM_FROM_LIST, ['slug', 'section', 'id_type', 'show_id'])
 def remove_from_list(slug, section, id_type, show_id):
     item={'type': TRAKT_SECTIONS[section][:-1], id_type: show_id}
-    if slug==WATCHLIST_SLUG:
+    if slug==utils.WATCHLIST_SLUG:
         trakt_api.remove_from_watchlist(section, item)
     else:
         trakt_api.remove_from_list(slug, item)
@@ -377,17 +387,72 @@ def remove_from_list(slug, section, id_type, show_id):
 @url_dispatcher.register(MODES.ADD_TO_LIST, ['section', 'id_type', 'show_id'], ['slug'])
 def add_to_list(section, id_type, show_id, slug=None):
     item={'type': TRAKT_SECTIONS[section][:-1], id_type: show_id}
-    if not slug: slug=choose_list()
-    if slug==WATCHLIST_SLUG:
+    if not slug: slug=utils.choose_list()
+    if slug==utils.WATCHLIST_SLUG:
         trakt_api.add_to_watchlist(section, item)
-    else:
+    elif slug:
         trakt_api.add_to_list(slug, item)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
-@url_dispatcher.register(MODES.ADD_TO_LIST, ['video_type', 'title', 'year'])
-def add_to_library(video_type, title, year):
-    pass
+@url_dispatcher.register(MODES.ADD_TO_LIBRARY, ['video_type', 'title', 'year', 'slug'])
+def add_to_library(video_type, title, year, slug):
+    log_utils.log('Creating .strm for |%s|%s|%s|' % (video_type, title, year))
+    if video_type == VIDEO_TYPES.TVSHOW:
+        save_path = _SALTS.get_setting('tvshow-folder')
+        save_path = xbmc.translatePath(save_path)
+        show = trakt_api.get_show_details(slug)
+        seasons = trakt_api.get_seasons(slug)
 
+        if not seasons:
+            log_utils.log('No Seasons found for %s (%s)' % (show['title'], show['year']), xbmc.LOGERROR)
+
+        for season in reversed(seasons):
+            season_num = season['season']
+            episodes = trakt_api.get_episodes(slug, season_num)
+            for episode in episodes:
+                ep_num = episode['episode']
+                filename = utils.filename_from_title(show['title'], video_type)
+                filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
+                final_path = os.path.join(save_path, show['title'], 'Season %s' % (season_num), filename)
+                strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 'episode': ep_num, 'slug': slug})
+                write_strm(strm_string, final_path)
+                
+    elif video_type == VIDEO_TYPES.MOVIE:
+        save_path = _SALTS.get_setting('movie-folder')
+        save_path = xbmc.translatePath(save_path)
+        strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': video_type, 'title': title, 'year': year, 'slug': slug})
+        if year: title = '%s (%s)' % (title, year)
+        filename = utils.filename_from_title(title, VIDEO_TYPES.MOVIE)
+        final_path = os.path.join(save_path, title, filename)
+        write_strm(strm_string, final_path)
+
+def write_strm(stream, path):
+    path = xbmc.makeLegalFilename(path)
+    if not xbmcvfs.exists(os.path.dirname(path)):
+        try:
+            try: xbmcvfs.mkdirs(os.path.dirname(path))
+            except: os.mkdir(os.path.dirname(path))
+        except:
+            log_utils.log('Failed to create directory %s' % path, xbmc.LOGERROR)
+
+    old_strm_string=''
+    try:
+        f = xbmcvfs.File(path, 'r')
+        old_strm_string = f.read()
+        f.close()
+    except:  pass
+    
+    #print "Old String: %s; New String %s" %(old_strm_string,strm_string)
+    # string will be blank if file doesn't exist or is blank
+    if stream != old_strm_string:
+        try:
+            log_utils.log('Writing strm: %s' % stream)
+            file_desc = xbmcvfs.File(path, 'w')
+            file_desc.write(stream)
+            file_desc.close()
+        except Exception, e:
+            log_utils.log('Failed to create .strm file: %s\n%s' % (path, e), xbmc.LOGERROR)
+    
 def show_pickable_list(slug, pick_label, pick_mode, section):
     if not slug:
         liz = xbmcgui.ListItem(label=pick_label)
@@ -397,28 +462,20 @@ def show_pickable_list(slug, pick_label, pick_mode, section):
     else:
         show_list(section, slug)
 
-def choose_list(username=None):
-    lists = trakt_api.get_lists(username)
-    lists.insert(0, {'name': 'watchlist', 'slug': WATCHLIST_SLUG})
-    dialog=xbmcgui.Dialog()
-    index = dialog.select('Pick a list', [list_data['name'] for list_data in lists])
-    if index>-1:
-        return lists[index]['slug']
-
 def make_dir_from_list(section, list_data, slug=None):
-    section_params=get_section_params(section)
+    section_params=utils.get_section_params(section)
     totalItems=len(list_data)
     for show in list_data:
 
         menu_items=[]
         if slug:
             queries = {'mode': MODES.REM_FROM_LIST, 'slug': slug, 'section': section}
-            queries.update(show_id(show))
+            queries.update(utils.show_id(show))
             menu_items.append(('Remove from List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         sub_slug=_SALTS.get_setting('%s_sub_slug' % (section))
         if sub_slug and sub_slug != slug:
             queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section'], 'slug': sub_slug}
-            queries.update(show_id(show))
+            queries.update(utils.show_id(show))
             menu_items.append(('Subscribe', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
             
 
@@ -427,20 +484,6 @@ def make_dir_from_list(section, list_data, slug=None):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-def show_id(show):
-    queries={}
-    if 'imdb_id' in show:
-        queries['id_type']='imdb_id'
-        queries['show_id']=show['imdb_id']
-    elif 'tvdb_id' in show:
-        queries['id_type']='tvdb_id'
-        queries['show_id']=show['tvdb_id']
-    elif 'tmdb_id' in show:
-        queries['id_type']='tmdb_id'
-        queries['show_id']=show['tmdb_id']
-    return queries
-    
-    
 def make_dir_from_cal(days):
     totalItems=len(days)
     for day in days:
@@ -460,36 +503,15 @@ def make_dir_from_cal(days):
             xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-def update_url(video_type, title, year, source, old_url, new_url, season, episode):
-    utils.log('Setting Url: |%s|%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, source, old_url, new_url, season, episode), xbmc.LOGDEBUG)
-    if new_url:
-        db_connection.set_related_url(video_type, title, year, source, new_url, season, episode)
-    else:
-        db_connection.clear_related_url(video_type, title, year, source, season, episode)
-
-    # clear all episode local urls if tvshow url changes
-    if video_type == VIDEO_TYPES.TVSHOW and new_url != old_url:
-        db_connection.clear_related_url(VIDEO_TYPES.EPISODE, title, year, source)
-    
-def make_season_item(season, fanart):
-    label = 'Season %s' % (season['season'])
-    season['images']['fanart']=fanart
-    liz=make_list_item(label, season)
-    liz.setInfo('video', {'season': season['season']})
-
-    menu_items=[]
-    liz.addContextMenuItems(menu_items, replaceItems=True)
-    return liz
-
 def make_episode_item(show, episode, fanart):
     if 'episode' in episode: episode_num=episode['episode']
     else:  episode_num=episode['number']
     label = '%sx%s %s' % (episode['season'], episode_num, episode['title'])
-    meta=make_info(episode, show)
+    meta=utils.make_info(episode, show)
     meta['images']={}
     meta['images']['poster']=episode['images']['screen']
     meta['images']['fanart']=fanart
-    liz=make_list_item(label, meta)
+    liz=utils.make_list_item(label, meta)
     del meta['images']
     liz.setInfo('video', meta)
     
@@ -503,99 +525,39 @@ def make_episode_item(show, episode, fanart):
 def make_item(section_params, show, menu_items=None):
     if menu_items is None: menu_items=[]
     label = '%s (%s)' % (show['title'], show['year'])
-    liz=make_list_item(label, show)
-    liz.setProperty('slug', trakt_api.get_slug(show['url']))
-    liz.setInfo('video', make_info(show))
+    liz=utils.make_list_item(label, show)
+    slug=trakt_api.get_slug(show['url'])
+    liz.setProperty('slug', slug)
+    liz.setInfo('video', utils.make_info(show))
     if not section_params['folder']:
         liz.setProperty('IsPlayable', 'true')
-
+ 
     if section_params['section']==SECTIONS.TV:
-        queries = {'mode': section_params['next_mode'], 'slug': liz.getProperty('slug'), 'fanart': liz.getProperty('fanart_image')}
+        queries = {'mode': section_params['next_mode'], 'slug': slug, 'fanart': liz.getProperty('fanart_image')}
     else:
-        queries = {'mode': section_params['next_mode'], 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
-
+        queries = {'mode': section_params['next_mode'], 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
+ 
     liz_url = _SALTS.build_plugin_url(queries)
-
+ 
     menu_items.insert(0, ('Show Information', 'XBMC.Action(Info)'), )
     queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section']}
-    queries.update(show_id(show))
+    queries.update(utils.show_id(show))
     menu_items.append(('Add to List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
-    queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
+    queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
     menu_items.append(('Add to Library', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     queries = {'mode': MODES.SET_URL_SEARCH, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
     menu_items.append(('Set Related Url (Search)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
     menu_items.append(('Set Related Url (Manual)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     liz.addContextMenuItems(menu_items, replaceItems=True)
-
+ 
     return liz, liz_url
 
-def make_list_item(label, meta):
-    art=make_art(meta)
-    listitem = xbmcgui.ListItem(label, iconImage=art['thumb'], thumbnailImage=art['thumb'])
-    listitem.setProperty('fanart_image', art['fanart'])
-    try: listitem.setArt(art)
-    except: pass
-    if 'imdb_id' in meta: listitem.setProperty('imdb_id', meta['imdb_id'])
-    if 'tvdb_id' in meta: listitem.setProperty('tvdb_id', str(meta['tvdb_id']))
-    return listitem
-
-def make_art(show, fanart=''):
-    art={'banner': '', 'fanart': fanart, 'thumb': '', 'poster': ''}
-    if 'images' in show:
-        if 'banner' in show['images']: art['banner']=show['images']['banner']
-        if 'fanart' in show['images']: art['fanart']=show['images']['fanart']
-        if 'poster' in show['images']: art['thumb']=art['poster']=show['images']['poster']
-    return art
-
-def make_info(item, show=''):
-    info={}
-    info['title']=item['title']
-    info['rating']=int(item['ratings']['percentage'])/10.0
-    info['votes']=item['ratings']['votes']
-    info['plot']=info['plotoutline']=item['overview']
-    
-    if 'runtime' in item: info['duration']=item['runtime']
-    if 'imdb_id' in item: info['code']=item['imdb_id']
-    if 'certification' in item: info['mpaa']=item['certification']
-    if 'year' in item: info['year']=item['year']
-    if 'season' in item: info['season']=item['season']
-    if 'episode' in item: info['episode']=item['episode']
-    if 'genres' in item: info['genre']=', '.join(item['genres'])
-    if 'network' in item: info['studio']=item['network']
-    if 'first_aired' in item: info['aired']=info['premiered']=time.strftime('%Y-%m-%d', time.localtime(item['first_aired']))
-    if 'released' in item: info['premiered']=time.strftime('%Y-%m-%d', time.localtime(item['released']))
-    if 'status' in item: info['status']=item['status']
-    if 'tagline' in item: info['tagline']=item['tagline']
-
-    # override item params with show info if it exists
-    if 'certification' in show: info['mpaa']=show['certification']
-    if 'year' in show: info['year']=show['year']
-    if 'imdb_id' in show: info['code']=show['imdb_id']
-    if 'runtime' in show: info['duration']=show['runtime']
-    if 'title' in show: info['tvshowtitle']=show['title']
-    if 'people' in show: info['cast']=[actor['name'] for actor in show['people']['actors'] if actor['name']]
-    if 'people' in show: info['castandrole']=['%s as %s' % (actor['name'],actor['character']) for actor in show['people']['actors'] if actor['name'] and actor['character']]
-    return info
-    
-def get_section_params(section):
-    section_params={}
-    section_params['section']=section
-    if section==SECTIONS.TV:
-        section_params['next_mode']=MODES.SEASONS
-        section_params['folder']=True
-        section_params['video_type']=VIDEO_TYPES.TVSHOW
-    else:
-        section_params['next_mode']=MODES.GET_SOURCES
-        section_params['folder']=False
-        section_params['video_type']=VIDEO_TYPES.MOVIE
-    return section_params
-        
 def main(argv=None):
     if sys.argv: argv=sys.argv
 
-    utils.log('Version: |%s| Queries: |%s|' % (_SALTS.get_version(),_SALTS.queries))
-    utils.log('Args: |%s|' % (argv))
+    log_utils.log('Version: |%s| Queries: |%s|' % (_SALTS.get_version(),_SALTS.queries))
+    log_utils.log('Args: |%s|' % (argv))
     
     # don't process params that don't match our url exactly. (e.g. plugin://plugin.video.1channel/extrafanart)
     plugin_url = 'plugin://%s/' % (_SALTS.get_id())
