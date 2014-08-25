@@ -25,32 +25,87 @@ class Scraper(object):
     def provides(cls):
         """
         Can not easily combine classmethod and abstract method, but must method be provided as a class method
+        returns a list of VIDEO_TYPES that are supported by this scraper.
+        Is a class method so that instances of the class don't have to be instantiated to determine they are not useful
         """
         raise NotImplementedError
         
     @abc.abstractmethod 
     def get_name(self):
+        """
+        Must be provided. 
+        Must return a string that is a name that will be used through out the UI and DB to refer to urls from this source
+        Should be descriptive enough to be recognized but short enough to be presented in the UI
+        """
         raise NotImplementedError
 
     @abc.abstractmethod 
     def resolve_link(self, link):
+        """
+        returns a string that is a urlresolver resolvable link given a link that this scraper supports
+        
+        link: a url fragment associated with this site that can be resolved to a hoster link 
+
+        * The purpose is many streaming sites provide the actual hoster link in a separate page from link
+        on the video page.
+        * This method is called for the user selected source before calling urlresolver on it.
+        """
         raise NotImplementedError
 
     @abc.abstractmethod 
     def format_source_label(self, item):
+        """
+        returns a string that is to be the label for a source in the "Choose Source" dialog
+        
+        item: one element of the list that is returned from get_sources for this scraper
+        """
         raise NotImplementedError
 
     @abc.abstractmethod 
     def get_sources(self, video_type, title, year, season='', episode=''):
+        """
+        returns a list of dictionaries that are potential link to hoster sites (or links to links to hoster sites)
+        Each dictionary must contain elements of at least:
+            * multi-part: True is this source is one part of a whole
+            * class: a reference to an instance of the scraper itself
+            * url: the url that is a link to a hoster, or a link to a page that this scraper can resolve to a link to a hoster
+            * any other keys that would be useful (e.g. for format_source_label)
+        
+        video_type: one of VIDEO_TYPES for whatever the sources should be for
+        title: the title of the tv show or movie
+        year: the year of the tv show or movie
+        season: only present for tv shows; the season number of the video for which sources are requested
+        episode: only present for tv shows; the episode number of the video for which sources are requested
+        """
         raise NotImplementedError
 
     @abc.abstractmethod 
     def get_url(self, video_type, title, year, season='', episode=''):
+        """
+        returns a url for the site this scraper is associated with that is related to this video
+        
+        video_type: one of VIDEO_TYPES this url is for (e.g. EPISODE urls might be different than TVSHOW urls)
+        title: the title of the tv show or movie
+        year: the year of the tv show or movie
+        season: only present for season or episode VIDEO_TYPES; the season number for the url being requested
+        episode: only present for season or episode VIDEO_TYPES; the episode number for the url being requested
+        
+        * Generally speaking, domain should not be included
+        """
         raise NotImplementedError
 
     @abc.abstractmethod 
     def search(self, video_type, title, year):
         """
-        Method must be provided, but can throw NotImplementedError if not available
+        If it does return results, it must be a list of dictionaries. Each dictionary must contain at least the following:
+            * title: title of the result
+            * year: year of the result
+            * url: a url fragment that is the url on the site associated with this scraper for this season result item
+        
+        video_type: one of the VIDEO_TYPES being searched for. Only tvshows and movies are expected generally
+        title: the title being search for
+        year: the year being search for
+        
+        * Method must be provided, but can raise NotImplementedError if search not available on the site
         """
         raise NotImplementedError

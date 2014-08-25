@@ -18,6 +18,8 @@
 import sys
 import os
 import re
+import datetime
+import time
 import xbmcplugin
 import xbmcgui
 import xbmc
@@ -95,20 +97,22 @@ def browse_friends(section):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=section_params['folder'],totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-@url_dispatcher.register(MODES.CAL)
-def browse_calendar():
-    days=trakt_api.get_calendar()
-    make_dir_from_cal(days)
-
-@url_dispatcher.register(MODES.MY_CAL)
-def browse_my_calendar():
-    days=trakt_api.get_my_calendar()
-    make_dir_from_cal(days)
-
-@url_dispatcher.register(MODES.PREMIERES)
-def browse_premiere_cal():
-    days=trakt_api.get_premieres()
-    make_dir_from_cal(days)
+@url_dispatcher.register(MODES.MY_CAL, ['mode'], ['start_date'])
+@url_dispatcher.register(MODES.CAL, ['mode'], ['start_date'])
+@url_dispatcher.register(MODES.PREMIERES, ['mode'], ['start_date'])
+def browse_calendar(mode, start_date=None):
+    if start_date is None:
+        now = datetime.datetime.now()
+        offset = int(_SALTS.get_setting('calendar-day'))
+        start_date = now + datetime.timedelta(days=offset)
+        start_date = datetime.datetime.strftime(start_date,'%Y%m%d')
+    if mode == MODES.MY_CAL:
+        days=trakt_api.get_my_calendar(start_date)
+    elif mode == MODES.CAL:
+        days=trakt_api.get_calendar(start_date)
+    elif mode == MODES.PREMIERES:
+        days=trakt_api.get_premieres(start_date)
+    make_dir_from_cal(mode, start_date, days)
 
 @url_dispatcher.register(MODES.MY_LISTS, ['section'])
 def browse_lists(section):
@@ -260,7 +264,8 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     hosters=[]
     for cls in classes:
-        hosters  += cls().get_sources(video_type, title, year, season, episode)
+        if video_type in cls.provides():
+            hosters  += cls().get_sources(video_type, title, year, season, episode)
     
     if not hosters:
         log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
@@ -321,14 +326,15 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     related_list=[]
     for cls in classes:
-        related={}
-        related['class']=cls()
-        url=related['class'].get_url(video_type, title, year, season, episode)
-        if not url: url=''
-        related['url']=url
-        related['name']=related['class'].get_name()
-        related['label'] = '[%s] %s' % (related['name'], related['url'])
-        related_list.append(related)
+        if video_type in cls.provides():
+            related={}
+            related['class']=cls()
+            url=related['class'].get_url(video_type, title, year, season, episode)
+            if not url: url=''
+            related['url']=url
+            related['name']=related['class'].get_name()
+            related['label'] = '[%s] %s' % (related['name'], related['url'])
+            related_list.append(related)
     
     dialog=xbmcgui.Dialog()
     index = dialog.select('Url To Change (%s)' % (video_type), [related['label'] for related in related_list])
@@ -484,7 +490,18 @@ def make_dir_from_list(section, list_data, slug=None):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-def make_dir_from_cal(days):
+def make_dir_from_cal(mode, start_date, days):
+    try: start_date=datetime.datetime.strptime(start_date,'%Y%m%d')
+    except TypeError: start_date = datetime.datetime(*(time.strptime(start_date, '%Y%m%d')[0:6]))
+    last_week = start_date - datetime.timedelta(days=7)
+    next_week = start_date + datetime.timedelta(days=7)
+    last_week = datetime.datetime.strftime(last_week, '%Y%m%d')
+    next_week = datetime.datetime.strftime(next_week, '%Y%m%d')
+    
+    liz = xbmcgui.ListItem(label='<< Previous Week')
+    liz_url = _SALTS.build_plugin_url({'mode': mode, 'start_date': last_week})
+    xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=True)
+    
     totalItems=len(days)
     for day in days:
         date=day['date']
@@ -501,6 +518,10 @@ def make_dir_from_cal(days):
                 label = '[COLOR green]%s[/COLOR]' % (label)
             liz.setLabel(label)
             xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
+
+    liz = xbmcgui.ListItem(label='Next Week >>')
+    liz_url = _SALTS.build_plugin_url({'mode': mode, 'start_date': next_week})
+    xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=True)    
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def make_episode_item(show, episode, fanart):

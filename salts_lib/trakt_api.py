@@ -89,16 +89,19 @@ class Trakt_API():
         url='/activity/friends.json/%s/%s' % (API_KEY, TRAKT_SECTIONS[section][:-1])
         return self.__call_trakt(url)
         
-    def get_calendar(self):
+    def get_calendar(self, start_date=None):
         url='/calendar/shows.json/%s' % (API_KEY)
+        if start_date: url += '/%s' % (start_date)
         return self.__call_trakt(url)
     
-    def get_premieres(self):
+    def get_premieres(self, start_date=None):
         url='/calendar/premieres.json/%s' % (API_KEY)
+        if start_date: url += '/%s' % (start_date)
         return self.__call_trakt(url)
     
-    def get_my_calendar(self):
+    def get_my_calendar(self, start_date=None):
         url='/user/calendar/shows.json/%s/%s' % (API_KEY, self.username)
+        if start_date: url += '/%s' % (start_date)
         return self.__call_trakt(url)
         
     def get_seasons(self, slug):

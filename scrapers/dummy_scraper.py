@@ -28,7 +28,7 @@ class Dummy_Scraper(scraper.Scraper):
     
     @classmethod
     def provides(cls):
-        return [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIES]
+        return [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE]
     
     def get_name(self):
         return 'Dummy'

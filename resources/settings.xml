@@ -6,8 +6,9 @@
     <setting id="Movies_sub_slug" type="text" visible="false"/>
     <setting id="TV_fav_slug" type="text" visible="false"/>
     <setting id="Movies_fav_slug" type="text" visible="false"/>
-        <setting id="tvshow-folder" type="folder" label="TV Show Folder"
-                 default="special://userdata/addon_data/plugin.video.salts/TVShows"/>
-        <setting id="movie-folder" type="folder" label="Movie Folder"
-                 default="special://userdata/addon_data/plugin.video.salts/Movies"/>    
+    <setting id="tvshow-folder" type="folder" label="TV Show Folder"
+             default="special://userdata/addon_data/plugin.video.salts/TVShows"/>
+    <setting id="movie-folder" type="folder" label="Movie Folder"
+             default="special://userdata/addon_data/plugin.video.salts/Movies"/>
+	<setting id="calendar-day" type="slider" label="Default Calendar Start Day" default="0" range="-7,7" option="int"/>
 </settings>
