@@ -47,10 +47,6 @@ db_connection=DB_Connection()
 @url_dispatcher.register(MODES.MAIN)
 def main_menu():
     db_connection.init_database()
-    ws_scraper = watchseries_scraper.WS_Scraper()
-    sources= ws_scraper.get_sources('', '', '', '', '')
-    print len(sources)
-    
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'})
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -374,7 +370,8 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                     log_utils.log('Searching for: |%s|%s|' % (temp_title, temp_year), xbmc.LOGDEBUG)
                     results = related_list[index]['class'].search(video_type, temp_title, temp_year)
                     for result in results:
-                        choice = '%s (%s)' % (result['title'], result['year'])
+                        choice = result['title']
+                        if result['year']: choice = '%s (%s)' % (choice, result['year'])
                         choices.append(choice)
                     results_index = dialog.select('Select Related', choices)
                     if results_index==0:
@@ -397,6 +394,7 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                     log_utils.log('%s does not support searching.' % (related_list[index]['class'].get_name()))
                     builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
                     xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
+                    break
                 
 @url_dispatcher.register(MODES.REM_FROM_LIST, ['slug', 'section', 'id_type', 'show_id'])
 def remove_from_list(slug, section, id_type, show_id):

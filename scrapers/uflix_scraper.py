@@ -44,12 +44,10 @@ class UFlix_Scraper(scraper.Scraper):
         html = self.__http_get(url, cache_limit=0)
         match = re.search('iframe\s+src="(.*?)"', html)
         if match:
-            print match.groups()
             return match.group(1)
         else:
             match = re.search('var\s+url\s+=\s+\'(.*?)\'', html)
             if match:
-                print match.groups()
                 return match.group(1)
     
     def format_source_label(self, item):
@@ -136,7 +134,8 @@ class UFlix_Scraper(scraper.Scraper):
         pattern = 'class="link"\s+href="(.*?/show/.*?/season/%s/episode/%s)"' % (season, episode)
         match = re.search(pattern, html)
         if match:
-            return match.group(1)
+            url = match.group(1)
+            return url.replace(self.base_url, '')
         
     def __http_get(self, url, cache_limit=8):
         log_utils.log('Getting Url: %s' % (url))

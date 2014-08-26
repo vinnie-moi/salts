@@ -18,6 +18,8 @@
 import scraper
 import xbmc
 import urllib2
+import urllib
+import urlparse
 import re
 from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
@@ -38,13 +40,17 @@ class WS_Scraper(scraper.Scraper):
         return 'WatchSeries'
     
     def resolve_link(self, link):
-        return link
+        url = urlparse.urljoin(self.base_url, link)
+        html = self.__http_get(url, cache_limit=0)
+        match = re.search('class\s*=\s*"myButton"\s+href\s*=\s*"(.*?)"', html)
+        if match:
+            return match.group(1)
     
     def format_source_label(self, item):
-        return ''
+        return '%s (%s%% rating)' % (item['host'], item['rating'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
-        url = self.base_url + '/episode/breaking_bad_s5_e16.html'
+        url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
         html = self.__http_get(url, cache_limit=.5)
         try:
             sources=[]
@@ -57,6 +63,7 @@ class WS_Scraper(scraper.Scraper):
                 source['url']=url
                 source['host']=host
                 source['rating']=rating
+                source['class']=self
                 sources.append(source)
         except Exception as e:
             log_utils.log('Failure During %s get sources: %s' % (self.get_name(), str(e)))
@@ -64,12 +71,60 @@ class WS_Scraper(scraper.Scraper):
         return sources
 
     def get_url(self, video_type, title, year, season='', episode=''):
-        result=db_connection.get_related_url(video_type, title, year, self.get_name(), season, episode)
+        temp_video_type=video_type
+        if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
+        url = None
+ 
+        result = db_connection.get_related_url(temp_video_type, title, year, self.get_name())
         if result:
-            return result[0][0]
-    
+            url=result[0][0]
+            log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
+        else:
+            results = self.search(temp_video_type, title, year)
+            if results:
+                url = results[0]['url']
+                db_connection.set_related_url(temp_video_type, title, year, self.get_name(), url)
+ 
+        if url and video_type==VIDEO_TYPES.EPISODE:
+            result = db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
+            if result:
+                url=result[0][0]
+                log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
+            else:
+                show_url = url
+                url = self.__get_episode_url(show_url, season, episode)
+                if url:
+                    db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
+         
+        return url
+   
     def search(self, video_type, title, year):
-        raise NotImplementedError
+        search_url = urlparse.urljoin(self.base_url, '/search/')
+        search_url += urllib.quote_plus(title)
+        html = self.__http_get(search_url, cache_limit=.25)
+        
+        pattern='<a title="watch[^"]+"\s+href="(.*?)"><b>(.*?)</b>'
+        results=[]
+        for match in re.finditer(pattern, html):
+            url, title_year = match.groups()
+            match = re.search('(.*?)\s+\((\d{4})\)', title_year)
+            if match:
+                title = match.group(1)
+                year = match.group(2)
+            else:
+                title=title_year
+                year=''
+            result={'url': url, 'title': title, 'year': year}
+            results.append(result)
+        return results
+    
+    def __get_episode_url(self, show_url, season, episode):
+        url = urlparse.urljoin(self.base_url, show_url)
+        html = self.__http_get(url, cache_limit=2)
+        pattern = 'href="(/episode/[^"]*_s%s_e%s.*?)"' % (season, episode)
+        match = re.search(pattern, html)
+        if match:
+            return match.group(1)
     
     def __http_get(self, url, cache_limit=8):
         log_utils.log('Getting Url: %s' % (url))
