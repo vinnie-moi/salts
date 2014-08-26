@@ -47,6 +47,10 @@ db_connection=DB_Connection()
 @url_dispatcher.register(MODES.MAIN)
 def main_menu():
     db_connection.init_database()
+    ws_scraper = watchseries_scraper.WS_Scraper()
+    sources= ws_scraper.get_sources('', '', '', '', '')
+    print len(sources)
+    
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'})
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))

@@ -18,6 +18,7 @@
 import scraper
 import xbmc
 import urllib2
+import re
 from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -27,14 +28,14 @@ db_connection = DB_Connection()
 
 class WS_Scraper(scraper.Scraper):
     def __init__(self):
-        self.base_url = ''
+        self.base_url = 'http://watchseries.sx'
     
     @classmethod
     def provides(cls):
-        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
+        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE])
     
     def get_name(self):
-        return 'UFlix'
+        return 'WatchSeries'
     
     def resolve_link(self, link):
         return link
@@ -43,7 +44,24 @@ class WS_Scraper(scraper.Scraper):
         return ''
     
     def get_sources(self, video_type, title, year, season='', episode=''):
-        return []
+        url = self.base_url + '/episode/breaking_bad_s5_e16.html'
+        html = self.__http_get(url, cache_limit=.5)
+        try:
+            sources=[]
+            match = re.search('English Links -.*?</tbody>\s*</table>', html, re.DOTALL)
+            fragment = match.group(0)
+            pattern = 'href\s*=\s*"([^"]*)"\s+class\s*=\s*"buttonlink"\s+title\s*=([^\s]*).*?<span class="percent"[^>]+>\s+(\d+)%\s+</span>'
+            for match in re.finditer(pattern, fragment, re.DOTALL):
+                source = {'multi-part': False}
+                url, host, rating = match.groups()
+                source['url']=url
+                source['host']=host
+                source['rating']=rating
+                sources.append(source)
+        except Exception as e:
+            log_utils.log('Failure During %s get sources: %s' % (self.get_name(), str(e)))
+            
+        return sources
 
     def get_url(self, video_type, title, year, season='', episode=''):
         result=db_connection.get_related_url(video_type, title, year, self.get_name(), season, episode)
