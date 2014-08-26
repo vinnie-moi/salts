@@ -260,7 +260,6 @@ def browse_episodes(slug, season, fanart):
 
 @url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode'])
 def get_sources(video_type, title, year, slug, season='', episode=''):
-    import urlresolver
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     hosters=[]
     for cls in classes:
@@ -271,33 +270,12 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
         log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
         builtin = 'XBMC.Notification(%s, No Sources Found, 5000, %s)'
         xbmc.executebuiltin(builtin % (_SALTS.get_name(), ICON_PATH))
-        return
+        return False
         
-    sources=[]
-    for item in hosters:
-        try:
-            # TODO: Skip multiple sources for now
-            if item['multi-part']:
-                continue
-            
-            label = item['class'].format_source_label(item)
-            label = '[%s] %s' % (item['class'].get_name(),label)
-            url=item['class'].resolve_link(item['url'])
-            hosted_media = urlresolver.HostedMediaFile(url=url, title=label)
-            sources.append(hosted_media)
-        except Exception as e:
-            log_utils.log('Error (%s) while trying to resolve %s' % (str(e), item['url']), xbmc.LOGERROR)
-    
-    source = urlresolver.choose_source(sources)
-    if source:
-        url=source.get_url()
-    else:
+    stream_url = pick_source_dialog(hosters)
+    if stream_url is None:
         return True
     
-    log_utils.log('Attempting to play url: %s' % url)
-    stream_url = urlresolver.HostedMediaFile(url=url).resolve()
-
-    #If urlresolver returns false then the video url was not resolved.
     if not stream_url or not isinstance(stream_url, basestring):
         return False
 
@@ -310,7 +288,7 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
         info = utils.make_info(item)
         art=utils.make_art(item)
 
-    listitem = xbmcgui.ListItem(path=url, iconImage=art['thumb'], thumbnailImage=art['thumb'])
+    listitem = xbmcgui.ListItem(path=stream_url, iconImage=art['thumb'], thumbnailImage=art['thumb'])
     listitem.setProperty('fanart_image', art['fanart'])
     try: listitem.setArt(art)
     except:pass
@@ -319,6 +297,41 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
     listitem.setInfo('video', info)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
     return True
+
+def pick_source_dialog(hosters, filtered=False):
+    import urlresolver
+    for item in hosters:
+        # TODO: Skip multiple sources for now
+        if item['multi-part']:
+            continue
+
+        if filtered:
+            hosted_media = urlresolver.HostedMediaFile(host=item['host'], media_id='dummy') # use dummy media_id to force host validation
+            if not hosted_media:
+                log_utils.log('Skipping unresolvable source: %s (%s)' % (item['url'], item['host']))
+                continue
+        
+        label = item['class'].format_source_label(item)
+        label = '[%s] %s' % (item['class'].get_name(),label)
+        item['label']=label
+    
+    dialog = xbmcgui.Dialog() 
+    index = dialog.select('Choose your stream', [item['label'] for item in hosters if 'label' in item])
+    if index>-1:
+        try:
+            url=hosters[index]['class'].resolve_link(hosters[index]['url'])
+            log_utils.log('Attempting to play url: %s' % url)
+            stream_url = urlresolver.HostedMediaFile(url=url).resolve()
+            if stream_url==False:
+                log_utils.log('Url (%s|%s) Resolution failed' % (hosters[index]['url'], url))
+                builtin = 'XBMC.Notification(%s, Could not Resolve Url: %s, 5000, %s)'
+                xbmc.executebuiltin(builtin % (_SALTS.get_name(), url, ICON_PATH))
+            return stream_url
+        except Exception as e:
+            log_utils.log('Error (%s) while trying to resolve %s' % (str(e), url), xbmc.LOGERROR)
+            return False
+    else:
+        return None
     
 @url_dispatcher.register(MODES.SET_URL_MANUAL, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
 @url_dispatcher.register(MODES.SET_URL_SEARCH, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])

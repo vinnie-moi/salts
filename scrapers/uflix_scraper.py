@@ -40,18 +40,68 @@ class UFlix_Scraper(scraper.Scraper):
         return 'UFlix.org'
     
     def resolve_link(self, link):
-        return link
+        url = urlparse.urljoin(self.base_url, link)
+        html = self.__http_get(url, cache_limit=0)
+        match = re.search('iframe\s+src="(.*?)"', html)
+        if match:
+            print match.groups()
+            return match.group(1)
+        else:
+            match = re.search('var\s+url\s+=\s+\'(.*?)\'', html)
+            if match:
+                print match.groups()
+                return match.group(1)
     
     def format_source_label(self, item):
-        return ''
+        return item['host']
     
     def get_sources(self, video_type, title, year, season='', episode=''):
-        return []
+        url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
+        html = self.__http_get(url, cache_limit=.5)
+        pattern='class="btn btn-primary".*?href="(.*?)".*?<center>(.*?)</center'
+        
+        sources=[]
+        for match in re.finditer(pattern, html, re.DOTALL | re.I):
+            url, host = match.groups()
+            # skip ad match
+            if host.upper()=='HDSPONSOR':
+                continue
+            
+            source = {'multi-part': False}
+            source['url']=url.replace(self.base_url,'')
+            source['host']=host.replace('<span>','').replace('</span>','')
+            source['class']=self
+            sources.append(source)
+        
+        return sources
 
     def get_url(self, video_type, title, year, season='', episode=''):
-        result=db_connection.get_related_url(video_type, title, year, self.get_name(), season, episode)
+        temp_video_type=video_type
+        if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
+        url = None
+
+        result = db_connection.get_related_url(temp_video_type, title, year, self.get_name())
         if result:
-            return result[0][0]
+            url=result[0][0]
+            log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
+        else:
+            results = self.search(temp_video_type, title, year)
+            if results:
+                url = results[0]['url']
+                db_connection.set_related_url(temp_video_type, title, year, self.get_name(), url)
+
+        if url and video_type==VIDEO_TYPES.EPISODE:
+            result = db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
+            if result:
+                url=result[0][0]
+                log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
+            else:
+                show_url = url
+                url = self.__get_episode_url(show_url, season, episode)
+                if url:
+                    db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
+        
+        return url
     
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/index.php?menu=search&query=')
@@ -79,6 +129,14 @@ class UFlix_Scraper(scraper.Scraper):
             log_utils.log('Failure during %s search: |%s|%s|%s| (%s)' % (self.get_name(), video_type, title, year, str(e)), xbmc.LOGWARNING)
         
         return results
+        
+    def __get_episode_url(self, show_url, season, episode):
+        url = urlparse.urljoin(self.base_url, show_url)
+        html = self.__http_get(url, cache_limit=2)
+        pattern = 'class="link"\s+href="(.*?/show/.*?/season/%s/episode/%s)"' % (season, episode)
+        match = re.search(pattern, html)
+        if match:
+            return match.group(1)
         
     def __http_get(self, url, cache_limit=8):
         log_utils.log('Getting Url: %s' % (url))
