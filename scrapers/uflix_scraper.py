@@ -25,8 +25,12 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
+from salts_lib.constants import QUALITIES
+
 
 db_connection = DB_Connection()
+
+QUALITY_MAP = {'HD': QUALITIES.HIGH, 'LOW': QUALITIES.LOW}
 
 class UFlix_Scraper(scraper.Scraper):
     def __init__(self):
@@ -51,14 +55,19 @@ class UFlix_Scraper(scraper.Scraper):
                 return match.group(1)
     
     def format_source_label(self, item):
-        return item['host']
+        return '[%s] %s' % (item['quality'], item['host'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
         url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
         html = self.__http_get(url, cache_limit=.5)
-        pattern='class="btn btn-primary".*?href="(.*?)".*?<center>(.*?)</center'
-        
+
+        quality=None
+        match = re.search('(?:qaulity|quality):\s*<span[^>]*>(.*?)</span>', html, re.DOTALL|re.I)
+        if match:
+            quality = QUALITY_MAP.get(match.group(1).upper())
+            
         sources=[]
+        pattern='class="btn btn-primary".*?href="(.*?)".*?<center>(.*?)</center'
         for match in re.finditer(pattern, html, re.DOTALL | re.I):
             url, host = match.groups()
             # skip ad match
@@ -69,6 +78,9 @@ class UFlix_Scraper(scraper.Scraper):
             source['url']=url.replace(self.base_url,'')
             source['host']=host.replace('<span>','').replace('</span>','')
             source['class']=self
+            source['source']=self.get_name()
+            source['quality']=quality
+            source['rating']=None
             sources.append(source)
         
         return sources

@@ -9,6 +9,10 @@ from trakt_api import Trakt_API
 from db_utils import DB_Connection
 
 ADDON = Addon('plugin.video.salts')
+
+SORT_FIELDS =  [(SORT_LIST[int(ADDON.get_setting('sort1_field'))], SORT_SIGNS[ADDON.get_setting('sort1_order')]),
+                (SORT_LIST[int(ADDON.get_setting('sort2_field'))], SORT_SIGNS[ADDON.get_setting('sort2_order')]),
+                (SORT_LIST[int(ADDON.get_setting('sort3_field'))], SORT_SIGNS[ADDON.get_setting('sort3_order')])]
 username=ADDON.get_setting('username')
 password=ADDON.get_setting('password')
 use_https=ADDON.get_setting('use_https')=='true'
@@ -134,3 +138,31 @@ def filename_from_title(title, video_type):
     filename = re.sub('\.+', '.', filename)
     xbmc.makeLegalFilename(filename)
     return filename
+
+def get_sort_key(item):
+    item_sort_key = []
+    for field, sign in SORT_FIELDS:
+        if field=='None':
+            break
+        elif field in SORT_KEY:
+            if item[field] in SORT_KEY[field]:
+                item_sort_key.append(sign*SORT_KEY[field][item[field]])
+            else: # assume all unlisted values sort as worst
+                item_sort_key.append(sign*-1)
+        else:
+            if item[field] is None:
+                item_sort_key.append(sign*-1)
+            else:
+                item_sort_key.append(sign*item[field])
+    print 'item: %s sort_key: %s' % (item, item_sort_key)
+    return tuple(item_sort_key)
+
+def make_source_sortkey():
+    sso=ADDON.get_setting('source_sort_order')
+    if sso:
+        sso = sso.replace(' ', '')
+        sources = sso.split(',')
+        sort_key={}
+        for i,source in enumerate(sources):
+            sort_key[source]=i
+        return sort_key        

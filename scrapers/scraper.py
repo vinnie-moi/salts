@@ -67,16 +67,19 @@ class Scraper(object):
         """
         Must return a list of dictionaries that are potential link to hoster sites (or links to links to hoster sites)
         Each dictionary must contain elements of at least:
-            * multi-part: True is this source is one part of a whole
+            * multi-part: True if this source is one part of a whole
             * class: a reference to an instance of the scraper itself
+            * source: the name return by get_name of the associated scraper
             * url: the url that is a link to a hoster, or a link to a page that this scraper can resolve to a link to a hoster
-            * any other keys that would be useful (e.g. for format_source_label)
+            * quality: one of the QUALITIES values, or None if unknown; users can sort sources by quality
+            * rating: a value between 0 and 100; 0 being worst, 100 the best, or None if unknown. Users can sort sources by rating. 
+            * other keys are allowed as needed if they would be useful (e.g. for format_source_label)
         
         video_type: one of VIDEO_TYPES for whatever the sources should be for
         title: the title of the tv show or movie
         year: the year of the tv show or movie
         season: only present for tv shows; the season number of the video for which sources are requested
-        episode: only present for tv shows; the episode number of the video for which sources are requested
+        episode: only present for tv shows; the episode number of the video for which sources are requested        
         """
         raise NotImplementedError
 

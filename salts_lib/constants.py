@@ -9,7 +9,17 @@ MODES=__enum(MAIN='main', BROWSE='browse', TRENDING='trending', RECOMMEND='recom
 SECTIONS=__enum(TV='TV', MOVIES='Movies')
 VIDEO_TYPES = __enum(TVSHOW='tvshow', MOVIE='movie', EPISODE='episode', SEASON='season')
 TRAKT_SECTIONS = {SECTIONS.TV: 'shows', SECTIONS.MOVIES: 'movies'}
+QUALITIES = __enum(LOW='Low', MEDIUM='Medium', HIGH='High', HD='HD')
 WATCHLIST_SLUG = 'watchlist_slug'
 USER_AGENT = ("User-Agent:Mozilla/5.0 (Windows NT 6.2; WOW64)"
               "AppleWebKit/537.17 (KHTML, like Gecko)"
               "Chrome/24.0.1312.56")
+
+# sort keys need to be defined such that "best" have highest values
+# unknown (i.e. None) is always worst
+SORT_KEY = {}
+SORT_KEY['quality'] = {None: 0, QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD: 4}
+SORT_LIST = ['None', 'source', 'quality', 'rating']
+
+SORT_SIGNS = {'0': -1, '1': 1} # 0 = Best to Worst; 1 = Worst to Best
+

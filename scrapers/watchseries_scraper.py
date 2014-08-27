@@ -47,7 +47,7 @@ class WS_Scraper(scraper.Scraper):
             return match.group(1)
     
     def format_source_label(self, item):
-        return '%s (%s%% rating)' % (item['host'], item['rating'])
+        return '%s (%s/100)' % (item['host'], item['rating'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
         url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
@@ -62,8 +62,11 @@ class WS_Scraper(scraper.Scraper):
                 url, host, rating = match.groups()
                 source['url']=url
                 source['host']=host
-                source['rating']=rating
+                source['rating']=int(rating)
+                if source['rating']==60: source['rating']=0 # rating seems to default to 60, so force to 0
+                source['quality']=None
                 source['class']=self
+                source['source']=self.get_name()
                 sources.append(source)
         except Exception as e:
             log_utils.log('Failure During %s get sources: %s' % (self.get_name(), str(e)))

@@ -25,8 +25,11 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
+from salts_lib.constants import QUALITIES
 
 db_connection = DB_Connection()
+
+QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'TS': QUALITIES.MEDIUM, 'CAM': QUALITIES.LOW}
 
 class PW_Scraper(scraper.Scraper):
     def __init__(self):
@@ -43,39 +46,35 @@ class PW_Scraper(scraper.Scraper):
         return link
     
     def format_source_label(self, item):
-        label='[%s] %s (%s views)' % (item['quality'], item['host'], item['views'])
+        label='[%s] %s (%s/100) (%s views)' % (item['quality'], item['host'], item['rating'], item['views'])
         if item['verified']: label = '[COLOR yellow]%s[/COLOR]' % (label)
         return label
     
     def get_sources(self, video_type, title, year, season='', episode=''):
         url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
         html = self.__http_get(url, cache_limit=.5)
-        adultregex = '<div class="offensive_material">.+<a href="(.+)">I understand'
-        adult = re.search(adultregex, html, re.DOTALL)
-        if adult:
-            log_utils.log('Adult content url detected')
-            adulturl = self.base_url + adult.group(1)
-            headers = {'Referer': url}
-            html = self.__get_url(adulturl, headers=headers, login=True)
         
-        imdbregex = 'mlink_imdb">.+?href="http://www.imdb.com/title/(tt[0-9]{7}).*?"'
-        match = re.search(imdbregex, html)
-        if match:
-            self.imdb_num = match.group(1)
         hosters = []
         container_pattern = r'<table[^>]+class="movie_version[ "][^>]*>(.*?)</table>'
         item_pattern = (
             r'quality_(?!sponsored|unknown)([^>]*)></span>.*?'
             r'url=([^&]+)&(?:amp;)?domain=([^&]+)&(?:amp;)?(.*?)'
             r'"version_veiws"> ([\d]+) views</')
+        max_index=0
+        max_views = -1
         for container in re.finditer(container_pattern, html, re.DOTALL | re.IGNORECASE):
-            for source in re.finditer(item_pattern, container.group(1), re.DOTALL):
+            for i, source in enumerate(re.finditer(item_pattern, container.group(1), re.DOTALL)):
                 qual, url, host, parts, views = source.groups()
          
                 item = {'host': host.decode('base-64'), 'url': url.decode('base-64')}
                 item['verified'] = source.group(0).find('star.gif') > -1
-                item['quality'] = qual.upper()
+                item['quality'] = QUALITY_MAP.get(qual.upper())
                 item['views'] = int(views)
+                if item['views'] > max_views:
+                    max_index=i
+                    max_views=item['views']
+                    
+                item['rating'] = item['views']*100/max_views
                 pattern = r'<a href=".*?url=(.*?)&(?:amp;)?.*?".*?>(part \d*)</a>'
                 other_parts = re.findall(pattern, parts, re.DOTALL | re.I)
                 if other_parts:
@@ -84,7 +83,11 @@ class PW_Scraper(scraper.Scraper):
                 else:
                     item['multi-part'] = False
                 item['class']=self
+                item['source']=self.get_name()
                 hosters.append(item)
+        
+        for i in xrange(0,max_index):
+            hosters[i]['rating']=hosters[i]['views']*100/max_views
      
         return hosters
 

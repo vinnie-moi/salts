@@ -19,6 +19,7 @@ import json
 import urllib2
 import urllib
 import sha
+import re
 import xbmc
 import log_utils
 from db_utils import DB_Connection
@@ -129,10 +130,10 @@ class Trakt_API():
         return self.__call_trakt(url)
     
     def get_slug(self, url):
-        show_url = self.protocol+'trakt.tv/show/'
-        movie_url= self.protocol+'trakt.tv/movie/'
-        url=url.replace(show_url,'')
-        url=url.replace(movie_url,'')
+        show_pattern = 'http[s]*://trakt\.tv/show/'
+        movie_pattern = 'http[s]*://trakt\.tv/movie/'
+        url=re.sub(show_pattern, '', url, flags=re.I)
+        url=re.sub(movie_pattern, '', url, flags=re.I)
         return url
     
     def __manage_list(self, action, slug, item):

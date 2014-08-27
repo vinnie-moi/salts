@@ -1,6 +1,6 @@
 <settings>
-	<setting id="username" type="text" label="Username" default=""/>
-	<setting id="password" type="text" label="Password" default="" option="hidden"/>
+	<setting id="username" type="text" label="Trakt Username" default=""/>
+	<setting id="password" type="text" label="Trakt Password" default="" option="hidden"/>
     <setting id="use_https" type="bool" label="Use HTTPS" default="false"/>
     <setting id="TV_sub_slug" type="text" visible="false"/>
     <setting id="Movies_sub_slug" type="text" visible="false"/>
@@ -11,4 +11,12 @@
     <setting id="movie-folder" type="folder" label="Movie Folder"
              default="special://userdata/addon_data/plugin.video.salts/Movies"/>
 	<setting id="calendar-day" type="slider" label="Default Calendar Start Day" default="0" range="-7,7" option="int"/>
+	<setting id="enable_sort" type="bool" label="Sort Sources" default="false"/>
+	<setting id="source_sort_order" type="text" label="Source Sort Order" default="" visible="eq(-1,true)"/>
+	<setting id="sort1_field" type="enum" label="1st Sort Key" values="None|Source|Quality|Rating" default="0" visible="eq(-2,true)"/>
+	<setting id="sort1_order" type="enum" label="1st Sort Key Order" values="Best to Worst|Worst to Best" default="0" visible="!eq(-1,0)"/>
+	<setting id="sort2_field" type="enum" label="2nd Sort Key" values="None|Source|Quality|Rating" default="0" visible="!eq(-2,0)"/>
+	<setting id="sort2_order" type="enum" label="2nd Sort Key Order" values="Best to Worst|Worst to Best" default="0" visible="!eq(-1,0)+!eq(-3,0)"/>
+	<setting id="sort3_field" type="enum" label="3rd Sort Key" values="None|Source|Quality|Rating" default="0" visible="!eq(-2,0) + !eq(-4,0)"/>
+	<setting id="sort3_order" type="enum" label="3rd Sort Key Order" values="Best to Worst|Worst to Best" default="0" visible="!eq(-1,0) + !eq(-3,0) + !eq(-5,0) "/>
 </settings>
