@@ -147,8 +147,6 @@ def filter_hosters(hosters):
                 break
         else:
             filtered_hosters.append(host)
-            
-    print filtered_hosters
     return filtered_hosters
 
 def get_sort_key(item):
