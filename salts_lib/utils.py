@@ -22,7 +22,7 @@ db_connection=DB_Connection()
 
 def choose_list(username=None):
     lists = trakt_api.get_lists(username)
-    lists.insert(0, {'name': 'watchlist', 'slug': WATCHLIST_SLUG})
+    if username is None: lists.insert(0, {'name': 'watchlist', 'slug': WATCHLIST_SLUG})
     dialog=xbmcgui.Dialog()
     index = dialog.select('Pick a list', [list_data['name'] for list_data in lists])
     if index>-1:

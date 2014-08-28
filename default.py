@@ -153,7 +153,7 @@ def add_other_list(section):
     keyboard.doModal()
     if keyboard.isConfirmed():
         username=keyboard.getText()
-        slug=pick_list(username)
+        slug=pick_list(None, section, username)
         if slug:
             db_connection.add_other_list(section, username, slug)
     xbmc.executebuiltin("XBMC.Container.Refresh")
@@ -190,13 +190,15 @@ def show_favorites(section):
 
 @url_dispatcher.register(MODES.PICK_SUB_LIST, ['mode', 'section'])
 @url_dispatcher.register(MODES.PICK_FAV_LIST, ['mode', 'section'])
-def pick_list(mode, section):
-    slug=utils.choose_list()
+def pick_list(mode, section, username=None):
+    slug=utils.choose_list(username)
     if slug:
         if mode == MODES.PICK_FAV_LIST:
             set_list(MODES.SET_FAV_LIST, slug, section)
         elif mode == MODES.PICK_SUB_LIST:
             set_list(MODES.SET_SUB_LIST, slug, section)
+        else:
+            return slug
         xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.SET_SUB_LIST, ['mode', 'slug', 'section'])
