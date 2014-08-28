@@ -238,7 +238,7 @@ class DB_Connection():
             if self.db_type == DB_TYPES.MYSQL:
                 self.db = db_lib.connect(database=self.dbname, user=self.username, password=self.password, host=self.address, buffered=True)
             else:
-                self.db = db_lib.connect(self.db_path)
+                self.db = db_lib.connect(self.db_path, check_same_thread=False)
                 self.db.text_factory = str
 
     # apply formatting changes to make sql work with a particular db driver

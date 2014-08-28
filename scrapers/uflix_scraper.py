@@ -27,14 +27,14 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
 from salts_lib.constants import QUALITIES
 
-
 db_connection = DB_Connection()
 
 QUALITY_MAP = {'HD': QUALITIES.HIGH, 'LOW': QUALITIES.LOW}
 
 class UFlix_Scraper(scraper.Scraper):
-    def __init__(self):
+    def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.base_url = 'http://uflix.org'
+        self.timeout=timeout
     
     @classmethod
     def provides(cls):
@@ -160,7 +160,7 @@ class UFlix_Scraper(scraper.Scraper):
         request.add_header('User-Agent', USER_AGENT)
         request.add_unredirected_header('Host', request.get_host())
         request.add_unredirected_header('Referer', self.base_url)
-        response = urllib2.urlopen(request, timeout=10)
+        response = urllib2.urlopen(request, timeout=self.timeout)
         html=response.read()
         db_connection.cache_url(url, html)
         return html

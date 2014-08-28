@@ -18,6 +18,8 @@
 import abc
 abstractstaticmethod = abc.abstractmethod
 
+DEFAULT_TIMEOUT=30
+
 class Scraper(object):
     __metaclass__ = abc.ABCMeta
     

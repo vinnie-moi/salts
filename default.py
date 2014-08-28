@@ -20,6 +20,8 @@ import os
 import re
 import datetime
 import time
+import threading
+import Queue
 import xbmcplugin
 import xbmcgui
 import xbmc
@@ -260,13 +262,59 @@ def browse_episodes(slug, season, fanart):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
+def parallel_get_sources(cls, q, video_type, title, year, season, episode):
+    scraper_instance=cls(int(_SALTS.get_setting('source_timeout')))
+    log_utils.log('Getting %s sources using thread %s' % (scraper_instance.get_name(), threading.current_thread().name), xbmc.LOGDEBUG)
+    hosters=scraper_instance.get_sources(video_type, title, year, season, episode)
+    log_utils.log('%s returned %s sources in thread %s' % (scraper_instance.get_name(), len(hosters), threading.current_thread().name), xbmc.LOGDEBUG)
+    q.put(hosters)
+
 @url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode'])
 def get_sources(video_type, title, year, slug, season='', episode=''):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     hosters=[]
+    q = Queue.Queue()
+    p_mode = int(_SALTS.get_setting('parallel_mode'))
+    timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
+    if max_timeout == 0: timeout=None # Queue treats 0 timeout as no timeout :(
+    max_results = int(_SALTS.get_setting('source_results'))
+    begin = time.time()
     for cls in classes:
         if video_type in cls.provides():
-            hosters  += cls().get_sources(video_type, title, year, season, episode)
+            if p_mode == P_MODES.THREADS:
+                t=threading.Thread(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
+                t.daemon=True
+                t.start()
+            elif p_mode == P_MODES.PROCESSES:
+                pass
+            else:
+                hosters += cls(max_timeout).get_sources(video_type, title, year, season, episode)
+                if max_results> 0 and len(hosters) >= max_results:
+                    break
+
+    # collect results from threads
+    if p_mode == P_MODES.THREADS:
+        while threading.active_count()>1:
+            try:
+                log_utils.log('Calling get with timeout: %s' %(timeout), xbmc.LOGDEBUG)
+                thread_result = q.get(True, timeout)
+                log_utils.log('Got %s Source Results' %(len(thread_result)), xbmc.LOGDEBUG)
+                hosters += thread_result
+                if max_timeout>0:
+                    timeout = max_timeout - (time.time() - begin)
+            except  Queue.Empty:
+                for t in threading.enumerate():
+                    if t != threading.current_thread():
+                        log_utils.log('Get Sources Timeout: Left Running Thread: %s' % (t.name), xbmc.LOGWARNING)
+                break
+            
+            if max_results> 0 and len(hosters) >= max_results:
+                log_utils.log('Exceeded max results: %s/%s' % (max_results, len(hosters)))
+                break
+
+        else:
+            log_utils.log('All source results received')
+
     
     if not hosters:
         log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))

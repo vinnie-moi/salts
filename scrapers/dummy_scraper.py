@@ -23,7 +23,7 @@ from salts_lib.db_utils import DB_Connection
 db_connection = DB_Connection()
 
 class Dummy_Scraper(scraper.Scraper):
-    def __init__(self):
+    def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         pass
     
     @classmethod

@@ -10,6 +10,7 @@ SECTIONS=__enum(TV='TV', MOVIES='Movies')
 VIDEO_TYPES = __enum(TVSHOW='tvshow', MOVIE='movie', EPISODE='episode', SEASON='season')
 TRAKT_SECTIONS = {SECTIONS.TV: 'shows', SECTIONS.MOVIES: 'movies'}
 QUALITIES = __enum(LOW='Low', MEDIUM='Medium', HIGH='High', HD='HD')
+P_MODES = __enum(THREADS=0, PROCESSES=1, NONE=2)
 WATCHLIST_SLUG = 'watchlist_slug'
 USER_AGENT = ("User-Agent:Mozilla/5.0 (Windows NT 6.2; WOW64)"
               "AppleWebKit/537.17 (KHTML, like Gecko)"
