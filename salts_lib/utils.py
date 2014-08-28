@@ -9,10 +9,10 @@ from trakt_api import Trakt_API
 from db_utils import DB_Connection
 
 ADDON = Addon('plugin.video.salts')
-
 SORT_FIELDS =  [(SORT_LIST[int(ADDON.get_setting('sort1_field'))], SORT_SIGNS[ADDON.get_setting('sort1_order')]),
                 (SORT_LIST[int(ADDON.get_setting('sort2_field'))], SORT_SIGNS[ADDON.get_setting('sort2_order')]),
                 (SORT_LIST[int(ADDON.get_setting('sort3_field'))], SORT_SIGNS[ADDON.get_setting('sort3_order')])]
+
 username=ADDON.get_setting('username')
 password=ADDON.get_setting('password')
 use_https=ADDON.get_setting('use_https')=='true'
@@ -142,7 +142,7 @@ def filename_from_title(title, video_type):
 def get_sort_key(item):
     item_sort_key = []
     for field, sign in SORT_FIELDS:
-        if field=='None':
+        if field=='none':
             break
         elif field in SORT_KEY:
             if item[field] in SORT_KEY[field]:
