@@ -126,7 +126,7 @@ class UFlix_Scraper(scraper.Scraper):
         match = re.search(pattern, html, re.DOTALL)
         try:
             fragment = match.group(0)
-            pattern = '<a title="Watch (.*?) Online For FREE".*href="(.*?)".*\((\d{4})\)</a>'
+            pattern = '<a title="Watch (.*?) Online For FREE".*href="(.*?)".*\((\d{1,4})\)</a>'
             for match in re.finditer(pattern, fragment):
                 result={}
                 title, url, year = match.groups()
