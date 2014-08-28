@@ -78,7 +78,6 @@ class UFlix_Scraper(scraper.Scraper):
             source['url']=url.replace(self.base_url,'')
             source['host']=host.replace('<span>','').replace('</span>','')
             source['class']=self
-            source['source']=self.get_name()
             source['quality']=quality
             source['rating']=None
             sources.append(source)

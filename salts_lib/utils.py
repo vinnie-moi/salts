@@ -139,14 +139,31 @@ def filename_from_title(title, video_type):
     xbmc.makeLegalFilename(filename)
     return filename
 
+def filter_hosters(hosters):
+    filtered_hosters=[]
+    for host in hosters:
+        for key, _ in SORT_FIELDS:
+            if key in host and host[key] is None:
+                break
+        else:
+            filtered_hosters.append(host)
+            
+    print filtered_hosters
+    return filtered_hosters
+
 def get_sort_key(item):
     item_sort_key = []
     for field, sign in SORT_FIELDS:
         if field=='none':
             break
-        elif field in SORT_KEY:
-            if item[field] in SORT_KEY[field]:
-                item_sort_key.append(sign*SORT_KEY[field][item[field]])
+        elif field in SORT_KEYS:
+            if field == 'source':
+                value=item['class'].get_name().lower()
+            else:
+                value=item[field]
+            
+            if value in SORT_KEYS[field]:
+                    item_sort_key.append(sign*SORT_KEYS[field][value])
             else: # assume all unlisted values sort as worst
                 item_sort_key.append(sign*-1)
         else:
@@ -154,7 +171,7 @@ def get_sort_key(item):
                 item_sort_key.append(sign*-1)
             else:
                 item_sort_key.append(sign*item[field])
-    print 'item: %s sort_key: %s' % (item, item_sort_key)
+    #print 'item: %s sort_key: %s' % (item, item_sort_key)
     return tuple(item_sort_key)
 
 def make_source_sortkey():
@@ -164,5 +181,5 @@ def make_source_sortkey():
         sources = sso.split(',')
         sort_key={}
         for i,source in enumerate(sources):
-            sort_key[source]=i
+            sort_key[source.lower()]=i
         return sort_key        

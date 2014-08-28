@@ -272,12 +272,12 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
         xbmc.executebuiltin(builtin % (_SALTS.get_name(), ICON_PATH))
         return False
         
+        
     if _SALTS.get_setting('enable_sort')=='true':
-        ssk = utils.make_source_sortkey()
-        if ssk:
-            SORT_KEY['source']=ssk
+        if _SALTS.get_setting('filter-unknown')=='true':
+            hosters = utils.filter_hosters(hosters)
+        SORT_KEYS['source'] = utils.make_source_sortkey()
         hosters.sort(key = utils.get_sort_key)
-        #print hosters
         
     stream_url = pick_source_dialog(hosters)
     if stream_url is None:

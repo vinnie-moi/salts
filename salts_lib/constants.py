@@ -17,8 +17,8 @@ USER_AGENT = ("User-Agent:Mozilla/5.0 (Windows NT 6.2; WOW64)"
 
 # sort keys need to be defined such that "best" have highest values
 # unknown (i.e. None) is always worst
-SORT_KEY = {}
-SORT_KEY['quality'] = {None: 0, QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD: 4}
+SORT_KEYS = {}
+SORT_KEYS['quality'] = {None: 0, QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD: 4}
 SORT_LIST = ['none', 'source', 'quality', 'rating']
 
 SORT_SIGNS = {'0': -1, '1': 1} # 0 = Best to Worst; 1 = Worst to Best

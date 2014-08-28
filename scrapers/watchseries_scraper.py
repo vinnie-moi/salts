@@ -63,10 +63,9 @@ class WS_Scraper(scraper.Scraper):
                 source['url']=url
                 source['host']=host
                 source['rating']=int(rating)
-                if source['rating']==60: source['rating']=0 # rating seems to default to 60, so force to 0
+                if source['rating']==60: source['rating']=None # rating seems to default to 60, so force to Unknown
                 source['quality']=None
                 source['class']=self
-                source['source']=self.get_name()
                 sources.append(source)
         except Exception as e:
             log_utils.log('Failure During %s get sources: %s' % (self.get_name(), str(e)))

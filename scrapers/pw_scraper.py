@@ -83,7 +83,6 @@ class PW_Scraper(scraper.Scraper):
                 else:
                     item['multi-part'] = False
                 item['class']=self
-                item['source']=self.get_name()
                 hosters.append(item)
         
         for i in xrange(0,max_index):
