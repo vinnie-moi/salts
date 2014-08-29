@@ -43,11 +43,11 @@ trakt_api=Trakt_API(username,password, use_https)
 url_dispatcher=URL_Dispatcher()
 db_connection=DB_Connection()
 
-p_mode = int(_SALTS.get_setting('parallel_mode'))
-if p_mode == P_MODES.THREADS:
+P_MODE = int(_SALTS.get_setting('parallel_mode'))
+if P_MODE == P_MODES.THREADS:
     import threading
     from Queue import Queue, Empty
-elif p_mode == P_MODES.PROCESSES:
+elif P_MODE == P_MODES.PROCESSES:
     import multiprocessing
     from multiprocessing import Queue
     from Queue import Empty
@@ -270,9 +270,9 @@ def browse_episodes(slug, season, fanart):
 
 def parallel_get_sources(cls, q, video_type, title, year, season, episode):
     scraper_instance=cls(int(_SALTS.get_setting('source_timeout')))
-    if p_mode == P_MODES.THREADS:
+    if P_MODE == P_MODES.THREADS:
         worker=threading.current_thread()
-    elif p_mode == P_MODES.PROCESSES:
+    elif P_MODE == P_MODES.PROCESSES:
         worker=multiprocessing.current_process()
         
     log_utils.log('Getting %s sources using %s' % (scraper_instance.get_name(), worker), xbmc.LOGDEBUG)
@@ -281,9 +281,9 @@ def parallel_get_sources(cls, q, video_type, title, year, season, episode):
     q.put(hosters)
 
 def start_worker(cls, q, video_type, title, year, season, episode):
-    if p_mode == P_MODES.THREADS:
+    if P_MODE == P_MODES.THREADS:
         worker=threading.Thread(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
-    elif p_mode == P_MODES.PROCESSES:
+    elif P_MODE == P_MODES.PROCESSES:
         worker=multiprocessing.Process(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
     worker.daemon=True
     worker.start()
@@ -306,9 +306,8 @@ def reap_workers(workers, timeout=0):
 @url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode'])
 def get_sources(video_type, title, year, slug, season='', episode=''):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
-    p_mode = int(_SALTS.get_setting('parallel_mode'))
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
-    if max_timeout == 0: timeout=None # Queue treats 0 timeout as no timeout :(
+    if max_timeout == 0: timeout=None
     max_results = int(_SALTS.get_setting('source_results'))
     worker_count=0
     hosters=[]
@@ -318,7 +317,7 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
     
     for cls in classes:
         if video_type in cls.provides():
-            if p_mode == P_MODES.NONE:
+            if P_MODE == P_MODES.NONE:
                 hosters += cls(max_timeout).get_sources(video_type, title, year, season, episode)
                 if max_results> 0 and len(hosters) >= max_results:
                     break
@@ -328,7 +327,7 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
                 workers.append(worker)
 
     # collect results from workers
-    if p_mode != P_MODES.NONE:
+    if P_MODE != P_MODES.NONE:
         while worker_count>0:
             try:
                 log_utils.log('Calling get with timeout: %s' %(timeout), xbmc.LOGDEBUG)
