@@ -91,8 +91,8 @@ def make_art(show, fanart=''):
     return art
 
 def make_info(item, show=''):
-    log_utils.log('Making Info: Show: %s' % (show), xbmc.LOGDEBUG)
-    log_utils.log('Making Info: Item: %s' % (item), xbmc.LOGDEBUG)
+    #log_utils.log('Making Info: Show: %s' % (show), xbmc.LOGDEBUG)
+    #log_utils.log('Making Info: Item: %s' % (item), xbmc.LOGDEBUG)
     info={}
     info['title']=item['title']
     info['rating']=int(item['ratings']['percentage'])/10.0
