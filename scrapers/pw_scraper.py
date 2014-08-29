@@ -27,7 +27,6 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
 from salts_lib.constants import QUALITIES
 
-db_connection = DB_Connection()
 
 QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'TS': QUALITIES.MEDIUM, 'CAM': QUALITIES.LOW}
 
@@ -35,6 +34,7 @@ class PW_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.base_url = 'http://www.primewire.ag'
         self.timeout=timeout
+        self.db_connection = DB_Connection()
    
     @classmethod
     def provides(cls):
@@ -96,7 +96,7 @@ class PW_Scraper(scraper.Scraper):
         if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
         url = None
 
-        result = db_connection.get_related_url(temp_video_type, title, year, self.get_name())
+        result = self.db_connection.get_related_url(temp_video_type, title, year, self.get_name())
         if result:
             url=result[0][0]
             log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
@@ -104,10 +104,10 @@ class PW_Scraper(scraper.Scraper):
             results = self.search(temp_video_type, title, year)
             if results:
                 url = results[0]['url']
-                db_connection.set_related_url(temp_video_type, title, year, self.get_name(), url)
+                self.db_connection.set_related_url(temp_video_type, title, year, self.get_name(), url)
 
         if url and video_type==VIDEO_TYPES.EPISODE:
-            result = db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
+            result = self.db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
             if result:
                 url=result[0][0]
                 log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
@@ -115,7 +115,7 @@ class PW_Scraper(scraper.Scraper):
                 show_url = url
                 url = self.__get_episode_url(show_url, season, episode)
                 if url:
-                    db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
+                    self.db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
         
         return url
     

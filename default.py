@@ -20,8 +20,6 @@ import os
 import re
 import datetime
 import time
-import threading
-import Queue
 import xbmcplugin
 import xbmcgui
 import xbmc
@@ -35,7 +33,6 @@ from salts_lib import log_utils
 from salts_lib.constants import *
 from scrapers import * # import all scrapers into this namespace
 
-
 _SALTS = Addon('plugin.video.salts', sys.argv)
 ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
 username=_SALTS.get_setting('username')
@@ -45,6 +42,15 @@ use_https=_SALTS.get_setting('use_https')=='true'
 trakt_api=Trakt_API(username,password, use_https)
 url_dispatcher=URL_Dispatcher()
 db_connection=DB_Connection()
+
+p_mode = int(_SALTS.get_setting('parallel_mode'))
+if p_mode == P_MODES.THREADS:
+    import threading
+    from Queue import Queue, Empty
+elif p_mode == P_MODES.PROCESSES:
+    import multiprocessing
+    from multiprocessing import Queue
+    from Queue import Empty
 
 @url_dispatcher.register(MODES.MAIN)
 def main_menu():
@@ -264,48 +270,76 @@ def browse_episodes(slug, season, fanart):
 
 def parallel_get_sources(cls, q, video_type, title, year, season, episode):
     scraper_instance=cls(int(_SALTS.get_setting('source_timeout')))
-    log_utils.log('Getting %s sources using thread %s' % (scraper_instance.get_name(), threading.current_thread().name), xbmc.LOGDEBUG)
+    if p_mode == P_MODES.THREADS:
+        worker=threading.current_thread()
+    elif p_mode == P_MODES.PROCESSES:
+        worker=multiprocessing.current_process()
+        
+    log_utils.log('Getting %s sources using %s' % (scraper_instance.get_name(), worker), xbmc.LOGDEBUG)
     hosters=scraper_instance.get_sources(video_type, title, year, season, episode)
-    log_utils.log('%s returned %s sources in thread %s' % (scraper_instance.get_name(), len(hosters), threading.current_thread().name), xbmc.LOGDEBUG)
+    log_utils.log('%s returned %s sources from %s' % (scraper_instance.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
     q.put(hosters)
+
+def start_worker(cls, q, video_type, title, year, season, episode):
+    if p_mode == P_MODES.THREADS:
+        worker=threading.Thread(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
+    elif p_mode == P_MODES.PROCESSES:
+        worker=multiprocessing.Process(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
+    worker.daemon=True
+    worker.start()
+    return worker
+
+def reap_workers(workers, timeout=0):
+    """
+    Reap thread/process workers; don't block by default; return un-reaped workers
+    """
+    log_utils.log('In Reap: %s' % (workers), xbmc.LOGDEBUG)
+    living_workers=[]
+    for worker in workers:
+        log_utils.log('Reaping: %s' % (worker.name), xbmc.LOGDEBUG)
+        worker.join(timeout)
+        if worker.is_alive():
+            log_utils.log('Worker %s still running' % (worker.name), xbmc.LOGDEBUG)
+            living_workers.append(worker)
+    return living_workers
 
 @url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode'])
 def get_sources(video_type, title, year, slug, season='', episode=''):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
-    hosters=[]
-    q = Queue.Queue()
     p_mode = int(_SALTS.get_setting('parallel_mode'))
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
     if max_timeout == 0: timeout=None # Queue treats 0 timeout as no timeout :(
     max_results = int(_SALTS.get_setting('source_results'))
+    worker_count=0
+    hosters=[]
+    workers=[]
+    q = Queue()
     begin = time.time()
+    
     for cls in classes:
         if video_type in cls.provides():
-            if p_mode == P_MODES.THREADS:
-                t=threading.Thread(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
-                t.daemon=True
-                t.start()
-            elif p_mode == P_MODES.PROCESSES:
-                pass
-            else:
+            if p_mode == P_MODES.NONE:
                 hosters += cls(max_timeout).get_sources(video_type, title, year, season, episode)
                 if max_results> 0 and len(hosters) >= max_results:
                     break
+            else:
+                worker=start_worker(cls, q, video_type, title, year, season, episode)
+                worker_count+=1
+                workers.append(worker)
 
-    # collect results from threads
-    if p_mode == P_MODES.THREADS:
-        while threading.active_count()>1:
+    # collect results from workers
+    if p_mode != P_MODES.NONE:
+        while worker_count>0:
             try:
                 log_utils.log('Calling get with timeout: %s' %(timeout), xbmc.LOGDEBUG)
-                thread_result = q.get(True, timeout)
-                log_utils.log('Got %s Source Results' %(len(thread_result)), xbmc.LOGDEBUG)
-                hosters += thread_result
+                result = q.get(True, timeout)
+                log_utils.log('Got %s Source Results' %(len(result)), xbmc.LOGDEBUG)
+                worker_count -=1
+                hosters += result
                 if max_timeout>0:
                     timeout = max_timeout - (time.time() - begin)
-            except  Queue.Empty:
-                for t in threading.enumerate():
-                    if t != threading.current_thread():
-                        log_utils.log('Get Sources Timeout: Left Running Thread: %s' % (t.name), xbmc.LOGWARNING)
+            except Empty:
+                log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
                 break
             
             if max_results> 0 and len(hosters) >= max_results:
@@ -314,45 +348,48 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
 
         else:
             log_utils.log('All source results received')
+        
+    workers=reap_workers(workers)
+    try:
+        if not hosters:
+            log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
+            builtin = 'XBMC.Notification(%s, No Sources Found, 5000, %s)'
+            xbmc.executebuiltin(builtin % (_SALTS.get_name(), ICON_PATH))
+            return False
+        
+        if _SALTS.get_setting('enable_sort')=='true':
+            if _SALTS.get_setting('filter-unknown')=='true':
+                hosters = utils.filter_hosters(hosters)
+            SORT_KEYS['source'] = utils.make_source_sortkey()
+            hosters.sort(key = utils.get_sort_key)
+            
+        stream_url = pick_source_dialog(hosters)
+        if stream_url is None:
+            return True
+        
+        if not stream_url or not isinstance(stream_url, basestring):
+            return False
 
+        if video_type == VIDEO_TYPES.EPISODE:
+            details = trakt_api.get_episode_details(slug, season, episode)
+            info = utils.make_info(details['episode'], details['show'])
+            art=utils.make_art(details['episode'], details['show']['images']['fanart'])
+        else:
+            item = trakt_api.get_movie_details(slug)
+            info = utils.make_info(item)
+            art=utils.make_art(item)
     
-    if not hosters:
-        log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
-        builtin = 'XBMC.Notification(%s, No Sources Found, 5000, %s)'
-        xbmc.executebuiltin(builtin % (_SALTS.get_name(), ICON_PATH))
-        return False
+        listitem = xbmcgui.ListItem(path=stream_url, iconImage=art['thumb'], thumbnailImage=art['thumb'])
+        listitem.setProperty('fanart_image', art['fanart'])
+        try: listitem.setArt(art)
+        except:pass
+        listitem.setProperty('IsPlayable', 'true')
+        listitem.setPath(stream_url)
+        listitem.setInfo('video', info)
+        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+    finally:
+        reap_workers(workers, None)
         
-        
-    if _SALTS.get_setting('enable_sort')=='true':
-        if _SALTS.get_setting('filter-unknown')=='true':
-            hosters = utils.filter_hosters(hosters)
-        SORT_KEYS['source'] = utils.make_source_sortkey()
-        hosters.sort(key = utils.get_sort_key)
-        
-    stream_url = pick_source_dialog(hosters)
-    if stream_url is None:
-        return True
-    
-    if not stream_url or not isinstance(stream_url, basestring):
-        return False
-
-    if video_type == VIDEO_TYPES.EPISODE:
-        details = trakt_api.get_episode_details(slug, season, episode)
-        info = utils.make_info(details['episode'], details['show'])
-        art=utils.make_art(details['episode'], details['show']['images']['fanart'])
-    else:
-        item = trakt_api.get_movie_details(slug)
-        info = utils.make_info(item)
-        art=utils.make_art(item)
-
-    listitem = xbmcgui.ListItem(path=stream_url, iconImage=art['thumb'], thumbnailImage=art['thumb'])
-    listitem.setProperty('fanart_image', art['fanart'])
-    try: listitem.setArt(art)
-    except:pass
-    listitem.setProperty('IsPlayable', 'true')
-    listitem.setPath(stream_url)
-    listitem.setInfo('video', info)
-    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
     return True
 
 def pick_source_dialog(hosters, filtered=False):

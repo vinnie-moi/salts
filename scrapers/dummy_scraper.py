@@ -20,11 +20,10 @@ from salts_lib.constants import VIDEO_TYPES
 
 from salts_lib.db_utils import DB_Connection
 
-db_connection = DB_Connection()
 
 class Dummy_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        pass
+        self.db_connection = DB_Connection()
     
     @classmethod
     def provides(cls):
@@ -43,7 +42,7 @@ class Dummy_Scraper(scraper.Scraper):
         return []
 
     def get_url(self, video_type, title, year, season='', episode=''):
-        result=db_connection.get_related_url(video_type, title, year, self.get_name(), season, episode)
+        result=self.db_connection.get_related_url(video_type, title, year, self.get_name(), season, episode)
         if result:
             return result[0][0]
 
