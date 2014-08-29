@@ -17,6 +17,15 @@ username=ADDON.get_setting('username')
 password=ADDON.get_setting('password')
 use_https=ADDON.get_setting('use_https')=='true'
 
+P_MODE = int(ADDON.get_setting('parallel_mode'))
+if P_MODE == P_MODES.THREADS:
+    import threading
+    from Queue import Queue, Empty
+elif P_MODE == P_MODES.PROCESSES:
+    import multiprocessing
+    from multiprocessing import Queue
+    from Queue import Empty
+
 trakt_api=Trakt_API(username,password, use_https)
 db_connection=DB_Connection()
 
@@ -181,3 +190,39 @@ def make_source_sortkey():
         for i,source in enumerate(sources):
             sort_key[source.lower()]=i
         return sort_key        
+
+def start_worker(cls, q, video_type, title, year, season, episode):
+    if P_MODE == P_MODES.THREADS:
+        worker=threading.Thread(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
+    elif P_MODE == P_MODES.PROCESSES:
+        worker=multiprocessing.Process(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
+    worker.daemon=True
+    worker.start()
+    return worker
+
+def reap_workers(workers, timeout=0):
+    """
+    Reap thread/process workers; don't block by default; return un-reaped workers
+    """
+    log_utils.log('In Reap: %s' % (workers), xbmc.LOGDEBUG)
+    living_workers=[]
+    for worker in workers:
+        log_utils.log('Reaping: %s' % (worker.name), xbmc.LOGDEBUG)
+        worker.join(timeout)
+        if worker.is_alive():
+            log_utils.log('Worker %s still running' % (worker.name), xbmc.LOGDEBUG)
+            living_workers.append(worker)
+    return living_workers
+
+def parallel_get_sources(cls, q, video_type, title, year, season, episode):
+    scraper_instance=cls(int(ADDON.get_setting('source_timeout')))
+    if P_MODE == P_MODES.THREADS:
+        worker=threading.current_thread()
+    elif P_MODE == P_MODES.PROCESSES:
+        worker=multiprocessing.current_process()
+        
+    log_utils.log('Getting %s sources using %s' % (scraper_instance.get_name(), worker), xbmc.LOGDEBUG)
+    hosters=scraper_instance.get_sources(video_type, title, year, season, episode)
+    log_utils.log('%s returned %s sources from %s' % (scraper_instance.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
+    q.put(hosters)
+

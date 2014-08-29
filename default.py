@@ -43,15 +43,6 @@ trakt_api=Trakt_API(username,password, use_https)
 url_dispatcher=URL_Dispatcher()
 db_connection=DB_Connection()
 
-P_MODE = int(_SALTS.get_setting('parallel_mode'))
-if P_MODE == P_MODES.THREADS:
-    import threading
-    from Queue import Queue, Empty
-elif P_MODE == P_MODES.PROCESSES:
-    import multiprocessing
-    from multiprocessing import Queue
-    from Queue import Empty
-
 @url_dispatcher.register(MODES.MAIN)
 def main_menu():
     db_connection.init_database()
@@ -268,41 +259,6 @@ def browse_episodes(slug, season, fanart):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-def parallel_get_sources(cls, q, video_type, title, year, season, episode):
-    scraper_instance=cls(int(_SALTS.get_setting('source_timeout')))
-    if P_MODE == P_MODES.THREADS:
-        worker=threading.current_thread()
-    elif P_MODE == P_MODES.PROCESSES:
-        worker=multiprocessing.current_process()
-        
-    log_utils.log('Getting %s sources using %s' % (scraper_instance.get_name(), worker), xbmc.LOGDEBUG)
-    hosters=scraper_instance.get_sources(video_type, title, year, season, episode)
-    log_utils.log('%s returned %s sources from %s' % (scraper_instance.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
-    q.put(hosters)
-
-def start_worker(cls, q, video_type, title, year, season, episode):
-    if P_MODE == P_MODES.THREADS:
-        worker=threading.Thread(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
-    elif P_MODE == P_MODES.PROCESSES:
-        worker=multiprocessing.Process(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
-    worker.daemon=True
-    worker.start()
-    return worker
-
-def reap_workers(workers, timeout=0):
-    """
-    Reap thread/process workers; don't block by default; return un-reaped workers
-    """
-    log_utils.log('In Reap: %s' % (workers), xbmc.LOGDEBUG)
-    living_workers=[]
-    for worker in workers:
-        log_utils.log('Reaping: %s' % (worker.name), xbmc.LOGDEBUG)
-        worker.join(timeout)
-        if worker.is_alive():
-            log_utils.log('Worker %s still running' % (worker.name), xbmc.LOGDEBUG)
-            living_workers.append(worker)
-    return living_workers
-
 @url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode'])
 def get_sources(video_type, title, year, slug, season='', episode=''):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
@@ -312,22 +268,22 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
     worker_count=0
     hosters=[]
     workers=[]
-    q = Queue()
+    q = utils.Queue()
     begin = time.time()
     
     for cls in classes:
         if video_type in cls.provides():
-            if P_MODE == P_MODES.NONE:
+            if utils.P_MODE == P_MODES.NONE:
                 hosters += cls(max_timeout).get_sources(video_type, title, year, season, episode)
                 if max_results> 0 and len(hosters) >= max_results:
                     break
             else:
-                worker=start_worker(cls, q, video_type, title, year, season, episode)
+                worker=utils.start_worker(cls, q, video_type, title, year, season, episode)
                 worker_count+=1
                 workers.append(worker)
 
     # collect results from workers
-    if P_MODE != P_MODES.NONE:
+    if utils.P_MODE != P_MODES.NONE:
         while worker_count>0:
             try:
                 log_utils.log('Calling get with timeout: %s' %(timeout), xbmc.LOGDEBUG)
@@ -337,7 +293,7 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
                 hosters += result
                 if max_timeout>0:
                     timeout = max_timeout - (time.time() - begin)
-            except Empty:
+            except utils.Empty:
                 log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
                 break
             
@@ -348,7 +304,7 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
         else:
             log_utils.log('All source results received')
         
-    workers=reap_workers(workers)
+    workers=utils.reap_workers(workers)
     try:
         if not hosters:
             log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
@@ -387,7 +343,7 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
         listitem.setInfo('video', info)
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
     finally:
-        reap_workers(workers, None)
+        utils.reap_workers(workers, None)
         
     return True
 
