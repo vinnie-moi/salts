@@ -129,7 +129,7 @@ class UFlix_Scraper(scraper.Scraper):
             pattern = '<a title="Watch (.*?) Online For FREE".*href="(.*?)".*\((\d{1,4})\)</a>'
             for match in re.finditer(pattern, fragment):
                 result={}
-                title, url, year = match.groups()
+                title, url, year = match.groups('')
                 result['title']=title
                 result['url']=url.replace(self.base_url,'')
                 result['year']=year

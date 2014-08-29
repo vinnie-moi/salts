@@ -27,7 +27,6 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
 from salts_lib.constants import QUALITIES
 
-
 QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'TS': QUALITIES.MEDIUM, 'CAM': QUALITIES.LOW}
 
 class PW_Scraper(scraper.Scraper):
@@ -137,7 +136,7 @@ class PW_Scraper(scraper.Scraper):
         results=[]
         for match in re.finditer(pattern, html):
             result={}
-            url, title, year = match.groups()
+            url, title, year = match.groups('')
             result['url']=url
             result['title']=title
             result['year']=year
