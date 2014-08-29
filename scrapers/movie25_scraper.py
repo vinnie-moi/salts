@@ -45,7 +45,7 @@ class Dummy_Scraper(scraper.Scraper):
     def resolve_link(self, link):
         url = urlparse.urljoin(self.base_url, link)
         html = self.__http_get(url, cache_limit=0)
-        match = re.search('href=\'([^\']*)\'"\s+value="Click Here to Play"', html)
+        match = re.search('href=\'([^\']*)\'"\s+value="Click Here to Play"', html, re.DOTALL|re.I)
         if match:
             return match.group(1)
 
