@@ -571,16 +571,18 @@ def make_dir_from_cal(mode, start_date, days):
         date=day['date']
         for episode_elem in day['episodes']:
             show=episode_elem['show']
+            slug=trakt_api.get_slug(show['url'])
             episode=episode_elem['episode']
             fanart=show['images']['fanart']
             liz=make_episode_item(show, episode, fanart)
-            queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['number']}
+            queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['number'], 'slug': slug}
             liz_url = _SALTS.build_plugin_url(queries)
             label=liz.getLabel()
             label = '[%s] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
             if episode['season']==1 and episode['number']==1:
                 label = '[COLOR green]%s[/COLOR]' % (label)
             liz.setLabel(label)
+            liz.setProperty('isPlayable', 'true')
             xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
 
     liz = xbmcgui.ListItem(label='Next Week >>')
