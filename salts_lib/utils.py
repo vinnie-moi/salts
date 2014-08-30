@@ -225,4 +225,3 @@ def parallel_get_sources(cls, q, video_type, title, year, season, episode):
     hosters=scraper_instance.get_sources(video_type, title, year, season, episode)
     log_utils.log('%s returned %s sources from %s' % (scraper_instance.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
     q.put(hosters)
-

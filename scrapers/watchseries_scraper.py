@@ -16,15 +16,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
-import xbmc
-import urllib2
 import urllib
 import urlparse
 import re
+import common
 from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.constants import USER_AGENT
 
 class WS_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
@@ -130,23 +128,4 @@ class WS_Scraper(scraper.Scraper):
             return match.group(1)
     
     def __http_get(self, url, cache_limit=8):
-        log_utils.log('Getting Url: %s' % (url))
-        db_connection=DB_Connection()
-        html = db_connection.get_cached_url(url, cache_limit)
-        if html:
-            log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
-            return html
-        
-        try:
-            request = urllib2.Request(url)
-            request.add_header('User-Agent', USER_AGENT)
-            request.add_unredirected_header('Host', request.get_host())
-            request.add_unredirected_header('Referer', self.base_url)
-            response = urllib2.urlopen(request, timeout=self.timeout)
-            html=response.read()
-        except Exception as e:
-            log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), xbmc.LOGWARNING)
-
-        db_connection.cache_url(url, html)
-        return html
-        
+        return common.cached_http_get(url, self.base_url, self.timeout, cache_limit)
