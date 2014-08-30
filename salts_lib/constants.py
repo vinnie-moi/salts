@@ -24,3 +24,6 @@ SORT_LIST = ['none', 'source', 'quality', 'rating']
 
 SORT_SIGNS = {'0': -1, '1': 1} # 0 = Best to Worst; 1 = Worst to Best
 
+HOURS_LIST={}
+HOURS_LIST[MODES.UPDATE_SUBS] = [.5, 1] + range(2, 25)
+LONG_AGO='1970-01-01 23:59:00.000000'

@@ -14,6 +14,11 @@
 	<setting id="parallel_mode" type="enum" label="Parallel Mode" values="Threads|Processes|None" default="0"/>
 	<setting id="source_timeout" type="slider" label="Timeout to Get Sources (seconds) (0=No Limit)" default="5" range="0,120" option="int"/>
 	<setting id="source_results" type="number" label="Maximum Results (0=No Limit)" default="0"/>
+	<setting id="auto-update_subs" type="bool" label="Automatically Update Subscriptions" default="false"/>
+	<setting id="update_subs-interval" type="slider" range=".5,.5,24" option="float" label="     Update Interval (hours)" default="2" visible="eq(-1,true)"/>
+	<setting id="update_subs-during-startup" type="bool" label="     During StartUp?" default="false" visible="eq(-2,true)"/>
+	<setting id="update_subs-during-playback" type="bool" label="     During Playback?" default="false" visible="eq(-3,true)"/>
+	<setting id="include_movies" type="bool" label="     Include Movies" default="false" visible="eq(-4,true)"/>
 	<setting id="enable_sort" type="bool" label="Sort Sources" default="false"/>
 	<setting id="filter-unknown" type="bool" label="Drop hosters with unknown sort values" default="false" visible="eq(-1,true)"/>
 	<setting id="source_sort_order" type="text" label="Source Sort Order" default="" visible="eq(-2,true)"/>

@@ -142,6 +142,16 @@ class DB_Connection():
         rows=self.__execute(sql, (video_type, title, year, season, episode, source))
         return rows
                        
+    def get_setting(self, setting):
+        sql = 'SELECT value FROM db_info WHERE setting=?'
+        rows=self.__execute(sql, (setting,))
+        if rows:
+            return rows[0][0]
+    
+    def set_setting(self, setting, value):
+        sql = 'REPLACE INTO db_info (setting, value) VALUES (?, ?)'
+        self.__execute(sql, (setting, value))
+    
     def execute_sql(self, sql):
         self.__execute(sql)
 

@@ -173,7 +173,8 @@ def show_watchlist(section):
 def manage_subscriptions(section):
     slug=_SALTS.get_setting('%s_sub_slug' % (section))
     if slug:
-        liz = xbmcgui.ListItem(label='Update Subscriptions')
+        next_run = utils.get_next_run(MODES.UPDATE_SUBS)
+        liz = xbmcgui.ListItem(label='Update Subscriptions: (Next Run: [COLOR green]%s[/COLOR])' % (next_run.strftime("%Y-%m-%d %H:%M:%S.%f")))
         liz_url = _SALTS.build_plugin_url({'mode': MODES.UPDATE_SUBS, 'section': section})
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)    
         if section == SECTIONS.TV:
@@ -464,9 +465,13 @@ def add_to_list(section, id_type, show_id, slug=None):
         trakt_api.add_to_list(slug, item)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
+@url_dispatcher.register(MODES.UPDATE_SUBS)
+def update_subscriptions():
+    log_utils.log('Updating Subscriptions', xbmc.LOGDEBUG)
+    
 @url_dispatcher.register(MODES.ADD_TO_LIBRARY, ['video_type', 'title', 'year', 'slug'])
 def add_to_library(video_type, title, year, slug):
-    log_utils.log('Creating .strm for |%s|%s|%s|' % (video_type, title, year))
+    log_utils.log('Creating .strm for |%s|%s|%s|' % (video_type, title, year), xbmc.LOGDEBUG)
     if video_type == VIDEO_TYPES.TVSHOW:
         save_path = _SALTS.get_setting('tvshow-folder')
         save_path = xbmc.translatePath(save_path)

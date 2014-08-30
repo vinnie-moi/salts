@@ -1,5 +1,6 @@
 import time
 import re
+import datetime
 import xbmc
 import xbmcgui
 import log_utils
@@ -225,3 +226,44 @@ def parallel_get_sources(cls, q, video_type, title, year, season, episode):
     hosters=scraper_instance.get_sources(video_type, title, year, season, episode)
     log_utils.log('%s returned %s sources from %s' % (scraper_instance.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
     q.put(hosters)
+
+# Run a task on startup. Settings and mode values must match task name
+def do_startup_task(task):
+    run_on_startup=ADDON.get_setting('auto-%s' % task)=='true' and ADDON.get_setting('%s-during-startup' % task) == 'true' 
+    if run_on_startup and not xbmc.abortRequested:
+        log_utils.log('Service: Running startup task [%s]' % (task))
+        now = datetime.datetime.now()
+        xbmc.executebuiltin('RunPlugin(plugin://%s/?mode=%s)' % (ADDON.get_id(), task))
+        db_connection.set_setting('%s-last_run' % (task), now.strftime("%Y-%m-%d %H:%M:%S.%f"))
+    
+# Run a recurring scheduled task. Settings and mode values must match task name
+def do_scheduled_task(task, isPlaying):
+    now = datetime.datetime.now()
+    if ADDON.get_setting('auto-%s' % task) == 'true':
+        next_run=get_next_run(task)
+        #log_utils.log("Update Status on [%s]: Currently: %s Will Run: %s" % (task, now, next_run), xbmc.LOGDEBUG)
+        if now >= next_run:
+            is_scanning = xbmc.getCondVisibility('Library.IsScanningVideo')
+            if not is_scanning:
+                during_playback = ADDON.get_setting('%s-during-playback' % (task))=='true'
+                if during_playback or not isPlaying:
+                    log_utils.log('Service: Running Scheduled Task: [%s]' % (task))
+                    builtin = 'RunPlugin(plugin://%s/?mode=%s)' % (ADDON.get_id(), task)
+                    xbmc.executebuiltin(builtin)
+                    db_connection.set_setting('%s-last_run' % task, now.strftime("%Y-%m-%d %H:%M:%S.%f"))
+                else:
+                    log_utils.log('Service: Playing... Busy... Postponing [%s]' % (task), xbmc.LOGDEBUG)
+            else:
+                log_utils.log('Service: Scanning... Busy... Postponing [%s]' % (task), xbmc.LOGDEBUG)
+
+def get_next_run(task):
+    # strptime mysteriously fails sometimes with TypeError; this is a hacky workaround
+    # note, they aren't 100% equal as time.strptime loses fractional seconds but they are close enough
+    try:
+        last_run_string = db_connection.get_setting(task+'-last_run')
+        if not last_run_string: last_run_string=LONG_AGO
+        last_run=datetime.datetime.strptime(last_run_string, "%Y-%m-%d %H:%M:%S.%f")
+    except TypeError:
+        last_run=datetime.datetime(*(time.strptime(last_run_string, '%Y-%m-%d %H:%M:%S.%f')[0:6]))
+    interval=datetime.timedelta(hours=float(ADDON.get_setting(task+'-interval')))
+    return (last_run+interval)
