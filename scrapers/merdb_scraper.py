@@ -31,7 +31,7 @@ QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'TS': QUALITIES.MEDIUM, 'CAM': QUALITIES.L
 
 class PW_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        self.base_url = 'http://www.primewire.ag'
+        self.base_url = 'http://merdb.cn'
         self.timeout=timeout
         self.db_connection = DB_Connection()
    
@@ -40,7 +40,7 @@ class PW_Scraper(scraper.Scraper):
         return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
     
     def get_name(self):
-        return 'PrimeWire'
+        return 'MerDB'
     
     def resolve_link(self, link):
         return link
@@ -57,7 +57,7 @@ class PW_Scraper(scraper.Scraper):
         hosters = []
         container_pattern = r'<table[^>]+class="movie_version[ "][^>]*>(.*?)</table>'
         item_pattern = (
-            r'quality_(?!sponsored|unknown)([^>]*)></span>.*?'
+            r'quality_(?!sponsored|unknown|play)([^>]*)></span>.*?'
             r'url=([^&]+)&(?:amp;)?domain=([^&]+)&(?:amp;)?(.*?)'
             r'"version_veiws"> ([\d]+) views</')
         max_index=0
@@ -119,25 +119,22 @@ class PW_Scraper(scraper.Scraper):
         return url
     
     def search(self, video_type, title, year):
-        search_url = urlparse.urljoin(self.base_url, '/index.php?search_keywords=')
+        search_url = self.base_url
+        if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE]:
+            search_url += '/tvshow'
+            
+        search_url += '/advanced_search.php?name='
         search_url += urllib.quote_plus(title)
         search_url += '&year=' + urllib.quote_plus(year)
-        if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE]:
-            search_url += '&search_section=2'
-        else:
-            search_url += '&search_section=1'
+        search_url += '&advanced_search=Search'
             
-        html = self. __http_get(self.base_url, cache_limit=0)
-        r = re.search('input type="hidden" name="key" value="([0-9a-f]*)"', html).group(1)
-        search_url += '&key=' + r
-        
         html = self.__http_get(search_url, cache_limit=.25)
-        pattern = r'class="index_item.+?href="(.+?)" title="Watch (.+?)"?\(?([0-9]{4})?\)?"?>'
+        pattern = r'class="list_box_title.+?href="(.+?)" title="Watch (.+?)"?\(?([0-9]{4})?\)?"?>'
         results=[]
         for match in re.finditer(pattern, html):
             result={}
             url, title, year = match.groups('')
-            result['url']=url
+            result['url']=urlparse.urljoin('/',url)
             result['title']=title
             result['year']=year
             results.append(result)
@@ -172,7 +169,7 @@ class PW_Scraper(scraper.Scraper):
             html=response.read()
         except Exception as e:
             log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), xbmc.LOGWARNING)
-
+        
         db_connection.cache_url(url, html)
         return html
         

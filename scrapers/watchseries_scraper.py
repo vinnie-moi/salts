@@ -137,12 +137,16 @@ class WS_Scraper(scraper.Scraper):
             log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
             return html
         
-        request = urllib2.Request(url)
-        request.add_header('User-Agent', USER_AGENT)
-        request.add_unredirected_header('Host', request.get_host())
-        request.add_unredirected_header('Referer', self.base_url)
-        response = urllib2.urlopen(request, timeout=self.timeout)
-        html=response.read()
+        try:
+            request = urllib2.Request(url)
+            request.add_header('User-Agent', USER_AGENT)
+            request.add_unredirected_header('Host', request.get_host())
+            request.add_unredirected_header('Referer', self.base_url)
+            response = urllib2.urlopen(request, timeout=self.timeout)
+            html=response.read()
+        except Exception as e:
+            log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), xbmc.LOGWARNING)
+
         db_connection.cache_url(url, html)
         return html
         
