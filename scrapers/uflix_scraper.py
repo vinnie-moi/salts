@@ -54,7 +54,7 @@ class UFlix_Scraper(scraper.Scraper):
                 return match.group(1)
     
     def format_source_label(self, item):
-        return '[%s] %s' % (item['quality'], item['host'])
+        return '[%s] %s (%s Up, %s Down) (%s/100)' % (item['quality'], item['host'], item['up'], item['down'], item['rating'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
         url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
@@ -66,19 +66,24 @@ class UFlix_Scraper(scraper.Scraper):
             quality = QUALITY_MAP.get(match.group(1).upper())
             
         sources=[]
-        pattern='class="btn btn-primary".*?href="(.*?)".*?<center>(.*?)</center'
+        pattern='class="btn btn-primary".*?href="(.*?)".*?\?domain=[^>]+>\s*(.*?)</.*?class="fa fa-thumbs-o-up">\s*\((\d+)\).*?\((\d+)\)\s*<i class="fa fa-thumbs-o-down'
         for match in re.finditer(pattern, html, re.DOTALL | re.I):
-            url, host = match.groups()
+            url, host,up,down = match.groups()
             # skip ad match
-            if host.upper()=='HDSPONSOR':
+            if host.upper()=='HDSTREAM':
                 continue
-            
+
+            up=int(up)
+            down=int(down)
             source = {'multi-part': False}
             source['url']=url.replace(self.base_url,'')
             source['host']=host.replace('<span>','').replace('</span>','')
             source['class']=self
             source['quality']=quality
-            source['rating']=None
+            source['up']=up
+            source['down']=down
+            rating=up*100/(up+down) if (up>0 or down>0) else None
+            source['rating']=rating
             sources.append(source)
         
         return sources
