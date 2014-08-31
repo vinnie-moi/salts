@@ -74,6 +74,7 @@ class Dummy_Scraper(scraper.Scraper):
             hoster['down']=down
             rating=up*100/(up+down) if (up>0 or down>0) else None
             hoster['rating']=rating
+            hoster['views']=up+down
             hosters.append(hoster)
         return hosters
 

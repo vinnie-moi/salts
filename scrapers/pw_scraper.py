@@ -44,7 +44,7 @@ class PW_Scraper(scraper.Scraper):
         return link
     
     def format_source_label(self, item):
-        label='[%s] %s (%s/100) (%s views)' % (item['quality'], item['host'], item['rating'], item['views'])
+        label='[%s] %s (%s views) (%s/100) ' % (item['quality'], item['host'], item['views'], item['rating'])
         if item['verified']: label = '[COLOR yellow]%s[/COLOR]' % (label)
         return label
     

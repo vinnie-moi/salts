@@ -84,6 +84,7 @@ class UFlix_Scraper(scraper.Scraper):
             source['down']=down
             rating=up*100/(up+down) if (up>0 or down>0) else None
             source['rating']=rating
+            source['views']=up+down
             sources.append(source)
         
         return sources

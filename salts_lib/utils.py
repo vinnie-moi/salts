@@ -12,7 +12,8 @@ from db_utils import DB_Connection
 ADDON = Addon('plugin.video.salts')
 SORT_FIELDS =  [(SORT_LIST[int(ADDON.get_setting('sort1_field'))], SORT_SIGNS[ADDON.get_setting('sort1_order')]),
                 (SORT_LIST[int(ADDON.get_setting('sort2_field'))], SORT_SIGNS[ADDON.get_setting('sort2_order')]),
-                (SORT_LIST[int(ADDON.get_setting('sort3_field'))], SORT_SIGNS[ADDON.get_setting('sort3_order')])]
+                (SORT_LIST[int(ADDON.get_setting('sort3_field'))], SORT_SIGNS[ADDON.get_setting('sort3_order')]),
+                (SORT_LIST[int(ADDON.get_setting('sort4_field'))], SORT_SIGNS[ADDON.get_setting('sort4_order')])]
 
 username=ADDON.get_setting('username')
 password=ADDON.get_setting('password')
@@ -179,7 +180,7 @@ def get_sort_key(item):
                 item_sort_key.append(sign*-1)
             else:
                 item_sort_key.append(sign*item[field])
-    #print 'item: %s sort_key: %s' % (item, item_sort_key)
+    print 'item: %s sort_key: %s' % (item, item_sort_key)
     return tuple(item_sort_key)
 
 def make_source_sortkey():

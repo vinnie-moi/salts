@@ -65,6 +65,7 @@ class WS_Scraper(scraper.Scraper):
                 if source['rating']==60: source['rating']=None # rating seems to default to 60, so force to Unknown
                 source['quality']=None
                 source['class']=self
+                source['views']=None
                 sources.append(source)
         except Exception as e:
             log_utils.log('Failure During %s get sources: %s' % (self.get_name(), str(e)))
