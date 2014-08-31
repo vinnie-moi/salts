@@ -279,7 +279,7 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
                 if max_results> 0 and len(hosters) >= max_results:
                     break
             else:
-                worker=utils.start_worker(cls, q, video_type, title, year, season, episode)
+                worker=utils.start_worker(q, utils.parallel_get_sources, [cls, video_type, title, year, season, episode])
                 worker_count+=1
                 workers.append(worker)
 
@@ -388,63 +388,95 @@ def pick_source_dialog(hosters, filtered=False):
 def set_related_url(mode, video_type, title, year, season='', episode=''):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     related_list=[]
+    timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
+    if max_timeout == 0: timeout=None
+    worker_count=0
+    workers=[]
+    q = utils.Queue()
+    begin = time.time()
     for cls in classes:
         if video_type in cls.provides():
-            related={}
-            related['class']=cls()
-            url=related['class'].get_url(video_type, title, year, season, episode)
-            if not url: url=''
-            related['url']=url
-            related['name']=related['class'].get_name()
-            related['label'] = '[%s] %s' % (related['name'], related['url'])
-            related_list.append(related)
+            if P_MODES == P_MODES.NONE:
+                related={}
+                related['class']=cls(max_timeout)
+                url=related['class'].get_url(video_type, title, year, season, episode)
+                if not url: url=''
+                related['url']=url
+                related['name']=related['class'].get_name()
+                related['label'] = '[%s] %s' % (related['name'], related['url'])
+                related_list.append(related)
+            else:
+                worker = utils.start_worker(q, utils.parallel_get_url, [cls, video_type, title, year, season, episode])
+                worker_count += 1
+                workers.append(worker)
     
-    dialog=xbmcgui.Dialog()
-    index = dialog.select('Url To Change (%s)' % (video_type), [related['label'] for related in related_list])
-    if index>-1:
-        if mode == MODES.SET_URL_MANUAL:
-            keyboard = xbmc.Keyboard()
-            keyboard.setHeading('Related %s url at %s' % (video_type, related_list[index]['name']))
-            keyboard.setDefault(related_list[index]['url'])
-            keyboard.doModal()
-            if keyboard.isConfirmed():
-                new_url = keyboard.getText()
-                utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], new_url, season, episode)
-        elif mode == MODES.SET_URL_SEARCH:
-            temp_title = title
-            temp_year = year
-            while True:
-                dialog=xbmcgui.Dialog()
-                choices = ['Manual Search']
-                try:
-                    log_utils.log('Searching for: |%s|%s|' % (temp_title, temp_year), xbmc.LOGDEBUG)
-                    results = related_list[index]['class'].search(video_type, temp_title, temp_year)
-                    for result in results:
-                        choice = result['title']
-                        if result['year']: choice = '%s (%s)' % (choice, result['year'])
-                        choices.append(choice)
-                    results_index = dialog.select('Select Related', choices)
-                    if results_index==0:
-                        keyboard = xbmc.Keyboard()
-                        keyboard.setHeading('Enter Search')
-                        text = temp_title
-                        if temp_year: text = '%s (%s)' % (text, temp_year)
-                        keyboard.setDefault(text)
-                        keyboard.doModal()
-                        if keyboard.isConfirmed():
-                            match = re.match('([^\(]+)\s*\(*(\d{4})?\)*', keyboard.getText())
-                            temp_title = match.group(1).strip()
-                            temp_year = match.group(2) if match.group(2) else '' 
-                    elif results_index>0:
-                        utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], results[results_index-1]['url'], season, episode)
+    # collect results from workers
+    if utils.P_MODE != P_MODES.NONE:
+        while worker_count>0:
+            try:
+                log_utils.log('Calling get with timeout: %s' %(timeout), xbmc.LOGDEBUG)
+                result = q.get(True, timeout)
+                log_utils.log('Got result: %s' %(result), xbmc.LOGDEBUG)
+                related_list.append(result)
+                worker_count -=1
+                if max_timeout>0:
+                    timeout = max_timeout - (time.time() - begin)
+            except utils.Empty:
+                log_utils.log('Get Url Timeout', xbmc.LOGWARNING)
+                break
+        else:
+            log_utils.log('All source results received')
+
+    workers=utils.reap_workers(workers)
+    try:
+        dialog=xbmcgui.Dialog()
+        index = dialog.select('Url To Change (%s)' % (video_type), [related['label'] for related in related_list])
+        if index>-1:
+            if mode == MODES.SET_URL_MANUAL:
+                keyboard = xbmc.Keyboard()
+                keyboard.setHeading('Related %s url at %s' % (video_type, related_list[index]['name']))
+                keyboard.setDefault(related_list[index]['url'])
+                keyboard.doModal()
+                if keyboard.isConfirmed():
+                    new_url = keyboard.getText()
+                    utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], new_url, season, episode)
+            elif mode == MODES.SET_URL_SEARCH:
+                temp_title = title
+                temp_year = year
+                while True:
+                    dialog=xbmcgui.Dialog()
+                    choices = ['Manual Search']
+                    try:
+                        log_utils.log('Searching for: |%s|%s|' % (temp_title, temp_year), xbmc.LOGDEBUG)
+                        results = related_list[index]['class'].search(video_type, temp_title, temp_year)
+                        for result in results:
+                            choice = result['title']
+                            if result['year']: choice = '%s (%s)' % (choice, result['year'])
+                            choices.append(choice)
+                        results_index = dialog.select('Select Related', choices)
+                        if results_index==0:
+                            keyboard = xbmc.Keyboard()
+                            keyboard.setHeading('Enter Search')
+                            text = temp_title
+                            if temp_year: text = '%s (%s)' % (text, temp_year)
+                            keyboard.setDefault(text)
+                            keyboard.doModal()
+                            if keyboard.isConfirmed():
+                                match = re.match('([^\(]+)\s*\(*(\d{4})?\)*', keyboard.getText())
+                                temp_title = match.group(1).strip()
+                                temp_year = match.group(2) if match.group(2) else '' 
+                        elif results_index>0:
+                            utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], results[results_index-1]['url'], season, episode)
+                            break
+                        else:
+                            break
+                    except NotImplementedError:
+                        log_utils.log('%s does not support searching.' % (related_list[index]['class'].get_name()))
+                        builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
+                        xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
                         break
-                    else:
-                        break
-                except NotImplementedError:
-                    log_utils.log('%s does not support searching.' % (related_list[index]['class'].get_name()))
-                    builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
-                    xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
-                    break
+    finally:
+        utils.reap_workers(workers, None)
                 
 @url_dispatcher.register(MODES.REM_FROM_LIST, ['slug', 'section', 'id_type', 'show_id'])
 def remove_from_list(slug, section, id_type, show_id):

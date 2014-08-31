@@ -192,11 +192,11 @@ def make_source_sortkey():
             sort_key[source.lower()]=i
         return sort_key        
 
-def start_worker(cls, q, video_type, title, year, season, episode):
+def start_worker(q, func, args):
     if P_MODE == P_MODES.THREADS:
-        worker=threading.Thread(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
+        worker=threading.Thread(target=func, args=([q] + args))
     elif P_MODE == P_MODES.PROCESSES:
-        worker=multiprocessing.Process(target=parallel_get_sources, args=(cls, q, video_type, title, year, season, episode))
+        worker=multiprocessing.Process(target=func, args=([q] + args))
     worker.daemon=True
     worker.start()
     return worker
@@ -215,7 +215,7 @@ def reap_workers(workers, timeout=0):
             living_workers.append(worker)
     return living_workers
 
-def parallel_get_sources(cls, q, video_type, title, year, season, episode):
+def parallel_get_sources(q, cls, video_type, title, year, season, episode):
     scraper_instance=cls(int(ADDON.get_setting('source_timeout')))
     if P_MODE == P_MODES.THREADS:
         worker=threading.current_thread()
@@ -226,6 +226,24 @@ def parallel_get_sources(cls, q, video_type, title, year, season, episode):
     hosters=scraper_instance.get_sources(video_type, title, year, season, episode)
     log_utils.log('%s returned %s sources from %s' % (scraper_instance.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
     q.put(hosters)
+
+def parallel_get_url(q, cls, video_type, title, year, season, episode):
+    scraper_instance=cls(int(ADDON.get_setting('source_timeout')))
+    if P_MODE == P_MODES.THREADS:
+        worker=threading.current_thread()
+    elif P_MODE == P_MODES.PROCESSES:
+        worker=multiprocessing.current_process()
+        
+    log_utils.log('Getting %s url using %s' % (scraper_instance.get_name(), worker), xbmc.LOGDEBUG)
+    url=scraper_instance.get_url(video_type, title, year, season, episode)
+    log_utils.log('%s returned url %s from %s' % (scraper_instance.get_name(), url, worker), xbmc.LOGDEBUG)
+    related={}
+    related['class']=scraper_instance
+    if not url: url=''
+    related['url']=url
+    related['name']=related['class'].get_name()
+    related['label'] = '[%s] %s' % (related['name'], related['url'])
+    q.put(related)
 
 # Run a task on startup. Settings and mode values must match task name
 def do_startup_task(task):
