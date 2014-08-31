@@ -119,7 +119,7 @@ class PW_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/index.php?search_keywords=')
         search_url += urllib.quote_plus(title)
-        search_url += '&year=' + urllib.quote_plus(year)
+        search_url += '&year=' + urllib.quote_plus(str(year))
         if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE]:
             search_url += '&search_section=2'
         else:

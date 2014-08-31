@@ -5,6 +5,7 @@ import xbmc
 import xbmcgui
 import log_utils
 from constants import *
+from scrapers import * # import all scrapers into this namespace
 from addon.common.addon import Addon
 from trakt_api import Trakt_API
 from db_utils import DB_Connection
@@ -180,7 +181,7 @@ def get_sort_key(item):
                 item_sort_key.append(sign*-1)
             else:
                 item_sort_key.append(sign*item[field])
-    print 'item: %s sort_key: %s' % (item, item_sort_key)
+    #print 'item: %s sort_key: %s' % (item, item_sort_key)
     return tuple(item_sort_key)
 
 def make_source_sortkey():
@@ -286,3 +287,20 @@ def get_next_run(task):
         last_run=datetime.datetime(*(time.strptime(last_run_string, '%Y-%m-%d %H:%M:%S.%f')[0:6]))
     interval=datetime.timedelta(hours=float(ADDON.get_setting(task+'-interval')))
     return (last_run+interval)
+
+def url_exists(video_type, title, year, season='', episode=''):
+    """
+    check each source for a url for this video; return True as soon as one is found. If none are found, return False
+    """
+    classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
+    max_timeout = int(ADDON.get_setting('source_timeout'))
+    for cls in classes:
+        if video_type in cls.provides():
+            scraper_instance=cls(max_timeout)
+            url = scraper_instance.get_url(video_type, title, year, season, episode)
+            if url:
+                log_utils.log('Found url for |%s|%s|%s|%s|%s| @ %s: %s' % (video_type, title, year, season, episode, scraper_instance.get_name(), url))
+                return True
+
+    log_utils.log('No url found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
+    return False

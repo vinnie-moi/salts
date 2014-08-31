@@ -500,10 +500,75 @@ def add_to_list(section, id_type, show_id, slug=None):
 @url_dispatcher.register(MODES.UPDATE_SUBS)
 def update_subscriptions():
     log_utils.log('Updating Subscriptions', xbmc.LOGDEBUG)
+    if _SALTS.get_setting(MODES.UPDATE_SUBS+'-notify')=='true':
+        builtin = "XBMC.Notification(%s,Subscription Update Started, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
+        xbmc.executebuiltin(builtin)
+
+    slug=_SALTS.get_setting('TV_sub_slug')
+    if slug == utils.WATCHLIST_SLUG:
+        items = trakt_api.show_watchlist(SECTIONS.TV)
+    else:
+        _, items = trakt_api.show_list(slug, SECTIONS.TV)
     
+    for item in items:
+        add_to_library(VIDEO_TYPES.TVSHOW, item['title'], item['year'], trakt_api.get_slug(item['url']), require_source=True)
+     
+    if _SALTS.get_setting('include_movies') == 'true':
+        update_movies()
+    if _SALTS.get_setting('library-update') == 'true':
+        xbmc.executebuiltin('UpdateLibrary(video)')
+    if _SALTS.get_setting('cleanup-subscriptions') == 'true':
+        clean_subs()
+
+    now = datetime.datetime.now()
+    db_connection.set_setting('%s-last_run' % MODES.UPDATE_SUBS, now.strftime("%Y-%m-%d %H:%M:%S.%f"))
+
+    if _SALTS.get_setting(MODES.UPDATE_SUBS+'-notify')=='true':
+        builtin = "XBMC.Notification(%s,Subscriptions Updated, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
+        xbmc.executebuiltin(builtin)
+        builtin = "XBMC.Notification(%s,Next Update in %0.1f hours,5000, %s)" % (_SALTS.get_name(), float(_SALTS.get_setting(MODES.UPDATE_SUBS+'-interval')), ICON_PATH)
+        xbmc.executebuiltin(builtin)
+    xbmc.executebuiltin("XBMC.Container.Refresh")
+    
+def update_movies():
+    slug=_SALTS.get_setting('Movies_sub_slug')
+    if slug == utils.WATCHLIST_SLUG:
+        items = trakt_api.show_watchlist(SECTIONS.MOVIES)
+    else:
+        _, items = trakt_api.show_list(slug, SECTIONS.MOVIES)
+    
+    for item in items:
+        add_to_library(VIDEO_TYPES.MOVIE, item['title'], item['year'], trakt_api.get_slug(item['url']), require_source=True)
+
+@url_dispatcher.register(MODES.CLEAN_SUBS)
+def clean_subs():
+    slug=_SALTS.get_setting('TV_sub_slug')
+    if slug == utils.WATCHLIST_SLUG:
+        items = trakt_api.show_watchlist(SECTIONS.TV)
+    else:
+        _, items = trakt_api.show_list(slug, SECTIONS.TV)
+    
+    for item in items:
+        show_slug=trakt_api.get_slug(item['url'])
+        show=trakt_api.get_show_details(show_slug)
+        if show['status'].upper()=='ENDED':
+            del_item = {'type': TRAKT_SECTIONS[SECTIONS.TV][:-1]}
+            if 'imdb_id' in show:
+                show_id={'imdb_id': show['imdb_id']}
+            elif 'tvdb_id' in show:
+                show_id={'tvdb_id': show['tvdb_id']}
+            else:
+                show_id={'title': show['title'], 'year': show['year']}
+            del_item.update(show_id)
+            
+            if slug == utils.WATCHLIST_SLUG:
+                trakt_api.remove_from_watchlist(SECTIONS.TV, del_item)
+            else:
+                trakt_api.remove_from_list(slug, del_item)
+
 @url_dispatcher.register(MODES.ADD_TO_LIBRARY, ['video_type', 'title', 'year', 'slug'])
-def add_to_library(video_type, title, year, slug):
-    log_utils.log('Creating .strm for |%s|%s|%s|' % (video_type, title, year), xbmc.LOGDEBUG)
+def add_to_library(video_type, title, year, slug, require_source=False):
+    log_utils.log('Creating .strm for |%s|%s|%s|%s|' % (video_type, title, year, slug), xbmc.LOGDEBUG)
     if video_type == VIDEO_TYPES.TVSHOW:
         save_path = _SALTS.get_setting('tvshow-folder')
         save_path = xbmc.translatePath(save_path)
@@ -518,11 +583,12 @@ def add_to_library(video_type, title, year, slug):
             episodes = trakt_api.get_episodes(slug, season_num)
             for episode in episodes:
                 ep_num = episode['episode']
-                filename = utils.filename_from_title(show['title'], video_type)
-                filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
-                final_path = os.path.join(save_path, show['title'], 'Season %s' % (season_num), filename)
-                strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 'episode': ep_num, 'slug': slug})
-                write_strm(strm_string, final_path)
+                if not require_source or utils.url_exists(VIDEO_TYPES.EPISODE, title, year, season_num, ep_num):
+                    filename = utils.filename_from_title(show['title'], video_type)
+                    filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
+                    final_path = os.path.join(save_path, show['title'], 'Season %s' % (season_num), filename)
+                    strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 'episode': ep_num, 'slug': slug})
+                    write_strm(strm_string, final_path)
                 
     elif video_type == VIDEO_TYPES.MOVIE:
         save_path = _SALTS.get_setting('movie-folder')

@@ -123,7 +123,7 @@ class PW_Scraper(scraper.Scraper):
             
         search_url += '/advanced_search.php?name='
         search_url += urllib.quote_plus(title)
-        search_url += '&year=' + urllib.quote_plus(year)
+        search_url += '&year=' + urllib.quote_plus(str(year))
         search_url += '&advanced_search=Search'
             
         html = self.__http_get(search_url, cache_limit=.25)
