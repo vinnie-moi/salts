@@ -78,6 +78,7 @@ class Dummy_Scraper(scraper.Scraper):
         return hosters
 
     def get_url(self, video_type, title, year, season='', episode=''):
+        url = None
         result = self.db_connection.get_related_url(video_type, title, year, self.get_name())
         if result:
             url=result[0][0]
