@@ -396,7 +396,7 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
     begin = time.time()
     for cls in classes:
         if video_type in cls.provides():
-            if P_MODES == P_MODES.NONE:
+            if utils.P_MODE == P_MODES.NONE:
                 related={}
                 related['class']=cls(max_timeout)
                 url=related['class'].get_url(video_type, title, year, season, episode)

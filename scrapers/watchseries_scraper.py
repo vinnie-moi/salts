@@ -112,12 +112,13 @@ class WS_Scraper(scraper.Scraper):
             match = re.search('(.*?)\s+\((\d{4})\)', title_year)
             if match:
                 title = match.group(1)
-                year = match.group(2)
+                res_year = match.group(2)
             else:
                 title=title_year
                 year=''
-            result={'url': url, 'title': title, 'year': year}
-            results.append(result)
+            if not year or year == res_year:
+                result={'url': url, 'title': title, 'year': res_year}
+                results.append(result)
         return results
     
     def __get_episode_url(self, show_url, season, episode):
