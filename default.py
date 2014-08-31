@@ -504,7 +504,7 @@ def update_subscriptions():
         builtin = "XBMC.Notification(%s,Subscription Update Started, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
         xbmc.executebuiltin(builtin)
 
-#     update_strms(SECTIONS.TV)
+    update_strms(SECTIONS.TV)
     if _SALTS.get_setting('include_movies') == 'true':
         update_strms(SECTIONS.MOVIES)
     if _SALTS.get_setting('library-update') == 'true':
