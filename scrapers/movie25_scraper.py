@@ -51,31 +51,33 @@ class Dummy_Scraper(scraper.Scraper):
         return '[%s] %s (%s Up, %s Down) (%s/100)' % (item['quality'], item['host'], item['up'], item['down'], item['rating'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
-        url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
-        html = self.__http_get(url, cache_limit=.5)
-        
-        quality=None
-        match = re.search('Links - Quality\s*([^ ]*)\s*</h1>', html, re.DOTALL|re.I)
-        if match:
-            quality = QUALITY_MAP.get(match.group(1).upper())
-
-        pattern='li class="link_name">\s*(.*?)\s*</li>.*?href="([^"]+).*?<div class="good".*?/>\s*(.*?)\s*</a>.*?<div class="bad".*?/>\s*(.*?)\s*</a>'
+        source_url= self.get_url(video_type, title, year, season, episode)
         hosters=[]
-        for match in re.finditer(pattern, html, re.DOTALL):
-            host, url, up, down = match.groups()
-            up=int(up)
-            down=int(down)
-            hoster = {'multi-part': False}
-            hoster['host']=host
-            hoster['class']=self
-            hoster['url']=url
-            hoster['quality']=quality
-            hoster['up']=up
-            hoster['down']=down
-            rating=up*100/(up+down) if (up>0 or down>0) else None
-            hoster['rating']=rating
-            hoster['views']=up+down
-            hosters.append(hoster)
+        if source_url:
+            url = urlparse.urljoin(self.base_url,source_url)
+            html = self.__http_get(url, cache_limit=.5)
+            
+            quality=None
+            match = re.search('Links - Quality\s*([^ ]*)\s*</h1>', html, re.DOTALL|re.I)
+            if match:
+                quality = QUALITY_MAP.get(match.group(1).upper())
+    
+            pattern='li class="link_name">\s*(.*?)\s*</li>.*?href="([^"]+).*?<div class="good".*?/>\s*(.*?)\s*</a>.*?<div class="bad".*?/>\s*(.*?)\s*</a>'
+            for match in re.finditer(pattern, html, re.DOTALL):
+                host, url, up, down = match.groups()
+                up=int(up)
+                down=int(down)
+                hoster = {'multi-part': False}
+                hoster['host']=host
+                hoster['class']=self
+                hoster['url']=url
+                hoster['quality']=quality
+                hoster['up']=up
+                hoster['down']=down
+                rating=up*100/(up+down) if (up>0 or down>0) else None
+                hoster['rating']=rating
+                hoster['views']=up+down
+                hosters.append(hoster)
         return hosters
 
     def get_url(self, video_type, title, year, season='', episode=''):

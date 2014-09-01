@@ -49,27 +49,29 @@ class WS_Scraper(scraper.Scraper):
         return '%s (%s/100)' % (item['host'], item['rating'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
-        url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
-        html = self.__http_get(url, cache_limit=.5)
-        try:
-            sources=[]
-            match = re.search('English Links -.*?</tbody>\s*</table>', html, re.DOTALL)
-            fragment = match.group(0)
-            pattern = 'href\s*=\s*"([^"]*)"\s+class\s*=\s*"buttonlink"\s+title\s*=([^\s]*).*?<span class="percent"[^>]+>\s+(\d+)%\s+</span>'
-            for match in re.finditer(pattern, fragment, re.DOTALL):
-                source = {'multi-part': False}
-                url, host, rating = match.groups()
-                source['url']=url
-                source['host']=host
-                source['rating']=int(rating)
-                if source['rating']==60: source['rating']=None # rating seems to default to 60, so force to Unknown
-                source['quality']=None
-                source['class']=self
-                source['views']=None
-                sources.append(source)
-        except Exception as e:
-            log_utils.log('Failure During %s get sources: %s' % (self.get_name(), str(e)))
-            
+        source_url=self.get_url(video_type, title, year, season, episode)
+        sources=[]
+        if source_url:
+            url = urlparse.urljoin(self.base_url, source_url)
+            html = self.__http_get(url, cache_limit=.5)
+            try:
+                match = re.search('English Links -.*?</tbody>\s*</table>', html, re.DOTALL)
+                fragment = match.group(0)
+                pattern = 'href\s*=\s*"([^"]*)"\s+class\s*=\s*"buttonlink"\s+title\s*=([^\s]*).*?<span class="percent"[^>]+>\s+(\d+)%\s+</span>'
+                for match in re.finditer(pattern, fragment, re.DOTALL):
+                    source = {'multi-part': False}
+                    url, host, rating = match.groups()
+                    source['url']=url
+                    source['host']=host
+                    source['rating']=int(rating)
+                    if source['rating']==60: source['rating']=None # rating seems to default to 60, so force to Unknown
+                    source['quality']=None
+                    source['class']=self
+                    source['views']=None
+                    sources.append(source)
+            except Exception as e:
+                log_utils.log('Failure During %s get sources: %s' % (self.get_name(), str(e)))
+                
         return sources
 
     def get_url(self, video_type, title, year, season='', episode=''):

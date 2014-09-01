@@ -269,7 +269,7 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
     worker_count=0
     hosters=[]
     workers=[]
-    q = utils.Queue()
+    if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
     
     for cls in classes:
@@ -392,7 +392,7 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
     if max_timeout == 0: timeout=None
     worker_count=0
     workers=[]
-    q = utils.Queue()
+    if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
     for cls in classes:
         if video_type in cls.provides():

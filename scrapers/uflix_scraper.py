@@ -57,35 +57,37 @@ class UFlix_Scraper(scraper.Scraper):
         return '[%s] %s (%s Up, %s Down) (%s/100)' % (item['quality'], item['host'], item['up'], item['down'], item['rating'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
-        url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
-        html = self.__http_get(url, cache_limit=.5)
-
-        quality=None
-        match = re.search('(?:qaulity|quality):\s*<span[^>]*>(.*?)</span>', html, re.DOTALL|re.I)
-        if match:
-            quality = QUALITY_MAP.get(match.group(1).upper())
-            
+        source_url=self.get_url(video_type, title, year, season, episode)
         sources=[]
-        pattern='class="btn btn-primary".*?href="(.*?)".*?\?domain=[^>]+>\s*(.*?)</.*?class="fa fa-thumbs-o-up">\s*\((\d+)\).*?\((\d+)\)\s*<i class="fa fa-thumbs-o-down'
-        for match in re.finditer(pattern, html, re.DOTALL | re.I):
-            url, host,up,down = match.groups()
-            # skip ad match
-            if host.upper()=='HDSTREAM':
-                continue
-
-            up=int(up)
-            down=int(down)
-            source = {'multi-part': False}
-            source['url']=url.replace(self.base_url,'')
-            source['host']=host.replace('<span>','').replace('</span>','')
-            source['class']=self
-            source['quality']=quality
-            source['up']=up
-            source['down']=down
-            rating=up*100/(up+down) if (up>0 or down>0) else None
-            source['rating']=rating
-            source['views']=up+down
-            sources.append(source)
+        if source_url:
+            url = urlparse.urljoin(self.base_url, source_url)
+            html = self.__http_get(url, cache_limit=.5)
+    
+            quality=None
+            match = re.search('(?:qaulity|quality):\s*<span[^>]*>(.*?)</span>', html, re.DOTALL|re.I)
+            if match:
+                quality = QUALITY_MAP.get(match.group(1).upper())
+                
+            pattern='class="btn btn-primary".*?href="(.*?)".*?\?domain=[^>]+>\s*(.*?)</.*?class="fa fa-thumbs-o-up">\s*\((\d+)\).*?\((\d+)\)\s*<i class="fa fa-thumbs-o-down'
+            for match in re.finditer(pattern, html, re.DOTALL | re.I):
+                url, host,up,down = match.groups()
+                # skip ad match
+                if host.upper()=='HDSTREAM':
+                    continue
+    
+                up=int(up)
+                down=int(down)
+                source = {'multi-part': False}
+                source['url']=url.replace(self.base_url,'')
+                source['host']=host.replace('<span>','').replace('</span>','')
+                source['class']=self
+                source['quality']=quality
+                source['up']=up
+                source['down']=down
+                rating=up*100/(up+down) if (up>0 or down>0) else None
+                source['rating']=rating
+                source['views']=up+down
+                sources.append(source)
         
         return sources
 

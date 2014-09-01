@@ -45,7 +45,6 @@ class UFlix_Scraper(scraper.Scraper):
     def resolve_link(self, link):
         url = urlparse.urljoin(self.base_url, link)
         html = self.__http_get(url, cookie={'links_tos': '1'}, cache_limit=0)
-        print html
         match = re.search('<iframe.*?src="([^"]+)', html, re.DOTALL)
         if match:
             return match.group(1)
@@ -54,22 +53,24 @@ class UFlix_Scraper(scraper.Scraper):
         return '[%s] %s (%s/100)' % (item['quality'], item['host'], item['rating'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
-        url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
-        html = self.__http_get(url, cache_limit=.5)
-
         sources=[]
-        pattern='class="playDiv3".*?href="([^"]+).*?>(.*?)</a>'
-        for match in re.finditer(pattern, html, re.DOTALL | re.I):
-            url, host = match.groups()
-            source = {'multi-part': False}
-            source['url']=url.replace(self.base_url,'')
-            source['host']=host
-            source['class']=self
-            source['quality']=None
-            source['rating']=None
-            source['views']=None
-            sources.append(source)
-        
+        source_url=self.get_url(video_type, title, year, season, episode)
+        if source_url:
+            url = urlparse.urljoin(self.base_url, source_url)
+            html = self.__http_get(url, cache_limit=.5)
+    
+            pattern='class="playDiv3".*?href="([^"]+).*?>(.*?)</a>'
+            for match in re.finditer(pattern, html, re.DOTALL | re.I):
+                url, host = match.groups()
+                source = {'multi-part': False}
+                source['url']=url.replace(self.base_url,'')
+                source['host']=host
+                source['class']=self
+                source['quality']=None
+                source['rating']=None
+                source['views']=None
+                sources.append(source)
+            
         return sources
 
     def get_url(self, video_type, title, year, season='', episode=''):
@@ -131,7 +132,7 @@ class UFlix_Scraper(scraper.Scraper):
     def __get_episode_url(self, show_url, season, episode):
         url = urlparse.urljoin(self.base_url, show_url)
         html = self.__http_get(url, cache_limit=2)
-        pattern = 'class="linkname\d*" href="([^"]+/watch_episode/The_Big_Bang_Theory/%s/%s/)"' % (season, episode)
+        pattern = 'class="linkname\d*" href="([^"]+/watch_episode/[^/]+/%s/%s/)"' % (season, episode)
         match = re.search(pattern, html)
         if match:
             url = match.group(1)
