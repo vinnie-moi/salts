@@ -31,7 +31,7 @@ QUALITY_MAP = {'HD': QUALITIES.HIGH, 'LOW': QUALITIES.LOW}
 
 class UFlix_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        self.base_url = 'http://uflix.org'
+        self.base_url = 'http://twomovies.us'
         self.timeout=timeout
         self.db_connection = DB_Connection()
     
@@ -40,51 +40,34 @@ class UFlix_Scraper(scraper.Scraper):
         return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
     
     def get_name(self):
-        return 'UFlix.org'
+        return '2movies'
     
     def resolve_link(self, link):
         url = urlparse.urljoin(self.base_url, link)
-        html = self.__http_get(url, cache_limit=0)
-        match = re.search('iframe\s+src="(.*?)"', html)
+        html = self.__http_get(url, cookie={'links_tos': '1'}, cache_limit=0)
+        print html
+        match = re.search('<iframe.*?src="([^"]+)', html, re.DOTALL)
         if match:
             return match.group(1)
-        else:
-            match = re.search('var\s+url\s+=\s+\'(.*?)\'', html)
-            if match:
-                return match.group(1)
     
     def format_source_label(self, item):
-        return '[%s] %s (%s Up, %s Down) (%s/100)' % (item['quality'], item['host'], item['up'], item['down'], item['rating'])
+        return '[%s] %s (%s/100)' % (item['quality'], item['host'], item['rating'])
     
     def get_sources(self, video_type, title, year, season='', episode=''):
         url = urlparse.urljoin(self.base_url, self.get_url(video_type, title, year, season, episode))
         html = self.__http_get(url, cache_limit=.5)
 
-        quality=None
-        match = re.search('(?:qaulity|quality):\s*<span[^>]*>(.*?)</span>', html, re.DOTALL|re.I)
-        if match:
-            quality = QUALITY_MAP.get(match.group(1).upper())
-            
         sources=[]
-        pattern='class="btn btn-primary".*?href="(.*?)".*?\?domain=[^>]+>\s*(.*?)</.*?class="fa fa-thumbs-o-up">\s*\((\d+)\).*?\((\d+)\)\s*<i class="fa fa-thumbs-o-down'
+        pattern='class="playDiv3".*?href="([^"]+).*?>(.*?)</a>'
         for match in re.finditer(pattern, html, re.DOTALL | re.I):
-            url, host,up,down = match.groups()
-            # skip ad match
-            if host.upper()=='HDSTREAM':
-                continue
-
-            up=int(up)
-            down=int(down)
+            url, host = match.groups()
             source = {'multi-part': False}
             source['url']=url.replace(self.base_url,'')
-            source['host']=host.replace('<span>','').replace('</span>','')
+            source['host']=host
             source['class']=self
-            source['quality']=quality
-            source['up']=up
-            source['down']=down
-            rating=up*100/(up+down) if (up>0 or down>0) else None
-            source['rating']=rating
-            source['views']=up+down
+            source['quality']=None
+            source['rating']=None
+            source['views']=None
             sources.append(source)
         
         return sources
@@ -118,23 +101,23 @@ class UFlix_Scraper(scraper.Scraper):
         return url
     
     def search(self, video_type, title, year):
-        search_url = urlparse.urljoin(self.base_url, '/index.php?menu=search&query=')
+        search_url = urlparse.urljoin(self.base_url, '/search/?criteria=title&search_query=')
         search_url += urllib.quote_plus(title)
         html = self.__http_get(search_url, cache_limit=.25)
         results=[]
         
         # filter the html down to only tvshow or movie results
         if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE]:
-            pattern='<div id="grid2".*'
+            pattern='<h1>Tv Shows</h1>.*'
         else:
-            pattern='<div id="grid".*<div id="grid2"'
+            pattern='<div class="filmDiv".*(<h1>Tv Shows</h1>)*'
         match = re.search(pattern, html, re.DOTALL)
         try:
             fragment = match.group(0)
-            pattern = '<a title="Watch (.*?) Online For FREE".*href="(.*?)".*\((\d{1,4})\)</a>'
-            for match in re.finditer(pattern, fragment):
+            pattern = 'href="([^"]+)" class="filmname">(.*?)\s*</a>.*?/all/byViews/(\d+)/'
+            for match in re.finditer(pattern, fragment, re.DOTALL):
                 result={}
-                res_title, url, res_year = match.groups('')
+                url, res_title, res_year = match.groups('')
                 if not year or year == res_year:                
                     result['title']=res_title
                     result['url']=url.replace(self.base_url,'')
@@ -148,12 +131,11 @@ class UFlix_Scraper(scraper.Scraper):
     def __get_episode_url(self, show_url, season, episode):
         url = urlparse.urljoin(self.base_url, show_url)
         html = self.__http_get(url, cache_limit=2)
-        pattern = 'class="link"\s+href="(.*?/show/.*?/season/%s/episode/%s)"' % (season, episode)
+        pattern = 'class="linkname\d*" href="([^"]+/watch_episode/The_Big_Bang_Theory/%s/%s/)"' % (season, episode)
         match = re.search(pattern, html)
         if match:
             url = match.group(1)
             return url.replace(self.base_url, '')
         
-    def __http_get(self, url, cache_limit=8):
-        return common.cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
-        
+    def __http_get(self, url, cookie=None, cache_limit=8):
+        return common.cached_http_get(url, self.base_url, self.timeout, cookie, cache_limit=cache_limit)

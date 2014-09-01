@@ -154,4 +154,4 @@ class PW_Scraper(scraper.Scraper):
                 return ep_url
         
     def __http_get(self, url, cache_limit=8):
-        return common.cached_http_get(url, self.base_url, self.timeout, cache_limit)
+        return common.cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

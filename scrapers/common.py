@@ -4,16 +4,17 @@ from salts_lib.constants import USER_AGENT
 from salts_lib import log_utils
 from salts_lib.db_utils import DB_Connection
 
-def cached_http_get(url, base_url, timeout, cache_limit=8):
+def cached_http_get(url, base_url, timeout, cookie=None, cache_limit=8):
     log_utils.log('Getting Url: %s' % (url))
     db_connection=DB_Connection()
     html = db_connection.get_cached_url(url, cache_limit)
     if html:
         log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
-        return html
     
     try:
         request = urllib2.Request(url)
+        if cookie is not None:
+            request.add_header('Cookie', make_cookie(cookie)) 
         request.add_header('User-Agent', USER_AGENT)
         request.add_unredirected_header('Host', request.get_host())
         request.add_unredirected_header('Referer', base_url)
@@ -24,3 +25,9 @@ def cached_http_get(url, base_url, timeout, cache_limit=8):
     
     db_connection.cache_url(url, html)
     return html
+
+def make_cookie(cookie):
+    s=''
+    for key in cookie:
+        s += '%s=%s; ' % (key, cookie[key])
+    return s[:-2]
