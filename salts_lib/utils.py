@@ -299,7 +299,7 @@ def url_exists(video_type, title, year, season='', episode=''):
             scraper_instance=cls(max_timeout)
             url = scraper_instance.get_url(video_type, title, year, season, episode)
             if url:
-                log_utils.log('Found url for |%s|%s|%s|%s|%s| @ %s: %s' % (video_type, title, year, season, episode, scraper_instance.get_name(), url))
+                log_utils.log('Found url for |%s|%s|%s|%s|%s| @ %s: %s' % (video_type, title, year, season, episode, scraper_instance.get_name(), url), xbmc.LOGDEBUG)
                 return True
 
     log_utils.log('No url found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))

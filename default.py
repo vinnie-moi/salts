@@ -576,24 +576,22 @@ def add_to_library(video_type, title, year, slug, require_source=False):
             episodes = trakt_api.get_episodes(slug, season_num)
             for episode in episodes:
                 ep_num = episode['episode']
-                if not require_source or utils.url_exists(VIDEO_TYPES.EPISODE, title, year, season_num, ep_num):
-                    filename = utils.filename_from_title(show['title'], video_type)
-                    filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
-                    final_path = os.path.join(save_path, show['title'], 'Season %s' % (season_num), filename)
-                    strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 'episode': ep_num, 'slug': slug})
-                    write_strm(strm_string, final_path)
+                filename = utils.filename_from_title(show['title'], video_type)
+                filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
+                final_path = os.path.join(save_path, show['title'], 'Season %s' % (season_num), filename)
+                strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 'episode': ep_num, 'slug': slug})
+                write_strm(strm_string, final_path, VIDEO_TYPES.EPISODE, title, year, season_num, ep_num, require_source)
                 
     elif video_type == VIDEO_TYPES.MOVIE:
-        if not require_source or utils.url_exists(VIDEO_TYPES.MOVIE, title, year):
-            save_path = _SALTS.get_setting('movie-folder')
-            save_path = xbmc.translatePath(save_path)
-            strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': video_type, 'title': title, 'year': year, 'slug': slug})
-            if year: title = '%s (%s)' % (title, year)
-            filename = utils.filename_from_title(title, VIDEO_TYPES.MOVIE)
-            final_path = os.path.join(save_path, title, filename)
-            write_strm(strm_string, final_path)
+        save_path = _SALTS.get_setting('movie-folder')
+        save_path = xbmc.translatePath(save_path)
+        strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': video_type, 'title': title, 'year': year, 'slug': slug})
+        if year: title = '%s (%s)' % (title, year)
+        filename = utils.filename_from_title(title, VIDEO_TYPES.MOVIE)
+        final_path = os.path.join(save_path, title, filename)
+        write_strm(strm_string, final_path, VIDEO_TYPES.MOVIE, title, year, require_source=require_source)
 
-def write_strm(stream, path):
+def write_strm(stream, path, video_type, title, year, season='', episode='', require_source=False):
     path = xbmc.makeLegalFilename(path)
     if not xbmcvfs.exists(os.path.dirname(path)):
         try:
@@ -613,10 +611,13 @@ def write_strm(stream, path):
     # string will be blank if file doesn't exist or is blank
     if stream != old_strm_string:
         try:
-            log_utils.log('Writing strm: %s' % stream)
-            file_desc = xbmcvfs.File(path, 'w')
-            file_desc.write(stream)
-            file_desc.close()
+            if not require_source or utils.url_exists(video_type, title, year, season, episode):
+                log_utils.log('Writing strm: %s' % stream)
+                file_desc = xbmcvfs.File(path, 'w')
+                file_desc.write(stream)
+                file_desc.close()
+            else:
+                log_utils.log('No strm written for |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode), xbmc.LOGWARNING)
         except Exception, e:
             log_utils.log('Failed to create .strm file: %s\n%s' % (path, e), xbmc.LOGERROR)
     
