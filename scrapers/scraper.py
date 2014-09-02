@@ -34,11 +34,13 @@ class Scraper(object):
         """
         raise NotImplementedError
         
-    @abc.abstractmethod 
-    def get_name(self):
+    @classmethod
+    def get_name(cls):
         """
         Must return a string that is a name that will be used through out the UI and DB to refer to urls from this source
         Should be descriptive enough to be recognized but short enough to be presented in the UI
+
+        * Can not easily combine classmethod and abstract method, but this method must be provided as a class method
         """
         raise NotImplementedError
 

@@ -29,7 +29,8 @@ class Dummy_Scraper(scraper.Scraper):
     def provides(cls):
         return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
     
-    def get_name(self):
+    @classmethod
+    def get_name(cls):
         return 'Dummy'
     
     def resolve_link(self, link):

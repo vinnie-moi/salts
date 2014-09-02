@@ -224,9 +224,9 @@ def parallel_get_sources(q, cls, video_type, title, year, season, episode):
     elif P_MODE == P_MODES.PROCESSES:
         worker=multiprocessing.current_process()
         
-    log_utils.log('Getting %s sources using %s' % (scraper_instance.get_name(), worker), xbmc.LOGDEBUG)
+    log_utils.log('Getting %s sources using %s' % (cls.get_name(), worker), xbmc.LOGDEBUG)
     hosters=scraper_instance.get_sources(video_type, title, year, season, episode)
-    log_utils.log('%s returned %s sources from %s' % (scraper_instance.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
+    log_utils.log('%s returned %s sources from %s' % (cls.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
     q.put(hosters)
 
 def parallel_get_url(q, cls, video_type, title, year, season, episode):
@@ -236,9 +236,9 @@ def parallel_get_url(q, cls, video_type, title, year, season, episode):
     elif P_MODE == P_MODES.PROCESSES:
         worker=multiprocessing.current_process()
         
-    log_utils.log('Getting %s url using %s' % (scraper_instance.get_name(), worker), xbmc.LOGDEBUG)
+    log_utils.log('Getting %s url using %s' % (cls.get_name(), worker), xbmc.LOGDEBUG)
     url=scraper_instance.get_url(video_type, title, year, season, episode)
-    log_utils.log('%s returned url %s from %s' % (scraper_instance.get_name(), url, worker), xbmc.LOGDEBUG)
+    log_utils.log('%s returned url %s from %s' % (cls.get_name(), url, worker), xbmc.LOGDEBUG)
     related={}
     related['class']=scraper_instance
     if not url: url=''
@@ -292,15 +292,46 @@ def url_exists(video_type, title, year, season='', episode=''):
     """
     check each source for a url for this video; return True as soon as one is found. If none are found, return False
     """
-    classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     max_timeout = int(ADDON.get_setting('source_timeout'))
-    for cls in classes:
-        if video_type in cls.provides():
-            scraper_instance=cls(max_timeout)
-            url = scraper_instance.get_url(video_type, title, year, season, episode)
-            if url:
-                log_utils.log('Found url for |%s|%s|%s|%s|%s| @ %s: %s' % (video_type, title, year, season, episode, scraper_instance.get_name(), url), xbmc.LOGDEBUG)
-                return True
+    for cls in relevant_scrapers(video_type):
+        scraper_instance=cls(max_timeout)
+        url = scraper_instance.get_url(video_type, title, year, season, episode)
+        if url:
+            log_utils.log('Found url for |%s|%s|%s|%s|%s| @ %s: %s' % (video_type, title, year, season, episode, cls.get_name(), url), xbmc.LOGDEBUG)
+            return True
 
     log_utils.log('No url found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
     return False
+
+def relevant_scrapers(video_type=None, include_disabled=False):
+    classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
+    relevant=[]
+    for cls in classes:
+        if video_type is None or video_type in cls.provides():
+            if include_disabled or scraper_enabled(cls.get_name()):
+                relevant.append(cls)
+    return relevant
+
+def scraper_enabled(name):
+    return '|%s|' % (name) not in ADDON.get_setting('disabled_scrapers')
+
+def enable_scraper(name):
+    if not scraper_enabled(name):
+        disabled=ADDON.get_setting('disabled_scrapers')
+        pattern = '|%s|' % (name)
+        pieces = disabled.split(pattern)
+        disabled='|'.join(pieces)
+        if disabled=='|': disabled=''
+        ADDON.set_setting('disabled_scrapers', disabled)
+
+def disable_scraper(name):
+    if scraper_enabled(name):
+        disabled=ADDON.get_setting('disabled_scrapers')
+        if not disabled:
+            disabled = '|%s|' % (name)
+        else:
+            disabled = '%s%s|' % (disabled, name)
+        ADDON.set_setting('disabled_scrapers', disabled)
+
+                
+    

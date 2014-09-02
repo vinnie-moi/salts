@@ -35,7 +35,8 @@ class WS_Scraper(scraper.Scraper):
     def provides(cls):
         return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE])
     
-    def get_name(self):
+    @classmethod
+    def get_name(cls):
         return 'WatchSeries'
     
     def resolve_link(self, link):

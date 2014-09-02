@@ -48,6 +48,7 @@ def main_menu():
     db_connection.init_database()
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'})
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'})
+    _SALTS.add_directory({'mode': MODES.SCRAPERS}, {'title': 'Scraper Settings'})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.BROWSE, ['section'])
@@ -68,6 +69,26 @@ def browse_menu(section):
     _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
+@url_dispatcher.register(MODES.SCRAPERS)
+def scraper_settings():
+    for cls in utils.relevant_scrapers(None, True):
+        label = '%s (Provides: %s)' % (cls.get_name(), str(list(cls.provides())).replace("'", ""))
+        if not utils.scraper_enabled(cls.get_name()): label = '[COLOR red]%s[/COLOR]' % (label)
+        liz = xbmcgui.ListItem(label=label)
+        liz.setProperty('IsPlayable', 'false')
+        liz.setInfo('video', {'title': label})
+        liz_url = _SALTS.build_plugin_url({'mode': MODES.TOGGLE_SCRAPER, 'name': cls.get_name()})
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+@url_dispatcher.register(MODES.TOGGLE_SCRAPER, ['name'])
+def toggle_scraper(name):
+    if utils.scraper_enabled(name):
+        utils.disable_scraper(name)
+    else:
+        utils.enable_scraper(name)
+    xbmc.executebuiltin("XBMC.Container.Refresh")
+    
 @url_dispatcher.register(MODES.TRENDING, ['section'])
 def browse_trending(section):
     list_data = trakt_api.get_trending(section)
@@ -262,7 +283,6 @@ def browse_episodes(slug, season, fanart):
 
 @url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode'])
 def get_sources(video_type, title, year, slug, season='', episode=''):
-    classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
     if max_timeout == 0: timeout=None
     max_results = int(_SALTS.get_setting('source_results'))
@@ -272,16 +292,15 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
     if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
     
-    for cls in classes:
-        if video_type in cls.provides():
-            if utils.P_MODE == P_MODES.NONE:
-                hosters += cls(max_timeout).get_sources(video_type, title, year, season, episode)
-                if max_results> 0 and len(hosters) >= max_results:
-                    break
-            else:
-                worker=utils.start_worker(q, utils.parallel_get_sources, [cls, video_type, title, year, season, episode])
-                worker_count+=1
-                workers.append(worker)
+    for cls in utils.relevant_scrapers(video_type):
+        if utils.P_MODE == P_MODES.NONE:
+            hosters += cls(max_timeout).get_sources(video_type, title, year, season, episode)
+            if max_results> 0 and len(hosters) >= max_results:
+                break
+        else:
+            worker=utils.start_worker(q, utils.parallel_get_sources, [cls, video_type, title, year, season, episode])
+            worker_count+=1
+            workers.append(worker)
 
     # collect results from workers
     if utils.P_MODE != P_MODES.NONE:
@@ -386,7 +405,6 @@ def pick_source_dialog(hosters, filtered=False):
 @url_dispatcher.register(MODES.SET_URL_MANUAL, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
 @url_dispatcher.register(MODES.SET_URL_SEARCH, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
 def set_related_url(mode, video_type, title, year, season='', episode=''):
-    classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     related_list=[]
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
     if max_timeout == 0: timeout=None
@@ -394,21 +412,20 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
     workers=[]
     if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
-    for cls in classes:
-        if video_type in cls.provides():
-            if utils.P_MODE == P_MODES.NONE:
-                related={}
-                related['class']=cls(max_timeout)
-                url=related['class'].get_url(video_type, title, year, season, episode)
-                if not url: url=''
-                related['url']=url
-                related['name']=related['class'].get_name()
-                related['label'] = '[%s] %s' % (related['name'], related['url'])
-                related_list.append(related)
-            else:
-                worker = utils.start_worker(q, utils.parallel_get_url, [cls, video_type, title, year, season, episode])
-                worker_count += 1
-                workers.append(worker)
+    for cls in utils.relevant_scrapers(video_type):
+        if utils.P_MODE == P_MODES.NONE:
+            related={}
+            related['class']=cls(max_timeout)
+            url=related['class'].get_url(video_type, title, year, season, episode)
+            if not url: url=''
+            related['url']=url
+            related['name']=related['class'].get_name()
+            related['label'] = '[%s] %s' % (related['name'], related['url'])
+            related_list.append(related)
+        else:
+            worker = utils.start_worker(q, utils.parallel_get_url, [cls, video_type, title, year, season, episode])
+            worker_count += 1
+            workers.append(worker)
     
     # collect results from workers
     if utils.P_MODE != P_MODES.NONE:
