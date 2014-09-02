@@ -1,20 +1,21 @@
 import urllib2
+import urllib
 import xbmc
 from salts_lib.constants import USER_AGENT
 from salts_lib import log_utils
 from salts_lib.db_utils import DB_Connection
 
-def cached_http_get(url, base_url, timeout, cookie=None, cache_limit=8):
-    log_utils.log('Getting Url: %s' % (url))
+def cached_http_get(url, base_url, timeout, cookie=None, data=None, cache_limit=8):
+    log_utils.log('Getting Url: %s cookie=|%s| data=|%s|' % (url, cookie, data))
     db_connection=DB_Connection()
     html = db_connection.get_cached_url(url, cache_limit)
     if html:
         log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
     
     try:
-        request = urllib2.Request(url)
-        if cookie is not None:
-            request.add_header('Cookie', make_cookie(cookie)) 
+        if data is not None: data=urllib.urlencode(data, True)            
+        request = urllib2.Request(url, data=data)
+        if cookie is not None: request.add_header('Cookie', make_cookie(cookie)) 
         request.add_header('User-Agent', USER_AGENT)
         request.add_unredirected_header('Host', request.get_host())
         request.add_unredirected_header('Referer', base_url)

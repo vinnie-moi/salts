@@ -471,8 +471,8 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                         else:
                             break
                     except NotImplementedError:
-                        log_utils.log('%s does not support searching.' % (related_list[index]['class'].get_name()))
-                        builtin = 'XBMC.Notification(%s, %s does not support searching, 5000, %s)'
+                        log_utils.log('%s Scraper does not support searching.' % (related_list[index]['class'].get_name()))
+                        builtin = 'XBMC.Notification(%s, %s Scraper does not support searching, 5000, %s)'
                         xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
                         break
     finally:
