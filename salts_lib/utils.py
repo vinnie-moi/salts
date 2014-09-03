@@ -332,6 +332,3 @@ def disable_scraper(name):
         else:
             disabled = '%s%s|' % (disabled, name)
         ADDON.set_setting('disabled_scrapers', disabled)
-
-                
-    
