@@ -294,6 +294,7 @@ def url_exists(video_type, title, year, season='', episode=''):
     check each source for a url for this video; return True as soon as one is found. If none are found, return False
     """
     max_timeout = int(ADDON.get_setting('source_timeout'))
+    log_utils.log('url_exists: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode), xbmc.LOGDEBUG)
     for cls in relevant_scrapers(video_type):
         scraper_instance=cls(max_timeout)
         url = scraper_instance.get_url(video_type, title, year, season, episode)
