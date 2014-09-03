@@ -19,7 +19,6 @@ import scraper
 import re
 import urllib
 import urlparse
-import common
 from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -92,7 +91,7 @@ class PW_Scraper(scraper.Scraper):
         return hosters
 
     def get_url(self, video_type, title, year, season='', episode=''):
-        return super(PW_Scraper, self).default_get_url(video_type, title, year, season, episode)
+        return super(PW_Scraper, self)._default_get_url(video_type, title, year, season, episode)
     
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/index.php?search_keywords=')
@@ -132,4 +131,4 @@ class PW_Scraper(scraper.Scraper):
                 return ep_url
         
     def __http_get(self, url, cache_limit=8):
-        return common.cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
+        return super(PW_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

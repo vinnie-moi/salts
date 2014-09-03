@@ -19,7 +19,6 @@ import scraper
 import re
 import urllib
 import urlparse
-import common
 from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -124,7 +123,7 @@ class IceFilms_Scraper(scraper.Scraper):
                 log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
             else:
                 show_url = url
-                url = self.get_episode_url(show_url, season, episode)
+                url = self._get_episode_url(show_url, season, episode)
                 if url:
                     self.db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
         
@@ -143,4 +142,4 @@ class IceFilms_Scraper(scraper.Scraper):
             return url.replace(self.base_url, '')
         
     def __http_get(self, url, data=None, cache_limit=8):
-        return common.cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
+        return super(IceFilms_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

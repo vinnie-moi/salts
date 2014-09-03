@@ -19,7 +19,6 @@ import scraper
 import urllib
 import urlparse
 import re
-import common
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.db_utils import DB_Connection
@@ -108,4 +107,4 @@ class Movie25_Scraper(scraper.Scraper):
         return results
 
     def __http_get(self, url, cache_limit=8):
-        return common.cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
+        return super(Movie25_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

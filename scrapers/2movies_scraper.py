@@ -20,7 +20,6 @@ import xbmc
 import urllib
 import urlparse
 import re
-import common
 from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -75,7 +74,7 @@ class TwoMovies_Scraper(scraper.Scraper):
         return sources
 
     def get_url(self, video_type, title, year, season='', episode=''):
-        return super(TwoMovies_Scraper, self).default_get_url(video_type, title, year, season, episode)
+        return super(TwoMovies_Scraper, self)._default_get_url(video_type, title, year, season, episode)
     
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/search/?criteria=title&search_query=')
@@ -115,4 +114,4 @@ class TwoMovies_Scraper(scraper.Scraper):
             return url.replace(self.base_url, '')
         
     def __http_get(self, url, cookie=None, cache_limit=8):
-        return common.cached_http_get(url, self.base_url, self.timeout, cookie, cache_limit=cache_limit)
+        return super(TwoMovies_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
