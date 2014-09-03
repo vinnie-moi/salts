@@ -92,32 +92,7 @@ class PW_Scraper(scraper.Scraper):
         return hosters
 
     def get_url(self, video_type, title, year, season='', episode=''):
-        temp_video_type=video_type
-        if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
-        url = None
-
-        result = self.db_connection.get_related_url(temp_video_type, title, year, self.get_name())
-        if result:
-            url=result[0][0]
-            log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
-        else:
-            results = self.search(temp_video_type, title, year)
-            if results:
-                url = results[0]['url']
-                self.db_connection.set_related_url(temp_video_type, title, year, self.get_name(), url)
-
-        if url and video_type==VIDEO_TYPES.EPISODE:
-            result = self.db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
-            if result:
-                url=result[0][0]
-                log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
-            else:
-                show_url = url
-                url = self.__get_episode_url(show_url, season, episode)
-                if url:
-                    self.db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
-        
-        return url
+        return super(PW_Scraper, self).default_get_url(video_type, title, year, season, episode)
     
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/index.php?search_keywords=')
@@ -144,7 +119,7 @@ class PW_Scraper(scraper.Scraper):
             results.append(result)
         return results
     
-    def __get_episode_url(self, show_url, season, episode):
+    def _get_episode_url(self, show_url, season, episode):
         url = urlparse.urljoin(self.base_url, show_url)
         html = self.__http_get(url, cache_limit=2)
         pattern = '"tv_episode_item".+?href="(.+?)">.*?</a>'

@@ -27,9 +27,9 @@ from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW}
 
-class Dummy_Scraper(scraper.Scraper):
+class Movie25_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        self.base_url = 'http://movie25.com'
+        self.base_url = 'http://movie25.cm'
         self.timeout=timeout
         self.db_connection = DB_Connection()
     

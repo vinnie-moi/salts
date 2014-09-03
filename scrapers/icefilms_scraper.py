@@ -28,7 +28,7 @@ from salts_lib.constants import QUALITIES
 QUALITY_MAP = {'HD 720P': QUALITIES.HD, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH}
 BROKEN_RESOLVERS = ['180UPLOAD', 'HUGEFILES', 'VIDPLAY']
 
-class PW_Scraper(scraper.Scraper):
+class IceFilms_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.base_url = 'http://www.icefilms.info/'
         self.timeout=timeout
@@ -124,7 +124,7 @@ class PW_Scraper(scraper.Scraper):
                 log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
             else:
                 show_url = url
-                url = self.__get_episode_url(show_url, season, episode)
+                url = self.get_episode_url(show_url, season, episode)
                 if url:
                     self.db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
         
@@ -133,7 +133,7 @@ class PW_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         raise NotImplementedError
     
-    def __get_episode_url(self, show_url, season, episode):
+    def _get_episode_url(self, show_url, season, episode):
         url = urlparse.urljoin(self.base_url, show_url)
         html = self.__http_get(url, cache_limit=2)
         pattern = 'href=(/ip\.php[^>]+)>%sx0?%s\s+' % (season, episode)

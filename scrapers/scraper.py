@@ -16,6 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import abc
+from salts_lib.db_utils import DB_Connection
+from salts_lib import log_utils
+from salts_lib.constants import VIDEO_TYPES
+
 abstractstaticmethod = abc.abstractmethod
 
 DEFAULT_TIMEOUT=30
@@ -23,6 +27,9 @@ DEFAULT_TIMEOUT=30
 class Scraper(object):
     __metaclass__ = abc.ABCMeta
     
+    def __init__(self, timeout=DEFAULT_TIMEOUT):
+        self.db_connection = DB_Connection()
+
     @classmethod
     def provides(cls):
         """
@@ -101,6 +108,34 @@ class Scraper(object):
         * Generally speaking, domain should not be included
         """
         raise NotImplementedError
+    
+    def default_get_url(self, video_type, title, year, season='', episode=''):
+        temp_video_type=video_type
+        if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
+        url = None
+
+        result = self.db_connection.get_related_url(temp_video_type, title, year, self.get_name())
+        if result:
+            url=result[0][0]
+            log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
+        else:
+            results = self.search(temp_video_type, title, year)
+            if results:
+                url = results[0]['url']
+                self.db_connection.set_related_url(temp_video_type, title, year, self.get_name(), url)
+
+        if url and video_type==VIDEO_TYPES.EPISODE:
+            result = self.db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
+            if result:
+                url=result[0][0]
+                log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
+            else:
+                show_url = url
+                url = self._get_episode_url(show_url, season, episode)
+                if url:
+                    self.db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
+        
+        return url
 
     @abc.abstractmethod 
     def search(self, video_type, title, year):
