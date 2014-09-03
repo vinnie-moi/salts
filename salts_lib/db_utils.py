@@ -173,8 +173,7 @@ class DB_Connection():
             (video_type TEXT NOT NULL, title TEXT NOT NULL, year TEXT NOT NULL, season TEXT NOT NULL, episode TEXT NOT NULL, source TEXT NOT NULL, rel_url TEXT, \
             PRIMARY KEY(video_type, title, year, season, episode, source))')
             self.__execute('CREATE TABLE IF NOT EXISTS other_lists (section TEXT NOT NULL, username TEXT NOT NULL, slug TEXT NOT NULL, PRIMARY KEY(section, username, slug))')
-            
-        
+                
         sql = 'REPLACE INTO db_info (setting, value) VALUES(?,?)'
         self.__execute(sql, ('version', _SALTS.get_version()))
 

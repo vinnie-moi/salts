@@ -54,18 +54,35 @@ def main_menu():
 @url_dispatcher.register(MODES.BROWSE, ['section'])
 def browse_menu(section):
     section_label='TV Shows' if section==SECTIONS.TV else 'Movies'
+    try:
+        valid_account=trakt_api.valid_account()
+    except:
+        valid_account=False
+    
+    if not valid_account:
+        remind_count = int(_SALTS.get_setting('remind_count'))
+        remind_max=5
+        if remind_count<remind_max:
+            remind_count += 1
+            log_utils.log('Showing Config reminder')
+            builtin = 'XBMC.Notification(%s,(%s/%s) Configure Trakt Account for more options, 7500, %s)'
+            xbmc.executebuiltin(builtin % (_SALTS.get_name(), remind_count, remind_max, ICON_PATH))
+            _SALTS.set_setting('remind_count', str(remind_count))
+    else:
+        _SALTS.set_setting('remind_count', '0')
+
     _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': 'Trending %s' % (section_label)})
-    _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
-    _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES, 'section': section}, {'title': 'My Favorites'})
-    _SALTS.add_directory({'mode': MODES.MANAGE_SUBS, 'section': section}, {'title': 'My Subscriptions'})
-    _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': 'My Watchlist'})
-    _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'})
+    if valid_account: _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
+    if valid_account: _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES, 'section': section}, {'title': 'My Favorites'})
+    if valid_account: _SALTS.add_directory({'mode': MODES.MANAGE_SUBS, 'section': section}, {'title': 'My Subscriptions'})
+    if valid_account: _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': 'My Watchlist'})
+    if valid_account: _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'})
     _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': 'Other Lists'})
     if section==SECTIONS.TV:
-        _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
+        if valid_account: _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
         _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'General Calendar'})
         _SALTS.add_directory({'mode': MODES.PREMIERES}, {'title': 'Premiere Calendar'})
-    _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'})
+    if valid_account: _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'})
     _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
