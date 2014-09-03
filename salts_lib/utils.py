@@ -135,15 +135,16 @@ def get_section_params(section):
         section_params['video_type']=VIDEO_TYPES.TVSHOW
     else:
         section_params['next_mode']=MODES.GET_SOURCES
-        section_params['folder']=False
+        section_params['folder']=ADDON.get_setting('source-win')=='Directory'
         section_params['video_type']=VIDEO_TYPES.MOVIE
     return section_params
 
-def filename_from_title(title, video_type):
+def filename_from_title(title, video_type, year=None):
     if video_type == VIDEO_TYPES.TVSHOW:
         filename = '%s S%sE%s.strm'
         filename = filename % (title, '%s', '%s')
     else:
+        if year: title = '%s (%s)' % (title, year)
         filename = '%s.strm' % title
 
     filename = re.sub(r'(?!%s)[^\w\-_\.]', '.', filename)

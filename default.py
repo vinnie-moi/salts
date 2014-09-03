@@ -298,8 +298,8 @@ def browse_episodes(slug, season, fanart):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-@url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode'])
-def get_sources(video_type, title, year, slug, season='', episode=''):
+@url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode', 'dialog'])
+def get_sources(video_type, title, year, slug, season='', episode='', dialog=None):
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
     if max_timeout == 0: timeout=None
     max_results = int(_SALTS.get_setting('source_results'))
@@ -355,33 +355,61 @@ def get_sources(video_type, title, year, slug, season='', episode=''):
             SORT_KEYS['source'] = utils.make_source_sortkey()
             hosters.sort(key = utils.get_sort_key)
             
-        stream_url = pick_source_dialog(hosters)
-        if stream_url is None:
-            return True
-        
-        if not stream_url or not isinstance(stream_url, basestring):
-            return False
-
-        if video_type == VIDEO_TYPES.EPISODE:
-            details = trakt_api.get_episode_details(slug, season, episode)
-            info = utils.make_info(details['episode'], details['show'])
-            art=utils.make_art(details['episode'], details['show']['images']['fanart'])
+        if dialog or (dialog is None and _SALTS.get_setting('source-win') == 'Dialog'):
+            stream_url = pick_source_dialog(hosters)
+            return play_source(stream_url, video_type, slug, season, episode)
         else:
-            item = trakt_api.get_movie_details(slug)
-            info = utils.make_info(item)
-            art=utils.make_art(item)
-    
-        listitem = xbmcgui.ListItem(path=stream_url, iconImage=art['thumb'], thumbnailImage=art['thumb'])
-        listitem.setProperty('fanart_image', art['fanart'])
-        try: listitem.setArt(art)
-        except:pass
-        listitem.setProperty('IsPlayable', 'true')
-        listitem.setPath(stream_url)
-        listitem.setInfo('video', info)
-        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+            pick_source_dir(hosters, video_type, slug, season, episode)
     finally:
         utils.reap_workers(workers, None)
+    
+
+@url_dispatcher.register(MODES.RESOLVE_SOURCE, ['class_url', 'video_type', 'slug', 'class_name'], ['season', 'episode'])
+def resolve_source(class_url, video_type, slug, class_name, season='', episode=''):
+    for cls in utils.relevant_scrapers(video_type):
+        if cls.get_name() == class_name:
+            scraper_instance=cls()
+            break
+    else:
+        log_utils.log('Unable to locate scraper with name: %s' % (class_name))
+        return False
         
+    hoster_url = scraper_instance.resolve_link(class_url)
+    return play_source(hoster_url, video_type, slug, season, episode)
+
+def play_source(hoster_url, video_type, slug, season='', episode=''):
+    import urlresolver
+    stream_url = urlresolver.HostedMediaFile(url=hoster_url).resolve()
+    if stream_url==False:
+        log_utils.log('Url (%s|%s) Resolution failed' % (hoster_url))
+        builtin = 'XBMC.Notification(%s, Could not Resolve Url: %s, 5000, %s)'
+        xbmc.executebuiltin(builtin % (_SALTS.get_name(), hoster_url, ICON_PATH))
+
+    if stream_url is None:
+        return True
+    
+    if not stream_url or not isinstance(stream_url, basestring):
+        return False
+    
+
+    if video_type == VIDEO_TYPES.EPISODE:
+        details = trakt_api.get_episode_details(slug, season, episode)
+        info = utils.make_info(details['episode'], details['show'])
+        art=utils.make_art(details['episode'], details['show']['images']['fanart'])
+    else:
+        item = trakt_api.get_movie_details(slug)
+        info = utils.make_info(item)
+        art=utils.make_art(item)
+    
+    listitem = xbmcgui.ListItem(path=stream_url, iconImage=art['thumb'], thumbnailImage=art['thumb'])
+    listitem.setProperty('fanart_image', art['fanart'])
+    try: listitem.setArt(art)
+    except:pass
+    listitem.setProperty('IsPlayable', 'true')
+    listitem.setPath(stream_url)
+    listitem.setInfo('video', info)
+    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+    
     return True
 
 def pick_source_dialog(hosters, filtered=False):
@@ -405,20 +433,40 @@ def pick_source_dialog(hosters, filtered=False):
     index = dialog.select('Choose your stream', [item['label'] for item in hosters if 'label' in item])
     if index>-1:
         try:
-            url=hosters[index]['class'].resolve_link(hosters[index]['url'])
-            log_utils.log('Attempting to play url: %s' % url)
-            stream_url = urlresolver.HostedMediaFile(url=url).resolve()
-            if stream_url==False:
-                log_utils.log('Url (%s|%s) Resolution failed' % (hosters[index]['url'], url))
-                builtin = 'XBMC.Notification(%s, Could not Resolve Url: %s, 5000, %s)'
-                xbmc.executebuiltin(builtin % (_SALTS.get_name(), url, ICON_PATH))
-            return stream_url
+            hoster_url=hosters[index]['class'].resolve_link(hosters[index]['url'])
+            log_utils.log('Attempting to play url: %s' % hoster_url)
+            return hoster_url
         except Exception as e:
-            log_utils.log('Error (%s) while trying to resolve %s' % (str(e), url), xbmc.LOGERROR)
+            log_utils.log('Error (%s) while trying to resolve %s' % (str(e), hoster_url), xbmc.LOGERROR)
             return False
     else:
         return None
     
+def pick_source_dir(hosters, video_type, slug, season='', episode='', filtered=False):
+    import urlresolver
+    for item in hosters:
+        # TODO: Skip multiple sources for now
+        if item['multi-part']:
+            continue
+
+        if filtered:
+            hosted_media = urlresolver.HostedMediaFile(host=item['host'], media_id='dummy') # use dummy media_id to force host validation
+            if not hosted_media:
+                log_utils.log('Skipping unresolvable source: %s (%s)' % (item['url'], item['host']))
+                continue
+        
+        label = item['class'].format_source_label(item)
+        label = '[%s] %s' % (item['class'].get_name(),label)
+        item['label']=label
+    
+    hosters_len=len(hosters)
+    for item in hosters:
+        #log_utils.log(item, xbmc.LOGDEBUG)
+        queries={'mode': MODES.RESOLVE_SOURCE, 'hoster_url': item['url'], 'video_type': video_type, 'slug': slug, 'season': season, 'episode': episode, 'class_name': item['class'].get_name()}
+        _SALTS.add_directory(queries, infolabels={'title': item['label']}, is_folder=False, img='', fanart='', total_items=hosters_len)
+    
+    _SALTS.end_of_directory()
+
 @url_dispatcher.register(MODES.SET_URL_MANUAL, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
 @url_dispatcher.register(MODES.SET_URL_SEARCH, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
 def set_related_url(mode, video_type, title, year, season='', episode=''):
@@ -634,16 +682,16 @@ def add_to_library(video_type, title, year, slug, require_source=False):
                 filename = utils.filename_from_title(show['title'], video_type)
                 filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
                 final_path = os.path.join(save_path, show['title'], 'Season %s' % (season_num), filename)
-                strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 'episode': ep_num, 'slug': slug})
+                strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 'episode': ep_num, 'slug': slug, 'dialog': True})
                 write_strm(strm_string, final_path, VIDEO_TYPES.EPISODE, title, year, season_num, ep_num, require_source)
                 
     elif video_type == VIDEO_TYPES.MOVIE:
         save_path = _SALTS.get_setting('movie-folder')
         save_path = xbmc.translatePath(save_path)
-        strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': video_type, 'title': title, 'year': year, 'slug': slug})
-        if year: title = '%s (%s)' % (title, year)
-        filename = utils.filename_from_title(title, VIDEO_TYPES.MOVIE)
-        final_path = os.path.join(save_path, title, filename)
+        strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': video_type, 'title': title, 'year': year, 'slug': slug, 'dialog': True})
+        filename = utils.filename_from_title(title, VIDEO_TYPES.MOVIE, year)
+        dir_name = title if not year else '%s (%s)' % (title, year)
+        final_path = os.path.join(save_path, dir_name, filename)
         write_strm(strm_string, final_path, VIDEO_TYPES.MOVIE, title, year, require_source=require_source)
 
 def write_strm(stream, path, video_type, title, year, season='', episode='', require_source=False):
