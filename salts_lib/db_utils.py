@@ -157,7 +157,7 @@ class DB_Connection():
 
     # intended to be a common method for creating a db from scratch
     def init_database(self):
-        log_utils.log('Building PrimeWire Database', xbmc.LOGDEBUG)
+        log_utils.log('Building SALTS Database', xbmc.LOGDEBUG)
         if self.db_type == DB_TYPES.MYSQL:
             self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url))')
             self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255) NOT NULL, value TEXT, PRIMARY KEY(setting)')
