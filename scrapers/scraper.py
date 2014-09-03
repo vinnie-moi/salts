@@ -25,6 +25,13 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
 
 abstractstaticmethod = abc.abstractmethod
+class abstractclassmethod(classmethod):
+
+    __isabstractmethod__ = True
+
+    def __init__(self, callable):
+        callable.__isabstractmethod__ = True
+        super(abstractclassmethod, self).__init__(callable)
 
 DEFAULT_TIMEOUT=30
 
@@ -34,24 +41,21 @@ class Scraper(object):
     def __init__(self, timeout=DEFAULT_TIMEOUT):
         self.db_connection = DB_Connection()
 
-    @classmethod
+    @abstractclassmethod
     def provides(cls):
         """
         Must return a list/set/frozenset of VIDEO_TYPES that are supported by this scraper. Is a class method so that instances of the class 
         don't have to be instantiated to determine they are not useful
         
-        * Can not easily combine classmethod and abstract method, but this method must be provided as a class method
         * Datatypes set or frozenset are preferred as existence checking is faster with sets
         """
         raise NotImplementedError
         
-    @classmethod
+    @abstractclassmethod
     def get_name(cls):
         """
         Must return a string that is a name that will be used through out the UI and DB to refer to urls from this source
         Should be descriptive enough to be recognized but short enough to be presented in the UI
-
-        * Can not easily combine classmethod and abstract method, but this method must be provided as a class method
         """
         raise NotImplementedError
 
