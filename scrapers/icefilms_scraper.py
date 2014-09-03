@@ -25,7 +25,8 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'HD 720P': QUALITIES.HD, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH}
-BROKEN_RESOLVERS = ['180UPLOAD', 'HUGEFILES', 'VIDPLAY']
+#BROKEN_RESOLVERS = ['180UPLOAD', 'HUGEFILES', 'VIDPLAY']
+BROKEN_RESOLVERS = []
 
 class IceFilms_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
