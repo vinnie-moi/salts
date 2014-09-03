@@ -576,6 +576,27 @@ def clean_subs():
             else:
                 trakt_api.remove_from_list(slug, del_item)
 
+@url_dispatcher.register(MODES.FLUSH_CACHE)
+def flush_cache():
+    dlg = xbmcgui.Dialog()
+    ln1 = 'Are you sure you want to delete the url cache?'
+    ln2 = 'This will slow things down until rebuilt'
+    ln3 = ''
+    yes = 'Keep'
+    no = 'Delete'
+    if dlg.yesno('Flush web cache', ln1, ln2, ln3, yes, no):
+        db_connection.flush_cache()
+
+@url_dispatcher.register(MODES.RESET_DB)
+def reset_db():
+    if db_connection.reset_db():
+        message='DB Reset Successful'
+    else:
+        message='Reset only allowed on sqlite DBs'
+    
+    builtin = "XBMC.Notification(PrimeWire,%s,2000, %s)" % (message, ICON_PATH)
+    xbmc.executebuiltin(builtin)        
+
 @url_dispatcher.register(MODES.ADD_TO_LIBRARY, ['video_type', 'title', 'year', 'slug'])
 def add_to_library(video_type, title, year, slug, require_source=False):
     log_utils.log('Creating .strm for |%s|%s|%s|%s|' % (video_type, title, year, slug), xbmc.LOGDEBUG)

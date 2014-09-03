@@ -160,8 +160,7 @@ class DB_Connection():
         log_utils.log('Building SALTS Database', xbmc.LOGDEBUG)
         if self.db_type == DB_TYPES.MYSQL:
             self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url))')
-            self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255) NOT NULL, value TEXT, PRIMARY KEY(setting)')
-            self.__execute('CREATE TABLE IF NOT EXISTS new_bkmark (url VARCHAR(255) NOT NULL, resumepoint DOUBLE NOT NULL, PRIMARY KEY(url)))')            
+            self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255) NOT NULL, value TEXT, PRIMARY KEY(setting))')
             self.__execute('CREATE TABLE IF NOT EXISTS rel_url \
             (video_type VARCHAR(15) NOT NULL, title VARCHAR(255) NOT NULL, year VARCHAR(4) NOT NULL, season VARCHAR(5) NOT NULL, episode VARCHAR(5) NOT NULL, source VARCHAR(50) NOT NULL, rel_url VARCHAR(255), \
             PRIMARY KEY(video_type, title, year, season, episode, source))')
@@ -170,7 +169,6 @@ class DB_Connection():
             self.__create_sqlite_db()
             self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, response, timestamp, PRIMARY KEY(url))')
             self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255), value TEXT, PRIMARY KEY(setting))')
-            self.__execute('CREATE TABLE IF NOT EXISTS new_bkmark (url TEXT NOT NULL, resumepoint DOUBLE NOT NULL, PRIMARY KEY(url))')
             self.__execute('CREATE TABLE IF NOT EXISTS rel_url \
             (video_type TEXT NOT NULL, title TEXT NOT NULL, year TEXT NOT NULL, season TEXT NOT NULL, episode TEXT NOT NULL, source TEXT NOT NULL, rel_url TEXT, \
             PRIMARY KEY(video_type, title, year, season, episode, source))')
