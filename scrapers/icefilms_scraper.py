@@ -19,6 +19,9 @@ import scraper
 import re
 import urllib
 import urlparse
+import HTMLParser
+import string
+import xbmc
 from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -30,7 +33,7 @@ BROKEN_RESOLVERS = []
 
 class IceFilms_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        self.base_url = 'http://www.icefilms.info/'
+        self.base_url = 'http://www.icefilms.info'
         self.timeout=timeout
         self.db_connection = DB_Connection()
    
@@ -108,30 +111,43 @@ class IceFilms_Scraper(scraper.Scraper):
         return sources
 
     def get_url(self, video_type, title, year, season='', episode=''):
-        temp_video_type=video_type
-        if video_type == VIDEO_TYPES.EPISODE: temp_video_type=VIDEO_TYPES.TVSHOW
-        url = None
-
-        result = self.db_connection.get_related_url(temp_video_type, title, year, self.get_name())
-        if result:
-            url=result[0][0]
-            log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (temp_video_type, title, year, self.get_name(), url))
-
-        if url and video_type==VIDEO_TYPES.EPISODE:
-            result = self.db_connection.get_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), season, episode)
-            if result:
-                url=result[0][0]
-                log_utils.log('Got local related url: |%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode, self.get_name(), url))
-            else:
-                show_url = url
-                url = self._get_episode_url(show_url, season, episode)
-                if url:
-                    self.db_connection.set_related_url(VIDEO_TYPES.EPISODE, title, year, self.get_name(), url, season, episode)
-        
-        return url
+        return super(IceFilms_Scraper, self)._default_get_url(video_type, title, year, season, episode)
     
     def search(self, video_type, title, year):
-        raise NotImplementedError
+        if video_type==VIDEO_TYPES.MOVIE:
+            url = urlparse.urljoin(self.base_url, '/movies/a-z/')
+        else:
+            url = urlparse.urljoin(self.base_url,'/tv/a-z/')
+
+        if title.upper().startswith('THE '):
+            first_letter=title[4:5]
+        elif title.upper().startswith('A '):
+            first_letter = title[2:3]
+        elif title[:1] in string.digits:
+            first_letter='1'
+        else:
+            first_letter=title[:1]
+        url = url + first_letter.upper()
+        
+        html = self.__http_get(url, cache_limit=.25)
+        h = HTMLParser.HTMLParser()
+        html = unicode(html, 'windows-1252')
+        html = h.unescape(html)
+        norm_title = self.__normalize_title(title)
+        pattern = 'class=star.*?href=([^>]+)>(.*?)(?:\s*\((\d+)\))?</a>'
+        results=[]
+        for match in re.finditer(pattern, html, re.DOTALL):
+            url, match_title, match_year = match.groups('')
+            if norm_title == self.__normalize_title(match_title) and (not year or not match_year or year == match_year):
+                result={'url': url, 'title': match_title, 'year': match_year}
+                results.append(result)
+        return results
+    
+    def __normalize_title(self, title):
+        new_title=title.upper()
+        new_title=re.sub('\W', '', new_title)
+        log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), xbmc.LOGDEBUG)
+        return new_title
     
     def _get_episode_url(self, show_url, season, episode):
         url = urlparse.urljoin(self.base_url, show_url)

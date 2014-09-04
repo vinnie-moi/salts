@@ -3,7 +3,9 @@ import re
 import datetime
 import xbmc
 import xbmcgui
+import xbmcplugin
 import log_utils
+import sys
 from constants import *
 from scrapers import * # import all scrapers into this namespace
 from addon.common.addon import Addon
@@ -115,6 +117,7 @@ def make_info(item, show=''):
     if 'released' in item: info['premiered']=time.strftime('%Y-%m-%d', time.localtime(item['released']))
     if 'status' in item: info['status']=item['status']
     if 'tagline' in item: info['tagline']=item['tagline']
+    if 'plays' in item and item['plays']: info['playcount']=item['plays']
 
     # override item params with show info if it exists
     if 'certification' in show: info['mpaa']=show['certification']
@@ -130,10 +133,12 @@ def get_section_params(section):
     section_params={}
     section_params['section']=section
     if section==SECTIONS.TV:
+        set_view('tvshows')
         section_params['next_mode']=MODES.SEASONS
         section_params['folder']=True
         section_params['video_type']=VIDEO_TYPES.TVSHOW
     else:
+        set_view('movies')
         section_params['next_mode']=MODES.GET_SOURCES
         section_params['folder']=ADDON.get_setting('source-win')=='Directory'
         section_params['video_type']=VIDEO_TYPES.MOVIE
@@ -334,3 +339,17 @@ def disable_scraper(name):
         else:
             disabled = '%s%s|' % (disabled, name)
         ADDON.set_setting('disabled_scrapers', disabled)
+
+def set_view(content):
+    # set content type so library shows more views and info
+    if content:
+        xbmcplugin.setContent(int(sys.argv[1]), content)
+
+    # set sort methods - probably we don't need all of them
+    xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_LABEL)
+    xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_RATING)
+    xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_DATE)
+    xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_PROGRAM_COUNT)
+    xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
+    xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_GENRE)

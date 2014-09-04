@@ -287,17 +287,18 @@ def browse_seasons(slug, fanart):
 
 @url_dispatcher.register(MODES.EPISODES, ['slug', 'season', 'fanart'])
 def browse_episodes(slug, season, fanart):
-    section_params=utils.get_section_params(SECTIONS.TV)
+    folder=_SALTS.get_setting('source-win')=='Directory'
     show=trakt_api.get_show_details(slug)
     episodes=trakt_api.get_episodes(slug, season)
+    utils.set_view('episodes')
     totalItems=len(episodes)
     for episode in episodes:
         liz=make_episode_item(show, episode, fanart)
         queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['episode'], 'slug': slug}
         liz_url = _SALTS.build_plugin_url(queries)
-        if not section_params['folder']:
+        if not folder:
             liz.setProperty('IsPlayable', 'true')
-        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=section_params['folder'],totalItems=totalItems)
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode', 'dialog'])
@@ -380,6 +381,9 @@ def resolve_source(class_url, video_type, slug, class_name, season='', episode='
     return play_source(hoster_url, video_type, slug, season, episode)
 
 def play_source(hoster_url, video_type, slug, season='', episode=''):
+    if hoster_url is None:
+        return True
+
     import urlresolver
     stream_url = urlresolver.HostedMediaFile(url=hoster_url).resolve()
     if stream_url==False:
@@ -387,8 +391,6 @@ def play_source(hoster_url, video_type, slug, season='', episode=''):
         builtin = 'XBMC.Notification(%s, Could not Resolve Url: %s, 5000, %s)'
         xbmc.executebuiltin(builtin % (_SALTS.get_name(), hoster_url, ICON_PATH))
 
-    if stream_url is None:
-        return True
     
     if not stream_url or not isinstance(stream_url, basestring):
         return False
@@ -801,6 +803,7 @@ def make_episode_item(show, episode, fanart):
     meta['images']={}
     meta['images']['poster']=episode['images']['screen']
     meta['images']['fanart']=fanart
+    if 'watched' in episode and episode['watched']: meta['playcount']=1
     liz=utils.make_list_item(label, meta)
     del meta['images']
     liz.setInfo('video', meta)
@@ -818,15 +821,18 @@ def make_item(section_params, show, menu_items=None):
     liz=utils.make_list_item(label, show)
     slug=trakt_api.get_slug(show['url'])
     liz.setProperty('slug', slug)
-    liz.setInfo('video', utils.make_info(show))
+    info = utils.make_info(show)
     if not section_params['folder']:
         liz.setProperty('IsPlayable', 'true')
  
     if section_params['section']==SECTIONS.TV:
         queries = {'mode': section_params['next_mode'], 'slug': slug, 'fanart': liz.getProperty('fanart_image')}
+        if 'playcount' in info: del info['playcount'] # remove playcount from tv shows
+        info['TVShowTitle']=info['title']
     else:
         queries = {'mode': section_params['next_mode'], 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
  
+    liz.setInfo('video', info)
     liz_url = _SALTS.build_plugin_url(queries)
  
     menu_items.insert(0, ('Show Information', 'XBMC.Action(Info)'), )
