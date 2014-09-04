@@ -117,9 +117,7 @@ class MerDB_Scraper(scraper.Scraper):
     
     def _get_episode_url(self, show_url, season, episode):
         url = urlparse.urljoin(self.base_url, show_url)
-        print url
         html = self.__http_get(url, cache_limit=2)
-        print html
         pattern = '"tv_episode_item".+?href="([^"]+/season-%s-episode-%s)">' % (season, episode)
         match = re.search(pattern, html, re.DOTALL)
         if match:
