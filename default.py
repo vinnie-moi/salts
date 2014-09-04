@@ -287,6 +287,7 @@ def browse_seasons(slug, fanart):
 
 @url_dispatcher.register(MODES.EPISODES, ['slug', 'season', 'fanart'])
 def browse_episodes(slug, season, fanart):
+    section_params=utils.get_section_params(SECTIONS.TV)
     show=trakt_api.get_show_details(slug)
     episodes=trakt_api.get_episodes(slug, season)
     totalItems=len(episodes)
@@ -294,8 +295,9 @@ def browse_episodes(slug, season, fanart):
         liz=make_episode_item(show, episode, fanart)
         queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['episode'], 'slug': slug}
         liz_url = _SALTS.build_plugin_url(queries)
-        liz.setProperty('IsPlayable', 'true')
-        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=False,totalItems=totalItems)
+        if not section_params['folder']:
+            liz.setProperty('IsPlayable', 'true')
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=section_params['folder'],totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.GET_SOURCES, ['video_type', 'title', 'year', 'slug'], ['season', 'episode', 'dialog'])
@@ -462,7 +464,7 @@ def pick_source_dir(hosters, video_type, slug, season='', episode='', filtered=F
     hosters_len=len(hosters)
     for item in hosters:
         #log_utils.log(item, xbmc.LOGDEBUG)
-        queries={'mode': MODES.RESOLVE_SOURCE, 'hoster_url': item['url'], 'video_type': video_type, 'slug': slug, 'season': season, 'episode': episode, 'class_name': item['class'].get_name()}
+        queries={'mode': MODES.RESOLVE_SOURCE, 'class_url': item['url'], 'video_type': video_type, 'slug': slug, 'season': season, 'episode': episode, 'class_name': item['class'].get_name()}
         _SALTS.add_directory(queries, infolabels={'title': item['label']}, is_folder=False, img='', fanart='', total_items=hosters_len)
     
     _SALTS.end_of_directory()
