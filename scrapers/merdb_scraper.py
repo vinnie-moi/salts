@@ -117,15 +117,13 @@ class MerDB_Scraper(scraper.Scraper):
     
     def _get_episode_url(self, show_url, season, episode):
         url = urlparse.urljoin(self.base_url, show_url)
+        print url
         html = self.__http_get(url, cache_limit=2)
-        pattern = '"tv_episode_item".+?href="(.+?)">.*?</a>'
-        episodes = re.finditer(pattern, html, re.DOTALL)
-        for ep in episodes:
-            ep_url = ep.group(1)
-            match_season = re.search('/season-([0-9]{1,4})-', ep_url).group(1)
-            match_episode = re.search('-episode-([0-9]{1,3})', ep_url).group(1)
-            if match_season == season and match_episode == episode:
-                return ep_url
+        print html
+        pattern = '"tv_episode_item".+?href="([^"]+/season-%s-episode-%s)">' % (season, episode)
+        match = re.search(pattern, html, re.DOTALL)
+        if match:
+            return match.group(1)
         
     def __http_get(self, url, cache_limit=8):
         return super(MerDB_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

@@ -89,16 +89,17 @@ class TwoMovies_Scraper(scraper.Scraper):
             pattern='<div class="filmDiv".*(<h1>Tv Shows</h1>)*'
         match = re.search(pattern, html, re.DOTALL)
         try:
-            fragment = match.group(0)
-            pattern = 'href="([^"]+)" class="filmname">(.*?)\s*</a>.*?/all/byViews/(\d+)/'
-            for match in re.finditer(pattern, fragment, re.DOTALL):
-                result={}
-                url, res_title, res_year = match.groups('')
-                if not year or year == res_year:                
-                    result['title']=res_title
-                    result['url']=url.replace(self.base_url,'')
-                    result['year']=res_year
-                    results.append(result)
+            if match:
+                fragment = match.group(0)
+                pattern = 'href="([^"]+)" class="filmname">(.*?)\s*</a>.*?/all/byViews/(\d+)/'
+                for match in re.finditer(pattern, fragment, re.DOTALL):
+                    result={}
+                    url, res_title, res_year = match.groups('')
+                    if not year or year == res_year:                
+                        result['title']=res_title
+                        result['url']=url.replace(self.base_url,'')
+                        result['year']=res_year
+                        results.append(result)
         except Exception as e:
             log_utils.log('Failure during %s search: |%s|%s|%s| (%s)' % (self.get_name(), video_type, title, year, str(e)), xbmc.LOGWARNING)
         
