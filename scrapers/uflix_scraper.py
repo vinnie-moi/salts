@@ -25,14 +25,18 @@ from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-
 QUALITY_MAP = {'HD': QUALITIES.HIGH, 'LOW': QUALITIES.LOW}
+BASE_URL = 'http://uflix.org'
 
 class UFlix_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        self.base_url = 'http://uflix.org'
         self.timeout=timeout
         self.db_connection = DB_Connection()
+        base_url = self.db_connection.get_setting('%s_base_url' % (self.get_name()))
+        if not base_url:
+            self.base_url = BASE_URL
+        else:
+            self.base_url = base_url
     
     @classmethod
     def provides(cls):

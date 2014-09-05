@@ -32,10 +32,11 @@ BASE_URL = 'api.trakt.tv'
 API_KEY='db2aa092680518505621a5ddc007611c'
     
 class Trakt_API():
-    def __init__(self, username, password, use_https=False):
+    def __init__(self, username, password, use_https=False, timeout=5):
         self.username=username
         self.sha1password=sha.new(password).hexdigest()
         self.protocol='https://' if use_https else 'http://'
+        self.timeout=timeout
         
     def valid_account(self):
         url='/account/test/%s' % (API_KEY)
@@ -158,7 +159,7 @@ class Trakt_API():
             if result:
                 log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
             else: 
-                f=urllib2.urlopen(url, json.dumps(data))
+                f=urllib2.urlopen(url, json.dumps(data), self.timeout)
                 result=f.read()
                 db_connection.cache_url(url, result)
             response=json.loads(result)

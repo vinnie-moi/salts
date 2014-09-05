@@ -21,6 +21,7 @@ SORT_FIELDS =  [(SORT_LIST[int(ADDON.get_setting('sort1_field'))], SORT_SIGNS[AD
 username=ADDON.get_setting('username')
 password=ADDON.get_setting('password')
 use_https=ADDON.get_setting('use_https')=='true'
+trakt_timeout=int(ADDON.get_setting('trakt_timeout'))
 
 P_MODE = int(ADDON.get_setting('parallel_mode'))
 if P_MODE == P_MODES.THREADS:
@@ -31,7 +32,7 @@ elif P_MODE == P_MODES.PROCESSES:
     from multiprocessing import Queue
     from Queue import Empty
 
-trakt_api=Trakt_API(username,password, use_https)
+trakt_api=Trakt_API(username,password, use_https, trakt_timeout)
 db_connection=DB_Connection()
 
 def choose_list(username=None):

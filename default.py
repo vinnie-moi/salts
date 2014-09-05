@@ -38,8 +38,9 @@ ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
 username=_SALTS.get_setting('username')
 password=_SALTS.get_setting('password')
 use_https=_SALTS.get_setting('use_https')=='true'
+trakt_timeout=int(_SALTS.get_setting('trakt_timeout'))
 
-trakt_api=Trakt_API(username,password, use_https)
+trakt_api=Trakt_API(username,password, use_https, trakt_timeout)
 url_dispatcher=URL_Dispatcher()
 db_connection=DB_Connection()
 
@@ -90,11 +91,25 @@ def browse_menu(section):
 def scraper_settings():
     for cls in utils.relevant_scrapers(None, True):
         label = '%s (Provides: %s)' % (cls.get_name(), str(list(cls.provides())).replace("'", ""))
-        if not utils.scraper_enabled(cls.get_name()): label = '[COLOR red]%s[/COLOR]' % (label)
+        if not utils.scraper_enabled(cls.get_name()): 
+            label = '[COLOR red]%s[/COLOR]' % (label)
+            toggle_label='Enable Scraper'
+        else:
+            toggle_label='Disable Scraper'
         liz = xbmcgui.ListItem(label=label)
         liz.setProperty('IsPlayable', 'false')
         liz.setInfo('video', {'title': label})
         liz_url = _SALTS.build_plugin_url({'mode': MODES.TOGGLE_SCRAPER, 'name': cls.get_name()})
+        
+        menu_items=[]
+        queries = {'mode': MODES.TOGGLE_SCRAPER, 'name': cls.get_name()}
+        menu_items.append((toggle_label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        queries = {'mode': MODES.SET_BASE_URL, 'name': cls.get_name()}
+        menu_items.append(('Set Base Url', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        queries = {'mode': MODES.RESET_BASE_URL, 'name': cls.get_name()}
+        menu_items.append(('Reset Base Url', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        liz.addContextMenuItems(menu_items, replaceItems=True)
+        
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
@@ -106,6 +121,29 @@ def toggle_scraper(name):
         utils.enable_scraper(name)
     xbmc.executebuiltin("XBMC.Container.Refresh")
     
+@url_dispatcher.register(MODES.SET_BASE_URL, ['mode', 'name'])
+@url_dispatcher.register(MODES.RESET_BASE_URL, ['mode', 'name'])
+def set_base_url(mode, name):
+    setting = '%s_base_url' % (name)
+    for cls in utils.relevant_scrapers(None, True):
+        if cls.get_name() == name:
+            old_base_url = cls().base_url
+
+    if mode == MODES.SET_BASE_URL:
+        keyboard = xbmc.Keyboard()
+        keyboard.setHeading('Enter Base Url for %s Scraper' % (name))
+        keyboard.setDefault(old_base_url) 
+        keyboard.doModal()
+        if keyboard.isConfirmed():
+            new_base_url=keyboard.getText()
+        else:
+            return
+    elif mode == MODES.RESET_BASE_URL:
+        new_base_url = ''
+
+    if old_base_url != new_base_url:
+        db_connection.set_setting(setting, new_base_url)
+
 @url_dispatcher.register(MODES.TRENDING, ['section'])
 def browse_trending(section):
     list_data = trakt_api.get_trending(section)
@@ -526,6 +564,8 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                 if keyboard.isConfirmed():
                     new_url = keyboard.getText()
                     utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], new_url, season, episode)
+                    builtin = 'XBMC.Notification(%s,[COLOR blue]%s[/COLOR] Related Url Set, 5000, %s)'
+                    xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['name'], ICON_PATH))
             elif mode == MODES.SET_URL_SEARCH:
                 temp_title = title
                 temp_year = year
@@ -553,6 +593,8 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                                 temp_year = match.group(2) if match.group(2) else '' 
                         elif results_index>0:
                             utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], results[results_index-1]['url'], season, episode)
+                            builtin = 'XBMC.Notification(%s,[COLOR blue]%s[/COLOR] Related Url Set, 5000, %s)'
+                            xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['name'], ICON_PATH))
                             break
                         else:
                             break

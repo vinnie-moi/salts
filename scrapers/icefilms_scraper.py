@@ -30,12 +30,17 @@ from salts_lib.constants import QUALITIES
 QUALITY_MAP = {'HD 720P': QUALITIES.HD, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH}
 #BROKEN_RESOLVERS = ['180UPLOAD', 'HUGEFILES', 'VIDPLAY']
 BROKEN_RESOLVERS = []
+BASE_URL='http://www.icefilms.info'
 
 class IceFilms_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        self.base_url = 'http://www.icefilms.info'
         self.timeout=timeout
         self.db_connection = DB_Connection()
+        base_url = self.db_connection.get_setting('%s_base_url' % (self.get_name()))
+        if not base_url:
+            self.base_url = BASE_URL
+        else:
+            self.base_url = base_url
    
     @classmethod
     def provides(cls):
@@ -146,7 +151,7 @@ class IceFilms_Scraper(scraper.Scraper):
     def __normalize_title(self, title):
         new_title=title.upper()
         new_title=re.sub('\W', '', new_title)
-        log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), xbmc.LOGDEBUG)
+        #log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), xbmc.LOGDEBUG)
         return new_title
     
     def _get_episode_url(self, show_url, season, episode):

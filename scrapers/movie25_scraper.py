@@ -25,12 +25,17 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW}
+BASE_URL = 'http://movie25.cm'
 
 class Movie25_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        self.base_url = 'http://movie25.cm'
         self.timeout=timeout
         self.db_connection = DB_Connection()
+        base_url = self.db_connection.get_setting('%s_base_url' % (self.get_name()))
+        if not base_url:
+            self.base_url = BASE_URL
+        else:
+            self.base_url = base_url
     
     @classmethod
     def provides(cls):
