@@ -424,15 +424,11 @@ def play_source(hoster_url, video_type, slug, season='', episode=''):
 
     import urlresolver
     stream_url = urlresolver.HostedMediaFile(url=hoster_url).resolve()
-    if stream_url==False:
+    if not stream_url or not isinstance(stream_url, basestring):
         log_utils.log('Url (%s|%s) Resolution failed' % (hoster_url))
         builtin = 'XBMC.Notification(%s, Could not Resolve Url: %s, 5000, %s)'
         xbmc.executebuiltin(builtin % (_SALTS.get_name(), hoster_url, ICON_PATH))
-
-    
-    if not stream_url or not isinstance(stream_url, basestring):
         return False
-    
 
     if video_type == VIDEO_TYPES.EPISODE:
         details = trakt_api.get_episode_details(slug, season, episode)
