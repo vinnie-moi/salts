@@ -54,7 +54,7 @@
         <setting id="db_name" type="text" label="    Database" enable="eq(-5,true)" visible="eq(-5,true)" default="salts_db"/>
         <setting id="flush_cache" type="action" label="Flush webpage cache..." enable="true"
                  action="RunPlugin(plugin://plugin.video.salts/?mode=flush_cache)"/>
-        <setting id="reset_db" type="action" label="Reset 1Channel DB ([COLOR red]SQLITE Only[/COLOR])" enable="true"
+        <setting id="reset_db" type="action" label="Reset SALTS DB ([COLOR red]SQLITE Only[/COLOR])" enable="true"
                  action="RunPlugin(plugin://plugin.video.salts/?mode=reset_db)"/>
 	</category>	
 </settings>
