@@ -303,15 +303,21 @@ def search(section):
             break
     
     if keyboard.isConfirmed():
-        section_params=utils.get_section_params(section)
-        results = trakt_api.search(section, keyboard.getText())
-        totalItems=len(results)
-        for result in results:
-            liz, liz_url = make_item(section_params, result)
-            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
-        xbmcplugin.endOfDirectory(int(sys.argv[1]))
-
+        queries = {'mode': MODES.SEARCH_RESULTS, 'section': section, 'query': keyboard.getText()}
+        pluginurl = _SALTS.build_plugin_url(queries)
+        builtin = 'Container.Update(%s)' %(pluginurl)
+        xbmc.executebuiltin(builtin)
     
+@url_dispatcher.register(MODES.SEARCH_RESULTS, ['section', 'query'])
+def search_results(section, query):
+    section_params=utils.get_section_params(section)
+    results = trakt_api.search(section, query)
+    totalItems=len(results)
+    for result in results:
+        liz, liz_url = make_item(section_params, result)
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
 @url_dispatcher.register(MODES.SEASONS, ['slug', 'fanart'])
 def browse_seasons(slug, fanart):
     seasons=trakt_api.get_seasons(slug)
@@ -619,6 +625,8 @@ def add_to_list(section, id_type, show_id, slug=None):
         trakt_api.add_to_watchlist(section, item)
     elif slug:
         trakt_api.add_to_list(slug, item)
+    builtin = "XBMC.Notification(%s,Item Added to List, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
+    xbmc.executebuiltin(builtin)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.UPDATE_SUBS)
