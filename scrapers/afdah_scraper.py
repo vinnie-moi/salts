@@ -67,7 +67,7 @@ class Afdah_Scraper(scraper.Scraper):
             for match in re.finditer(pattern, html, re.DOTALL | re.I):
                 host, url = match.groups('')
                 hoster = {'multi-part': False}
-                hoster['url']=url.replace(self.base_url,'')
+                hoster['url']=url
                 hoster['host']=host
                 hoster['class']=self
                 hoster['quality']=quality
