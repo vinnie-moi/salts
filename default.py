@@ -89,10 +89,11 @@ def browse_menu(section):
 
 @url_dispatcher.register(MODES.SCRAPERS)
 def scraper_settings():
-    for cls in utils.relevant_scrapers(None, True):
+    scrapers=utils.relevant_scrapers(None, True, True)
+    for i, cls in enumerate(scrapers):
         label = '%s (Provides: %s)' % (cls.get_name(), str(list(cls.provides())).replace("'", ""))
         if not utils.scraper_enabled(cls.get_name()): 
-            label = '[COLOR red]%s[/COLOR]' % (label)
+            label = '[COLOR darkred]%s[/COLOR]' % (label)
             toggle_label='Enable Scraper'
         else:
             toggle_label='Disable Scraper'
@@ -102,6 +103,13 @@ def scraper_settings():
         liz_url = _SALTS.build_plugin_url({'mode': MODES.TOGGLE_SCRAPER, 'name': cls.get_name()})
         
         menu_items=[]
+        if i>0:
+            queries = {'mode': MODES.MOVE_SCRAPER, 'name': cls.get_name(), 'direction': DIRS.UP, 'other': scrapers[i-1].get_name()}
+            menu_items.append(('Move Up', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        if i<len(scrapers)-1:
+            queries = {'mode': MODES.MOVE_SCRAPER, 'name': cls.get_name(), 'direction': DIRS.DOWN, 'other': scrapers[i+1].get_name()}
+            menu_items.append(('Move Down', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+
         queries = {'mode': MODES.TOGGLE_SCRAPER, 'name': cls.get_name()}
         menu_items.append((toggle_label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         queries = {'mode': MODES.SET_BASE_URL, 'name': cls.get_name()}
@@ -112,6 +120,20 @@ def scraper_settings():
         
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+@url_dispatcher.register(MODES.MOVE_SCRAPER, ['name', 'direction', 'other'])
+def move_scraper(name, direction, other):
+    sort_key = utils.make_source_sort_key()
+    print sort_key
+    if direction == DIRS.UP:
+        sort_key[name] +=1
+        sort_key[other] -= 1
+    elif direction == DIRS.DOWN:
+        sort_key[name] -= 1
+        sort_key[other] += 1
+    print sort_key
+    _SALTS.set_setting('source_sort_order', utils.make_source_sort_string(sort_key))
+    xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.TOGGLE_SCRAPER, ['name'])
 def toggle_scraper(name):
@@ -334,7 +356,6 @@ def browse_episodes(slug, season, fanart):
     folder=_SALTS.get_setting('source-win')=='Directory'
     show=trakt_api.get_show_details(slug)
     episodes=trakt_api.get_episodes(slug, season)
-    utils.set_view('episodes')
     totalItems=len(episodes)
     for episode in episodes:
         liz=make_episode_item(show, episode, fanart)
@@ -399,7 +420,7 @@ def get_sources(video_type, title, year, slug, season='', episode='', dialog=Non
         if _SALTS.get_setting('enable_sort')=='true':
             if _SALTS.get_setting('filter-unknown')=='true':
                 hosters = utils.filter_hosters(hosters)
-            SORT_KEYS['source'] = utils.make_source_sortkey()
+            SORT_KEYS['source'] = utils.make_source_sort_key()
             hosters.sort(key = utils.get_sort_key)
             
         if dialog or (dialog is None and _SALTS.get_setting('source-win') == 'Dialog'):
@@ -801,6 +822,7 @@ def make_dir_from_list(section, list_data, slug=None):
             
 
         liz, liz_url =make_item(section_params, show, menu_items)
+        print liz.getLabel()
         
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))

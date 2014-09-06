@@ -175,12 +175,12 @@ def get_sort_key(item):
             break
         elif field in SORT_KEYS:
             if field == 'source':
-                value=item['class'].get_name().lower()
+                value=item['class'].get_name()
             else:
                 value=item[field]
             
             if value in SORT_KEYS[field]:
-                    item_sort_key.append(sign*SORT_KEYS[field][value])
+                item_sort_key.append(sign*SORT_KEYS[field][value])
             else: # assume all unlisted values sort as worst
                 item_sort_key.append(sign*-1)
         else:
@@ -191,15 +191,32 @@ def get_sort_key(item):
     #print 'item: %s sort_key: %s' % (item, item_sort_key)
     return tuple(item_sort_key)
 
-def make_source_sortkey():
+def make_source_sort_key():
     sso=ADDON.get_setting('source_sort_order')
+    sort_key={}
+    i=0
     if sso:
-        sso = sso.replace(' ', '')
-        sources = sso.split(',')
+        sources = sso.split('|')
         sort_key={}
         for i,source in enumerate(sources):
-            sort_key[source.lower()]=i
-        return sort_key        
+            sort_key[source]=-i
+        
+    scrapers = relevant_scrapers(include_disabled=True)
+    for j, scraper in enumerate(scrapers):
+        if scraper.get_name() not in sort_key:
+            sort_key[scraper.get_name()]=-(i+j)
+    
+    print sort_key
+    return sort_key
+
+def get_source_sort_key(item):
+    sort_key=make_source_sort_key()
+    return -sort_key[item.get_name()]
+        
+def make_source_sort_string(sort_key):
+    sorted_key = sorted(sort_key.items(), key=lambda x: -x[1])
+    sort_string = '|'.join([element[0] for element in sorted_key])
+    return sort_string
 
 def start_worker(q, func, args):
     if P_MODE == P_MODES.THREADS:
@@ -311,13 +328,16 @@ def url_exists(video_type, title, year, season='', episode=''):
     log_utils.log('No url found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
     return False
 
-def relevant_scrapers(video_type=None, include_disabled=False):
+def relevant_scrapers(video_type=None, include_disabled=False, order_matters=False):
     classes=scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     relevant=[]
     for cls in classes:
         if video_type is None or video_type in cls.provides():
             if include_disabled or scraper_enabled(cls.get_name()):
                 relevant.append(cls)
+    
+    if order_matters:
+        relevant.sort(key=get_source_sort_key)
     return relevant
 
 def scraper_enabled(name):
