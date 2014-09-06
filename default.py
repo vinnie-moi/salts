@@ -819,7 +819,7 @@ def make_dir_from_cal(mode, start_date, days):
     
     totalItems=len(days)
     for day in days:
-        date=day['date']
+        date=utils.make_day(day['date'])
         for episode_elem in day['episodes']:
             show=episode_elem['show']
             slug=trakt_api.get_slug(show['url'])
@@ -829,7 +829,7 @@ def make_dir_from_cal(mode, start_date, days):
             queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['number'], 'slug': slug}
             liz_url = _SALTS.build_plugin_url(queries)
             label=liz.getLabel()
-            label = '[%s] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
+            label = '[[COLOR deeppink]%s[/COLOR]] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
             if episode['season']==1 and episode['number']==1:
                 label = '[COLOR green]%s[/COLOR]' % (label)
             liz.setLabel(label)

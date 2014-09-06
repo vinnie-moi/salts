@@ -354,3 +354,19 @@ def set_view(content):
     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_PROGRAM_COUNT)
     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_GENRE)
+
+def make_day(date):
+    try: date=datetime.datetime.strptime(date,'%Y-%m-%d').date()
+    except TypeError: date = datetime.datetime(*(time.strptime(date, '%Y-%m-%d')[0:6])).date()
+    today=datetime.date.today()
+    day_diff = (date - today).days
+    if day_diff == -1:
+        date='Yesterday'
+    elif day_diff == 0:
+        date='Today'
+    elif day_diff == 1:
+        date='Tomorrow'
+    elif day_diff > 1 and day_diff < 7:
+        date = date.strftime('%A')
+
+    return date
