@@ -6,6 +6,7 @@ import xbmcgui
 import xbmcplugin
 import log_utils
 import sys
+import md5
 from constants import *
 from scrapers import * # import all scrapers into this namespace
 from addon.common.addon import Addon
@@ -206,7 +207,6 @@ def make_source_sort_key():
         if scraper.get_name() not in sort_key:
             sort_key[scraper.get_name()]=-(i+j)
     
-    print sort_key
     return sort_key
 
 def get_source_sort_key(item):
@@ -317,7 +317,7 @@ def url_exists(video_type, title, year, season='', episode=''):
     check each source for a url for this video; return True as soon as one is found. If none are found, return False
     """
     max_timeout = int(ADDON.get_setting('source_timeout'))
-    log_utils.log('url_exists: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode), xbmc.LOGDEBUG)
+    log_utils.log('Checking for Url Existence: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode), xbmc.LOGDEBUG)
     for cls in relevant_scrapers(video_type):
         scraper_instance=cls(max_timeout)
         url = scraper_instance.get_url(video_type, title, year, season, episode)
@@ -390,3 +390,23 @@ def make_day(date):
         date = date.strftime('%A')
 
     return date
+
+def valid_account():
+    username=ADDON.get_setting('username')
+    password=ADDON.get_setting('password')
+    last_hash=ADDON.get_setting('last_hash')
+    cur_hash = md5.new(username+password).hexdigest()
+    if cur_hash != last_hash:
+        try:
+            valid_account=trakt_api.valid_account()
+        except:
+            valid_account=False
+        log_utils.log('Checked valid account (%s): %s != %s' % (valid_account, last_hash, cur_hash), xbmc.LOGDEBUG)
+
+        if valid_account:
+            ADDON.set_setting('last_hash', cur_hash)
+    else:
+        log_utils.log('Assuming valid account: %s == %s' % (last_hash, cur_hash), xbmc.LOGDEBUG)
+        valid_account=True
+        
+    return valid_account

@@ -4,6 +4,7 @@
 		<setting id="password" type="text" label="Trakt Password" default="" option="hidden"/>
 	    <setting id="use_https" type="bool" label="Use HTTPS" default="false"/>
 		<setting id="trakt_timeout" type="slider" label="Trakt Timeout (seconds) (0=No Limit)" default="5" range="0,120" option="int"/>
+		<setting id="last_hash" type="text" default="" visible="false"/>
 		<setting id="calendar-day" type="slider" label="Calendar Start Day (0=Today)" default="0" range="-7,7" option="int"/>
 	    <setting id="TV_sub_slug" type="text" visible="false"/>
 	    <setting id="Movies_sub_slug" type="text" visible="false"/>

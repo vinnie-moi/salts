@@ -27,7 +27,7 @@ import xbmcvfs
 from addon.common.addon import Addon
 from salts_lib.db_utils import DB_Connection
 from salts_lib.url_dispatcher import URL_Dispatcher
-from salts_lib.trakt_api import Trakt_API
+from salts_lib.trakt_api import Trakt_API, TransientTraktError
 from salts_lib import utils
 from salts_lib import log_utils
 from salts_lib.constants import *
@@ -35,6 +35,7 @@ from scrapers import * # import all scrapers into this namespace
 
 _SALTS = Addon('plugin.video.salts', sys.argv)
 ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
+VALID_ACCOUNT=utils.valid_account()
 username=_SALTS.get_setting('username')
 password=_SALTS.get_setting('password')
 use_https=_SALTS.get_setting('use_https')=='true'
@@ -47,20 +48,7 @@ db_connection=DB_Connection()
 @url_dispatcher.register(MODES.MAIN)
 def main_menu():
     db_connection.init_database()
-    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'})
-    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'})
-    _SALTS.add_directory({'mode': MODES.SCRAPERS}, {'title': 'Scraper Settings'})
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
-
-@url_dispatcher.register(MODES.BROWSE, ['section'])
-def browse_menu(section):
-    section_label='TV Shows' if section==SECTIONS.TV else 'Movies'
-    try:
-        valid_account=trakt_api.valid_account()
-    except:
-        valid_account=False
-    
-    if not valid_account:
+    if not VALID_ACCOUNT:
         remind_count = int(_SALTS.get_setting('remind_count'))
         remind_max=5
         if remind_count<remind_max:
@@ -72,18 +60,26 @@ def browse_menu(section):
     else:
         _SALTS.set_setting('remind_count', '0')
 
+    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'})
+    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'})
+    _SALTS.add_directory({'mode': MODES.SCRAPERS}, {'title': 'Scraper Settings'})
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+@url_dispatcher.register(MODES.BROWSE, ['section'])
+def browse_menu(section):
+    section_label='TV Shows' if section==SECTIONS.TV else 'Movies'
     _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': 'Trending %s' % (section_label)})
-    if valid_account: _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
-    if valid_account: _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES, 'section': section}, {'title': 'My Favorites'})
-    if valid_account: _SALTS.add_directory({'mode': MODES.MANAGE_SUBS, 'section': section}, {'title': 'My Subscriptions'})
-    if valid_account: _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': 'My Watchlist'})
-    if valid_account: _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'})
+    if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)})
+    if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES, 'section': section}, {'title': 'My Favorites'})
+    if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MANAGE_SUBS, 'section': section}, {'title': 'My Subscriptions'})
+    if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': 'My Watchlist'})
+    if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'})
     _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': 'Other Lists'})
     if section==SECTIONS.TV:
-        if valid_account: _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
+        if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
         _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'General Calendar'})
         _SALTS.add_directory({'mode': MODES.PREMIERES}, {'title': 'Premiere Calendar'})
-    if valid_account: _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'})
+    if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'})
     _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
@@ -124,14 +120,12 @@ def scraper_settings():
 @url_dispatcher.register(MODES.MOVE_SCRAPER, ['name', 'direction', 'other'])
 def move_scraper(name, direction, other):
     sort_key = utils.make_source_sort_key()
-    print sort_key
     if direction == DIRS.UP:
         sort_key[name] +=1
         sort_key[other] -= 1
     elif direction == DIRS.DOWN:
         sort_key[name] -= 1
         sort_key[other] += 1
-    print sort_key
     _SALTS.set_setting('source_sort_order', utils.make_source_sort_string(sort_key))
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
@@ -413,7 +407,7 @@ def get_sources(video_type, title, year, slug, season='', episode='', dialog=Non
     try:
         if not hosters:
             log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
-            builtin = 'XBMC.Notification(%s, No Sources Found, 5000, %s)'
+            builtin = 'XBMC.Notification(%s,No Sources Found, 5000, %s)'
             xbmc.executebuiltin(builtin % (_SALTS.get_name(), ICON_PATH))
             return False
         
@@ -453,7 +447,7 @@ def play_source(hoster_url, video_type, slug, season='', episode=''):
     stream_url = urlresolver.HostedMediaFile(url=hoster_url).resolve()
     if not stream_url or not isinstance(stream_url, basestring):
         log_utils.log('Url (%s) Resolution failed' % (hoster_url))
-        builtin = 'XBMC.Notification(%s, Could not Resolve Url: %s, 5000, %s)'
+        builtin = 'XBMC.Notification(%s,Could not Resolve Url: %s, 5000, %s)'
         xbmc.executebuiltin(builtin % (_SALTS.get_name(), hoster_url, ICON_PATH))
         return False
 
@@ -623,7 +617,7 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                             break
                     except NotImplementedError:
                         log_utils.log('%s Scraper does not support searching.' % (related_list[index]['class'].get_name()))
-                        builtin = 'XBMC.Notification(%s, %s Scraper does not support searching, 5000, %s)'
+                        builtin = 'XBMC.Notification(%s,%s Scraper does not support searching, 5000, %s)'
                         xbmc.executebuiltin(builtin % (_SALTS.get_name(), related_list[index]['class'].get_name(), ICON_PATH))
                         break
     finally:
@@ -678,7 +672,9 @@ def update_subscriptions():
 def update_strms(section):
     section_params = utils.get_section_params(section)
     slug=_SALTS.get_setting('%s_sub_slug' % (section))
-    if slug == utils.WATCHLIST_SLUG:
+    if not slug:
+        return
+    elif slug == utils.WATCHLIST_SLUG:
         items = trakt_api.show_watchlist(section)
     else:
         _, items = trakt_api.show_list(slug, section)
@@ -689,7 +685,9 @@ def update_strms(section):
 @url_dispatcher.register(MODES.CLEAN_SUBS)
 def clean_subs():
     slug=_SALTS.get_setting('TV_sub_slug')
-    if slug == utils.WATCHLIST_SLUG:
+    if not slug:
+        return
+    elif slug == utils.WATCHLIST_SLUG:
         items = trakt_api.show_watchlist(SECTIONS.TV)
     else:
         _, items = trakt_api.show_list(slug, SECTIONS.TV)
@@ -808,21 +806,18 @@ def make_dir_from_list(section, list_data, slug=None):
     section_params=utils.get_section_params(section)
     totalItems=len(list_data)
     for show in list_data:
-
         menu_items=[]
         if slug:
             queries = {'mode': MODES.REM_FROM_LIST, 'slug': slug, 'section': section}
             queries.update(utils.show_id(show))
             menu_items.append(('Remove from List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         sub_slug=_SALTS.get_setting('%s_sub_slug' % (section))
-        if sub_slug and sub_slug != slug:
+        if VALID_ACCOUNT and sub_slug and sub_slug != slug:
             queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section'], 'slug': sub_slug}
             queries.update(utils.show_id(show))
             menu_items.append(('Subscribe', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
-            
 
         liz, liz_url =make_item(section_params, show, menu_items)
-        print liz.getLabel()
         
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -904,9 +899,10 @@ def make_item(section_params, show, menu_items=None):
     liz_url = _SALTS.build_plugin_url(queries)
  
     menu_items.insert(0, ('Show Information', 'XBMC.Action(Info)'), )
-    queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section']}
-    queries.update(utils.show_id(show))
-    menu_items.append(('Add to List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+    if VALID_ACCOUNT:
+        queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section']}
+        queries.update(utils.show_id(show))
+        menu_items.append(('Add to List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
     menu_items.append(('Add to Library', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     queries = {'mode': MODES.SET_URL_SEARCH, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
@@ -928,8 +924,13 @@ def main(argv=None):
     if argv[0] != plugin_url:
         return
 
-    mode = _SALTS.queries.get('mode', None)
-    url_dispatcher.dispatch(mode, _SALTS.queries)
+    try:
+        mode = _SALTS.queries.get('mode', None)
+        url_dispatcher.dispatch(mode, _SALTS.queries)
+    except TransientTraktError as e:
+        log_utils.log(str(e), xbmc.LOGERROR)
+        builtin = 'XBMC.Notification(%s,%s, 5000, %s)'
+        xbmc.executebuiltin(builtin % (_SALTS.get_name(), str(e), ICON_PATH))
 
 if __name__ == '__main__':
     sys.exit(main())
