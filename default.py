@@ -79,6 +79,7 @@ def browse_menu(section):
         if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'})
         _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'General Calendar'})
         _SALTS.add_directory({'mode': MODES.PREMIERES}, {'title': 'Premiere Calendar'})
+        if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.FRIENDS_EPISODE, 'section': section}, {'title': 'Friends Episode Activity'})
     if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'})
     _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'})
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -170,22 +171,36 @@ def browse_recommendations(section):
     list_data = trakt_api.get_recommendations(section)
     make_dir_from_list(section, list_data)
 
-@url_dispatcher.register(MODES.FRIENDS, ['section'])
-def browse_friends(section):
-    section_params=utils.get_section_params(section)
-    activities=trakt_api.get_friends_activity(section)
+@url_dispatcher.register(MODES.FRIENDS, ['mode', 'section'])
+@url_dispatcher.register(MODES.FRIENDS_EPISODE, ['mode', 'section'])
+def browse_friends(mode, section):
+    section_params=utils.get_section_params(section, set_sort = False)
+    activities=trakt_api.get_friends_activity(section, mode==MODES.FRIENDS_EPISODE)
     totalItems=len(activities)
     
     for activity in activities['activity']:
-        liz, liz_url = make_item(section_params, activity[TRAKT_SECTIONS[section][:-1]])
+        if 'episode' in activity:
+            show=activity['show']
+            liz, liz_url = make_episode_item(show, activity['episode'], show['images']['fanart'])
+            folder=_SALTS.get_setting('source-win')=='Directory'
+            label=liz.getLabel()
+            label = '%s (%s) - %s' % (show['title'], show['year'], label)
+            liz.setLabel(label) 
+        else:
+            liz, liz_url = make_item(section_params, activity[TRAKT_SECTIONS[section][:-1]])
+            folder = section_params['folder']
+
+        if not folder:
+            liz.setProperty('IsPlayable', 'true')
 
         label=liz.getLabel()
-        label += ' (%s %s' % (activity['user']['username'], activity['action'])
-        if activity['action']=='rating': label += ' - %s' % (activity['rating'])
-        label += ')'
+        action = ' [[COLOR blue]%s[/COLOR] [COLOR green]%s' % (activity['user']['username'], activity['action'])
+        if activity['action']=='rating': action += ' - %s' % (activity['rating'])
+        action += '[/COLOR]]'
+        label = '%s %s' % (action, label)
         liz.setLabel(label)
         
-        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=section_params['folder'],totalItems=totalItems)
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder,totalItems=totalItems)        
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.MY_CAL, ['mode'], ['start_date'])
@@ -352,9 +367,7 @@ def browse_episodes(slug, season, fanart):
     episodes=trakt_api.get_episodes(slug, season)
     totalItems=len(episodes)
     for episode in episodes:
-        liz=make_episode_item(show, episode, fanart)
-        queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['episode'], 'slug': slug}
-        liz_url = _SALTS.build_plugin_url(queries)
+        liz, liz_url =make_episode_item(show, episode, fanart)
         if not folder:
             liz.setProperty('IsPlayable', 'true')
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder,totalItems=totalItems)
@@ -839,12 +852,9 @@ def make_dir_from_cal(mode, start_date, days):
         date=utils.make_day(day['date'])
         for episode_elem in day['episodes']:
             show=episode_elem['show']
-            slug=trakt_api.get_slug(show['url'])
             episode=episode_elem['episode']
             fanart=show['images']['fanart']
-            liz=make_episode_item(show, episode, fanart)
-            queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['number'], 'slug': slug}
-            liz_url = _SALTS.build_plugin_url(queries)
+            liz, liz_url =make_episode_item(show, episode, fanart)
             label=liz.getLabel()
             label = '[[COLOR deeppink]%s[/COLOR]] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
             if episode['season']==1 and episode['number']==1:
@@ -870,13 +880,16 @@ def make_episode_item(show, episode, fanart):
     liz=utils.make_list_item(label, meta)
     del meta['images']
     liz.setInfo('video', meta)
+    queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['episode'], 
+               'slug': trakt_api.get_slug(show['url'])}
+    liz_url = _SALTS.build_plugin_url(queries)
     
     menu_items=[]
     menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
     queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num}
     menu_items.append(('Set Related Url (Manual)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     liz.addContextMenuItems(menu_items, replaceItems=True)
-    return liz
+    return liz, liz_url
 
 def make_item(section_params, show, menu_items=None):
     if menu_items is None: menu_items=[]

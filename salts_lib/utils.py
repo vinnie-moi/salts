@@ -131,16 +131,16 @@ def make_info(item, show=''):
     if 'people' in show: info['castandrole']=['%s as %s' % (actor['name'],actor['character']) for actor in show['people']['actors'] if actor['name'] and actor['character']]
     return info
     
-def get_section_params(section):
+def get_section_params(section, set_sort=True):
     section_params={}
     section_params['section']=section
     if section==SECTIONS.TV:
-        set_view('tvshows')
+        set_view('tvshows', set_sort)
         section_params['next_mode']=MODES.SEASONS
         section_params['folder']=True
         section_params['video_type']=VIDEO_TYPES.TVSHOW
     else:
-        set_view('movies')
+        set_view('movies', set_sort)
         section_params['next_mode']=MODES.GET_SOURCES
         section_params['folder']=ADDON.get_setting('source-win')=='Directory'
         section_params['video_type']=VIDEO_TYPES.MOVIE
@@ -361,20 +361,20 @@ def disable_scraper(name):
             disabled = '%s%s|' % (disabled, name)
         ADDON.set_setting('disabled_scrapers', disabled)
 
-def set_view(content):
+def set_view(content, set_sort):
     # set content type so library shows more views and info
     if content:
         xbmcplugin.setContent(int(sys.argv[1]), content)
 
     # set sort methods - probably we don't need all of them
-    # comment out sortmethods so that XBMC doesn't override label...
-#     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_UNSORTED)
-#     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_LABEL)
-#     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_RATING)
-#     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_DATE)
-#     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_PROGRAM_COUNT)
-#     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
-#     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_GENRE)
+    if set_sort:
+        xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_RATING)
+        xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_DATE)
+        xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_PROGRAM_COUNT)
+        xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
+        xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_GENRE)
 
 def make_day(date):
     try: date=datetime.datetime.strptime(date,'%Y-%m-%d').date()
