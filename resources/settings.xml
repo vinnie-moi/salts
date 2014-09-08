@@ -48,6 +48,7 @@
 	</category>
 
     <category label="Subtitles">
+    	<setting type="lsep" label="Subtitles work only for TV Shows currently"/>
     	<setting id="enable-subtitles" type="bool" label="Enable Subtitles" default="false"/>
 		<setting id="subtitle-indicator" type="bool" label="Show subtitle indicators" default="true" enable="eq(-1,true)"/>
     	<setting id="subtitle-lang" type="text" label="Subtitle Language" default="English" enable="eq(-2,true)"/>
