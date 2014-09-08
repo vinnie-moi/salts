@@ -27,6 +27,7 @@ import xbmcvfs
 from addon.common.addon import Addon
 from salts_lib.db_utils import DB_Connection
 from salts_lib.url_dispatcher import URL_Dispatcher
+from salts_lib.srt_scraper import SRT_Scraper
 from salts_lib.trakt_api import Trakt_API, TransientTraktError
 from salts_lib import utils
 from salts_lib import log_utils
@@ -452,6 +453,25 @@ def resolve_source(class_url, video_type, slug, class_name, season='', episode='
     hoster_url = scraper_instance.resolve_link(class_url)
     return play_source(hoster_url, video_type, slug, season, episode)
 
+def download_subtitles(language, title, year, season, episode):
+    srt_scraper=SRT_Scraper()
+    tvshow_id=srt_scraper.get_tvshow_id(title, year)
+    if tvshow_id is None:
+        return
+     
+    subs=srt_scraper.get_episode_subtitles(language, tvshow_id, season, episode)
+    sub_labels=[]
+    for sub in subs:
+        sub_labels.append(utils.format_sub_label(sub))
+     
+    index=0
+    if len(sub_labels)>1:
+        dialog = xbmcgui.Dialog()       
+        index = dialog.select('Choose a subtitle to download', sub_labels)
+         
+    if index > -1:
+        return srt_scraper.download_subtitle(subs[index]['url'])
+    
 def play_source(hoster_url, video_type, slug, season='', episode=''):
     if hoster_url is None:
         return True
@@ -473,6 +493,13 @@ def play_source(hoster_url, video_type, slug, season='', episode=''):
         info = utils.make_info(item)
         art=utils.make_art(item)
     
+    if video_type == VIDEO_TYPES.EPISODE and utils.srt_download_enabled():
+        srt_path = download_subtitles(_SALTS.get_setting('subtitle-lang'), details['show']['title'], details['show']['year'], season, episode)
+        if utils.srt_show_enabled() and srt_path:
+            log_utils.log('Setting srt path: %s' % (srt_path), xbmc.LOGDEBUG)
+            win = xbmcgui.Window(10000)
+            win.setProperty('salts.playing.srt', srt_path)
+
     listitem = xbmcgui.ListItem(path=stream_url, iconImage=art['thumb'], thumbnailImage=art['thumb'])
     listitem.setProperty('fanart_image', art['fanart'])
     try: listitem.setArt(art)
@@ -635,6 +662,18 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                         break
     finally:
         utils.reap_workers(workers, None)
+
+@url_dispatcher.register(MODES.EDIT_TVSHOW_ID, ['title'], ['year'])
+def edit_tvshow_id(title, year=''):
+    srt_scraper=SRT_Scraper()
+    tvshow_id=srt_scraper.get_tvshow_id(title, year)
+    keyboard = xbmc.Keyboard()
+    keyboard.setHeading('Input TVShow ID')
+    if tvshow_id:
+        keyboard.setDefault(str(tvshow_id))
+    keyboard.doModal()
+    if keyboard.isConfirmed():
+        db_connection.set_related_url(VIDEO_TYPES.TVSHOW, title, year, SRT_SOURCE, keyboard.getText())
                 
 @url_dispatcher.register(MODES.REM_FROM_LIST, ['slug', 'section', 'id_type', 'show_id'])
 def remove_from_list(slug, section, id_type, show_id):
@@ -872,6 +911,16 @@ def make_episode_item(show, episode, fanart):
     if 'episode' in episode: episode_num=episode['episode']
     else:  episode_num=episode['number']
     label = '%sx%s %s' % (episode['season'], episode_num, episode['title'])
+    if utils.srt_indicators_enabled():
+        srt_scraper=SRT_Scraper()
+        language=_SALTS.get_setting('subtitle-lang')
+        tvshow_id=srt_scraper.get_tvshow_id(show['title'], show['year'])
+        if tvshow_id is not None:
+            srts=srt_scraper.get_episode_subtitles(language, tvshow_id, episode['season'], episode_num)
+        else:
+            srts=[]
+        label = utils.format_episode_label(label, episode['season'], episode_num, srts)
+            
     meta=utils.make_info(episode, show)
     meta['images']={}
     meta['images']['poster']=episode['images']['screen']
@@ -880,7 +929,7 @@ def make_episode_item(show, episode, fanart):
     liz=utils.make_list_item(label, meta)
     del meta['images']
     liz.setInfo('video', meta)
-    queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['episode'], 
+    queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num, 
                'slug': trakt_api.get_slug(show['url'])}
     liz_url = _SALTS.build_plugin_url(queries)
     
@@ -918,6 +967,12 @@ def make_item(section_params, show, menu_items=None):
         menu_items.append(('Add to List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
     menu_items.append(('Add to Library', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+
+    if section_params['section']==SECTIONS.TV and _SALTS.get_setting('enable-subtitles')=='true':
+        queries = {'mode': MODES.EDIT_TVSHOW_ID, 'title': show['title'], 'year': show['year']}
+        runstring = 'RunPlugin(%s)' % _SALTS.build_plugin_url(queries)
+        menu_items.append(('Set Addic7ed TVShowID', runstring,))
+
     queries = {'mode': MODES.SET_URL_SEARCH, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}
     menu_items.append(('Set Related Url (Search)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year']}

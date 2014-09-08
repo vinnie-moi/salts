@@ -411,3 +411,67 @@ def valid_account():
         valid_account=True
         
     return valid_account
+
+def format_sub_label(sub):
+    label = '%s - [%s] - (' % (sub['language'], sub['version'])
+    if sub['completed']:
+        color='green'
+    else:
+        label += '%s%% Complete, ' % (sub['percent'])
+        color='yellow'
+    if sub['hi']: label += 'HI, '
+    if sub['corrected']: label += 'Corrected, '
+    if sub['hd']: label += 'HD, '
+    if not label.endswith('('):
+        label = label[:-2] + ')'
+    else:
+        label = label[:-4]
+    label='[COLOR %s]%s[/COLOR]' % (color, label)
+    return label
+
+def srt_indicators_enabled():
+    return (ADDON.get_setting('enable-subtitles')=='true' and (ADDON.get_setting('subtitle-indicator')=='true'))
+
+def srt_download_enabled():
+    return (ADDON.get_setting('enable-subtitles')=='true' and (ADDON.get_setting('subtitle-download')=='true'))
+
+def srt_show_enabled():
+    return (ADDON.get_setting('enable-subtitles')=='true' and (ADDON.get_setting('subtitle-show')=='true'))
+
+def format_episode_label(label, season, episode, srts):
+    req_hi = ADDON.get_setting('subtitle-hi')=='true'
+    req_hd = ADDON.get_setting('subtitle-hd')=='true'
+    color='red'
+    percent=0
+    hi=None
+    hd=None
+    corrected=None
+    
+    for srt in srts:
+        if str(season)==srt['season'] and str(episode)==srt['episode']:
+            if not req_hi or srt['hi']:
+                if not req_hd or srt['hd']:
+                    if srt['completed']:
+                        color='green'
+                        if not hi: hi=srt['hi']
+                        if not hd: hd=srt['hd']
+                        if not corrected: corrected=srt['corrected']
+                    elif color!='green':
+                        color='yellow'
+                        if float(srt['percent'])>percent:
+                            if not hi: hi=srt['hi']
+                            if not hd: hd=srt['hd']
+                            if not corrected: corrected=srt['corrected']
+                            percent=srt['percent']
+    
+    label='[COLOR %s]%s[/COLOR]' % (color, label)
+    if color!='red':
+        label += ' (SRT: '
+        if color=='yellow':
+            label += ' %s%%, ' % (percent)
+        if hi: label += 'HI, '
+        if hd: label += 'HD, '
+        if corrected: label += 'Corrected, '
+        label = label[:-2]
+        label+= ')'
+    return label
