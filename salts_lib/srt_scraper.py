@@ -139,6 +139,9 @@ class SRT_Scraper():
     def download_subtitle(self, url):
         url = BASE_URL + url
         (response, srt) = self.__get_url(url)
+        if 'Content-Disposition' not in response.info():
+            return
+        
         cd=response.info()['Content-Disposition']
         r=re.search('filename="(.*)"', cd)
         if r:
