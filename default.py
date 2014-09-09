@@ -110,10 +110,6 @@ def scraper_settings():
 
         queries = {'mode': MODES.TOGGLE_SCRAPER, 'name': cls.get_name()}
         menu_items.append((toggle_label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
-        queries = {'mode': MODES.SET_BASE_URL, 'name': cls.get_name()}
-        menu_items.append(('Set Base Url', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
-        queries = {'mode': MODES.RESET_BASE_URL, 'name': cls.get_name()}
-        menu_items.append(('Reset Base Url', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         liz.addContextMenuItems(menu_items, replaceItems=True)
         
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
@@ -134,34 +130,12 @@ def move_scraper(name, direction, other):
 @url_dispatcher.register(MODES.TOGGLE_SCRAPER, ['name'])
 def toggle_scraper(name):
     if utils.scraper_enabled(name):
-        utils.disable_scraper(name)
+        setting='false'
     else:
-        utils.enable_scraper(name)
+        setting='true'
+    _SALTS.set_setting('%s-enable' % (name), setting)
     xbmc.executebuiltin("XBMC.Container.Refresh")
     
-@url_dispatcher.register(MODES.SET_BASE_URL, ['mode', 'name'])
-@url_dispatcher.register(MODES.RESET_BASE_URL, ['mode', 'name'])
-def set_base_url(mode, name):
-    setting = '%s_base_url' % (name)
-    for cls in utils.relevant_scrapers(None, True):
-        if cls.get_name() == name:
-            old_base_url = cls().base_url
-
-    if mode == MODES.SET_BASE_URL:
-        keyboard = xbmc.Keyboard()
-        keyboard.setHeading('Enter Base Url for %s Scraper' % (name))
-        keyboard.setDefault(old_base_url) 
-        keyboard.doModal()
-        if keyboard.isConfirmed():
-            new_base_url=keyboard.getText()
-        else:
-            return
-    elif mode == MODES.RESET_BASE_URL:
-        new_base_url = ''
-
-    if old_base_url != new_base_url:
-        db_connection.set_setting(setting, new_base_url)
-
 @url_dispatcher.register(MODES.TRENDING, ['section'])
 def browse_trending(section):
     list_data = trakt_api.get_trending(section)

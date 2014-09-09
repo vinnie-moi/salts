@@ -341,25 +341,8 @@ def relevant_scrapers(video_type=None, include_disabled=False, order_matters=Fal
     return relevant
 
 def scraper_enabled(name):
-    return '|%s|' % (name) not in ADDON.get_setting('disabled_scrapers')
-
-def enable_scraper(name):
-    if not scraper_enabled(name):
-        disabled=ADDON.get_setting('disabled_scrapers')
-        pattern = '|%s|' % (name)
-        pieces = disabled.split(pattern)
-        disabled='|'.join(pieces)
-        if disabled=='|': disabled=''
-        ADDON.set_setting('disabled_scrapers', disabled)
-
-def disable_scraper(name):
-    if scraper_enabled(name):
-        disabled=ADDON.get_setting('disabled_scrapers')
-        if not disabled:
-            disabled = '|%s|' % (name)
-        else:
-            disabled = '%s%s|' % (disabled, name)
-        ADDON.set_setting('disabled_scrapers', disabled)
+    # return true if setting exists and set to true, or setting doesn't exist (i.e. '')
+    return ADDON.get_setting('%s-enable' % (name)) in ['true', '']
 
 def set_view(content, set_sort):
     # set content type so library shows more views and info
