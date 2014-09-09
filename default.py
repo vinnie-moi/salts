@@ -443,7 +443,7 @@ def download_subtitles(language, title, year, season, episode):
         dialog = xbmcgui.Dialog()       
         index = dialog.select('Choose a subtitle to download', sub_labels)
          
-    if index > -1:
+    if subs and index > -1:
         return srt_scraper.download_subtitle(subs[index]['url'])
     
 def play_source(hoster_url, video_type, slug, season='', episode=''):
