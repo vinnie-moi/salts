@@ -464,14 +464,13 @@ def format_episode_label(label, season, episode, srts):
                             if not corrected: corrected=srt['corrected']
                             percent=srt['percent']
     
-    label='[COLOR %s]%s[/COLOR]' % (color, label)
     if color!='red':
-        label += ' (SRT: '
+        label += ' [COLOR %s](SRT: ' % (color)
         if color=='yellow':
             label += ' %s%%, ' % (percent)
         if hi: label += 'HI, '
         if hd: label += 'HD, '
         if corrected: label += 'Corrected, '
         label = label[:-2]
-        label+= ')'
+        label+= ')[/COLOR]'
     return label

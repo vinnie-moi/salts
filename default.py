@@ -182,7 +182,7 @@ def browse_friends(mode, section):
     for activity in activities['activity']:
         if 'episode' in activity:
             show=activity['show']
-            liz, liz_url = make_episode_item(show, activity['episode'], show['images']['fanart'])
+            liz, liz_url = make_episode_item(show, activity['episode'], show['images']['fanart'], show_subs=False)
             folder=_SALTS.get_setting('source-win')=='Directory'
             label=liz.getLabel()
             label = '%s (%s) - %s' % (show['title'], show['year'], label)
@@ -893,7 +893,7 @@ def make_dir_from_cal(mode, start_date, days):
             show=episode_elem['show']
             episode=episode_elem['episode']
             fanart=show['images']['fanart']
-            liz, liz_url =make_episode_item(show, episode, fanart)
+            liz, liz_url =make_episode_item(show, episode, fanart, show_subs=False)
             label=liz.getLabel()
             label = '[[COLOR deeppink]%s[/COLOR]] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
             if episode['season']==1 and episode['number']==1:
@@ -907,11 +907,11 @@ def make_dir_from_cal(mode, start_date, days):
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=True)    
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-def make_episode_item(show, episode, fanart):
+def make_episode_item(show, episode, fanart, show_subs=True):
     if 'episode' in episode: episode_num=episode['episode']
     else:  episode_num=episode['number']
     label = '%sx%s %s' % (episode['season'], episode_num, episode['title'])
-    if utils.srt_indicators_enabled():
+    if show_subs and utils.srt_indicators_enabled():
         srt_scraper=SRT_Scraper()
         language=_SALTS.get_setting('subtitle-lang')
         tvshow_id=srt_scraper.get_tvshow_id(show['title'], show['year'])
