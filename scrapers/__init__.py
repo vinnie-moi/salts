@@ -3,19 +3,19 @@ __all__ = ['scraper', 'dummy_scraper', 'pw_scraper', 'uflix_scraper', 'watchseri
 import re
 import os
 import xbmcaddon
+import xbmc
+from salts_lib import log_utils
 from . import scraper # just to avoid editor warning
 from . import *
 
 def update_settings():
     path=xbmcaddon.Addon().getAddonInfo('path')
     full_path = os.path.join(path, 'resources', 'settings.xml')
-    print full_path
-    xml=''
     try:
         with open(full_path, 'r') as f:
             xml=f.read()
     except:
-        pass
+        raise
     
     match = re.search('(<category label="Scrapers">.*?</category>)', xml, re.DOTALL | re.I)
     if match:
@@ -29,11 +29,14 @@ def update_settings():
             
         if old_settings != new_settings:
             xml=xml.replace(old_settings, new_settings)
-            with open(full_path, 'w') as f:
-                f.write(xml)
+            try:
+                with open(full_path, 'w') as f:
+                    f.write(xml)
+            except:
+                raise
         else:
-            print 'don\'t need to update settings'
+            log_utils.log('No Settings Update Needed', xbmc.LOGDEBUG)
     else:
-        print 'unable to match scraper category'
+        log_utils.log('Failed to match scraper category in settings.xml', xbmc.LOGWARNING)
 
 update_settings()
