@@ -458,14 +458,19 @@ def play_source(hoster_url, video_type, slug, season='', episode=''):
         xbmc.executebuiltin(builtin % (_SALTS.get_name(), hoster_url, ICON_PATH))
         return False
 
-    if video_type == VIDEO_TYPES.EPISODE:
-        details = trakt_api.get_episode_details(slug, season, episode)
-        info = utils.make_info(details['episode'], details['show'])
-        art=utils.make_art(details['episode'], details['show']['images']['fanart'])
-    else:
-        item = trakt_api.get_movie_details(slug)
-        info = utils.make_info(item)
-        art=utils.make_art(item)
+    try:
+        art={'thumb': '', 'fanart': ''}
+        info={}
+        if video_type == VIDEO_TYPES.EPISODE:
+            details = trakt_api.get_episode_details(slug, season, episode)
+            info = utils.make_info(details['episode'], details['show'])
+            art=utils.make_art(details['episode'], details['show']['images']['fanart'])
+        else:
+            item = trakt_api.get_movie_details(slug)
+            info = utils.make_info(item)
+            art=utils.make_art(item)
+    except TransientTraktError as e:
+        log_utils.log('During Playback: %s' % (str(e)), xbmc.LOGWARNING) # just log warning if trakt calls fail and leave meta and art blank
     
     if video_type == VIDEO_TYPES.EPISODE and utils.srt_download_enabled():
         srt_path = download_subtitles(_SALTS.get_setting('subtitle-lang'), details['show']['title'], details['show']['year'], season, episode)
