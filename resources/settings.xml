@@ -48,6 +48,24 @@
 	</category>
 	
 	<category label="Scrapers">
+         <setting id="Dummy-enable" type="bool" label="Dummy Enabled" default="true" visible="true"/>
+         <setting id="Dummy-base_url" type="text" label="     Dummy Base Url" default="" visible="eq(-1,true)"/>
+         <setting id="PrimeWire-enable" type="bool" label="PrimeWire Enabled" default="true" visible="true"/>
+         <setting id="PrimeWire-base_url" type="text" label="     PrimeWire Base Url" default="http://www.primewire.ag" visible="eq(-1,true)"/>
+         <setting id="UFlix.org-enable" type="bool" label="UFlix.org Enabled" default="true" visible="true"/>
+         <setting id="UFlix.org-base_url" type="text" label="     UFlix.org Base Url" default="http://uflix.org" visible="eq(-1,true)"/>
+         <setting id="WatchSeries-enable" type="bool" label="WatchSeries Enabled" default="true" visible="true"/>
+         <setting id="WatchSeries-base_url" type="text" label="     WatchSeries Base Url" default="http://watchseries.sx" visible="eq(-1,true)"/>
+         <setting id="movie25-enable" type="bool" label="movie25 Enabled" default="true" visible="true"/>
+         <setting id="movie25-base_url" type="text" label="     movie25 Base Url" default="http://movie25.cm" visible="eq(-1,true)"/>
+         <setting id="MerDB-enable" type="bool" label="MerDB Enabled" default="true" visible="true"/>
+         <setting id="MerDB-base_url" type="text" label="     MerDB Base Url" default="http://merdb.cn" visible="eq(-1,true)"/>
+         <setting id="2movies-enable" type="bool" label="2movies Enabled" default="true" visible="true"/>
+         <setting id="2movies-base_url" type="text" label="     2movies Base Url" default="http://twomovies.us" visible="eq(-1,true)"/>
+         <setting id="IceFilms-enable" type="bool" label="IceFilms Enabled" default="true" visible="true"/>
+         <setting id="IceFilms-base_url" type="text" label="     IceFilms Base Url" default="http://www.icefilms.info" visible="eq(-1,true)"/>
+         <setting id="afdah-enable" type="bool" label="afdah Enabled" default="true" visible="true"/>
+         <setting id="afdah-base_url" type="text" label="     afdah Base Url" default="http://afdah.com" visible="eq(-1,true)"/>
     </category>
 
     <category label="Subtitles">
