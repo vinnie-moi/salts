@@ -882,6 +882,7 @@ def make_dir_from_cal(mode, start_date, days):
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def make_episode_item(show, episode, fanart, show_subs=True):
+    show['title']=re.sub(' \(\d{4}\)$','',show['title'])
     if 'episode' in episode: episode_num=episode['episode']
     else:  episode_num=episode['number']
     label = '%sx%s %s' % (episode['season'], episode_num, episode['title'])
@@ -916,6 +917,7 @@ def make_episode_item(show, episode, fanart, show_subs=True):
 
 def make_item(section_params, show, menu_items=None):
     if menu_items is None: menu_items=[]
+    show['title']=re.sub(' \(\d{4}\)$','',show['title'])
     label = '%s (%s)' % (show['title'], show['year'])
     liz=utils.make_list_item(label, show)
     slug=trakt_api.get_slug(show['url'])
