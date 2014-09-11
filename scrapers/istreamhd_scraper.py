@@ -119,8 +119,8 @@ class IStreamHD_Scraper(scraper.Scraper):
                     '         <setting id="%s-password" type="text" label="     Password" option="hidden" default="" visible="eq(-3,true)"/>' % (name)]
     
     def __http_get(self, url, data=None, cache_limit=8):
-        # return all uncached blank pages if no user & pass
-        if not self.username and not self.password:
+        # return all uncached blank pages if no user or pass
+        if not self.username or not self.password:
             return ''
          
         html=super(IStreamHD_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
