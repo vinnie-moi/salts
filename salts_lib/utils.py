@@ -6,7 +6,7 @@ import xbmcgui
 import xbmcplugin
 import log_utils
 import sys
-import md5
+import hashlib
 from constants import *
 from scrapers import * # import all scrapers into this namespace
 from addon.common.addon import Addon
@@ -393,7 +393,7 @@ def valid_account():
     username=ADDON.get_setting('username')
     password=ADDON.get_setting('password')
     last_hash=ADDON.get_setting('last_hash')
-    cur_hash = md5.new(username+password).hexdigest()
+    cur_hash = hashlib.md5(username+password).hexdigest()
     if cur_hash != last_hash:
         try:
             valid_account=trakt_api.valid_account()
