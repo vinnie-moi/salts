@@ -47,7 +47,7 @@ trakt_api=Trakt_API(username,password, use_https, trakt_timeout)
 url_dispatcher=URL_Dispatcher()
 db_connection=DB_Connection()
 
-THEME_LIST = ['Shine', 'XXX', 'YYY']
+THEME_LIST = ['Shine', 'Luna_Blue', 'YYY']
 THEME = THEME_LIST[int(_SALTS.get_setting('theme'))]
 if xbmc.getCondVisibility('System.HasAddon(script.salts.themepak)'):
     themepak_path = xbmcaddon.Addon('script.salts.themepak').getAddonInfo('path')
