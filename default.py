@@ -959,6 +959,11 @@ def make_item(section_params, show, menu_items=None):
     info = utils.make_info(show)
     if not section_params['folder']:
         liz.setProperty('IsPlayable', 'true')
+    
+    if 'TotalEpisodes' in info:
+        liz.setProperty('TotalEpisodes', str(info['TotalEpisodes']))
+        liz.setProperty('WatchedEpisodes', str(info['WatchedEpisodes']))
+        liz.setProperty('UnWatchedEpisodes', str(info['UnWatchedEpisodes']))
  
     if section_params['section']==SECTIONS.TV:
         queries = {'mode': section_params['next_mode'], 'slug': slug, 'fanart': liz.getProperty('fanart_image')}
