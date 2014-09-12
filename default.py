@@ -926,7 +926,6 @@ def make_episode_item(show, episode, fanart, show_subs=True):
     meta['images']={}
     meta['images']['poster']=episode['images']['screen']
     meta['images']['fanart']=fanart
-    if 'watched' in episode and episode['watched']: meta['playcount']=1
     liz=utils.make_list_item(label, meta)
     del meta['images']
     liz.setInfo('video', meta)
