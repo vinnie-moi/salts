@@ -46,13 +46,13 @@ def choose_list(username=None):
 
 def show_id(show):
     queries={}
-    if 'imdb_id' in show:
+    if 'imdb_id' in show and show['imdb_id']:
         queries['id_type']='imdb_id'
         queries['show_id']=show['imdb_id']
-    elif 'tvdb_id' in show:
+    elif 'tvdb_id' in show and show['tvdb_id']:
         queries['id_type']='tvdb_id'
         queries['show_id']=show['tvdb_id']
-    elif 'tmdb_id' in show:
+    elif 'tmdb_id' in show and show['tmdb_id']:
         queries['id_type']='tmdb_id'
         queries['show_id']=show['tmdb_id']
     return queries
