@@ -17,6 +17,7 @@
 """
 import json
 import urllib2
+from urllib2 import HTTPError
 import urllib
 import hashlib
 import re
@@ -199,6 +200,8 @@ class Trakt_API():
             # if it's a temporary code, retry
             if e.code in TEMP_ERRORS:
                 raise TransientTraktError('Temporary Trakt Error: '+str(e))
+            elif e.code == 404:
+                return
             else:
                 raise
         except Exception as e:

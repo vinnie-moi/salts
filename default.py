@@ -78,7 +78,7 @@ def main_menu():
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'}, img=art('movies.png'))
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'}, img=art('television.png'))
     _SALTS.add_directory({'mode': MODES.SCRAPERS}, {'title': 'Scraper Settings'}, img=art('settings.png'))
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
 
 @url_dispatcher.register(MODES.BROWSE, ['section'])
 def browse_menu(section):
@@ -245,10 +245,36 @@ def browse_other_lists(section):
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)    
     
     lists = db_connection.get_other_lists(section)
+    totalItems=len(lists)
     for other_list in lists:
         header, _ = trakt_api.show_list(other_list[1], section, other_list[0])
-        _SALTS.add_directory({'mode': MODES.SHOW_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}, {'title': header['name']}, img=art('list.png'))
+        if other_list[2]:
+            name=other_list[2]
+        else:
+            name=header['name']
+
+        liz = xbmcgui.ListItem(label=name, iconImage=art('list.png'), thumbnailImage=art('list.png'))
+        queries = {'mode': MODES.SHOW_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
+        liz_url = _SALTS.build_plugin_url(queries)
+        
+        menu_items=[]
+        queries={'mode': MODES.RENAME_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0], 'name': name}
+        menu_items.append(('Rename List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        liz.addContextMenuItems(menu_items, replaceItems=True)
+
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=True,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    
+@url_dispatcher.register(MODES.RENAME_LIST, ['section', 'slug', 'username', 'name'])
+def rename_list(section, slug, username, name):
+    keyboard = xbmc.Keyboard()
+    keyboard.setHeading('Enter the new name (blank to reset)')
+    keyboard.setDefault(name)
+    keyboard.doModal()
+    if keyboard.isConfirmed():
+        new_name=keyboard.getText()
+        db_connection.rename_other_list(section, username, slug, new_name)
+    xbmc.executebuiltin("XBMC.Container.Refresh")
     
 @url_dispatcher.register(MODES.ADD_OTHER_LIST, ['section'])
 def add_other_list(section):
@@ -833,6 +859,42 @@ def reset_db():
     
     builtin = "XBMC.Notification(PrimeWire,%s,2000, %s)" % (message, ICON_PATH)
     xbmc.executebuiltin(builtin)        
+
+@url_dispatcher.register(MODES.EXPORT_DB)
+def export_db():
+    try:
+        dialog = xbmcgui.Dialog()
+        export_path = dialog.browse(0, 'Select Export Directory', 'files')
+        if export_path:
+            export_path = xbmc.translatePath(export_path)
+            keyboard = xbmc.Keyboard('export.csv', 'Enter Export Filename')
+            keyboard.doModal()
+            if keyboard.isConfirmed():
+                export_filename = keyboard.getText()
+                export_file = export_path + export_filename
+                db_connection.export_from_db(export_file)
+                builtin = "XBMC.Notification(Export Successful,Exported to %s,2000, %s)" % (export_file, ICON_PATH)
+                xbmc.executebuiltin(builtin)
+    except Exception as e:
+        log_utils.log('Export Failed: %s' % (e), xbmc.LOGERROR)
+        builtin = "XBMC.Notification(Export,Export Failed,2000, %s)" % (ICON_PATH)
+        xbmc.executebuiltin(builtin)
+
+@url_dispatcher.register(MODES.IMPORT_DB)
+def import_db():
+    try:
+        dialog = xbmcgui.Dialog()
+        import_file = dialog.browse(1, 'Select Import File', 'files')
+        if import_file:
+            import_file = xbmc.translatePath(import_file)
+            db_connection.import_into_db(import_file)
+            builtin = "XBMC.Notification(Import Success,Imported from %s,5000, %s)" % (import_file, ICON_PATH)
+            xbmc.executebuiltin(builtin)
+    except Exception as e:
+        log_utils.log('Import Failed: %s' % (e), xbmc.LOGERROR)
+        builtin = "XBMC.Notification(Import,Import Failed,2000, %s)" % (ICON_PATH)
+        xbmc.executebuiltin(builtin)
+        raise
 
 @url_dispatcher.register(MODES.ADD_TO_LIBRARY, ['video_type', 'title', 'year', 'slug'])
 def add_to_library(video_type, title, year, slug, require_source=False):

@@ -1,3 +1,4 @@
+import os
 import time
 import re
 import datetime
@@ -14,6 +15,7 @@ from trakt_api import Trakt_API
 from db_utils import DB_Connection
 
 ADDON = Addon('plugin.video.salts')
+ICON_PATH = os.path.join(ADDON.get_path(), 'icon.png')
 SORT_FIELDS =  [(SORT_LIST[int(ADDON.get_setting('sort1_field'))], SORT_SIGNS[ADDON.get_setting('sort1_order')]),
                 (SORT_LIST[int(ADDON.get_setting('sort2_field'))], SORT_SIGNS[ADDON.get_setting('sort2_order')]),
                 (SORT_LIST[int(ADDON.get_setting('sort3_field'))], SORT_SIGNS[ADDON.get_setting('sort3_order')]),
@@ -39,10 +41,14 @@ db_connection=DB_Connection()
 def choose_list(username=None):
     lists = trakt_api.get_lists(username)
     if username is None: lists.insert(0, {'name': 'watchlist', 'slug': WATCHLIST_SLUG})
-    dialog=xbmcgui.Dialog()
-    index = dialog.select('Pick a list', [list_data['name'] for list_data in lists])
-    if index>-1:
-        return lists[index]['slug']
+    if lists:
+        dialog=xbmcgui.Dialog()
+        index = dialog.select('Pick a list', [list_data['name'] for list_data in lists])
+        if index>-1:
+            return lists[index]['slug']
+    else:
+        builtin = 'XBMC.Notification(%s,No Lists exist for user: %s, 5000, %s)'
+        xbmc.executebuiltin(builtin % (ADDON.get_name(), username, ICON_PATH))
 
 def show_id(show):
     queries={}

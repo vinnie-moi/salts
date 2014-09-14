@@ -3,6 +3,8 @@
 - Fixed uflix.org scraper (Site keeps changing!)
 - Added Next Episodes view
 - Add Play Trailer context menu
+- Added in csv db export/import
+- Added in db version migration code
 
 [B]Version 0.0.7[/B]
 - Improve handling of PW Scraper with site is offline
