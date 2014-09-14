@@ -65,7 +65,7 @@ class UFlix_Scraper(scraper.Scraper):
             pattern='class="btn btn-primary".*?href="([^"]+).*?[^>]+> ([^<]+).*?fa-thumbs-o-up">\s+\((\d+)\).*?\((\d+)\)\s+<i class="fa fa-thumbs-o-down'
             for match in re.finditer(pattern, html, re.DOTALL | re.I):
                 url, host, up,down = match.groups()
-                match = re.search('url=([^&]+)domain=([^&]+)', url)
+                match = re.search('url=([^&]+)&domain=([^&]+)', url)
                 if match:
                     url=match.group(1).decode('base-64')
                     host=match.group(2).decode('base-64')

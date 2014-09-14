@@ -1,8 +1,8 @@
 [B]Version 0.0.8[/B]
 - Added movieshd.co scraper
-- Fixed uflix.org scraper (Site keeps changing!)
+- Fixed uflix.org scraper (Site keeps making changes!)
 - Added Next Episodes view
-- Add Play Trailer context menu
+- Added Play Trailer context menu
 - Added in csv db export/import
 - Added in db version migration code
 
