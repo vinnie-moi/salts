@@ -98,7 +98,7 @@ def browse_menu(section):
     if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'}, img=art('my_lists.png'))
     _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': 'Other Lists'}, img=art('other_lists.png'))
     if section==SECTIONS.TV:
-        if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_PROGRESS}, {'title': 'My Progress'}, img=art('my_progress.png'))
+        if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_PROGRESS}, {'title': 'My Next Episodes'}, img=art('my_progress.png'))
         if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'}, img=art('my_calendar.png'))
         _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'General Calendar'}, img=art('calendar.png'))
         _SALTS.add_directory({'mode': MODES.PREMIERES}, {'title': 'Premiere Calendar'}, img=art('premiere_calendar.png'))
@@ -285,18 +285,20 @@ def show_progress():
     items = trakt_api.get_progress(SORT_MAP[int(sort_index)])
     for item in items:
         if 'next_episode' in item and item['next_episode']:
-            show=item['show']
-            fanart=item['show']['images']['fanart']
-            liz, liz_url = make_episode_item(show, item['next_episode'], fanart)
-            folder=_SALTS.get_setting('source-win')=='Directory'
-            label=liz.getLabel()
-            label = '%s (%s) - %s' % (show['title'], show['year'], label)
-            liz.setLabel(label) 
+            if _SALTS.get_setting('show_unaired')=='true' or item['next_episode']['first_aired']<=time.time():
+                show=item['show']
+                fanart=item['show']['images']['fanart']
+                date=utils.make_day(time.strftime('%Y-%m-%d', time.localtime(item['next_episode']['first_aired'])))                
+                liz, liz_url = make_episode_item(show, item['next_episode'], fanart)
+                folder=_SALTS.get_setting('source-win')=='Directory'
+                label=liz.getLabel()
+                label = '[[COLOR deeppink]%s[/COLOR]] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
+                liz.setLabel(label) 
 
-            if not folder:
-                liz.setProperty('IsPlayable', 'true')
-
-            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder)        
+                if not folder:
+                    liz.setProperty('IsPlayable', 'true')
+    
+                xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder)        
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
     
 @url_dispatcher.register(MODES.MANAGE_SUBS, ['section'])
@@ -481,6 +483,11 @@ def resolve_source(class_url, video_type, slug, class_name, season='', episode='
     hoster_url = scraper_instance.resolve_link(class_url)
     return play_source(hoster_url, video_type, slug, season, episode)
 
+@url_dispatcher.register(MODES.PLAY_TRAILER,['stream_url'])
+def play_trailer(stream_url):
+    print stream_url
+    xbmc.Player().play(stream_url)
+
 def download_subtitles(language, title, year, season, episode):
     srt_scraper=SRT_Scraper()
     tvshow_id=srt_scraper.get_tvshow_id(title, year)
@@ -501,6 +508,9 @@ def download_subtitles(language, title, year, season, episode):
         return srt_scraper.download_subtitle(subs[index]['url'])
     
 def play_source(hoster_url, video_type, slug, season='', episode=''):
+    global urlresolver
+    import urlresolver
+
     if hoster_url is None:
         return False
 
@@ -1032,6 +1042,10 @@ def make_item(section_params, show, menu_items=None):
     queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
     menu_items.append(('Add to Library', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
 
+    if 'trailer' in info:
+        queries = {'mode': MODES.PLAY_TRAILER, 'stream_url': info['trailer']}
+        menu_items.append(('Play Trailer', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        
     if section_params['section']==SECTIONS.TV and _SALTS.get_setting('enable-subtitles')=='true':
         queries = {'mode': MODES.EDIT_TVSHOW_ID, 'title': show['title'], 'year': show['year']}
         runstring = 'RunPlugin(%s)' % _SALTS.build_plugin_url(queries)
