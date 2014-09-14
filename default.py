@@ -98,6 +98,7 @@ def browse_menu(section):
     if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'}, img=art('my_lists.png'))
     _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': 'Other Lists'}, img=art('other_lists.png'))
     if section==SECTIONS.TV:
+        if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_PROGRESS}, {'title': 'My Progress'}, img=art('my_progress.png'))
         if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'}, img=art('my_calendar.png'))
         _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'General Calendar'}, img=art('calendar.png'))
         _SALTS.add_directory({'mode': MODES.PREMIERES}, {'title': 'Premiere Calendar'}, img=art('premiere_calendar.png'))
@@ -277,6 +278,26 @@ def show_watchlist(section):
 def show_collection(section):
     items = trakt_api.get_collection(section)
     make_dir_from_list(section, items)
+    
+@url_dispatcher.register(MODES.SHOW_PROGRESS)
+def show_progress():
+    sort_index =_SALTS.get_setting('sort_progress')
+    items = trakt_api.get_progress(SORT_MAP[int(sort_index)])
+    for item in items:
+        if 'next_episode' in item and item['next_episode']:
+            show=item['show']
+            fanart=item['show']['images']['fanart']
+            liz, liz_url = make_episode_item(show, item['next_episode'], fanart)
+            folder=_SALTS.get_setting('source-win')=='Directory'
+            label=liz.getLabel()
+            label = '%s (%s) - %s' % (show['title'], show['year'], label)
+            liz.setLabel(label) 
+
+            if not folder:
+                liz.setProperty('IsPlayable', 'true')
+
+            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder)        
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
     
 @url_dispatcher.register(MODES.MANAGE_SUBS, ['section'])
 def manage_subscriptions(section):
@@ -928,6 +949,7 @@ def make_dir_from_cal(mode, start_date, days):
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def make_episode_item(show, episode, fanart, show_subs=True):
+    log_utils.log('Make Episode: Show: %s, Episode: %s, Fanart: %s, Show Subs: %s' % (show, episode, fanart, show_subs))
     show['title']=re.sub(' \(\d{4}\)$','',show['title'])
     if 'episode' in episode: episode_num=episode['episode']
     else:  episode_num=episode['number']

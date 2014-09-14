@@ -28,6 +28,7 @@ from db_utils import DB_Connection
 from constants import TRAKT_SECTIONS
 from constants import TEMP_ERRORS
 from constants import SECTIONS
+from constants import TRAKT_SORT
 
 class TraktError(Exception):
     pass
@@ -146,6 +147,10 @@ class Trakt_API():
     
     def get_collection(self, section):
         url='/user/library/%s/collection.json/%s/%s' % (TRAKT_SECTIONS[section], API_KEY, self.username)
+        return self.__call_trakt(url)
+    
+    def get_progress(self, sort=TRAKT_SORT.ACTIVITY):
+        url='/user/progress/watched.json/%s/%s/all/%s/normal' % (API_KEY, self.username, sort)
         return self.__call_trakt(url)
     
     def get_slug(self, url):
