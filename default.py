@@ -680,6 +680,8 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
             worker = utils.start_worker(q, utils.parallel_get_url, [cls, video_type, title, year, season, episode])
             worker_count += 1
             workers.append(worker)
+            related={'class': cls(max_timeout), 'name': cls.get_name(), 'label': '[%s]' % (cls.get_name()), 'url': ''}
+            related_list.append(related)
     
     # collect results from workers
     if utils.P_MODE != P_MODES.NONE:
@@ -688,7 +690,10 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
                 log_utils.log('Calling get with timeout: %s' %(timeout), xbmc.LOGDEBUG)
                 result = q.get(True, timeout)
                 log_utils.log('Got result: %s' %(result), xbmc.LOGDEBUG)
-                related_list.append(result)
+                #related_list.append(result)
+                for i, item in enumerate(related_list):
+                    if item['name']==result['name']:
+                        related_list[i]=result
                 worker_count -=1
                 if max_timeout>0:
                     timeout = max_timeout - (time.time() - begin)

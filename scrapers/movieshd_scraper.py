@@ -87,13 +87,14 @@ class MoviesHD_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/search/')
         search_url += urllib.quote_plus(title)
         html = self.__http_get(search_url, cache_limit=.25)
-        pattern ='href="([^"]+)"\s+title="([^"]+)\s+\((\d{4})\)'
         results=[]
-        for match in re.finditer(pattern, html):
-            url, title, match_year = match.groups('')
-            if not year or not match_year or year == match_year:
-                result={'url': url.replace(self.base_url,''), 'title': title, 'year': match_year}
-                results.append(result)
+        if not re.search('Sorry, but nothing matched your search criteria', html, re.I):
+            pattern ='href="([^"]+)"\s+title="([^"]+)\s+\((\d{4})\)'
+            for match in re.finditer(pattern, html):
+                url, title, match_year = match.groups('')
+                if not year or not match_year or year == match_year:
+                    result={'url': url.replace(self.base_url,''), 'title': title, 'year': match_year}
+                    results.append(result)
         return results
 
     def __http_get(self, url, cache_limit=8):
