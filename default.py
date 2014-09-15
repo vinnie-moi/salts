@@ -259,6 +259,10 @@ def browse_other_lists(section):
         liz_url = _SALTS.build_plugin_url(queries)
         
         menu_items=[]
+        queries={'mode': MODES.ADD_OTHER_LIST, 'section': section, 'username': other_list[0]}
+        menu_items.append(('Add more from %s' % (other_list[0]), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        queries={'mode': MODES.REMOVE_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
+        menu_items.append(('Remove List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         queries={'mode': MODES.RENAME_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0], 'name': name}
         menu_items.append(('Rename List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         queries={'mode': MODES.COPY_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
@@ -268,6 +272,11 @@ def browse_other_lists(section):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=True,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
     
+@url_dispatcher.register(MODES.REMOVE_LIST, ['section', 'username', 'slug'])
+def remove_list(section, username, slug):
+    db_connection.delete_other_list(section, username, slug)
+    xbmc.executebuiltin("XBMC.Container.Refresh")
+
 @url_dispatcher.register(MODES.RENAME_LIST, ['section', 'slug', 'username', 'name'])
 def rename_list(section, slug, username, name):
     keyboard = xbmc.Keyboard()
@@ -279,16 +288,17 @@ def rename_list(section, slug, username, name):
         db_connection.rename_other_list(section, username, slug, new_name)
     xbmc.executebuiltin("XBMC.Container.Refresh")
     
-@url_dispatcher.register(MODES.ADD_OTHER_LIST, ['section'])
-def add_other_list(section):
-    keyboard = xbmc.Keyboard()
-    keyboard.setHeading('Enter username of list owner')
-    keyboard.doModal()
-    if keyboard.isConfirmed():
-        username=keyboard.getText()
-        slug=pick_list(None, section, username)
-        if slug:
-            db_connection.add_other_list(section, username, slug)
+@url_dispatcher.register(MODES.ADD_OTHER_LIST, ['section'], ['username'])
+def add_other_list(section, username=None):
+    if username is None:
+        keyboard = xbmc.Keyboard()
+        keyboard.setHeading('Enter username of list owner')
+        keyboard.doModal()
+        if keyboard.isConfirmed():
+            username=keyboard.getText()
+    slug=pick_list(None, section, username)
+    if slug:
+        db_connection.add_other_list(section, username, slug)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.SHOW_LIST, ['section', 'slug'], ['username'])
