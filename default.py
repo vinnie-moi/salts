@@ -555,10 +555,10 @@ def play_source(hoster_url, video_type, slug, season='', episode=''):
 
     stream_url = urlresolver.HostedMediaFile(url=hoster_url).resolve()
     if not stream_url or not isinstance(stream_url, basestring):
-        log_utils.log('Url (%s) Resolution failed' % (hoster_url))
-        builtin = 'XBMC.Notification(%s,Could not Resolve Url: %s, 5000, %s)'
-        xbmc.executebuiltin(builtin % (_SALTS.get_name(), hoster_url, ICON_PATH))
-        return False
+        log_utils.log('Url (%s) Resolution failed trying with hoster_url' % (hoster_url))
+        stream_url = hoster_url
+#         builtin = 'XBMC.Notification(%s,Could not Resolve Url: %s, 5000, %s)'
+#         xbmc.executebuiltin(builtin % (_SALTS.get_name(), hoster_url, ICON_PATH))
 
     try:
         art={'thumb': '', 'fanart': ''}
