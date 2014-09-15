@@ -252,14 +252,17 @@ def browse_other_lists(section):
             name=other_list[2]
         else:
             name=header['name']
+        label = '[[COLOR blue]%s[/COLOR]] %s' % (other_list[0], name)
 
-        liz = xbmcgui.ListItem(label=name, iconImage=art('list.png'), thumbnailImage=art('list.png'))
+        liz = xbmcgui.ListItem(label=label, iconImage=art('list.png'), thumbnailImage=art('list.png'))
         queries = {'mode': MODES.SHOW_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
         liz_url = _SALTS.build_plugin_url(queries)
         
         menu_items=[]
         queries={'mode': MODES.RENAME_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0], 'name': name}
         menu_items.append(('Rename List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        queries={'mode': MODES.COPY_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
+        menu_items.append(('Copy to My List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         liz.addContextMenuItems(menu_items, replaceItems=True)
 
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=True,totalItems=totalItems)
@@ -755,23 +758,43 @@ def edit_tvshow_id(title, year=''):
 @url_dispatcher.register(MODES.REM_FROM_LIST, ['slug', 'section', 'id_type', 'show_id'])
 def remove_from_list(slug, section, id_type, show_id):
     item={'type': TRAKT_SECTIONS[section][:-1], id_type: show_id}
-    if slug==utils.WATCHLIST_SLUG:
-        trakt_api.remove_from_watchlist(section, item)
-    else:
-        trakt_api.remove_from_list(slug, item)
+    remove_many_from_list(section, item, slug)
     xbmc.executebuiltin("XBMC.Container.Refresh")
+    
+def remove_many_from_list(section, items, slug):
+    if slug==utils.WATCHLIST_SLUG:
+        response=trakt_api.remove_from_watchlist(section, items)
+    else:
+        response=trakt_api.remove_from_list(slug, items)
+    return response
     
 @url_dispatcher.register(MODES.ADD_TO_LIST, ['section', 'id_type', 'show_id'], ['slug'])
 def add_to_list(section, id_type, show_id, slug=None):
     item={'type': TRAKT_SECTIONS[section][:-1], id_type: show_id}
-    if not slug: slug=utils.choose_list()
-    if slug==utils.WATCHLIST_SLUG:
-        trakt_api.add_to_watchlist(section, item)
-    elif slug:
-        trakt_api.add_to_list(slug, item)
+    add_many_to_list(section, item, slug)
     builtin = "XBMC.Notification(%s,Item Added to List, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
     xbmc.executebuiltin(builtin)
     xbmc.executebuiltin("XBMC.Container.Refresh")
+
+def add_many_to_list(section, item, slug=None):
+    if not slug: slug=utils.choose_list()
+    if slug==utils.WATCHLIST_SLUG:
+        response=trakt_api.add_to_watchlist(section, item)
+    elif slug:
+        response=trakt_api.add_to_list(slug, item)
+    return response
+    
+@url_dispatcher.register(MODES.COPY_LIST, ['section', 'slug', 'username'])
+def copy_list(section, slug, username):
+    _, items = trakt_api.show_list(slug, section, username)
+    copy_items=[]
+    for item in items:
+        query=utils.show_id(item)
+        copy_item={'type': TRAKT_SECTIONS[section][:-1], query['id_type']: query['show_id']}
+        copy_items.append(copy_item)
+    response=add_many_to_list(section, copy_items)
+    builtin = "XBMC.Notification(%s,List Copied: (A:%s/ E:%s/ S:%s), 5000, %s)" % (_SALTS.get_name(), response['inserted'], response['already_exist'], response['skipped'], ICON_PATH)
+    xbmc.executebuiltin(builtin)
 
 @url_dispatcher.register(MODES.UPDATE_SUBS)
 def update_subscriptions():
