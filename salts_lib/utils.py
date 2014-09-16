@@ -358,11 +358,12 @@ def url_exists(video_type, title, year, season='', episode=''):
     max_timeout = int(ADDON.get_setting('source_timeout'))
     log_utils.log('Checking for Url Existence: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode), xbmc.LOGDEBUG)
     for cls in relevant_scrapers(video_type):
-        scraper_instance=cls(max_timeout)
-        url = scraper_instance.get_url(video_type, title, year, season, episode)
-        if url:
-            log_utils.log('Found url for |%s|%s|%s|%s|%s| @ %s: %s' % (video_type, title, year, season, episode, cls.get_name(), url), xbmc.LOGDEBUG)
-            return True
+        if ADDON.get_setting('%s-sub_check' % (cls.get_name()))=='true':
+            scraper_instance=cls(max_timeout)
+            url = scraper_instance.get_url(video_type, title, year, season, episode)
+            if url:
+                log_utils.log('Found url for |%s|%s|%s|%s|%s| @ %s: %s' % (video_type, title, year, season, episode, cls.get_name(), url), xbmc.LOGDEBUG)
+                return True
 
     log_utils.log('No url found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
     return False

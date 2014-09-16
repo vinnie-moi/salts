@@ -111,3 +111,12 @@ class WS_Scraper(scraper.Scraper):
     
     def __http_get(self, url, cache_limit=8):
         return super(WS_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
+    
+    @classmethod
+    def get_settings(cls):
+        settings=super(WS_Scraper, cls).get_settings()
+        # force watchseries to not partipcate in url exists since they create pages before links are available
+        for i in reversed(xrange(len(settings))):
+            if 'sub_check' in settings[i]:
+                settings[i]=settings[i].replace('"true"', '"false"')
+        return settings
