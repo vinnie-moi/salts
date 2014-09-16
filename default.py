@@ -324,7 +324,7 @@ def show_progress():
     items = trakt_api.get_progress(SORT_MAP[int(sort_index)])
     for item in items:
         if 'next_episode' in item and item['next_episode']:
-            if _SALTS.get_setting('show_unaired')=='true' or item['next_episode']['first_aired']<=time.time():
+            if _SALTS.get_setting('show_unaired_next')=='true' or item['next_episode']['first_aired']<=time.time():
                 show=item['show']
                 fanart=item['show']['images']['fanart']
                 date=utils.make_day(time.strftime('%Y-%m-%d', time.localtime(item['next_episode']['first_aired'])))                
@@ -432,11 +432,14 @@ def browse_episodes(slug, season, fanart):
     show=trakt_api.get_show_details(slug)
     episodes=trakt_api.get_episodes(slug, season)
     totalItems=len(episodes)
+    now=time.time()
     for episode in episodes:
-        liz, liz_url =make_episode_item(show, episode, fanart)
-        if not folder:
-            liz.setProperty('IsPlayable', 'true')
-        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder,totalItems=totalItems)
+        if _SALTS.get_setting('show_unaired')=='true' or episode['first_aired']<=now:
+            if _SALTS.get_setting('show_unknown')=='true' or episode['first_aired']:
+                liz, liz_url =make_episode_item(show, episode, fanart)
+                if not folder:
+                    liz.setProperty('IsPlayable', 'true')
+                xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.GET_SOURCES, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'episode', 'dialog'])
