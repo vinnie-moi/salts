@@ -21,12 +21,14 @@ import urlparse
 import re
 import json
 import xbmcaddon
+import xbmc
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://yify.tv'
+MAX_TRIES=3
 
 class YIFY_Scraper(scraper.Scraper):
     base_url=BASE_URL
@@ -44,11 +46,39 @@ class YIFY_Scraper(scraper.Scraper):
         return 'yify.tv'
     
     def resolve_link(self, link):
-        url = urlparse.urljoin(self.base_url,link)
-        html = self.__http_get(url, cache_limit=.5)
-        data = json.loads(html)
-        for elem in data:
-            print elem
+        url = '/reproductor2/pk/pk/plugins/player_p2.php'
+        url = urlparse.urljoin(self.base_url ,url)
+        data = {'url': link}
+        html = ''
+        tries=1
+        while tries<=MAX_TRIES:
+            html = self.__http_get(url, data=data, cache_limit=0)
+            log_utils.log('Initial Data (%s): %s' % (tries, html), xbmc.LOGDEBUG)
+            if html:
+                break 
+            tries+=1
+        else:
+            return None
+        
+        js_data = json.loads(html)
+        if 'captcha' in js_data[0]:
+            tries=1
+            while tries<=MAX_TRIES:
+                data['type']=js_data[0]['captcha']
+                captcha_result = self._do_recaptcha(js_data[0]['k'], tries, MAX_TRIES)
+                data['chall']=captcha_result['recaptcha_challenge_field']
+                data['res']=captcha_result['recaptcha_response_field']
+                html = self.__http_get(url, data=data, cache_limit=0)
+                log_utils.log('2nd Data (%s): %s' % (tries, html), xbmc.LOGDEBUG)
+                if html:
+                    js_data = json.loads(html)
+                    if 'captcha' not in js_data[0]:
+                        break
+                tries+=1
+            else:
+                return None
+
+        for elem in js_data:
             if elem['type'].startswith('video'):
                 url = elem['url']
         return url
@@ -64,12 +94,11 @@ class YIFY_Scraper(scraper.Scraper):
             html = self.__http_get(url, cache_limit=.5)
             match = re.search('showPkPlayer\("([^"]+)', html)
             if match:
-                video_id = match.group(1)
-                url = '/reproductor2/pk/pk/plugins/player_p2.php?url=%s' % (video_id)
-                hoster = {'multi-part': False, 'host': 'yify.tv', 'class': self, 'quality': QUALITIES.HD, 'views': None, 'rating': None, 'url': url}
+                video_id = match.group(1)                
+                hoster = {'multi-part': False, 'host': 'yify.tv', 'class': self, 'quality': QUALITIES.HD, 'views': None, 'rating': None, 'url': video_id}
                 match = re.search('class="votes">(\d+)</strong>', html)
                 if match:
-                    hoster['views']=match.group(1)
+                    hoster['views']=int(match.group(1))
                 hosters.append(hoster)
         return hosters
 
@@ -101,5 +130,5 @@ class YIFY_Scraper(scraper.Scraper):
                 results.append(result)
         return results
 
-    def __http_get(self, url, cache_limit=8):
-        return super(YIFY_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
+    def __http_get(self, url, data=None, cache_limit=8):
+        return super(YIFY_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

@@ -63,7 +63,7 @@ class MoviesHD_Scraper(scraper.Scraper):
             match=re.search('class="views-infos">(\d+).*?class="rating">([^%]+).*?class="nb-votes">(\d+)', html, re.DOTALL)
             if match:
                 views, rating, votes = match.groups()
-                hoster['views']=views
+                hoster['views']=int(views)
                 hoster['rating']=int(rating)
                 hoster['up']=int(round(hoster['rating']*int(votes)/100.0))
                 hoster['down']=int(int(votes)-hoster['up'])
