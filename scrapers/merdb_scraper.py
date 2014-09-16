@@ -51,8 +51,8 @@ class MerDB_Scraper(scraper.Scraper):
         if item['verified']: label = '[COLOR yellow]%s[/COLOR]' % (label)
         return label
     
-    def get_sources(self, video_type, title, year, season='', episode=''):
-        source_url=self.get_url(video_type, title, year, season, episode)
+    def get_sources(self, video):
+        source_url=self.get_url(video)
         hosters = []
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
@@ -93,8 +93,8 @@ class MerDB_Scraper(scraper.Scraper):
          
         return hosters
 
-    def get_url(self, video_type, title, year, season='', episode=''):
-        return super(MerDB_Scraper, self)._default_get_url(video_type, title, year, season, episode)
+    def get_url(self, video):
+        return super(MerDB_Scraper, self)._default_get_url(video)
     
     def search(self, video_type, title, year):
         search_url = self.base_url
@@ -118,7 +118,7 @@ class MerDB_Scraper(scraper.Scraper):
             results.append(result)
         return results
     
-    def _get_episode_url(self, show_url, season, episode):
+    def _get_episode_url(self, show_url, season, episode, ep_title):
         url = urlparse.urljoin(self.base_url, show_url)
         html = self.__http_get(url, cache_limit=2)
         pattern = '"tv_episode_item".+?href="([^"]+/season-%s-episode-%s)">' % (season, episode)

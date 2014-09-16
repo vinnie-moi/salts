@@ -48,8 +48,8 @@ class MoviesHD_Scraper(scraper.Scraper):
     def format_source_label(self, item):
         return '[%s] %s (%s views) (%s Up, %s Down) (%s/100)' % (item['quality'], item['host'],  item['views'], item['up'], item['down'], item['rating'])
     
-    def get_sources(self, video_type, title, year, season='', episode=''):
-        source_url= self.get_url(video_type, title, year, season, episode)
+    def get_sources(self, video):
+        source_url= self.get_url(video)
         hosters=[]
         if source_url:
             url = urlparse.urljoin(self.base_url,source_url)
@@ -70,18 +70,8 @@ class MoviesHD_Scraper(scraper.Scraper):
             hosters.append(hoster)
         return hosters
 
-    def get_url(self, video_type, title, year, season='', episode=''):
-        url = None
-        result = self.db_connection.get_related_url(video_type, title, year, self.get_name())
-        if result:
-            url=result[0][0]
-            log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (video_type, title, year, self.get_name(), url))
-        else:
-            results = self.search(video_type, title, year)
-            if results:
-                url = results[0]['url']
-                self.db_connection.set_related_url(video_type, title, year, self.get_name(), url)
-        return url
+    def get_url(self, video):
+        return super(MoviesHD_Scraper, self)._default_get_url(video)
 
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/search/')

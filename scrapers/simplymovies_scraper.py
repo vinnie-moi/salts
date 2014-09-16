@@ -50,8 +50,8 @@ class SimplyMovies_Scraper(scraper.Scraper):
         label='[%s] %s (%s views) (%s/100) ' % (item['quality'], item['host'], item['views'], item['rating'])
         return label
     
-    def get_sources(self, video_type, title, year, season='', episode=''):
-        source_url=self.get_url(video_type, title, year, season, episode)
+    def get_sources(self, video):
+        source_url=self.get_url(video)
         hosters = []
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
@@ -61,15 +61,15 @@ class SimplyMovies_Scraper(scraper.Scraper):
             if match:
                 hoster={'multi-part': False, 'host': 'vk.com', 'url': match.group(1), 'class': self, 'rating': None, 'views': None}
                 # episodes seem to be consistently available in HD, but movies only in SD
-                if video_type==VIDEO_TYPES.EPISODE:
+                if video.video_type==VIDEO_TYPES.EPISODE:
                     hoster['quality']=QUALITIES.HD
                 else:
                     hoster['quality']=QUALITIES.HIGH
                 hosters.append(hoster)
         return hosters
 
-    def get_url(self, video_type, title, year, season='', episode=''):
-        return super(SimplyMovies_Scraper, self)._default_get_url(video_type, title, year, season, episode)
+    def get_url(self, video):
+        return super(SimplyMovies_Scraper, self)._default_get_url(video)
     
     def search(self, video_type, title, year):
         search_url = self.base_url
@@ -98,7 +98,7 @@ class SimplyMovies_Scraper(scraper.Scraper):
         #log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), xbmc.LOGDEBUG)
         return new_title
     
-    def _get_episode_url(self, show_url, season, episode):
+    def _get_episode_url(self, show_url, season, episode, ep_title):
         url = urlparse.urljoin(self.base_url, show_url)
         html = self.__http_get(url, cache_limit=2)
         pattern='h3>Season\s+%s(.*?)(?:<h3>|</div>)' % (season)

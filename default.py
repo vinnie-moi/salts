@@ -34,6 +34,7 @@ from salts_lib import utils
 from salts_lib import log_utils
 from salts_lib.constants import *
 from scrapers import * # import all scrapers into this namespace
+from scrapers import ScraperVideo
 
 _SALTS = Addon('plugin.video.salts', sys.argv)
 ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
@@ -62,7 +63,7 @@ def art(name):
 
 @url_dispatcher.register(MODES.MAIN)
 def main_menu():
-    db_connection.init_database()
+    db_connection.init_database()    
     if not VALID_ACCOUNT:
         remind_count = int(_SALTS.get_setting('remind_count'))
         remind_max=5
@@ -442,9 +443,9 @@ def browse_episodes(slug, season, fanart):
                 xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder,totalItems=totalItems)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-@url_dispatcher.register(MODES.GET_SOURCES, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'episode', 'dialog'])
-@url_dispatcher.register(MODES.SELECT_SOURCE, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'episode'])
-def get_sources(mode, video_type, title, year, slug, season='', episode='', dialog=None):
+@url_dispatcher.register(MODES.GET_SOURCES, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'episode', 'ep_title', 'dialog'])
+@url_dispatcher.register(MODES.SELECT_SOURCE, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'ep_title', 'episode'])
+def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_title='', dialog=None):
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
     if max_timeout == 0: timeout=None
     max_results = int(_SALTS.get_setting('source_results'))
@@ -456,11 +457,11 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', dial
     
     for cls in utils.relevant_scrapers(video_type):
         if utils.P_MODE == P_MODES.NONE:
-            hosters += cls(max_timeout).get_sources(video_type, title, year, season, episode)
+            hosters += cls(max_timeout).get_sources(ScraperVideo(video_type, title, year, season, episode, ep_title))
             if max_results> 0 and len(hosters) >= max_results:
                 break
         else:
-            worker=utils.start_worker(q, utils.parallel_get_sources, [cls, video_type, title, year, season, episode])
+            worker=utils.start_worker(q, utils.parallel_get_sources, [cls, ScraperVideo(video_type, title, year, season, episode, ep_title)])
             worker_count+=1
             workers.append(worker)
 
@@ -661,9 +662,9 @@ def pick_source_dir(hosters, video_type, slug, season='', episode='', filtered=F
     
     _SALTS.end_of_directory()
 
-@url_dispatcher.register(MODES.SET_URL_MANUAL, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
-@url_dispatcher.register(MODES.SET_URL_SEARCH, ['mode', 'video_type', 'title', 'year'], ['season', 'episode'])
-def set_related_url(mode, video_type, title, year, season='', episode=''):
+@url_dispatcher.register(MODES.SET_URL_MANUAL, ['mode', 'video_type', 'title', 'year'], ['season', 'episode', 'ep_title'])
+@url_dispatcher.register(MODES.SET_URL_SEARCH, ['mode', 'video_type', 'title', 'year'], ['season', 'episode', 'ep_title'])
+def set_related_url(mode, video_type, title, year, season='', episode='', ep_title=''):
     related_list=[]
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
     if max_timeout == 0: timeout=None
@@ -675,14 +676,14 @@ def set_related_url(mode, video_type, title, year, season='', episode=''):
         if utils.P_MODE == P_MODES.NONE:
             related={}
             related['class']=cls(max_timeout)
-            url=related['class'].get_url(video_type, title, year, season, episode)
+            url=related['class'].get_url(ScraperVideo(video_type, title, year, season, episode, ep_title))
             if not url: url=''
             related['url']=url
             related['name']=related['class'].get_name()
             related['label'] = '[%s] %s' % (related['name'], related['url'])
             related_list.append(related)
         else:
-            worker = utils.start_worker(q, utils.parallel_get_url, [cls, video_type, title, year, season, episode])
+            worker = utils.start_worker(q, utils.parallel_get_url, [cls, ScraperVideo(video_type, title, year, season, episode, ep_title)])
             worker_count += 1
             workers.append(worker)
             related={'class': cls(max_timeout), 'name': cls.get_name(), 'label': '[%s]' % (cls.get_name()), 'url': ''}
@@ -959,7 +960,8 @@ def add_to_library(video_type, title, year, slug, require_source=False):
                 filename = utils.filename_from_title(show['title'], video_type)
                 filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
                 final_path = os.path.join(save_path, show['title'], 'Season %s' % (season_num), filename)
-                strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 'episode': ep_num, 'slug': slug, 'dialog': True})
+                strm_string = _SALTS.build_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': title, 'year': year, 'season': season_num, 
+                                                       'episode': ep_num, 'slug': slug, 'ep_title': episode['title'], 'dialog': True})
                 write_strm(strm_string, final_path, VIDEO_TYPES.EPISODE, title, year, season_num, ep_num, require_source)
                 
     elif video_type == VIDEO_TYPES.MOVIE:
@@ -1090,12 +1092,13 @@ def make_episode_item(show, episode, fanart, show_subs=True):
     del meta['images']
     liz.setInfo('video', meta)
     queries = {'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num, 
-               'slug': trakt_api.get_slug(show['url'])}
+               'ep_title': episode['title'], 'slug': trakt_api.get_slug(show['url'])}
     liz_url = _SALTS.build_plugin_url(queries)
     
     menu_items=[]
     if _SALTS.get_setting('auto-play')=='true':
-        queries = {'mode': MODES.SELECT_SOURCE, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num, 'slug': trakt_api.get_slug(show['url'])}
+        queries = {'mode': MODES.SELECT_SOURCE, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num, 
+                   'ep_title': episode['title'], 'slug': trakt_api.get_slug(show['url'])}
         if _SALTS.get_setting('source-win')=='Dialog':
             runstring = 'RunPlugin(%s)' % _SALTS.build_plugin_url(queries)
         else:
@@ -1103,7 +1106,8 @@ def make_episode_item(show, episode, fanart, show_subs=True):
         menu_items.append(('Select Source', runstring), )
         
     menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
-    queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode_num}
+    queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 
+               'episode': episode_num, 'ep_title': episode['title']}
     menu_items.append(('Set Related Url (Manual)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     liz.addContextMenuItems(menu_items, replaceItems=True)
     return liz, liz_url

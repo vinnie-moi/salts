@@ -52,8 +52,8 @@ class PW_Scraper(scraper.Scraper):
         if item['verified']: label = '[COLOR yellow]%s[/COLOR]' % (label)
         return label
     
-    def get_sources(self, video_type, title, year, season='', episode=''):
-        source_url=self.get_url(video_type, title, year, season, episode)
+    def get_sources(self, video):
+        source_url=self.get_url(video)
         hosters = []
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
@@ -94,8 +94,8 @@ class PW_Scraper(scraper.Scraper):
          
         return hosters
 
-    def get_url(self, video_type, title, year, season='', episode=''):
-        return super(PW_Scraper, self)._default_get_url(video_type, title, year, season, episode)
+    def get_url(self, video):
+        return super(PW_Scraper, self)._default_get_url(video)
     
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/index.php?search_keywords=')
@@ -126,7 +126,7 @@ class PW_Scraper(scraper.Scraper):
             log_utils.log('Unable to locate PW search key', xbmc.LOGWARNING)
         return results
     
-    def _get_episode_url(self, show_url, season, episode):
+    def _get_episode_url(self, show_url, season, episode, ep_title):
         url = urlparse.urljoin(self.base_url, show_url)
         html = self.__http_get(url, cache_limit=2)
         pattern = '"tv_episode_item".+?href="([^"]+/season-%s-episode-%s)">' % (season, episode)
