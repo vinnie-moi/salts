@@ -1069,6 +1069,9 @@ def make_episode_item(show, episode, fanart, show_subs=True):
     if 'episode' in episode: episode_num=episode['episode']
     else:  episode_num=episode['number']
     label = '%sx%s %s' % (episode['season'], episode_num, episode['title'])
+    
+    if _SALTS.get_setting('unaired_indicator')=='true' and (not episode['first_aired'] or episode['first_aired']>time.time()):
+        label = '[I][COLOR chocolate]%s[/COLOR][/I]' % (label)
     if show_subs and utils.srt_indicators_enabled():
         srt_scraper=SRT_Scraper()
         language=_SALTS.get_setting('subtitle-lang')
