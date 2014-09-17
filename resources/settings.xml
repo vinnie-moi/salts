@@ -100,6 +100,9 @@
          <setting id="viooz.be-enable" type="bool" label="viooz.be Enabled" default="true" visible="true"/>
          <setting id="viooz.be-base_url" type="text" label="     Base Url" default="http://viooz.be" visible="eq(-1,true)"/>
          <setting id="viooz.be-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="FilmStreaming.in-enable" type="bool" label="FilmStreaming.in Enabled" default="true" visible="true"/>
+         <setting id="FilmStreaming.in-base_url" type="text" label="     Base Url" default="http://film-streaming.in" visible="eq(-1,true)"/>
+         <setting id="FilmStreaming.in-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
     </category>
 
     <category label="Subtitles">
