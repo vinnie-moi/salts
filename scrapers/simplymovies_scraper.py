@@ -82,21 +82,15 @@ class SimplyMovies_Scraper(scraper.Scraper):
         html = self._http_get(search_url, cache_limit=.25)
         pattern = r'class="movieInfoOverlay">\s+<a\s+href="([^"]+).*?class="overlayMovieTitle">\s*([^<]+)(?:.*?class="overlayMovieRelease">.*?(\d{4})<)?'
         results=[]
-        norm_title = self.__normalize_title(title)
+        norm_title = self._normalize_title(title)
         for match in re.finditer(pattern, html, re.DOTALL):
             url, match_title, match_year = match.groups('')
             match_title=match_title.strip()
-            if norm_title == self.__normalize_title(match_title) and (match_year == '0001' or not year or not match_year or year == match_year):
+            if norm_title == self._normalize_title(match_title) and (match_year == '0001' or not year or not match_year or year == match_year):
                 url = '/'+url if not url.startswith('/') else url
                 result = {'url': url, 'title': match_title, 'year': match_year}
                 results.append(result)
         return results
-    
-    def __normalize_title(self, title):
-        new_title=title.upper()
-        new_title=re.sub('\W', '', new_title)
-        #log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), xbmc.LOGDEBUG)
-        return new_title
     
     def _get_episode_url(self, show_url, season, episode, ep_title):
         url = urlparse.urljoin(self.base_url, show_url)

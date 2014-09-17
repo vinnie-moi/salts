@@ -257,10 +257,21 @@ class Scraper(object):
     def _default_get_episode_url(self, show_url, season, episode, ep_title, episode_pattern, title_pattern=''):
         log_utils.log('Default Episode Url: |%s|%s|%s|%s|%s|' % (self.base_url, show_url, season, episode, ep_title), xbmc.LOGDEBUG)
         url = urlparse.urljoin(self.base_url, show_url)
-        html = self.__http_get(url, cache_limit=2)
+        html = self._http_get(url, cache_limit=2)
         match = re.search(episode_pattern, html, re.DOTALL)
         if match:
             url = match.group(1)
             return url.replace(self.base_url, '')
         elif xbmcaddon.Addon().getSetting('title-fallback')=='true' and ep_title and title_pattern:
-            pass
+            norm_title = self._normalize_title(ep_title)
+            for match in re.finditer(title_pattern, html, re.DOTALL | re.I):
+                url, title = match.groups()
+                if norm_title == self._normalize_title(title):
+                    return url.replace(self.base_url, '')
+
+    def _normalize_title(self, title):
+        new_title=title.upper()
+        new_title=re.sub('\W', '', new_title)
+        #log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), xbmc.LOGDEBUG)
+        return new_title
+    

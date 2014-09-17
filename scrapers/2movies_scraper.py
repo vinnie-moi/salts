@@ -109,7 +109,7 @@ class TwoMovies_Scraper(scraper.Scraper):
         
     def _get_episode_url(self, show_url, season, episode, ep_title):
         episode_pattern = 'class="linkname\d*" href="([^"]+/watch_episode/[^/]+/%s/%s/)"' % (season, episode)
-        title_pattern=''
+        title_pattern='class="linkname"\s+href="([^"]+)">Episode_\d+\s+-\s+([^<]+)'
         return super(TwoMovies_Scraper, self)._default_get_episode_url(show_url, season, episode, ep_title, episode_pattern, title_pattern)
         
     def _http_get(self, url, cookies=None, cache_limit=8):
