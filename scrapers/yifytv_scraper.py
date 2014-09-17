@@ -52,7 +52,7 @@ class YIFY_Scraper(scraper.Scraper):
         html = ''
         tries=1
         while tries<=MAX_TRIES:
-            html = self.__http_get(url, data=data, cache_limit=0)
+            html = self._http_get(url, data=data, cache_limit=0)
             log_utils.log('Initial Data (%s): %s' % (tries, html), xbmc.LOGDEBUG)
             if html:
                 break 
@@ -68,7 +68,7 @@ class YIFY_Scraper(scraper.Scraper):
                 captcha_result = self._do_recaptcha(js_data[0]['k'], tries, MAX_TRIES)
                 data['chall']=captcha_result['recaptcha_challenge_field']
                 data['res']=captcha_result['recaptcha_response_field']
-                html = self.__http_get(url, data=data, cache_limit=0)
+                html = self._http_get(url, data=data, cache_limit=0)
                 log_utils.log('2nd Data (%s): %s' % (tries, html), xbmc.LOGDEBUG)
                 if html:
                     js_data = json.loads(html)
@@ -91,7 +91,7 @@ class YIFY_Scraper(scraper.Scraper):
         hosters=[]
         if source_url:
             url = urlparse.urljoin(self.base_url,source_url)
-            html = self.__http_get(url, cache_limit=.5)
+            html = self._http_get(url, cache_limit=.5)
             match = re.search('showPkPlayer\("([^"]+)', html)
             if match:
                 video_id = match.group(1)                
@@ -108,7 +108,7 @@ class YIFY_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/?no&order=desc&years=%s&s=' %  (year))
         search_url += urllib.quote_plus(title)
-        html = self.__http_get(search_url, cache_limit=.25)
+        html = self._http_get(search_url, cache_limit=.25)
         results=[]
         pattern ='var\s+posts\s+=\s+(.*);'
         match = re.search(pattern, html)
@@ -120,5 +120,5 @@ class YIFY_Scraper(scraper.Scraper):
                 results.append(result)
         return results
 
-    def __http_get(self, url, data=None, cache_limit=8):
+    def _http_get(self, url, data=None, cache_limit=8):
         return super(YIFY_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

@@ -444,7 +444,7 @@ def browse_episodes(slug, season, fanart):
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.GET_SOURCES, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'episode', 'ep_title', 'dialog'])
-@url_dispatcher.register(MODES.SELECT_SOURCE, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'ep_title', 'episode'])
+@url_dispatcher.register(MODES.SELECT_SOURCE, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'episode', 'ep_title'])
 def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_title='', dialog=None):
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
     if max_timeout == 0: timeout=None
@@ -452,16 +452,17 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
     worker_count=0
     hosters=[]
     workers=[]
+    video=ScraperVideo(video_type, title, year, season, episode, ep_title)
     if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
     
     for cls in utils.relevant_scrapers(video_type):
         if utils.P_MODE == P_MODES.NONE:
-            hosters += cls(max_timeout).get_sources(ScraperVideo(video_type, title, year, season, episode, ep_title))
+            hosters += cls(max_timeout).get_sources(video)
             if max_results> 0 and len(hosters) >= max_results:
                 break
         else:
-            worker=utils.start_worker(q, utils.parallel_get_sources, [cls, ScraperVideo(video_type, title, year, season, episode, ep_title)])
+            worker=utils.start_worker(q, utils.parallel_get_sources, [cls, video])
             worker_count+=1
             workers.append(worker)
 
@@ -490,7 +491,7 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
     workers=utils.reap_workers(workers)
     try:
         if not hosters:
-            log_utils.log('No Sources found for: |%s|%s|%s|%s|%s|' % (video_type, title, year, season, episode))
+            log_utils.log('No Sources found for: |%s|' % (video))
             builtin = 'XBMC.Notification(%s,No Sources Found, 5000, %s)'
             xbmc.executebuiltin(builtin % (_SALTS.get_name(), ICON_PATH))
             return False
@@ -672,18 +673,19 @@ def set_related_url(mode, video_type, title, year, season='', episode='', ep_tit
     workers=[]
     if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
+    video=ScraperVideo(video_type, title, year, season, episode, ep_title)
     for cls in utils.relevant_scrapers(video_type):
         if utils.P_MODE == P_MODES.NONE:
             related={}
             related['class']=cls(max_timeout)
-            url=related['class'].get_url(ScraperVideo(video_type, title, year, season, episode, ep_title))
+            url=related['class'].get_url(video)
             if not url: url=''
             related['url']=url
             related['name']=related['class'].get_name()
             related['label'] = '[%s] %s' % (related['name'], related['url'])
             related_list.append(related)
         else:
-            worker = utils.start_worker(q, utils.parallel_get_url, [cls, ScraperVideo(video_type, title, year, season, episode, ep_title)])
+            worker = utils.start_worker(q, utils.parallel_get_url, [cls, video])
             worker_count += 1
             workers.append(worker)
             related={'class': cls(max_timeout), 'name': cls.get_name(), 'label': '[%s]' % (cls.get_name()), 'url': ''}
@@ -993,7 +995,7 @@ def write_strm(stream, path, video_type, title, year, season='', episode='', req
     # string will be blank if file doesn't exist or is blank
     if stream != old_strm_string:
         try:
-            if not require_source or utils.url_exists(video_type, title, year, season, episode):
+            if not require_source or utils.url_exists(ScraperVideo(video_type, title, year, season, episode)):
                 log_utils.log('Writing strm: %s' % stream)
                 file_desc = xbmcvfs.File(path, 'w')
                 file_desc.write(stream)

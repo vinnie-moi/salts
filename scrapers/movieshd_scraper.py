@@ -53,7 +53,7 @@ class MoviesHD_Scraper(scraper.Scraper):
         hosters=[]
         if source_url:
             url = urlparse.urljoin(self.base_url,source_url)
-            html = self.__http_get(url, cache_limit=.5)
+            html = self._http_get(url, cache_limit=.5)
             
             hoster = {'multi-part': False, 'host': 'videomega.tv', 'class': self, 'quality': QUALITIES.HD, 'views': None, 'rating': None, 'up': None, 'down': None}
             match = re.search(">ref='([^']+)", html)
@@ -76,7 +76,7 @@ class MoviesHD_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/search/')
         search_url += urllib.quote_plus(title)
-        html = self.__http_get(search_url, cache_limit=.25)
+        html = self._http_get(search_url, cache_limit=.25)
         results=[]
         if not re.search('Sorry, but nothing matched your search criteria', html, re.I):
             pattern ='href="([^"]+)"\s+title="([^"]+)\s+\((\d{4})\)'
@@ -87,5 +87,5 @@ class MoviesHD_Scraper(scraper.Scraper):
                     results.append(result)
         return results
 
-    def __http_get(self, url, cache_limit=8):
+    def _http_get(self, url, cache_limit=8):
         return super(MoviesHD_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

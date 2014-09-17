@@ -52,7 +52,7 @@ class Afdah_Scraper(scraper.Scraper):
         hosters=[]
         if source_url:
             url = urlparse.urljoin(self.base_url,source_url)
-            html = self.__http_get(url, cache_limit=.5)
+            html = self._http_get(url, cache_limit=.5)
             
             match = re.search('This movie is of poor quality', html, re.I)
             if match:
@@ -78,7 +78,7 @@ class Afdah_Scraper(scraper.Scraper):
 
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/?s=%s&x=0&y=0&type=title' % (urllib.quote_plus(title)))
-        html = self.__http_get(search_url, cache_limit=.25)
+        html = self._http_get(search_url, cache_limit=.25)
         pattern ='<div><b>Title:</b>\s*(.*?)\s*<br><b>Year:</b>\s*(\d+)\s*\|.*?href="([^"]+)'
         results=[]
         for match in re.finditer(pattern, html, re.DOTALL | re.I):
@@ -88,5 +88,5 @@ class Afdah_Scraper(scraper.Scraper):
                 results.append(result)
         return results
 
-    def __http_get(self, url, cache_limit=8):
+    def _http_get(self, url, cache_limit=8):
         return super(Afdah_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

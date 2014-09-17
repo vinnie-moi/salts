@@ -55,7 +55,7 @@ class SimplyMovies_Scraper(scraper.Scraper):
         hosters = []
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
-            html = self.__http_get(url, cache_limit=.5)
+            html = self._http_get(url, cache_limit=.5)
             pattern='class="videoPlayerIframe"\s+src="([^"]+)'
             match = re.search(pattern, html)
             if match:
@@ -79,7 +79,7 @@ class SimplyMovies_Scraper(scraper.Scraper):
             search_url += '/index.php'
         search_url += '?searchTerm=%s&sort=added&genre=' % (urllib.quote_plus(title))
             
-        html = self.__http_get(search_url, cache_limit=.25)
+        html = self._http_get(search_url, cache_limit=.25)
         pattern = r'class="movieInfoOverlay">\s+<a\s+href="([^"]+).*?class="overlayMovieTitle">\s*([^<]+)(?:.*?class="overlayMovieRelease">.*?(\d{4})<)?'
         results=[]
         norm_title = self.__normalize_title(title)
@@ -100,7 +100,7 @@ class SimplyMovies_Scraper(scraper.Scraper):
     
     def _get_episode_url(self, show_url, season, episode, ep_title):
         url = urlparse.urljoin(self.base_url, show_url)
-        html = self.__http_get(url, cache_limit=2)
+        html = self._http_get(url, cache_limit=2)
         pattern='h3>Season\s+%s(.*?)(?:<h3>|</div>)' % (season)
         match = re.search(pattern, html, re.DOTALL)
         if match:
@@ -112,5 +112,5 @@ class SimplyMovies_Scraper(scraper.Scraper):
                 url = '/'+url if not url.startswith('/') else url
                 return url
         
-    def __http_get(self, url, cache_limit=8):
+    def _http_get(self, url, cache_limit=8):
         return super(SimplyMovies_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

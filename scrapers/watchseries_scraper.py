@@ -43,7 +43,7 @@ class WS_Scraper(scraper.Scraper):
     
     def resolve_link(self, link):
         url = urlparse.urljoin(self.base_url, link)
-        html = self.__http_get(url, cache_limit=0)
+        html = self._http_get(url, cache_limit=0)
         match = re.search('class\s*=\s*"myButton"\s+href\s*=\s*"(.*?)"', html)
         if match:
             return match.group(1)
@@ -56,7 +56,7 @@ class WS_Scraper(scraper.Scraper):
         sources=[]
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
-            html = self.__http_get(url, cache_limit=.5)
+            html = self._http_get(url, cache_limit=.5)
             try:
                 match = re.search('English Links -.*?</tbody>\s*</table>', html, re.DOTALL)
                 fragment = match.group(0)
@@ -83,7 +83,7 @@ class WS_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/search/')
         search_url += urllib.quote_plus(title)
-        html = self.__http_get(search_url, cache_limit=.25)
+        html = self._http_get(search_url, cache_limit=.25)
         
         pattern='<a title="watch[^"]+"\s+href="(.*?)"><b>(.*?)</b>'
         results=[]
@@ -102,14 +102,11 @@ class WS_Scraper(scraper.Scraper):
         return results
     
     def _get_episode_url(self, show_url, season, episode, ep_title):
-        url = urlparse.urljoin(self.base_url, show_url)
-        html = self.__http_get(url, cache_limit=2)
-        pattern = 'href="(/episode/[^"]*_s%s_e%s.*?)"' % (season, episode)
-        match = re.search(pattern, html)
-        if match:
-            return match.group(1)
+        episode_pattern = 'href="(/episode/[^"]*_s%s_e%s.*?)"' % (season, episode)
+        title_pattern=''
+        return super(WS_Scraper, self)._default_get_episode_url(show_url, season, episode, ep_title, episode_pattern, title_pattern)
     
-    def __http_get(self, url, cache_limit=8):
+    def _http_get(self, url, cache_limit=8):
         return super(WS_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
     
     @classmethod

@@ -57,7 +57,7 @@ class PW_Scraper(scraper.Scraper):
         hosters = []
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
-            html = self.__http_get(url, cache_limit=.5)
+            html = self._http_get(url, cache_limit=.5)
             
             container_pattern = r'<table[^>]+class="movie_version[ "][^>]*>(.*?)</table>'
             item_pattern = (
@@ -107,13 +107,13 @@ class PW_Scraper(scraper.Scraper):
             search_url += '&search_section=1'
             
         results=[]
-        html = self. __http_get(self.base_url, cache_limit=0)
+        html = self. _http_get(self.base_url, cache_limit=0)
         match = re.search('input type="hidden" name="key" value="([0-9a-f]*)"', html)
         if match:
             key=match.group(1)
             search_url += '&key=' + key
             
-            html = self.__http_get(search_url, cache_limit=.25)
+            html = self._http_get(search_url, cache_limit=.25)
             pattern = r'class="index_item.+?href="(.+?)" title="Watch (.+?)"?\(?([0-9]{4})?\)?"?>'
             for match in re.finditer(pattern, html):
                 result={}
@@ -127,12 +127,9 @@ class PW_Scraper(scraper.Scraper):
         return results
     
     def _get_episode_url(self, show_url, season, episode, ep_title):
-        url = urlparse.urljoin(self.base_url, show_url)
-        html = self.__http_get(url, cache_limit=2)
-        pattern = '"tv_episode_item".+?href="([^"]+/season-%s-episode-%s)">' % (season, episode)
-        match = re.search(pattern, html, re.DOTALL)
-        if match:
-            return match.group(1)
+        episode_pattern = '"tv_episode_item".+?href="([^"]+/season-%s-episode-%s)">' % (season, episode)
+        title_pattern=''
+        return super(PW_Scraper, self)._default_get_episode_url(show_url, season, episode, ep_title, episode_pattern, title_pattern)
         
-    def __http_get(self, url, cache_limit=8):
+    def _http_get(self, url, cache_limit=8):
         return super(PW_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

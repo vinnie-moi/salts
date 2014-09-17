@@ -253,3 +253,14 @@ class Scraper(object):
                 raise Exception ('You must enter text in the image to access video')
         wdlg.close()
         return {'recaptcha_challenge_field':match.group(1),'recaptcha_response_field':solution}
+    
+    def _default_get_episode_url(self, show_url, season, episode, ep_title, episode_pattern, title_pattern=''):
+        log_utils.log('Default Episode Url: |%s|%s|%s|%s|%s|' % (self.base_url, show_url, season, episode, ep_title), xbmc.LOGDEBUG)
+        url = urlparse.urljoin(self.base_url, show_url)
+        html = self.__http_get(url, cache_limit=2)
+        match = re.search(episode_pattern, html, re.DOTALL)
+        if match:
+            url = match.group(1)
+            return url.replace(self.base_url, '')
+        elif xbmcaddon.Addon().getSetting('title-fallback')=='true' and ep_title and title_pattern:
+            pass

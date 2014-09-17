@@ -41,6 +41,7 @@
 		<setting id="source-win" type="labelenum" label="     Source Selection Method" values="Directory|Dialog" default="Dialog"/>
 		<setting id="source_timeout" type="slider" label="Scraper Timeout (seconds) (0=No Limit)" default="5" range="0,120" option="int"/>
 		<setting id="source_results" type="number" label="Maximum Source Results (0=No Limit)" default="0"/>
+		<setting id="title-fallback" type="bool" label="Fall back to episode title when needed (if available)" default="true"/>
 		<setting id="enable_sort" type="bool" label="Sort Sources" default="false"/>
 		<setting id="filter-unknown" type="bool" label="Drop Sources with unknown sort values" default="false" visible="eq(-1,true)"/>
 		<setting id="sort1_field" type="enum" label="1st Sort Key" values="None|Source|Quality|Views|Rating" default="0" visible="eq(-2,true)"/>

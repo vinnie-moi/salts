@@ -55,7 +55,7 @@ class UFlix_Scraper(scraper.Scraper):
         sources=[]
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
-            html = self.__http_get(url, cache_limit=.5)
+            html = self._http_get(url, cache_limit=.5)
     
             quality=None
             match = re.search('(?:qaulity|quality):\s*<span[^>]*>(.*?)</span>', html, re.DOTALL|re.I)
@@ -96,7 +96,7 @@ class UFlix_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/index.php?menu=search&query=')
         search_url += urllib.quote_plus(title)
-        html = self.__http_get(search_url, cache_limit=.25)
+        html = self._http_get(search_url, cache_limit=.25)
         results=[]
         
         # filter the html down to only tvshow or movie results
@@ -128,14 +128,10 @@ class UFlix_Scraper(scraper.Scraper):
         return results
         
     def _get_episode_url(self, show_url, season, episode, ep_title):
-        url = urlparse.urljoin(self.base_url, show_url)
-        html = self.__http_get(url, cache_limit=2)
-        pattern = 'class="link"\s+href="(.*?/show/.*?/season/%s/episode/%s)"' % (season, episode)
-        match = re.search(pattern, html)
-        if match:
-            url = match.group(1)
-            return url.replace(self.base_url, '')
+        episode_pattern = 'class="link"\s+href="(.*?/show/.*?/season/%s/episode/%s)"' % (season, episode)
+        title_pattern=''
+        return super(UFlix_Scraper, self)._default_get_episode_url(show_url, season, episode, ep_title, episode_pattern, title_pattern)
         
-    def __http_get(self, url, cache_limit=8):
+    def _http_get(self, url, cache_limit=8):
         return super(UFlix_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
         

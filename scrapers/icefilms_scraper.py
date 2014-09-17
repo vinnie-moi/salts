@@ -152,13 +152,9 @@ class IceFilms_Scraper(scraper.Scraper):
         return new_title
     
     def _get_episode_url(self, show_url, season, episode, ep_title):
-        url = urlparse.urljoin(self.base_url, show_url)
-        html = self.__http_get(url, cache_limit=2)
-        pattern = 'href=(/ip\.php[^>]+)>%sx0?%s\s+' % (season, episode)
-        match = re.search(pattern, html)
-        if match:
-            url = match.group(1)
-            return url.replace(self.base_url, '')
+        episode_pattern = 'href=(/ip\.php[^>]+)>%sx0?%s\s+' % (season, episode)
+        title_pattern=''
+        return super(IceFilms_Scraper, self)._default_get_episode_url(show_url, season, episode, ep_title, episode_pattern, title_pattern)
         
     def __http_get(self, url, data=None, cache_limit=8):
         return super(IceFilms_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
