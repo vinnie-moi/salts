@@ -170,6 +170,11 @@ class DB_Connection():
         sql = 'REPLACE INTO db_info (setting, value) VALUES (?, ?)'
         self.__execute(sql, (setting, value))
     
+    def increment_db_setting(self, setting):
+        cur_value =self.get_setting(setting)
+        cur_value = int(cur_value) if cur_value else 0
+        self.set_setting(setting, str(cur_value+1))
+        
     def export_from_db(self, full_path):
         temp_path = os.path.join(xbmc.translatePath("special://profile"),'temp_export_%s.csv' % (int(time.time())))
         with open(temp_path, 'w') as f:

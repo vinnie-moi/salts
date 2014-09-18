@@ -75,6 +75,9 @@ def main_menu():
             _SALTS.set_setting('remind_count', str(remind_count))
     else:
         _SALTS.set_setting('remind_count', '0')
+    
+    if _SALTS.get_setting('auto-disable') != DISABLE_SETTINGS.OFF:
+        utils.do_disable_check()
 
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'}, img=art('movies.png'))
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'}, img=art('television.png'))
@@ -114,6 +117,7 @@ def scraper_settings():
     scrapers=utils.relevant_scrapers(None, True, True)
     for i, cls in enumerate(scrapers):
         label = '%s (Provides: %s)' % (cls.get_name(), str(list(cls.provides())).replace("'", ""))
+        label = '%s (Success: %s%%)' % (label, utils.calculate_success(cls.get_name()))
         if not utils.scraper_enabled(cls.get_name()): 
             label = '[COLOR darkred]%s[/COLOR]' % (label)
             toggle_label='Enable Scraper'
@@ -455,7 +459,7 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
     video=ScraperVideo(video_type, title, year, season, episode, ep_title)
     if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
-    
+    fails={}
     for cls in utils.relevant_scrapers(video_type):
         if utils.P_MODE == P_MODES.NONE:
             hosters += cls(max_timeout).get_sources(video)
@@ -463,8 +467,10 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
                 break
         else:
             worker=utils.start_worker(q, utils.parallel_get_sources, [cls, video])
+            db_connection.increment_db_setting('%s_try' % (cls.get_name()))
             worker_count+=1
             workers.append(worker)
+            fails[cls.get_name()]=True
 
     # collect results from workers
     if utils.P_MODE != P_MODES.NONE:
@@ -472,13 +478,16 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
             try:
                 log_utils.log('Calling get with timeout: %s' %(timeout), xbmc.LOGDEBUG)
                 result = q.get(True, timeout)
-                log_utils.log('Got %s Source Results' %(len(result)), xbmc.LOGDEBUG)
+                log_utils.log('Got %s Source Results' %(len(result['hosters'])), xbmc.LOGDEBUG)
                 worker_count -=1
-                hosters += result
+                hosters += result['hosters']
+                del fails[result['name']]
                 if max_timeout>0:
                     timeout = max_timeout - (time.time() - begin)
+                    if timeout<0: timeout=0
             except utils.Empty:
                 log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
+                utils.record_timeouts(fails)
                 break
             
             if max_results> 0 and len(hosters) >= max_results:
@@ -686,6 +695,7 @@ def set_related_url(mode, video_type, title, year, season='', episode='', ep_tit
             related_list.append(related)
         else:
             worker = utils.start_worker(q, utils.parallel_get_url, [cls, video])
+            db_connection.increment_db_setting('%s_try' % (cls.get_name()))
             worker_count += 1
             workers.append(worker)
             related={'class': cls(max_timeout), 'name': cls.get_name(), 'label': '[%s]' % (cls.get_name()), 'url': ''}
@@ -693,6 +703,7 @@ def set_related_url(mode, video_type, title, year, season='', episode='', ep_tit
     
     # collect results from workers
     if utils.P_MODE != P_MODES.NONE:
+        fails = dict.fromkeys([item['name'] for item in related_list], True)
         while worker_count>0:
             try:
                 log_utils.log('Calling get with timeout: %s' %(timeout), xbmc.LOGDEBUG)
@@ -702,11 +713,13 @@ def set_related_url(mode, video_type, title, year, season='', episode='', ep_tit
                 for i, item in enumerate(related_list):
                     if item['name']==result['name']:
                         related_list[i]=result
+                        del fails[result['name']] 
                 worker_count -=1
                 if max_timeout>0:
                     timeout = max_timeout - (time.time() - begin)
             except utils.Empty:
                 log_utils.log('Get Url Timeout', xbmc.LOGWARNING)
+                utils.record_timeouts(fails)
                 break
         else:
             log_utils.log('All source results received')
