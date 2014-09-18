@@ -18,6 +18,7 @@
 import scraper
 import re
 import urllib
+import urllib2
 import urlparse
 import xbmcaddon
 import xbmc
@@ -25,6 +26,7 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import USER_AGENT
 
 QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'TS': QUALITIES.MEDIUM, 'CAM': QUALITIES.LOW}
 BASE_URL = 'http://www.alluc.to'
@@ -45,11 +47,16 @@ class PW_Scraper(scraper.Scraper):
         return 'Alluc.to'
     
     def resolve_link(self, link):
-        return link
+        url = urlparse.urljoin(self.base_url, link)
+        request = urllib2.Request(url)
+        request.add_header('User-Agent', USER_AGENT)
+        request.add_unredirected_header('Host', request.get_host())
+        request.add_unredirected_header('Referer', url)
+        response = urllib2.urlopen(request)
+        return response.geturl()
     
     def format_source_label(self, item):
         label='[%s] %s (%s views) (%s/100) ' % (item['quality'], item['host'], item['views'], item['rating'])
-        if item['verified']: label = '[COLOR yellow]%s[/COLOR]' % (label)
         return label
     
     def get_sources(self, video):
@@ -59,15 +66,27 @@ class PW_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             
+            if video.video_type==VIDEO_TYPES.MOVIE:
+                quality=None
+            else:
+                quality=QUALITIES.HIGH
+            
             # extract direct links section
             match = re.search('Direct Links.*', html, re.DOTALL)
             if match:
                 container = match.group()
                 # extract each group
-                for match in re.finditer('class="grouphosterlabel">(.*?)\s+\(\d+\)(.*?)class="grouphosterlabel">', container, re.DOTALL):
+                for match in re.finditer('class="grouphosterlabel">(.*?)\s+\(\d+\)(.*?)class="folderbtn"', container, re.DOTALL):
                     host, group = match.groups()
-                    print host, group
-            # extract links in each group
+                    # extract links in each group
+                    for match2 in re.finditer('class="openlink(?: newlink)?"\s+style="[^"]+"\s+href="([^"]+).*?Hits:\s+([.\d]+).*?name="score0"\s+value="(\d+)', group, re.DOTALL):
+                        url, views, rating = match2.groups()
+                        views=views.replace('.','')
+                        hoster = {'multi-part': False, 'host': host.strip(), 'class': self, 'quality': quality}
+                        hoster['url']='/'+url
+                        hoster['views']=int(views)
+                        hoster['rating']=rating
+                        hosters.append(hoster)
 
         return hosters
 
