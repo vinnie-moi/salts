@@ -717,6 +717,7 @@ def set_related_url(mode, video_type, title, year, season='', episode='', ep_tit
                 worker_count -=1
                 if max_timeout>0:
                     timeout = max_timeout - (time.time() - begin)
+                    if timeout<0: timeout=0
             except utils.Empty:
                 log_utils.log('Get Url Timeout', xbmc.LOGWARNING)
                 utils.record_timeouts(fails)
@@ -1036,14 +1037,19 @@ def make_dir_from_list(section, list_data, slug=None):
         watched={}
         now = time.time()
         for item in progress:
-            for id_type in ['imdb_id', 'tmdb_id', 'tvrage_id']:
+            for id_type in ['imdb_id', 'tvdb_id']:
                 if id_type in item['show'] and item['show'][id_type]:
                     if item['next_episode'] and item['next_episode']['first_aired']<now:
                         watched[item['show'][id_type]]=False
                     else:
                         watched[item['show'][id_type]]=True
     else:
-        pass
+        movie_watched = trakt_api.get_watched(section)
+        watched={}
+        for item in movie_watched:
+            for id_type in ['imdb_id', 'tmdb_id']:
+                if id_type in item and item[id_type]:
+                    watched[item[id_type]] = item['plays']>0
     
     for show in list_data:
         menu_items=[]
@@ -1058,7 +1064,9 @@ def make_dir_from_list(section, list_data, slug=None):
             menu_items.append(('Subscribe', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         
         if 'imdb_id' in show: show['watched'] = watched.get(show['imdb_id'], False)
+        elif 'tvdb_id' in show: show['watched'] = watched.get(show['tvdb_id'], False)
         elif 'tmdb_id' in show: show['watched'] = watched.get(show['tmdb_id'], False)
+        if not show['watched']: log_utils.log('Setting watched status on %s (%s): %s' % (show['title'], show['year'], show['watched']))
             
         liz, liz_url =make_item(section_params, show, menu_items)
         
