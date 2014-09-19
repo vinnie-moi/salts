@@ -29,6 +29,7 @@ def enum(**enums):
 
 DB_TYPES= enum(MYSQL='mysql', SQLITE='sqlite')
 CSV_MARKERS = enum(REL_URL='***REL_URL***', OTHER_LISTS='***OTHER_LISTS***')
+TRIG_DB_UPG = True
 
 _SALTS = Addon('plugin.video.salts')
 
@@ -242,11 +243,15 @@ class DB_Connection():
     def init_database(self):
         cur_version = _SALTS.get_version()
         db_version = self.__get_db_version()
+        if not TRIG_DB_UPG:
+            db_version=cur_version
+
         if db_version is not None and cur_version !=  db_version:
             log_utils.log('DB Upgrade from %s to %s detected.' % (db_version,cur_version))
-            self.__prep_for_reinit()
             self.progress = xbmcgui.DialogProgress()
-            self.progress.create('SALTS', line1='Migrating from %s to %s' % (db_version, cur_version), line2='Saved current data.')
+            self.progress.create('SALTS', line1='Migrating from %s to %s' % (db_version, cur_version), line2='Saving current data.')
+            self.progress.update(0)
+            self.__prep_for_reinit()
 
         log_utils.log('Building SALTS Database', xbmc.LOGDEBUG)
         if self.db_type == DB_TYPES.MYSQL:
