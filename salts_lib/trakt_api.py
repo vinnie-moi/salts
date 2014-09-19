@@ -79,6 +79,14 @@ class Trakt_API():
     def add_to_list(self, slug, items):
         return self.__manage_list('add', slug, items)
         
+    def add_to_collection(self, section, item):
+        url = '/%s/library/%s' % (TRAKT_SECTIONS[section][:-1], API_KEY)
+        if section == SECTIONS.TV:
+            data = item
+        else:
+            data = {'movies': [item]}
+        return self.__call_trakt(url, extra_data = data, cache_limit=0)
+        
     def remove_from_list(self, slug, items):
         return self.__manage_list('delete', slug, items)
     

@@ -805,6 +805,14 @@ def remove_many_from_list(section, items, slug):
         response=trakt_api.remove_from_list(slug, items)
     return response
     
+@url_dispatcher.register(MODES.ADD_TO_COLL, ['section', 'id_type', 'show_id'])
+def add_to_collection(section, id_type, show_id):
+    item={id_type: show_id}
+    trakt_api.add_to_collection(section, item)
+    builtin = "XBMC.Notification(%s,Item Added to Collection, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
+    xbmc.executebuiltin(builtin)
+    #xbmc.executebuiltin("XBMC.Container.Refresh")
+
 @url_dispatcher.register(MODES.ADD_TO_LIST, ['section', 'id_type', 'show_id'], ['slug'])
 def add_to_list(section, id_type, show_id, slug=None):
     item={'type': TRAKT_SECTIONS[section][:-1], id_type: show_id}
@@ -1188,9 +1196,15 @@ def make_item(section_params, show, menu_items=None):
         
     menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
     if VALID_ACCOUNT:
+        show_id=utils.show_id(show)
+        queries = {'mode': MODES.ADD_TO_COLL, 'section': section_params['section']}
+        queries.update(show_id)
+        menu_items.append(('Add to Collection', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        
         queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section']}
-        queries.update(utils.show_id(show))
+        queries.update(show_id)
         menu_items.append(('Add to List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        
     queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
     menu_items.append(('Add to Library', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
 
