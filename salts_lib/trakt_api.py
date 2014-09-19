@@ -87,6 +87,20 @@ class Trakt_API():
             data = {'movies': [item]}
         return self.__call_trakt(url, extra_data = data, cache_limit=0)
         
+    def set_watched(self, section, item, season='', episode='', watched=True):
+        video_type = TRAKT_SECTIONS[section][:-1]
+        data = item
+        if episode:
+            video_type += '/episode'
+            data.update({'episodes': [{'season': season, 'episode': episode}]})
+        elif season:
+            video_type += '/season.json'
+            data.update('season', season)
+            
+        w_str = 'seen' if watched else 'unseen'
+        url = '/%s/%s/%s' % (video_type, w_str, API_KEY)
+        return self.__call_trakt(url, extra_data=data, cache_limit=0)
+    
     def remove_from_list(self, slug, items):
         return self.__manage_list('delete', slug, items)
     

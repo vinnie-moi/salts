@@ -841,6 +841,11 @@ def copy_list(section, slug, username):
     builtin = "XBMC.Notification(%s,List Copied: (A:%s/ E:%s/ S:%s), 5000, %s)" % (_SALTS.get_name(), response['inserted'], response['already_exist'], response['skipped'], ICON_PATH)
     xbmc.executebuiltin(builtin)
 
+@ url_dispatcher.register(MODES.TOGGLE_WATCHED, ['section', 'id_type', 'show_id'], ['watched', 'season', 'episode'])
+def toggle_watched(section, id_type, show_id, watched=True, season='', episode=''):
+    log_utils.log('In Watched: |%s|%s|%s|%s|%s|%s|' % (section, id_type, show_id, season, episode, watched), xbmc.LOGDEBUG)
+    
+
 @url_dispatcher.register(MODES.UPDATE_SUBS)
 def update_subscriptions():
     log_utils.log('Updating Subscriptions', xbmc.LOGDEBUG)
@@ -1155,9 +1160,22 @@ def make_episode_item(show, episode, fanart, show_subs=True):
         menu_items.append(('Select Source', runstring), )
         
     menu_items.append(('Show Information', 'XBMC.Action(Info)'), )
+
+    if 'watched' in episode and episode['watched']:
+        watched=False
+        label='Mark as Unwatched'
+    else:
+        watched=True
+        label='Mark as Watched'
+        
+    queries = {'mode': MODES.TOGGLE_WATCHED, 'section': SECTIONS.TV, 'season': episode['season'], 'episode': episode_num, 'watched': watched}
+    queries.update(utils.show_id(show))
+    menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+
     queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 
                'episode': episode_num, 'ep_title': episode['title']}
     menu_items.append(('Set Related Url (Manual)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+ 
     liz.addContextMenuItems(menu_items, replaceItems=True)
     return liz, liz_url
 
@@ -1212,6 +1230,18 @@ def make_item(section_params, show, menu_items=None):
         queries = {'mode': MODES.PLAY_TRAILER, 'stream_url': info['trailer']}
         menu_items.append(('Play Trailer', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         
+    if VALID_ACCOUNT:
+        if 'watched' in show and show['watched']:
+            watched=False
+            label='Mark as Unwatched'
+        else:
+            watched=True
+            label='Mark as Watched'
+        
+        queries = {'mode': MODES.TOGGLE_WATCHED, 'section': section_params['section'], 'watched': watched}
+        queries.update(show_id)
+        menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+
     if section_params['section']==SECTIONS.TV and _SALTS.get_setting('enable-subtitles')=='true':
         queries = {'mode': MODES.EDIT_TVSHOW_ID, 'title': show['title'], 'year': show['year']}
         runstring = 'RunPlugin(%s)' % _SALTS.build_plugin_url(queries)
