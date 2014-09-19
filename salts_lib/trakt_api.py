@@ -148,10 +148,15 @@ class Trakt_API():
     
     def get_collection(self, section):
         url='/user/library/%s/collection.json/%s/%s' % (TRAKT_SECTIONS[section], API_KEY, self.username)
-        return self.__call_trakt(url)
+        return self.__call_trakt(url, cache_limit=0)
     
-    def get_progress(self, sort=TRAKT_SORT.ACTIVITY):
-        url='/user/progress/watched.json/%s/%s/all/%s/normal' % (API_KEY, self.username, sort)
+    def get_watched(self, section):
+        url='/user/library/%s/watched.json/%s/%s/min' % (TRAKT_SECTIONS[section], API_KEY, self.username)
+        return self.__call_trakt(url, cache_limit=0)
+        
+    def get_progress(self, sort=TRAKT_SORT.ACTIVITY, full=True):
+        url='/user/progress/watched.json/%s/%s/all/%s' % (API_KEY, self.username, sort)
+        if full: url += '/full'
         return self.__call_trakt(url)
     
     def get_slug(self, url):

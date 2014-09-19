@@ -332,7 +332,7 @@ def show_progress():
             if _SALTS.get_setting('show_unaired_next')=='true' or item['next_episode']['first_aired']<=time.time():
                 show=item['show']
                 fanart=item['show']['images']['fanart']
-                date=utils.make_day(time.strftime('%Y-%m-%d', time.localtime(item['next_episode']['first_aired'])))                
+                date=utils.make_day(time.strftime('%Y-%m-%d', time.localtime(item['next_episode']['first_aired'])))      
                 liz, liz_url = make_episode_item(show, item['next_episode'], fanart)
                 folder=_SALTS.get_setting('source-win')=='Directory'
                 label=liz.getLabel()
@@ -343,7 +343,7 @@ def show_progress():
                     liz.setProperty('IsPlayable', 'true')
     
                 xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz,isFolder=folder)        
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
     
 @url_dispatcher.register(MODES.MANAGE_SUBS, ['section'])
 def manage_subscriptions(section):
@@ -1030,6 +1030,21 @@ def show_pickable_list(slug, pick_label, pick_mode, section):
 def make_dir_from_list(section, list_data, slug=None):
     section_params=utils.get_section_params(section)
     totalItems=len(list_data)
+    
+    if section == SECTIONS.TV:
+        progress = trakt_api.get_progress(full=False)
+        watched={}
+        now = time.time()
+        for item in progress:
+            for id_type in ['imdb_id', 'tmdb_id', 'tvrage_id']:
+                if id_type in item['show'] and item['show'][id_type]:
+                    if item['next_episode'] and item['next_episode']['first_aired']<now:
+                        watched[item['show'][id_type]]=False
+                    else:
+                        watched[item['show'][id_type]]=True
+    else:
+        pass
+    
     for show in list_data:
         menu_items=[]
         if slug:
@@ -1041,7 +1056,10 @@ def make_dir_from_list(section, list_data, slug=None):
             queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section'], 'slug': sub_slug}
             queries.update(utils.show_id(show))
             menu_items.append(('Subscribe', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
-
+        
+        if 'imdb_id' in show: show['watched'] = watched.get(show['imdb_id'], False)
+        elif 'tmdb_id' in show: show['watched'] = watched.get(show['tmdb_id'], False)
+            
         liz, liz_url =make_item(section_params, show, menu_items)
         
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
@@ -1081,7 +1099,7 @@ def make_dir_from_cal(mode, start_date, days):
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def make_episode_item(show, episode, fanart, show_subs=True):
-    log_utils.log('Make Episode: Show: %s, Episode: %s, Fanart: %s, Show Subs: %s' % (show, episode, fanart, show_subs))
+    log_utils.log('Make Episode: Show: %s, Episode: %s, Fanart: %s, Show Subs: %s' % (show, episode, fanart, show_subs), xbmc.LOGDEBUG)
     show['title']=re.sub(' \(\d{4}\)$','',show['title'])
     if 'episode' in episode: episode_num=episode['episode']
     else:  episode_num=episode['number']
@@ -1145,7 +1163,6 @@ def make_item(section_params, show, menu_items=None):
  
     if section_params['section']==SECTIONS.TV:
         queries = {'mode': section_params['next_mode'], 'slug': slug, 'fanart': liz.getProperty('fanart_image')}
-        if 'playcount' in info: del info['playcount'] # remove playcount from tv shows
         info['TVShowTitle']=info['title']
     else:
         queries = {'mode': section_params['next_mode'], 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
@@ -1184,6 +1201,8 @@ def make_item(section_params, show, menu_items=None):
     menu_items.append(('Set Related Url (Manual)', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
     liz.addContextMenuItems(menu_items, replaceItems=True)
  
+    liz.setProperty('resumetime',str(0))
+    liz.setProperty('totaltime',str(1))
     return liz, liz_url
 
 def main(argv=None):
