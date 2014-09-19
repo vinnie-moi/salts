@@ -844,7 +844,9 @@ def copy_list(section, slug, username):
 @ url_dispatcher.register(MODES.TOGGLE_WATCHED, ['section', 'id_type', 'show_id'], ['watched', 'season', 'episode'])
 def toggle_watched(section, id_type, show_id, watched=True, season='', episode=''):
     log_utils.log('In Watched: |%s|%s|%s|%s|%s|%s|' % (section, id_type, show_id, season, episode, watched), xbmc.LOGDEBUG)
-    
+    item = {id_type: show_id}
+    trakt_api.set_watched(section, item, season, episode, watched)
+    xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.UPDATE_SUBS)
 def update_subscriptions():
@@ -1238,9 +1240,10 @@ def make_item(section_params, show, menu_items=None):
             watched=True
             label='Mark as Watched'
         
-        queries = {'mode': MODES.TOGGLE_WATCHED, 'section': section_params['section'], 'watched': watched}
-        queries.update(show_id)
-        menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        if watched or section_params['section']==SECTIONS.MOVIES:
+            queries = {'mode': MODES.TOGGLE_WATCHED, 'section': section_params['section'], 'watched': watched}
+            queries.update(show_id)
+            menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
 
     if section_params['section']==SECTIONS.TV and _SALTS.get_setting('enable-subtitles')=='true':
         queries = {'mode': MODES.EDIT_TVSHOW_ID, 'title': show['title'], 'year': show['year']}
