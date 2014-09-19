@@ -179,7 +179,7 @@ class Trakt_API():
     def get_progress(self, sort=TRAKT_SORT.ACTIVITY, full=True):
         url='/user/progress/watched.json/%s/%s/all/%s' % (API_KEY, self.username, sort)
         if full: url += '/full'
-        return self.__call_trakt(url)
+        return self.__call_trakt(url, cache_limit=0)
     
     def get_slug(self, url):
         pattern = 'https?://trakt\.tv/(?:show|movie)/'
