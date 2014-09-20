@@ -113,6 +113,9 @@
          <setting id="OnlineMovies-enable" type="bool" label="OnlineMovies Enabled" default="true" visible="true"/>
          <setting id="OnlineMovies-base_url" type="text" label="     Base Url" default="http://onlinemovies.pro" visible="eq(-1,true)"/>
          <setting id="OnlineMovies-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="OneClickMoviez-enable" type="bool" label="OneClickMoviez Enabled" default="true" visible="true"/>
+         <setting id="OneClickMoviez-base_url" type="text" label="     Base Url" default="http://www.oneclickmoviez.ag" visible="eq(-1,true)"/>
+         <setting id="OneClickMoviez-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
     </category>
 
     <category label="Subtitles">

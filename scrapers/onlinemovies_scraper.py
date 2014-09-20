@@ -19,7 +19,6 @@ import scraper
 import urllib
 import urlparse
 import re
-import json
 import xbmcaddon
 import xbmc
 from salts_lib import log_utils
@@ -28,7 +27,6 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://onlinemovies.pro'
-MAX_TRIES=3
 
 QUALITY_MAP={}
 QUALITY_MAP[QUALITIES.LOW]=['CAM']
