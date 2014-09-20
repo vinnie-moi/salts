@@ -73,7 +73,6 @@ class OnlineMovies_Scraper(scraper.Scraper):
                 if match:
                     q_str = match.group(1).upper()
                     for key in QUALITY_MAP:
-                        print key
                         if any(q in q_str for q in QUALITY_MAP[key]):
                             hoster['quality']=key
                 hosters.append(hoster)
