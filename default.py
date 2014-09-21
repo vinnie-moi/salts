@@ -1051,26 +1051,26 @@ def show_pickable_list(slug, pick_label, pick_mode, section):
 def make_dir_from_list(section, list_data, slug=None):
     section_params=utils.get_section_params(section)
     totalItems=len(list_data)
-    cache_watched = _SALTS.get_setting('cache_watched')=='true'
     
-    if section == SECTIONS.TV:
-        progress = trakt_api.get_progress(full=False, cached=cache_watched)
-        watched={}
-        now = time.time()
-        for item in progress:
-            for id_type in ['imdb_id', 'tvdb_id']:
-                if id_type in item['show'] and item['show'][id_type]:
-                    if item['next_episode'] and item['next_episode']['first_aired']<now:
-                        watched[item['show'][id_type]]=False
-                    else:
-                        watched[item['show'][id_type]]=True
-    else:
-        movie_watched = trakt_api.get_watched(section, cached=cache_watched)
-        watched={}
-        for item in movie_watched:
-            for id_type in ['imdb_id', 'tmdb_id']:
-                if id_type in item and item[id_type]:
-                    watched[item[id_type]] = item['plays']>0
+    watched={}
+    if VALID_ACCOUNT:
+        cache_watched = _SALTS.get_setting('cache_watched')=='true'
+        if section == SECTIONS.TV:
+            progress = trakt_api.get_progress(full=False, cached=cache_watched)
+            now = time.time()
+            for item in progress:
+                for id_type in ['imdb_id', 'tvdb_id']:
+                    if id_type in item['show'] and item['show'][id_type]:
+                        if item['next_episode'] and item['next_episode']['first_aired']<now:
+                            watched[item['show'][id_type]]=False
+                        else:
+                            watched[item['show'][id_type]]=True
+        else:
+            movie_watched = trakt_api.get_watched(section, cached=cache_watched)
+            for item in movie_watched:
+                for id_type in ['imdb_id', 'tmdb_id']:
+                    if id_type in item and item[id_type]:
+                        watched[item[id_type]] = item['plays']>0
     
     for show in list_data:
         menu_items=[]
