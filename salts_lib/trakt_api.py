@@ -186,6 +186,21 @@ class Trakt_API():
         cache_limit = .25 if cached else 0
         return self.__call_trakt(url, cache_limit=cache_limit)
     
+    def rate(self, section, item, rating, season='', episode=''):
+        data = item
+        if section == SECTIONS.MOVIES:
+            rating_type = 'movie'
+        else:
+            if season and episode:
+                rating_type = 'episode'
+                data.update({'season': season, 'episode': episode})
+            else:
+                rating_type = 'show'
+                
+        url ='/rate/%s/%s' % (rating_type, API_KEY)
+        data['rating']=rating
+        self.__call_trakt(url, extra_data=data, cache_limit=0)
+        
     def get_slug(self, url):
         pattern = 'https?://trakt\.tv/(?:show|movie)/'
         url=re.sub(pattern, '', url.lower())
@@ -221,7 +236,9 @@ class Trakt_API():
             response=json.loads(result)
 
             if 'status' in response and response['status']=='failure':
-                raise TraktError(response['message'])
+                if 'message' in response: raise TraktError(response['message'])
+                if 'error' in response: raise TraktError(response['error'])
+                else: raise TraktError()
             else:
                 #log_utils.log('Trakt Response: %s' % (response), xbmc.LOGDEBUG)
                 return response

@@ -781,6 +781,23 @@ def set_related_url(mode, video_type, title, year, season='', episode='', ep_tit
     finally:
         utils.reap_workers(workers, None)
 
+@url_dispatcher.register(MODES.RATE, ['section', 'id_type', 'show_id'], ['season', 'episode'])
+def rate_media(section, id_type, show_id, season='', episode=''):
+    item = {id_type: show_id}
+    keyboard = xbmc.Keyboard()
+    keyboard.setHeading('Enter Rating (love, hate, unrate, or 1-10)')
+    while True:
+        keyboard.doModal()
+        if keyboard.isConfirmed():
+            rating = keyboard.getText()
+            rating = rating.lower()
+            if rating in ['love', 'hate', 'unrate'] + [str(i) for i in range(1, 11)]:
+                break
+        else:
+            return
+        
+    trakt_api.rate(section, item, rating, season, episode)
+
 @url_dispatcher.register(MODES.EDIT_TVSHOW_ID, ['title'], ['year'])
 def edit_tvshow_id(title, year=''):
     srt_scraper=SRT_Scraper()
@@ -1176,9 +1193,15 @@ def make_episode_item(show, episode, fanart, show_subs=True):
         watched=True
         label='Mark as Watched'
         
-    queries = {'mode': MODES.TOGGLE_WATCHED, 'section': SECTIONS.TV, 'season': episode['season'], 'episode': episode_num, 'watched': watched}
-    queries.update(utils.show_id(show))
-    menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+    if VALID_ACCOUNT:
+        show_id=utils.show_id(show)
+        queries = {'mode': MODES.RATE, 'section': SECTIONS.TV, 'season': episode['season'], 'episode': episode_num}
+        queries.update(show_id)
+        menu_items.append(('Rate on trakt.tv', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+
+        queries = {'mode': MODES.TOGGLE_WATCHED, 'section': SECTIONS.TV, 'season': episode['season'], 'episode': episode_num, 'watched': watched}
+        queries.update(show_id)
+        menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
 
     queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 
                'episode': episode_num, 'ep_title': episode['title']}
@@ -1230,6 +1253,11 @@ def make_item(section_params, show, menu_items=None):
         queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section']}
         queries.update(show_id)
         menu_items.append(('Add to List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        
+        queries = {'mode': MODES.RATE, 'section': section_params['section']}
+        queries.update(show_id)
+        menu_items.append(('Rate on trakt.tv', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
+        
         
     queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
     menu_items.append(('Add to Library', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
