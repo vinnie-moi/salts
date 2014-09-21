@@ -81,7 +81,7 @@ class MyVidLinks_Scraper(scraper.Scraper):
             q_str=match.group(1)
             quality = self.get_quality(video, q_str)
         
-        return self.__get_links(video, views, html, quality)
+        return self.__get_links(views, html, quality)
     
     def __get_episode_links(self, video, views, html):
         pattern = '<h4>(.*?)</h4>(.*?)</ul>'
