@@ -177,13 +177,13 @@ class Trakt_API():
     
     def get_watched(self, section, cached=True):
         url='/user/library/%s/watched.json/%s/%s/min' % (TRAKT_SECTIONS[section], API_KEY, self.username)
-        cache_limit = .15 if cached else 0
+        cache_limit = .25 if cached else 0
         return self.__call_trakt(url, cache_limit=cache_limit)
         
     def get_progress(self, sort=TRAKT_SORT.ACTIVITY, full=True, cached=True):
         url='/user/progress/watched.json/%s/%s/all/%s' % (API_KEY, self.username, sort)
         if full: url += '/full'
-        cache_limit = .15 if cached else 0
+        cache_limit = .25 if cached else 0
         return self.__call_trakt(url, cache_limit=cache_limit)
     
     def get_slug(self, url):
