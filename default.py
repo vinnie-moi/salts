@@ -95,22 +95,65 @@ def browse_menu(section):
 
     _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': 'Trending %s' % (section_label)}, img=art('trending.png'))
     if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': 'Recommended %s' % (section_label)}, img=art('recommended.png'))
-    if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_COLLECTION, 'section': section}, {'title': 'My %s Collection' % (section_label[:-1])}, img=art('collection.png'))
+    if VALID_ACCOUNT: add_refresh_item({'mode': MODES.SHOW_COLLECTION, 'section': section}, 'My %s Collection' % (section_label[:-1]), art('collection.png'))
     if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES, 'section': section}, {'title': 'My Favorites'}, img=art('my_favorites.png'))
     if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MANAGE_SUBS, 'section': section}, {'title': 'My Subscriptions'}, img=art('my_subscriptions.png'))
     if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': 'My Watchlist'}, img=art('my_watchlist.png'))
     if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': 'My Lists'}, img=art('my_lists.png'))
     _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': 'Other Lists'}, img=art('other_lists.png'))
     if section==SECTIONS.TV:
-        if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.SHOW_PROGRESS}, {'title': 'My Next Episodes'}, img=art('my_progress.png'))
-        if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.MY_CAL}, {'title': 'My Calendar'}, img=art('my_calendar.png'))
-        _SALTS.add_directory({'mode': MODES.CAL}, {'title': 'General Calendar'}, img=art('calendar.png'))
-        _SALTS.add_directory({'mode': MODES.PREMIERES}, {'title': 'Premiere Calendar'}, img=art('premiere_calendar.png'))
-        if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.FRIENDS_EPISODE, 'section': section}, {'title': 'Friends Episode Activity'}, img=art('friends_episode.png'))
+        if VALID_ACCOUNT: add_refresh_item({'mode': MODES.SHOW_PROGRESS}, 'My Next Episodes', art('my_progress.png'))
+        if VALID_ACCOUNT: add_refresh_item({'mode': MODES.MY_CAL}, 'My Calendar', art('my_calendar.png'))
+        add_refresh_item({'mode': MODES.CAL}, 'General Calendar', art('calendar.png'))
+        add_refresh_item({'mode': MODES.PREMIERES}, 'Premiere Calendar', art('premiere_calendar.png'))
+        if VALID_ACCOUNT: add_refresh_item({'mode': MODES.FRIENDS_EPISODE, 'section': section}, 'Friends Episode Activity', art('friends_episode.png'))
 
-    if VALID_ACCOUNT: _SALTS.add_directory({'mode': MODES.FRIENDS, 'section': section}, {'title': 'Friends Activity'}, img=art('friends.png'))
+    if VALID_ACCOUNT: add_refresh_item({'mode': MODES.FRIENDS, 'section': section}, 'Friends Activity', art('friends.png'))
     _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'}, img=art(search_img))
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+def add_refresh_item(queries, label, thumb):
+    liz = xbmcgui.ListItem(label, iconImage=thumb, thumbnailImage=thumb)
+    menu_items = []
+    refresh_queries = {'mode': MODES.FORCE_REFRESH, 'refresh_mode': queries['mode']}
+    if 'section' in queries: refresh_queries.update({'section': queries['section']})
+    menu_items.append(('Force Refresh', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(refresh_queries))), )
+    liz.addContextMenuItems(menu_items)
+    xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True) 
+    
+@url_dispatcher.register(MODES.FORCE_REFRESH, ['refresh_mode'], ['section', 'slug', 'username'])
+def force_refresh(refresh_mode, section=None, slug=None, username=None):
+    builtin = "XBMC.Notification(%s,Forcing Refresh, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
+    xbmc.executebuiltin(builtin)
+    log_utils.log('Forcing refresh for mode: |%s|%s|%s|%s|' % (refresh_mode, section, slug, username))
+    now = datetime.datetime.now()
+    offset = int(_SALTS.get_setting('calendar-day'))
+    start_date = now + datetime.timedelta(days=offset)
+    start_date = datetime.datetime.strftime(start_date,'%Y%m%d')
+    if refresh_mode == MODES.SHOW_COLLECTION:
+        trakt_api.get_collection(section, cached=False)
+    elif refresh_mode == MODES.SHOW_PROGRESS:
+        trakt_api.get_progress(cached=False)
+        trakt_api.get_progress(full=False, cached=False)
+    elif refresh_mode == MODES.MY_CAL:
+        trakt_api.get_my_calendar(start_date, cached=False)
+    elif refresh_mode == MODES.CAL:
+        trakt_api.get_calendar(start_date, cached=False)
+    elif refresh_mode == MODES.PREMIERES:
+        trakt_api.get_premieres(start_date, cached=False)
+    elif refresh_mode == MODES.FRIENDS_EPISODE:
+        trakt_api.get_friends_activity(section, True)
+    elif refresh_mode == MODES.FRIENDS:
+        trakt_api.get_friends_activity(section)
+    elif refresh_mode == MODES.SHOW_LIST: 
+        trakt_api.show_list(slug, section, username, cached=False)
+    else:
+        log_utils.log('Force refresh on unsupported mode: |%s|' % (refresh_mode)) 
+        return
+        
+    log_utils.log('Force refresh complete: |%s|%s|%s|%s|' % (refresh_mode, section, slug, username))
+    builtin = "XBMC.Notification(%s,Force Refresh Complete, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
+    xbmc.executebuiltin(builtin)
 
 @url_dispatcher.register(MODES.SCRAPERS)
 def scraper_settings():
@@ -264,6 +307,8 @@ def browse_other_lists(section):
         liz_url = _SALTS.build_plugin_url(queries)
         
         menu_items=[]
+        queries = {'mode': MODES.FORCE_REFRESH, 'refresh_mode': MODES.SHOW_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
+        menu_items.append(('Force Refresh', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         queries={'mode': MODES.ADD_OTHER_LIST, 'section': section, 'username': other_list[0]}
         menu_items.append(('Add more from %s' % (other_list[0]), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))), )
         queries={'mode': MODES.REMOVE_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
@@ -783,20 +828,35 @@ def set_related_url(mode, video_type, title, year, season='', episode='', ep_tit
 
 @url_dispatcher.register(MODES.RATE, ['section', 'id_type', 'show_id'], ['season', 'episode'])
 def rate_media(section, id_type, show_id, season='', episode=''):
-    item = {id_type: show_id}
-    keyboard = xbmc.Keyboard()
-    keyboard.setHeading('Enter Rating (love, hate, unrate, or 1-10)')
-    while True:
-        keyboard.doModal()
-        if keyboard.isConfirmed():
-            rating = keyboard.getText()
-            rating = rating.lower()
-            if rating in ['love', 'hate', 'unrate'] + [str(i) for i in range(1, 11)]:
-                break
+    # disabled until fixes for rating are made in official addon
+    if False and xbmc.getCondVisibility('System.HasAddon(script.trakt)'):
+        run = 'RunScript(script.trakt, action=rate, media_type=%s, remoteid=%s'
+        if section == SECTIONS.MOVIES:
+            rating_type = 'movie'
+            run = run + ')' % (rating_type, show_id)
         else:
-            return
-        
-    trakt_api.rate(section, item, rating, season, episode)
+            if season and episode:
+                rating_type = 'episode'
+                run = (run +', season=%s, episode=%s)') % (rating_type, show_id, season, episode)
+            else:
+                rating_type = 'show'
+                run = run + ')' % (rating_type, show_id)
+        xbmc.executebuiltin(run)
+    else:
+        item = {id_type: show_id}
+        keyboard = xbmc.Keyboard()
+        keyboard.setHeading('Enter Rating (love, hate, unrate, or 1-10)')
+        while True:
+            keyboard.doModal()
+            if keyboard.isConfirmed():
+                rating = keyboard.getText()
+                rating = rating.lower()
+                if rating in ['love', 'hate', 'unrate'] + [str(i) for i in range(1, 11)]:
+                    break
+            else:
+                return
+             
+        trakt_api.rate(section, item, rating, season, episode)
 
 @url_dispatcher.register(MODES.EDIT_TVSHOW_ID, ['title'], ['year'])
 def edit_tvshow_id(title, year=''):
