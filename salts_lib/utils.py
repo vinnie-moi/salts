@@ -233,14 +233,14 @@ def get_sort_key(item):
                 value=item[field]
             
             if value in SORT_KEYS[field]:
-                item_sort_key.append(sign*SORT_KEYS[field][value])
+                item_sort_key.append(sign*int(SORT_KEYS[field][value]))
             else: # assume all unlisted values sort as worst
                 item_sort_key.append(sign*-1)
         else:
             if item[field] is None:
                 item_sort_key.append(sign*-1)
             else:
-                item_sort_key.append(sign*item[field])
+                item_sort_key.append(sign*int(item[field]))
     #print 'item: %s sort_key: %s' % (item, item_sort_key)
     return tuple(item_sort_key)
 

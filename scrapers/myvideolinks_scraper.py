@@ -66,7 +66,7 @@ class MyVidLinks_Scraper(scraper.Scraper):
             pattern = '<span[^>]+>(\d+)\s+Views'
             match = re.search(pattern, html)
             if match:
-                views=match.group(1)
+                views=int(match.group(1))
             
             if video.video_type == VIDEO_TYPES.MOVIE:
                 return self.__get_movie_links(video, views, html)
