@@ -596,7 +596,7 @@ def show_progress():
         if _SALTS.get_setting('show_unaired_next') == 'true' or first_aired_utc <= time.time():
             show = episode['show']
             fanart = show['images']['fanart']['full']
-            date = utils.make_day(time.strftime('%Y-%m-%d', time.localtime(first_aired_utc)))
+            date = utils.make_day(utils.make_air_date(episode['episode']['first_aired']))
 
             menu_items = []
             queries = {'mode': MODES.SEASONS, 'slug': show['ids']['slug'], 'fanart': fanart}
