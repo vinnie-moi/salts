@@ -1,3 +1,9 @@
+[B]Version 1.0.0~beta6[/B]
+- Fix blog get_url
+- Fix cartoonhd scraper
+- fix 2movies scraper
+- fix pre-1970 airdates in My Next Episodes
+
 [B]Version 1.0.0~beta5[/B]
 - Improve movie4k scraper
 - Fix moviestorm scraper
