@@ -26,6 +26,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://movietv.to'
+LINK_URL = '/series/getLink?id=%s&s=%s&e=%s'
 
 class MovieTV_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -57,20 +58,21 @@ class MovieTV_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=1)
             if video.video_type == VIDEO_TYPES.MOVIE:
-                pattern = 'show.start\((.*?)\);'
+                pattern = '<source\s+src="([^"]+)'
                 quality = QUALITIES.HD
             else:
-                pattern = 'vars\.links\s*=\s*(.*?);'
+                try:
+                    js_data = json.loads(html)
+                    html = js_data['url']
+                except:
+                    return
+                pattern = '(.*)'
                 quality = QUALITIES.HIGH
 
-            match = re.search(pattern, html)
-            if match:
-                js_data = json.loads(match.group(1))
-                if video.video_type == VIDEO_TYPES.EPISODE:
-                    js_data = js_data[str(video.episode)][0] if str(video.episode) in js_data else {}
-
-                if 'url' in js_data:
-                    stream_url = js_data['url'] + '|referer=%s' % (url)
+            if html:
+                match = re.search(pattern, html)
+                if match:
+                    stream_url = match.group(1) + '|referer=%s' % (url)
                     hoster = {'multi-part': False, 'host': 'movietv.to', 'class': self, 'url': stream_url, 'quality': quality, 'views': None, 'rating': None, 'direct': True}
                     hosters.append(hoster)
         return hosters
@@ -79,37 +81,31 @@ class MovieTV_Scraper(scraper.Scraper):
         return super(MovieTV_Scraper, self)._default_get_url(video)
 
     def _get_episode_url(self, show_url, video):
-        season_url = '%s/seasons/%s' % (show_url, video.season)
-        return season_url
+        episode_pattern = 'playSeries\((\d+),%s,%s\)' % (video.season, video.episode)
+        title_pattern = ''
+        airdate_pattern = ''
+        result = super(MovieTV_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern, airdate_pattern)
+        return LINK_URL % (result, video.season, video.episode)
 
     def search(self, video_type, title, year):
         results = []
-        html = self._http_get(self.base_url)
-        r = re.search("token\s*:\s*'([^']+)", html)
-        if r:
-            url = urlparse.urljoin(self.base_url, '/titles1/paginate?_token=%s&query=' % (r.group(1)))
-            url += urllib.quote_plus(title)
-            if video_type == VIDEO_TYPES.MOVIE:
-                url += '&type=movie'
-            else:
-                url += '&type=series'
-            url += '&order=mc_num_of_votesDesc'
-            html = self._http_get(url, headers={'X-Requested-With': 'XMLHttpRequest'}, cache_limit=.25)
+        url = urlparse.urljoin(self.base_url, '/search/auto?q=')
+        url += urllib.quote_plus(title)
+        html = self._http_get(url, headers={'X-Requested-With': 'XMLHttpRequest'}, cache_limit=.25)
+        if video_type == VIDEO_TYPES.MOVIE:
+            url_frag = '/movies/'
+        else:
+            url_frag = '/series/'
 
-            if html:
-                try:
-                    js_results = json.loads(html)
-                    for item in js_results['items']:
-                        if not year or not item['year'] or int(year) == int(item['year']):
-                            if video_type == VIDEO_TYPES.MOVIE:
-                                url = '/movies'
-                            else:
-                                url = '/series'
-                            url += '/%s-%s' % (item['id'], item['title'].lower().replace(' ', '-'))
-                            result = {'url': url, 'title': item['title'], 'year': item['year']}
-                            results.append(result)
-                except:
-                    pass
+        if html:
+            try:
+                js_results = json.loads(html)
+                for item in js_results:
+                    if url_frag in item['link'] and (not year or not item['year'] or int(year) == int(item['year'])):
+                        result = {'url': item['link'], 'title': item['title'], 'year': item['year']}
+                        results.append(result)
+            except:
+                pass
 
         return results
 
