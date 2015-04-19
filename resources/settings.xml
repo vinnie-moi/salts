@@ -133,6 +133,12 @@
          <setting id="afdah_try" type="number" default="0" visible="false"/>
          <setting id="afdah_fail" type="number" default="0" visible="false"/>
          <setting id="afdah_check" type="number" default="0" visible="false"/>
+         <setting id="alluc.com-enable" type="bool" label="alluc.com Enabled" default="true" visible="true"/>
+         <setting id="alluc.com-base_url" type="text" label="     Base Url" default="http://www.alluc.com" visible="eq(-1,true)"/>
+         <setting id="alluc.com-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="alluc.com_try" type="number" default="0" visible="false"/>
+         <setting id="alluc.com_fail" type="number" default="0" visible="false"/>
+         <setting id="alluc.com_check" type="number" default="0" visible="false"/>
          <setting id="CartoonHD-enable" type="bool" label="CartoonHD Enabled" default="true" visible="true"/>
          <setting id="CartoonHD-base_url" type="text" label="     Base Url" default="http://www.cartoonhd.is" visible="eq(-1,true)"/>
          <setting id="CartoonHD-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -207,15 +213,15 @@
          <setting id="iStreamHD_check" type="number" default="0" visible="false"/>
          <setting id="iStreamHD-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>
          <setting id="iStreamHD-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>
+    </category>
+
+	<category label="Scrapers 2">
          <setting id="iWatchOnline-enable" type="bool" label="iWatchOnline Enabled" default="true" visible="true"/>
          <setting id="iWatchOnline-base_url" type="text" label="     Base Url" default="http://www.iwatchonline.to" visible="eq(-1,true)"/>
          <setting id="iWatchOnline-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="iWatchOnline_try" type="number" default="0" visible="false"/>
          <setting id="iWatchOnline_fail" type="number" default="0" visible="false"/>
          <setting id="iWatchOnline_check" type="number" default="0" visible="false"/>
-    </category>
-
-	<category label="Scrapers 2">
          <setting id="Local-enable" type="bool" label="Local Enabled" default="true" visible="true"/>
          <setting id="Local-base_url" type="text" label="     Base Url" default="" visible="eq(-1,true)"/>
          <setting id="Local-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -302,6 +308,9 @@
          <setting id="NoobRoom-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>
          <setting id="NoobRoom-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>
          <setting id="NoobRoom-include_premium" type="bool" label="     Include Premium" default="false" visible="eq(-8,true)"/>
+    </category>
+
+	<category label="Scrapers 3">
          <setting id="OneClickWatch-enable" type="bool" label="OneClickWatch Enabled" default="true" visible="true"/>
          <setting id="OneClickWatch-base_url" type="text" label="     Base Url" default="http://oneclickwatch.ws" visible="eq(-1,true)"/>
          <setting id="OneClickWatch-sub_check" type="bool" label="     Include in Page Existence checks?" default="false" visible="eq(-2,true)"/>
@@ -310,9 +319,6 @@
          <setting id="OneClickWatch_check" type="number" default="0" visible="false"/>
          <setting id="OneClickWatch-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>
          <setting id="OneClickWatch-select" type="enum" label="     Automatically Select" values="Most Recent|Highest Quality" default="0" visible="eq(-7,true)"/>
-    </category>
-
-	<category label="Scrapers 3">
          <setting id="OnlineMovies-enable" type="bool" label="OnlineMovies Enabled" default="true" visible="true"/>
          <setting id="OnlineMovies-base_url" type="text" label="     Base Url" default="http://onlinemovies.pro" visible="eq(-1,true)"/>
          <setting id="OnlineMovies-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -400,15 +406,15 @@
          <setting id="VKBox_try" type="number" default="0" visible="false"/>
          <setting id="VKBox_fail" type="number" default="0" visible="false"/>
          <setting id="VKBox_check" type="number" default="0" visible="false"/>
+    </category>
+	
+    <category label="Scrapers 4">
          <setting id="WatchFree.to-enable" type="bool" label="WatchFree.to Enabled" default="true" visible="true"/>
          <setting id="WatchFree.to-base_url" type="text" label="     Base Url" default="http://www.watchfree.to" visible="eq(-1,true)"/>
          <setting id="WatchFree.to-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="WatchFree.to_try" type="number" default="0" visible="false"/>
          <setting id="WatchFree.to_fail" type="number" default="0" visible="false"/>
          <setting id="WatchFree.to_check" type="number" default="0" visible="false"/>
-    </category>
-	
-    <category label="Scrapers 4">
          <setting id="WatchSeries-enable" type="bool" label="WatchSeries Enabled" default="true" visible="true"/>
          <setting id="WatchSeries-base_url" type="text" label="     Base Url" default="http://watchseries.sx" visible="eq(-1,true)"/>
          <setting id="WatchSeries-sub_check" type="bool" label="     Include in Page Existence checks?" default="false" visible="eq(-2,true)"/>
