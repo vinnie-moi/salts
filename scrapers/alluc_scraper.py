@@ -66,9 +66,8 @@ class Alluc_Scraper(scraper.Scraper):
         seen_urls = set()
         source_url = self.get_url(video)
         if source_url:
-            url = urlparse.urljoin(self.base_url, source_url)
             for search_type in SEARCH_TYPES:
-                url = self.__translate_search(url, search_type)
+                url = self.__translate_search(source_url, search_type)
                 html = self._http_get(url, cache_limit=.5)
                 if html:
                     js_result = json.loads(html)
@@ -79,14 +78,25 @@ class Alluc_Scraper(scraper.Scraper):
                             
                             stream_url = result['hosterurls'][0]['url']
                             if stream_url not in seen_urls:
-                                host = urlparse.urlsplit(stream_url).hostname.lower()
-                                quality = self._get_quality(video, host, self._get_title_quality(result['title']))
-                                hoster = {'multi-part': False, 'class': self, 'views': None, 'url': stream_url, 'rating': None, 'host': host, 'quality': quality, 'direct': False}
-                                hosters.append(hoster)
-                                seen_urls.add(stream_url)
+                                if self.__title_check(video, result['title']):
+                                    host = urlparse.urlsplit(stream_url).hostname.lower()
+                                    quality = self._get_quality(video, host, self._get_title_quality(result['title']))
+                                    hoster = {'multi-part': False, 'class': self, 'views': None, 'url': stream_url, 'rating': None, 'host': host, 'quality': quality, 'direct': False}
+                                    hosters.append(hoster)
+                                    seen_urls.add(stream_url)
 
         return hosters
 
+    def __title_check(self, video, title):
+        if video.video_type == VIDEO_TYPES.MOVIE:
+            delim = video.year
+        else:
+            delim = 'S%02dE%02d' % (int(video.season), int(video.episode))
+        
+        title = title.upper()
+        print '%s - %s' % (self._normalize_title(video.title), self._normalize_title(title))
+        return self._normalize_title(video.title) in self._normalize_title(title) and delim in title
+    
     def _get_title_quality(self, title):
         post_quality = QUALITIES.HIGH
         title = title.upper()
