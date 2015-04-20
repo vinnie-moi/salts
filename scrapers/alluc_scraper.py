@@ -62,39 +62,53 @@ class Alluc_Scraper(scraper.Scraper):
         return '[%s] %s' % (item['quality'], item['host'])
 
     def get_sources(self, video):
-        hosters = []
-        seen_urls = set()
         source_url = self.get_url(video)
         if source_url:
-            for search_type in SEARCH_TYPES:
-                url = self.__translate_search(source_url, search_type)
-                html = self._http_get(url, cache_limit=.5)
-                if html:
-                    js_result = json.loads(html)
-                    if js_result['status'] == 'success':
-                        for result in js_result['result']:
-                            if len(result['hosterurls']) > 1: continue
-                            if result['extension'] == 'rar': continue
-                            
-                            stream_url = result['hosterurls'][0]['url']
-                            if stream_url not in seen_urls:
-                                if self.__title_check(video, result['title']):
-                                    host = urlparse.urlsplit(stream_url).hostname.lower()
-                                    quality = self._get_quality(video, host, self._get_title_quality(result['title']))
-                                    hoster = {'multi-part': False, 'class': self, 'views': None, 'url': stream_url, 'rating': None, 'host': host, 'quality': quality, 'direct': False}
-                                    hosters.append(hoster)
-                                    seen_urls.add(stream_url)
+            params = urlparse.parse_qs(urlparse.urlparse(source_url).query)
+            if video.video_type == VIDEO_TYPES.MOVIE:
+                query = urllib.quote_plus('%s %s' % (params['title'][0], params['year'][0]))
+            else:
+                query = urllib.quote_plus('%s S%02dE%02d' % (params['title'][0], int(params['season'][0]), int(params['episode'][0])))
+            query_url = '/search?query=%s' % (query)
+            hosters = self.__get_links(query_url, video)
+            if not hosters and video.video_type == VIDEO_TYPES.EPISODE and params['air_date'][0]:
+                query = urllib.quote_plus('%s %s' % (params['title'][0], params['air_date'][0].replace('-', '.')))
+                query_url = '/search?query=%s' % (query)
+                hosters = self.__get_links(query_url, video)
 
         return hosters
 
-    def __title_check(self, video, title):
-        if video.video_type == VIDEO_TYPES.MOVIE:
-            delim = video.year
-        else:
-            delim = 'S%02dE%02d' % (int(video.season), int(video.episode))
+    def __get_links(self, url, video):
+        hosters = []
+        seen_urls = set()
+        for search_type in SEARCH_TYPES:
+            url = self.__translate_search(url, search_type)
+            html = self._http_get(url, cache_limit=.5)
+            if html:
+                js_result = json.loads(html)
+                if js_result['status'] == 'success':
+                    for result in js_result['result']:
+                        if len(result['hosterurls']) > 1: continue
+                        if result['extension'] == 'rar': continue
+                        
+                        stream_url = result['hosterurls'][0]['url']
+                        if stream_url not in seen_urls:
+                            if self.__title_check(video, result['title']):
+                                host = urlparse.urlsplit(stream_url).hostname.lower()
+                                quality = self._get_quality(video, host, self._get_title_quality(result['title']))
+                                hoster = {'multi-part': False, 'class': self, 'views': None, 'url': stream_url, 'rating': None, 'host': host, 'quality': quality, 'direct': False}
+                                hosters.append(hoster)
+                                seen_urls.add(stream_url)
+        return hosters
         
+    def __title_check(self, video, title):
         title = title.upper()
-        return self._normalize_title(video.title) in self._normalize_title(title) and delim in title
+        if video.video_type == VIDEO_TYPES.MOVIE:
+            return self._normalize_title(video.title) in self._normalize_title(title) and video.year in title
+        else:
+            sxe = 'S%02dE%02d' % (int(video.season), int(video.episode))
+            air_date = video.ep_airdate.strftime('%Y.%m.%d')
+            return self._normalize_title(video.title) in self._normalize_title(title) and (sxe in title or air_date in title)
     
     def _get_title_quality(self, title):
         post_quality = QUALITIES.HIGH
@@ -114,10 +128,10 @@ class Alluc_Scraper(scraper.Scraper):
             log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (video.video_type, video.title, video.year, self.get_name(), url))
         else:
             if video.video_type == VIDEO_TYPES.MOVIE:
-                query = urllib.quote_plus('%s %s' % (video.title, video.year))
+                query = 'title=%s&year=%s' % (urllib.quote_plus(video.title), video.year)
             else:
-                query = urllib.quote_plus('%s S%02dE%02d' % (video.title, int(video.season), int(video.episode)))
-            url = '/search?query=%s' % (query)
+                query = 'title=%s&season=%s&episode=%s&air_date=%s' % (urllib.quote_plus(video.title), video.season, video.episode, video.ep_airdate)
+            url = '/search?%s' % (query)
             self.db_connection.set_related_url(video.video_type, video.title, video.year, self.get_name(), url)
         return url
 
