@@ -329,7 +329,7 @@ class Scraper(object):
 
     def _normalize_title(self, title):
         new_title = title.upper()
-        new_title = re.sub('\W', '', new_title)
+        new_title = re.sub('[^A-Za-z0-9]', '', new_title)
         # log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), xbmc.LOGDEBUG)
         return new_title
 

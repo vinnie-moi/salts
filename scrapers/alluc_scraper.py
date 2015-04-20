@@ -20,6 +20,7 @@ import urllib
 import urlparse
 import xbmcaddon
 import json
+import xbmc
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.db_utils import DB_Connection
@@ -82,8 +83,8 @@ class Alluc_Scraper(scraper.Scraper):
         hosters = []
         seen_urls = set()
         for search_type in SEARCH_TYPES:
-            url = self.__translate_search(url, search_type)
-            html = self._http_get(url, cache_limit=.5)
+            search_url = self.__translate_search(url, search_type)
+            html = self._http_get(search_url, cache_limit=.5)
             if html:
                 js_result = json.loads(html)
                 if js_result['status'] == 'success':
@@ -102,13 +103,23 @@ class Alluc_Scraper(scraper.Scraper):
         return hosters
         
     def __title_check(self, video, title):
-        title = title.upper()
+        title = self._normalize_title(title)
         if video.video_type == VIDEO_TYPES.MOVIE:
-            return self._normalize_title(video.title) in self._normalize_title(title) and video.year in title
+            return self._normalize_title(video.title) in title and video.year in title
         else:
             sxe = 'S%02dE%02d' % (int(video.season), int(video.episode))
-            air_date = video.ep_airdate.strftime('%Y.%m.%d')
-            return self._normalize_title(video.title) in self._normalize_title(title) and (sxe in title or air_date in title)
+            se = '%d%02d' % (int(video.season), int(video.episode))
+            air_date = video.ep_airdate.strftime('%Y%m%d')
+            if sxe in title:
+                show_title = title.split(sxe)[0]
+            elif air_date in title:
+                show_title = title.split(air_date)[0]
+            elif se in title:
+                show_title = title.split(se)[0]
+            else:
+                show_title = title
+            log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), xbmc.LOGDEBUG)
+            return self._normalize_title(video.title) in show_title and (sxe in title or se in title or air_date in title)
     
     def _get_title_quality(self, title):
         post_quality = QUALITIES.HIGH
