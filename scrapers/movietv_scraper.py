@@ -70,9 +70,10 @@ class MovieTV_Scraper(scraper.Scraper):
 
             try:
                 js_data = json.loads(html)
-                stream_url = js_data['url'] + '|referer=%s' % (url)
-                hoster = {'multi-part': False, 'host': 'movietv.to', 'class': self, 'url': stream_url, 'quality': quality, 'views': None, 'rating': None, 'direct': True}
-                hosters.append(hoster)
+                if js_data['url']:
+                    stream_url = js_data['url'] + '|referer=%s' % (url)
+                    hoster = {'multi-part': False, 'host': 'movietv.to', 'class': self, 'url': stream_url, 'quality': quality, 'views': None, 'rating': None, 'direct': True}
+                    hosters.append(hoster)
             except ValueError:
                 pass
 
