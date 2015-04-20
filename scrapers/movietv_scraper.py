@@ -59,22 +59,23 @@ class MovieTV_Scraper(scraper.Scraper):
             html = self._http_get(url, cache_limit=1)
             if video.video_type == VIDEO_TYPES.MOVIE:
                 pattern = '<source\s+src="([^"]+)'
-                quality = QUALITIES.HD
-            else:
-                try:
-                    js_data = json.loads(html)
-                    html = js_data['url']
-                except:
-                    return
-                pattern = '(.*)'
-                quality = QUALITIES.HIGH
-
-            if html:
                 match = re.search(pattern, html)
                 if match:
-                    stream_url = match.group(1) + '|referer=%s' % (url)
-                    hoster = {'multi-part': False, 'host': 'movietv.to', 'class': self, 'url': stream_url, 'quality': quality, 'views': None, 'rating': None, 'direct': True}
-                    hosters.append(hoster)
+                    html = '{"url":"%s"}' % (match.group(1))
+                else:
+                    return hosters
+                quality = QUALITIES.HD
+            else:
+                quality = QUALITIES.HIGH
+
+            try:
+                js_data = json.loads(html)
+                stream_url = js_data['url'] + '|referer=%s' % (url)
+                hoster = {'multi-part': False, 'host': 'movietv.to', 'class': self, 'url': stream_url, 'quality': quality, 'views': None, 'rating': None, 'direct': True}
+                hosters.append(hoster)
+            except ValueError:
+                pass
+
         return hosters
 
     def get_url(self, video):
