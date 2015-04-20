@@ -94,7 +94,6 @@ class Alluc_Scraper(scraper.Scraper):
             delim = 'S%02dE%02d' % (int(video.season), int(video.episode))
         
         title = title.upper()
-        print '%s - %s' % (self._normalize_title(video.title), self._normalize_title(title))
         return self._normalize_title(video.title) in self._normalize_title(title) and delim in title
     
     def _get_title_quality(self, title):
