@@ -118,7 +118,7 @@ class Alluc_Scraper(scraper.Scraper):
                 show_title = title.split(se)[0]
             else:
                 show_title = title
-            log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), xbmc.LOGDEBUG)
+            #log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), xbmc.LOGDEBUG)
             return self._normalize_title(video.title) in show_title and (sxe in title or se in title or air_date in title)
     
     def _get_title_quality(self, title):
