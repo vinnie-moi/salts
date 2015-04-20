@@ -1,3 +1,8 @@
+[B]Version 1.0.0~beta7[/B]
+- Add alluc.com scraper
+- Fix movietv.to scraper
+- Improve host qualities list
+
 [B]Version 1.0.0~beta6[/B]
 - Fix blog get_url
 - Fix cartoonhd scraper
