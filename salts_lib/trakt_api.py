@@ -42,6 +42,7 @@ class TransientTraktError(Exception):
 BASE_URL = 'api-v2launch.trakt.tv'
 V2_API_KEY = 'eb41e95243d8c95152ed72a1fc0394c93cb785cb33aed609fdde1a07454584b4'
 RESULTS_LIMIT = 10
+HIDDEN_SIZE = 100
 
 class Trakt_API():
     def __init__(self, username, password, token=None, use_https=False, list_size=RESULTS_LIMIT, timeout=5):
@@ -231,8 +232,16 @@ class Trakt_API():
 
     def get_hidden_progress(self, cached=True):
         url = '/users/hidden/progress_watched'
-        params = {'type': 'show', 'limit': self.list_size}
-        return self.__call_trakt(url, params=params, cached=cached)
+        page = 1
+        length = -1
+        result = []
+        while length != 0 or length == HIDDEN_SIZE:
+            params = {'type': 'show', 'limit': HIDDEN_SIZE, 'page': page}
+            hidden = self.__call_trakt(url, params=params, cached=cached)
+            length = len(hidden)
+            result += hidden
+            page += 1
+        return result
     
     def get_bookmarks(self):
         url = '/sync/playback'

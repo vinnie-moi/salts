@@ -583,14 +583,14 @@ def get_progress(cache_override=False):
             log_utils.log('All progress results received')
         
         total = len(workers)
-        workers = utils.reap_workers(workers)
         if worker_count > 0:
             timeout_msg = 'Progress Timeouts: %s/%s' % (worker_count, total)
             log_utils.log(timeout_msg, xbmc.LOGWARNING)
             builtin = 'XBMC.Notification(%s,%s, 5000, %s)'
             xbmc.executebuiltin(builtin % (_SALTS.get_name(), timeout_msg, ICON_PATH))
+        workers = utils.reap_workers(workers)
     
-    return (workers, utils.sort_progress(episodes, sort_order=SORT_MAP[int(_SALTS.get_setting('sort_progress'))]))
+    return workers, utils.sort_progress(episodes, sort_order=SORT_MAP[int(_SALTS.get_setting('sort_progress'))])
 
 @url_dispatcher.register(MODES.SHOW_PROGRESS)
 def show_progress():
