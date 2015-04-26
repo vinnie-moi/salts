@@ -117,9 +117,9 @@ class VKBox_Scraper(scraper.Scraper):
             return []
 
     def _get_episode_url(self, show_url, video):
-        if not self._force_title(video):
-            show_id = urlparse.parse_qs(urlparse.urlparse(show_url).query)['id'][0]
-            return LINKS[video.video_type] % (show_id, int(video.season), int(video.episode))
+        query = urlparse.parse_qs(urlparse.urlparse(show_url).query)
+        if not self._force_title(video) and 'id' in query:
+            return LINKS[video.video_type] % (query['id'][0], int(video.season), int(video.episode))
 
     def _http_get(self, url, headers=None, cache_limit=8):
         return super(VKBox_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, headers=headers, cache_limit=cache_limit)
