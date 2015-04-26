@@ -229,6 +229,11 @@ class Trakt_API():
         params = {'extended': 'full,images'} if full else None
         return self.__call_trakt(url, params=params, cached=cached)
 
+    def get_hidden_progress(self, cached=True):
+        url = '/users/hidden/progress_watched'
+        params = {'type': 'show', 'limit': self.list_size}
+        return self.__call_trakt(url, params=params, cached=cached)
+    
     def get_bookmarks(self):
         url = '/sync/playback'
         return self.__call_trakt(url, cached=False)

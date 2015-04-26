@@ -190,7 +190,10 @@ def force_refresh(refresh_mode, section=None, slug=None, username=None):
     if refresh_mode == MODES.SHOW_COLLECTION:
         trakt_api.get_collection(section, cached=False)
     elif refresh_mode == MODES.SHOW_PROGRESS:
-        get_progress(cache_override=True)
+        try:
+            workers, _ = get_progress(cache_override=True)
+        finally:
+            utils.reap_workers(workers, None)
     elif refresh_mode == MODES.MY_CAL:
         trakt_api.get_my_calendar(start_date, cached=False)
     elif refresh_mode == MODES.CAL:
@@ -525,6 +528,7 @@ def get_progress(cache_override=False):
     timeout = max_timeout = int(_SALTS.get_setting('trakt_timeout'))
     max_progress = int(_SALTS.get_setting('progress_size'))
     watched_list = trakt_api.get_watched(SECTIONS.TV, full=True, cached=cached)
+    hidden = dict.fromkeys([item['show']['ids']['slug'] for item in trakt_api.get_hidden_progress(cached=cached)])
     episodes = []
     worker_count = 0
     workers = []
@@ -532,6 +536,9 @@ def get_progress(cache_override=False):
     if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
     for i, watched in enumerate(watched_list):
+        if watched['show']['ids']['slug'] in hidden:
+            continue
+        
         if utils.P_MODE == P_MODES.NONE:
             if i != 0 and i >= max_progress:
                 break
@@ -552,63 +559,64 @@ def get_progress(cache_override=False):
             shows[watched['show']['ids']['slug']]['last_watched_at'] = watched['last_watched_at']
 
     if utils.P_MODE != P_MODES.NONE:
-        try:
-            while worker_count > 0:
-                try:
-                    log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
-                    progress = q.get(True, timeout)
-                    #log_utils.log('Got Progress: %s' % (progress), xbmc.LOGDEBUG)
-                    worker_count -= 1
+        while worker_count > 0:
+            try:
+                log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
+                progress = q.get(True, timeout)
+                #log_utils.log('Got Progress: %s' % (progress), xbmc.LOGDEBUG)
+                worker_count -= 1
+
+                if 'next_episode' in progress and progress['next_episode']:
+                    episode = {'show': shows[progress['slug']], 'episode': progress['next_episode']}
+                    episode['last_watched_at'] = shows[progress['slug']]['last_watched_at']
+                    episode['percent_completed'] = (progress['completed'] * 100) / progress['aired'] if progress['aired'] > 0 else 0
+                    episode['completed'] = progress['completed']
+                    episodes.append(episode)
+
+                if max_timeout > 0:
+                    timeout = max_timeout - (time.time() - begin)
+                    if timeout < 0: timeout = 0
+            except utils.Empty:
+                log_utils.log('Get Progress Process Timeout', xbmc.LOGWARNING)
+                break
+        else:
+            log_utils.log('All progress results received')
+        
+        total = len(workers)
+        workers = utils.reap_workers(workers)
+        if worker_count > 0:
+            timeout_msg = 'Progress Timeouts: %s/%s' % (worker_count, total)
+            log_utils.log(timeout_msg, xbmc.LOGWARNING)
+            builtin = 'XBMC.Notification(%s,%s, 5000, %s)'
+            xbmc.executebuiltin(builtin % (_SALTS.get_name(), timeout_msg, ICON_PATH))
     
-                    if 'next_episode' in progress and progress['next_episode']:
-                        episode = {'show': shows[progress['slug']], 'episode': progress['next_episode']}
-                        episode['last_watched_at'] = shows[progress['slug']]['last_watched_at']
-                        episode['percent_completed'] = (progress['completed'] * 100) / progress['aired'] if progress['aired'] > 0 else 0
-                        episode['completed'] = progress['completed']
-                        episodes.append(episode)
-    
-                    if max_timeout > 0:
-                        timeout = max_timeout - (time.time() - begin)
-                        if timeout < 0: timeout = 0
-                except utils.Empty:
-                    log_utils.log('Get Progress Process Timeout', xbmc.LOGWARNING)
-                    break
-            else:
-                log_utils.log('All progress results received')
-            
-            total = len(workers)
-            workers = utils.reap_workers(workers)
-            if worker_count > 0:
-                timeout_msg = 'Progress Timeouts: %s/%s' % (worker_count, total)
-                log_utils.log(timeout_msg, xbmc.LOGWARNING)
-                builtin = 'XBMC.Notification(%s,%s, 5000, %s)'
-                xbmc.executebuiltin(builtin % (_SALTS.get_name(), timeout_msg, ICON_PATH))
-        finally:
-            utils.reap_workers(workers, None)
-    
-    return utils.sort_progress(episodes, sort_order=SORT_MAP[int(_SALTS.get_setting('sort_progress'))])
+    return (workers, utils.sort_progress(episodes, sort_order=SORT_MAP[int(_SALTS.get_setting('sort_progress'))]))
 
 @url_dispatcher.register(MODES.SHOW_PROGRESS)
 def show_progress():
-    for episode in get_progress():
-        log_utils.log('Episode: Sort Keys: Tile: |%s| Last Watched: |%s| Percent: |%s%%| Completed: |%s|' % (episode['show']['title'], episode['last_watched_at'], episode['percent_completed'], episode['completed']), xbmc.LOGDEBUG)
-        first_aired_utc = utils.iso_2_utc(episode['episode']['first_aired'])
-        if _SALTS.get_setting('show_unaired_next') == 'true' or first_aired_utc <= time.time():
-            show = episode['show']
-            fanart = show['images']['fanart']['full']
-            date = utils.make_day(utils.make_air_date(episode['episode']['first_aired']))
-
-            menu_items = []
-            queries = {'mode': MODES.SEASONS, 'slug': show['ids']['slug'], 'fanart': fanart}
-            menu_items.append(('Browse Seasons', 'Container.Update(%s)' % (_SALTS.build_plugin_url(queries))),)
-
-            liz, liz_url = make_episode_item(show, episode['episode'], menu_items=menu_items)
-            label = liz.getLabel()
-            label = '[[COLOR deeppink]%s[/COLOR]] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
-            liz.setLabel(label)
-
-            xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=(liz.getProperty('isPlayable') != 'true'))
-    xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
+    try:
+        workers, progress = get_progress()
+        for episode in progress:
+            log_utils.log('Episode: Sort Keys: Tile: |%s| Last Watched: |%s| Percent: |%s%%| Completed: |%s|' % (episode['show']['title'], episode['last_watched_at'], episode['percent_completed'], episode['completed']), xbmc.LOGDEBUG)
+            first_aired_utc = utils.iso_2_utc(episode['episode']['first_aired'])
+            if _SALTS.get_setting('show_unaired_next') == 'true' or first_aired_utc <= time.time():
+                show = episode['show']
+                fanart = show['images']['fanart']['full']
+                date = utils.make_day(utils.make_air_date(episode['episode']['first_aired']))
+    
+                menu_items = []
+                queries = {'mode': MODES.SEASONS, 'slug': show['ids']['slug'], 'fanart': fanart}
+                menu_items.append(('Browse Seasons', 'Container.Update(%s)' % (_SALTS.build_plugin_url(queries))),)
+    
+                liz, liz_url = make_episode_item(show, episode['episode'], menu_items=menu_items)
+                label = liz.getLabel()
+                label = '[[COLOR deeppink]%s[/COLOR]] %s - %s' % (date, show['title'], label.decode('utf-8', 'replace'))
+                liz.setLabel(label)
+    
+                xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=(liz.getProperty('isPlayable') != 'true'))
+        xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
+    finally:
+        utils.reap_workers(workers, None)
 
 @url_dispatcher.register(MODES.MANAGE_SUBS, ['section'])
 def manage_subscriptions(section):
