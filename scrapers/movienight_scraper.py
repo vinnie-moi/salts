@@ -62,7 +62,12 @@ class MovieNight_Scraper(scraper.Scraper):
             else:
                 page_quality = QUALITIES.HIGH
 
-            match = re.search('<iframe\s+src="([^"]+)', html)
+            match = re.search("onClick=\"javascript:replaceb64Text.*?,\s*'([^']+)", html)
+            if match:
+                html = match.group(1).decode('base-64').replace('&quot;', '"')
+                    
+            match = re.search('iframe\s+src="([^"]+)', html)
+                    
             if match:
                 url = match.group(1)
                 host = urlparse.urlsplit(url).hostname.lower()
