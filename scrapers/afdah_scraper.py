@@ -70,8 +70,11 @@ class Afdah_Scraper(scraper.Scraper):
                 r = re.search('{\s*write\("([^"]+)', embed_html)
                 if r:
                     plaintext = self._caesar(r.group(1), 13).decode('base-64')
+                    if 'http' not in plaintext:
+                        plaintext = self._caesar(r.group(1).decode('base-64'), 13).decode('base-64')
                 else:
                     plaintext = embed_html
+                print plaintext
                 hosters += self._get_links(plaintext)
             
             pattern = 'href="([^"]+)".*play_video.gif'
