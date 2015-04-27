@@ -20,13 +20,15 @@ import urllib
 import urlparse
 import re
 import xbmcaddon
+import xbmc
 import base64
 from salts_lib import GKDecrypter
+from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://zumvo.com'
+BASE_URL = 'http://zumvo.me'
 QUALITY_MAP = {'HD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW, 'BR-RIP': QUALITIES.HD, 'UNKNOWN': QUALITIES.MEDIUM, 'SD': QUALITIES.HIGH}
 
 
@@ -57,7 +59,7 @@ class Zumvo_Scraper(scraper.Scraper):
         hosters = []
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
-            html = self._http_get(url, cache_limit=.5)
+            html = self._http_get(url, cache_limit=0)
             quality = QUALITIES.LOW
             match = re.search('class="status">([^<]+)', html)
             if match:
@@ -70,7 +72,7 @@ class Zumvo_Scraper(scraper.Scraper):
 
             match = re.search('href="([^"]+)"\s*class="btn-watch"', html)
             if match:
-                html = self._http_get(match.group(1), cache_limit=.5)
+                html = self._http_get(match.group(1), cache_limit=0)
 
                 match = re.search('proxy\.link":\s*"([^"&]+)', html)
                 if match:
@@ -105,7 +107,7 @@ class Zumvo_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/search/')
         search_url += urllib.quote_plus(title)
-        html = self._http_get(search_url, cache_limit=.25)
+        html = self._http_get(search_url, cache_limit=0)
         results = []
         match = re.search('ul class="list-film"(.*?)</ul>', html, re.DOTALL)
         if match:
@@ -119,4 +121,10 @@ class Zumvo_Scraper(scraper.Scraper):
         return results
 
     def _http_get(self, url, cache_limit=8):
-        return super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
+        html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
+        match = re.search("document.cookie='([^']+)", html)
+        if match:
+            key, value = match.group(1).split('=')
+            log_utils.log('Setting Zumvo cookie: %s: %s' % (key, value), xbmc.LOGDEBUG)
+            html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies={key: value}, cache_limit=0)
+        return html
