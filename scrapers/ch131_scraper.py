@@ -69,7 +69,7 @@ class CH131_Scraper(scraper.Scraper):
         return super(CH131_Scraper, self)._default_get_url(video)
 
     def _get_episode_url(self, show_url, video):
-        episode_pattern = 'href="([^"]+season-%s-episode-%s-[^"]+)' % (video.season, video.episode)
+        episode_pattern = 'href="([^"]+s(?:eason-)?0?%s-e(?:pisode-)?0?%s-[^"]+)' % (video.season, video.episode)
         title_pattern = 'href="([^"]+season-\d+-episode-\d+-[^"]+)[^>]+>[^<]+Season \d+ Episode \d ([^<]+)'
         return super(CH131_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern)
 

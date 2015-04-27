@@ -23,7 +23,7 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://projectfreetv.ch'
+BASE_URL = 'http://projectfreetv.so'
 
 class PFTV_Scraper(scraper.Scraper):
     base_url = BASE_URL
