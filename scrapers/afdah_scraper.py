@@ -69,7 +69,7 @@ class Afdah_Scraper(scraper.Scraper):
                 embed_html = self._http_get(url, cache_limit=.5)
                 r = re.search('{\s*write\("([^"]+)', embed_html)
                 if r:
-                    plaintext = self._caesar(r.group(1).decode('base-64'), 13).decode('base-64')
+                    plaintext = self._caesar(r.group(1), 13).decode('base-64')
                 else:
                     plaintext = embed_html
                 hosters += self._get_links(plaintext)
