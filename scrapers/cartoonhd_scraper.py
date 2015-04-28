@@ -28,7 +28,7 @@ from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://www.cartoonhd.is'
+BASE_URL = 'http://www.cartoonhd.tv'
 
 class CartoonHD_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -94,7 +94,7 @@ class CartoonHD_Scraper(scraper.Scraper):
 
     def search(self, video_type, title, year):
         results = []
-        html = self. _http_get(self.base_url, cache_limit=.25)
+        html = self. _http_get(self.base_url, cache_limit=0)
         match = re.search("var\s+token\s*=\s*'([^']+)", html)
         if match:
             token = match.group(1)
@@ -113,7 +113,7 @@ class CartoonHD_Scraper(scraper.Scraper):
                 try:
                     js_data = json.loads(html)
                 except ValueError:
-                    log_utils.log('No JSON returned: %s' % (search_url), xbmc.LOGWARNING)
+                    log_utils.log('No JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
                 else:
                     for item in js_data:
                         if item['meta'].upper().startswith(media_type):
