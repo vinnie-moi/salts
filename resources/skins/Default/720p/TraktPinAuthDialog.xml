@@ -72,24 +72,6 @@ To authorize SALTS to access your trakt.tv account:
 				<shadowcolor>black</shadowcolor>
 			</control>
 		</control>
-		<control type="edit" id="1">
-			<description>PIN Edit Control</description>
-			<posx>30</posx>
-			<posy>240</posy>
-			<width>450</width>
-			<height>40</height>
-			<aligny>center</aligny>
-			<hinttext>Trakt.tv PIN</hinttext>
-			<font>font12</font>
-			<textoffsetx>10</textoffsetx>
-			<textcolor>white</textcolor>
-			<texturefocus>button-focus.png</texturefocus>
-			<texturenofocus>button-nofocus.png</texturenofocus>
-			<onup>202</onup>
-			<onleft>202</onleft>
-			<ondown>200</ondown>
-			<onright>200</onright>
-		</control>
         <control type="image">
             <description>QR Code</description>
             <posx>191</posx>
@@ -110,8 +92,6 @@ To authorize SALTS to access your trakt.tv account:
 				<aligny>center</aligny>
 				<label>Authorize</label>
 				<font>font12_title</font>
-				<onup>1</onup>
-				<onleft>1</onleft>
 				<ondown>201</ondown>
 				<onright>201</onright>
 			</control>
@@ -142,8 +122,6 @@ To authorize SALTS to access your trakt.tv account:
 				<font>font12_title</font>
 				<onup>201</onup>
 				<onleft>201</onleft>
-				<ondown>1</ondown>
-				<onright>1</onright>
 			</control>
 		</control>
 	</controls>

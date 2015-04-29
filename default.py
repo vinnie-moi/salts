@@ -40,29 +40,31 @@ from scrapers import ScraperVideo
 
 _SALTS = Addon('plugin.video.salts', sys.argv)
 ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
-username = _SALTS.get_setting('username')
-password = _SALTS.get_setting('password')
 TOKEN = _SALTS.get_setting('trakt_oauth_token')
 use_https = _SALTS.get_setting('use_https') == 'true'
 trakt_timeout = int(_SALTS.get_setting('trakt_timeout'))
 list_size = int(_SALTS.get_setting('list_size'))
 
-trakt_api = Trakt_API(username, password, TOKEN, use_https, list_size, trakt_timeout)
+trakt_api = Trakt_API(TOKEN, use_https, list_size, trakt_timeout)
 url_dispatcher = URL_Dispatcher()
 db_connection = DB_Connection()
 
 @url_dispatcher.register(MODES.MAIN)
 def main_menu():
     db_connection.init_database()
-    if not TOKEN:
-        gui_utils.get_pin()
-
     if _SALTS.get_setting('auto-disable') != DISABLE_SETTINGS.OFF:
         utils.do_disable_check()
 
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'}, img=utils.art('movies.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'}, img=utils.art('television.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.SETTINGS}, {'title': 'Settings'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+
+    if not TOKEN:
+        last_reminder = int(_SALTS.get_setting('last_reminder'))
+        now = int(time.time())
+        if last_reminder >= 0 and last_reminder < now - (24 * 60 * 60):
+            gui_utils.get_pin()
+            
     xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
 
 @url_dispatcher.register(MODES.SETTINGS)

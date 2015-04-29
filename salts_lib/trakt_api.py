@@ -41,28 +41,34 @@ class TransientTraktError(Exception):
 
 BASE_URL = 'api-v2launch.trakt.tv'
 V2_API_KEY = 'eb41e95243d8c95152ed72a1fc0394c93cb785cb33aed609fdde1a07454584b4'
+CLIENT_SECRET = '96611f3e712a37bd8d3cac9316c4643e0e5fd0a0c02b4eaf4bba8fd57024c72e'
+REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob'
 RESULTS_LIMIT = 10
 HIDDEN_SIZE = 100
 
 class Trakt_API():
-    def __init__(self, username, password, token=None, use_https=False, list_size=RESULTS_LIMIT, timeout=5):
-        self.username = username
-        self.password = password
+    def __init__(self, token=None, use_https=False, list_size=RESULTS_LIMIT, timeout=5):
         self.token = token
         self.protocol = 'https://' if use_https else 'http://'
         self.timeout = timeout
         self.list_size = list_size
 
-    def login(self):
-        url = '/auth/login'
-        if not self.username or not self.password: return ''
-        data = {'login': self.username, 'password': self.password}
-        response = self.__call_trakt(url, data, cached=False)
-        return response['token']
-
+    def get_token(self, pin=None, refresh_token=None):
+        url = '/oauth/token'
+        data = {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'redirect_uri': REDIRECT_URI}
+        if pin:
+            data['code'] = pin
+            data['grant_type'] = 'authorization_code'
+        elif refresh_token:
+            data['refresh_token'] = refresh_token
+            data['grant_type'] = 'refresh_token'
+        else:
+            raise TraktError('Must have either PIN or Refresh Token to get Oauth Token')
+        return self.__call_trakt(url, data=data, auth=False, cached=False)
+    
     def show_list(self, slug, section, username=None, cached=True):
         if not username:
-            username = self.username
+            username = 'me'
             cache_limit = 0  # don't cache user's own lists at all
             cached = False
         else:
@@ -79,18 +85,18 @@ class Trakt_API():
         return items
 
     def show_watchlist(self, section):
-        url = '/users/%s/watchlist/%s' % (self.username, TRAKT_SECTIONS[section])
+        url = '/users/me/watchlist/%s' % (TRAKT_SECTIONS[section])
         params = {'extended': 'full,images'}
         response = self.__call_trakt(url, params=params, cache_limit=0)
         return [item[TRAKT_SECTIONS[section][:-1]] for item in response]
 
     def get_list_header(self, slug, username=None):
-        if not username: username = self.username
+        if not username: username = 'me'
         url = '/users/%s/lists/%s' % (username, slug)
         return self.__call_trakt(url)
 
     def get_lists(self, username=None):
-        if not username: username = self.username
+        if not username: username = 'me'
         url = '/users/%s/lists' % (username)
         return self.__call_trakt(url, cache_limit=0)
 
@@ -215,7 +221,7 @@ class Trakt_API():
         return [item[TRAKT_SECTIONS[section][:-1]] for item in response]
 
     def get_collection(self, section, full=True, cached=True):
-        url = '/users/%s/collection/%s' % (self.username, TRAKT_SECTIONS[section])
+        url = '/users/me/collection/%s' % (TRAKT_SECTIONS[section])
         params = {'extended': 'full,images'} if full else None
         response = self.__call_trakt(url, params=params, cached=cached)
         return [item[TRAKT_SECTIONS[section][:-1]] for item in response]
@@ -285,7 +291,7 @@ class Trakt_API():
         return show
 
     def __manage_list(self, action, section, slug, items):
-        url = '/users/%s/lists/%s/items' % (self.username, slug)
+        url = '/users/me/lists/%s/items' % (slug)
         if action == 'remove': url = url + '/remove'
         if not isinstance(items, (list, tuple)): items = [items]
         data = self.__make_media_list_from_list(section, items)
@@ -328,7 +334,6 @@ class Trakt_API():
         db_cache_limit = cache_limit if cache_limit > 8 else 8
         json_data = json.dumps(data) if data else None
         headers = {'Content-Type': 'application/json', 'trakt-api-key': V2_API_KEY, 'trakt-api-version': 2}
-        if auth: headers.update({'trakt-user-login': self.username, 'trakt-user-token': self.token})
         url = '%s%s%s' % (self.protocol, BASE_URL, url)
         if params: url = url + '?' + urllib.urlencode(params)
         log_utils.log('Trakt Call: %s, header: %s, data: %s' % (url, headers, data), xbmc.LOGDEBUG)
@@ -339,9 +344,10 @@ class Trakt_API():
             result = cached_result
             log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
         else:
-            login_retry = False
+            auth_retry = False
             while True:
                 try:
+                    if auth: headers.update({'Authorization': 'Bearer %s' % (self.token)})
                     request = urllib2.Request(url, data=json_data, headers=headers)
                     f = urllib2.urlopen(request, timeout=self.timeout)
                     result = f.read()
@@ -363,12 +369,21 @@ class Trakt_API():
                             else:
                                 raise TransientTraktError('Temporary Trakt Error: ' + str(e))
                         elif e.code == 401 or e.code == 405:
-                            if login_retry or url.endswith('login'):
-                                raise TraktError('Login Failed. Incorrect userid/password? (%s)' % (e.code))
+                            if auth_retry or url.endswith('/token'):
+                                raise TraktError('Unauthorized Trakt Call (%s)' % (e.code))
                             else:
-                                self.token = self.login()
-                                xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_token', self.token)
-                                login_retry = True
+                                refresh_token = xbmcaddon.Addon('plugin.video.salts').getSetting('trakt_refresh_token')
+                                if refresh_token:
+                                    result = self.get_token(refresh_token=refresh_token)
+                                    try:
+                                        self.token = result['access_token']
+                                        xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', self.token)
+                                        xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', result['refresh_token'])
+                                    except KeyError:
+                                        raise TraktError('Token Refresh Failed (%s)' % (e.code))
+                                else:
+                                    raise TraktError('No Refresh Token Available (%s)' % (e.code))
+                                auth_retry = True
                         elif e.code == 404:
                             raise TraktNotFoundError()
                         else:
@@ -382,7 +397,7 @@ class Trakt_API():
                             raise TransientTraktError('Temporary Trakt Error: ' + str(e))
                     else:
                         raise TraktError('Trakt Error: ' + str(e))
-                else:
+                except:
                     raise
 
         response = json.loads(result)
