@@ -40,7 +40,7 @@
 	</category>
 
 	<category label="Trakt.tv">
-	    <setting id="get_pin" label="Authorize SALTS to access your trakt account" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close"/>
+	    <setting id="get_pin" label="How do I authorize SALTS to access my trakt.tv account?" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close"/>
 	    <setting id="use_https" type="bool" label="Use HTTPS" default="false"/>
 		<setting id="trakt_timeout" type="slider" label="Trakt Timeout (seconds) (0=No Limit)" default="30" range="0,120" option="int"/>
 		<setting id="list_size" type="slider" label="Trakt Page Size" default="30" range="1,100" option="int"/>

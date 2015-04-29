@@ -61,7 +61,7 @@
 				<height>150</height>
 				<font>font12_title</font>
 				<wrapmultiline>true</wrapmultiline>
-				<label>SALTS can be used without a trakt account, but to take full advantage of SALTS you should authorize it to access your trakt account.
+				<label>SALTS can be used without a trakt.tv account, but to take full advantage of SALTS you should authorize it to access your trakt.tv account.
 
 To authorize SALTS to access your trakt.tv account:
 1) Visit [COLOR blue]http://trakt.tv/pin/347[/COLOR] or scan the QR Code below
