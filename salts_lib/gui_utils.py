@@ -18,10 +18,13 @@
 import sys
 import xbmcgui
 import time
+import xbmc
+import os
 from trakt_api import Trakt_API
 from addon.common.addon import Addon
 
 _SALTS = Addon('plugin.video.salts', sys.argv)
+ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
 use_https = _SALTS.get_setting('use_https') == 'true'
 trakt_timeout = int(_SALTS.get_setting('trakt_timeout'))
 
@@ -37,6 +40,7 @@ def get_pin():
     class PinAuthDialog(xbmcgui.WindowXMLDialog):
         def onInit(self):
             self.pin_edit_control = self.__add_editcontrol(30, 240, 40, 450)
+            self.setFocus(self.pin_edit_control)
             auth = self.getControl(AUTH_BUTTON)
             never = self.getControl(NEVER_BUTTON)
             self.pin_edit_control.controlUp(never)
@@ -63,14 +67,20 @@ def get_pin():
 
         def onClick(self, control):
             #print 'onClick: %s' % (control)
+            self.auth = False
             if control == AUTH_BUTTON:
                 if not self.__get_token():
                     return
+                self.auth = True
 
             if control == LATER_BUTTON:
+                builtin = "XBMC.Notification(%s, You will be reminded in 24 hours, 5000, %s)" % (_SALTS.get_name(), ICON_PATH)
+                xbmc.executebuiltin(builtin)
                 _SALTS.set_setting('last_reminder', str(int(time.time())))
 
             if control == NEVER_BUTTON:
+                builtin = "XBMC.Notification(%s, Use Addon Settings later if you change your mind, 5000, %s)" % (_SALTS.get_name(), ICON_PATH)
+                xbmc.executebuiltin(builtin)
                 _SALTS.set_setting('last_reminder', '-1')
 
             if control in [AUTH_BUTTON, LATER_BUTTON, NEVER_BUTTON]:
@@ -101,3 +111,8 @@ def get_pin():
         
     dialog = PinAuthDialog('TraktPinAuthDialog.xml', _SALTS.get_path())
     dialog.doModal()
+    if dialog.auth:
+        builtin = "XBMC.Notification(%s, Trakt Authorization Complete, 3000, %s)" % (_SALTS.get_name(), ICON_PATH)
+        xbmc.executebuiltin(builtin)
+    del dialog
+

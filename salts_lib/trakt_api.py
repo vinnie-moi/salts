@@ -72,6 +72,7 @@ class Trakt_API():
             self.token = result['access_token']
             xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', self.token)
             xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', result['refresh_token'])
+            return result
         except KeyError:
             raise TraktError('Trakt Authentication Failed')
     
