@@ -118,6 +118,10 @@ def resolver_settings():
 def addon_settings():
     _SALTS.show_settings()
 
+@url_dispatcher.register(MODES.GET_PIN)
+def get_pin():
+    gui_utils.get_pin()
+
 @url_dispatcher.register(MODES.BROWSE, ['section'])
 def browse_menu(section):
     if section == SECTIONS.TV:
