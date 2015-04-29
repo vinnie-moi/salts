@@ -53,18 +53,27 @@ class Trakt_API():
         self.timeout = timeout
         self.list_size = list_size
 
-    def get_token(self, pin=None, refresh_token=None):
+    def get_token(self, pin=None):
         url = '/oauth/token'
         data = {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'redirect_uri': REDIRECT_URI}
         if pin:
             data['code'] = pin
             data['grant_type'] = 'authorization_code'
-        elif refresh_token:
-            data['refresh_token'] = refresh_token
-            data['grant_type'] = 'refresh_token'
         else:
-            raise TraktError('Must have either PIN or Refresh Token to get Oauth Token')
-        return self.__call_trakt(url, data=data, auth=False, cached=False)
+            refresh_token = xbmcaddon.Addon('plugin.video.salts').getSetting('trakt_refresh_token')
+            if refresh_token:
+                data['refresh_token'] = refresh_token
+                data['grant_type'] = 'refresh_token'
+            else:
+                raise TraktError('Can not refresh trakt oauth token. Attempt to reauthorize SALTS.')
+            
+        result = self.__call_trakt(url, data=data, auth=False, cached=False)
+        try:
+            self.token = result['access_token']
+            xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', self.token)
+            xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', result['refresh_token'])
+        except KeyError:
+            raise TraktError('Trakt Authentication Failed')
     
     def show_list(self, slug, section, username=None, cached=True):
         if not username:
@@ -372,17 +381,7 @@ class Trakt_API():
                             if auth_retry or url.endswith('/token'):
                                 raise TraktError('Trakt Call Authentication Failed (%s)' % (e.code))
                             else:
-                                refresh_token = xbmcaddon.Addon('plugin.video.salts').getSetting('trakt_refresh_token')
-                                if refresh_token:
-                                    result = self.get_token(refresh_token=refresh_token)
-                                    try:
-                                        self.token = result['access_token']
-                                        xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', self.token)
-                                        xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', result['refresh_token'])
-                                    except KeyError:
-                                        raise TraktError('Token Refresh Failed (%s)' % (e.code))
-                                else:
-                                    raise TraktError('No Refresh Token Available (%s)' % (e.code))
+                                result = self.get_token()
                                 auth_retry = True
                         elif e.code == 404:
                             raise TraktNotFoundError()
