@@ -28,10 +28,6 @@ SORT_FIELDS = [(SORT_LIST[int(ADDON.get_setting('sort1_field'))], SORT_SIGNS[ADD
                 (SORT_LIST[int(ADDON.get_setting('sort4_field'))], SORT_SIGNS[ADDON.get_setting('sort4_order')]),
                 (SORT_LIST[int(ADDON.get_setting('sort5_field'))], SORT_SIGNS[ADDON.get_setting('sort5_order')])]
 
-token = ADDON.get_setting('trakt_oath_token')
-use_https = ADDON.get_setting('use_https') == 'true'
-trakt_timeout = int(ADDON.get_setting('trakt_timeout'))
-list_size = int(ADDON.get_setting('list_size'))
 last_check = datetime.datetime.fromtimestamp(0)
 
 P_MODE = int(ADDON.get_setting('parallel_mode'))
@@ -50,6 +46,10 @@ elif P_MODE == P_MODES.PROCESSES:
         builtin = 'XBMC.Notification(%s,Process Mode not supported on this platform falling back to Thread Mode, 7500, %s)'
         xbmc.executebuiltin(builtin % (ADDON.get_name(), ICON_PATH))
 
+token = ADDON.get_setting('trakt_oauth_token')
+use_https = ADDON.get_setting('use_https') == 'true'
+trakt_timeout = int(ADDON.get_setting('trakt_timeout'))
+list_size = int(ADDON.get_setting('list_size'))
 trakt_api = Trakt_API(token, use_https, list_size, trakt_timeout)
 db_connection = DB_Connection()
 

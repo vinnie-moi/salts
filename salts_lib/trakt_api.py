@@ -65,7 +65,7 @@ class Trakt_API():
                 data['refresh_token'] = refresh_token
                 data['grant_type'] = 'refresh_token'
             else:
-                raise TraktError('Can not refresh trakt oauth token. Attempt to reauthorize SALTS.')
+                raise TraktError('Can not refresh trakt token. Attempt to reauthorize SALTS.')
             
         result = self.__call_trakt(url, data=data, auth=False, cached=False)
         try:
@@ -247,15 +247,14 @@ class Trakt_API():
 
     def get_hidden_progress(self, cached=True):
         url = '/users/hidden/progress_watched'
-        page = 1
+        params = {'type': 'show', 'limit': HIDDEN_SIZE, 'page': 1}
         length = -1
         result = []
         while length != 0 or length == HIDDEN_SIZE:
-            params = {'type': 'show', 'limit': HIDDEN_SIZE, 'page': page}
             hidden = self.__call_trakt(url, params=params, cached=cached)
             length = len(hidden)
             result += hidden
-            page += 1
+            params['page'] += 1
         return result
     
     def get_bookmarks(self):
@@ -345,7 +344,6 @@ class Trakt_API():
         headers = {'Content-Type': 'application/json', 'trakt-api-key': V2_API_KEY, 'trakt-api-version': 2}
         url = '%s%s%s' % (self.protocol, BASE_URL, url)
         if params: url = url + '?' + urllib.urlencode(params)
-        log_utils.log('Trakt Call: %s, header: %s, data: %s' % (url, headers, data), xbmc.LOGDEBUG)
 
         db_connection = DB_Connection()
         created, cached_result = db_connection.get_cached_url(url, db_cache_limit)
@@ -357,6 +355,7 @@ class Trakt_API():
             while True:
                 try:
                     if auth: headers.update({'Authorization': 'Bearer %s' % (self.token)})
+                    log_utils.log('Trakt Call: %s, header: %s, data: %s' % (url, headers, data), xbmc.LOGDEBUG)
                     request = urllib2.Request(url, data=json_data, headers=headers)
                     f = urllib2.urlopen(request, timeout=self.timeout)
                     result = f.read()
@@ -381,7 +380,7 @@ class Trakt_API():
                             if auth_retry or url.endswith('/token'):
                                 raise TraktError('Trakt Call Authentication Failed (%s)' % (e.code))
                             else:
-                                result = self.get_token()
+                                self.get_token()
                                 auth_retry = True
                         elif e.code == 404:
                             raise TraktNotFoundError()
