@@ -33,6 +33,7 @@ from salts_lib.srt_scraper import SRT_Scraper
 from salts_lib.trakt_api import Trakt_API, TransientTraktError, TraktNotFoundError, TraktError
 from salts_lib import utils
 from salts_lib import log_utils
+from salts_lib import gui_utils
 from salts_lib.constants import *
 from scrapers import *  # import all scrapers into this namespace
 from scrapers import ScraperVideo
@@ -41,7 +42,7 @@ _SALTS = Addon('plugin.video.salts', sys.argv)
 ICON_PATH = os.path.join(_SALTS.get_path(), 'icon.png')
 username = _SALTS.get_setting('username')
 password = _SALTS.get_setting('password')
-TOKEN = utils.get_trakt_token()
+TOKEN = _SALTS.get_setting('trakt_oauth_token')
 use_https = _SALTS.get_setting('use_https') == 'true'
 trakt_timeout = int(_SALTS.get_setting('trakt_timeout'))
 list_size = int(_SALTS.get_setting('list_size'))
@@ -54,16 +55,7 @@ db_connection = DB_Connection()
 def main_menu():
     db_connection.init_database()
     if not TOKEN:
-        remind_count = int(_SALTS.get_setting('remind_count'))
-        remind_max = 5
-        if remind_count < remind_max:
-            remind_count += 1
-            log_utils.log('Showing Config reminder')
-            builtin = 'XBMC.Notification(%s,(%s/%s) Configure Trakt Account for more options, 7500, %s)'
-            xbmc.executebuiltin(builtin % (_SALTS.get_name(), remind_count, remind_max, ICON_PATH))
-            _SALTS.set_setting('remind_count', str(remind_count))
-    else:
-        _SALTS.set_setting('remind_count', '0')
+        gui_utils.get_pin()
 
     if _SALTS.get_setting('auto-disable') != DISABLE_SETTINGS.OFF:
         utils.do_disable_check()
