@@ -370,7 +370,7 @@ class Trakt_API():
                                 raise TransientTraktError('Temporary Trakt Error: ' + str(e))
                         elif e.code == 401 or e.code == 405:
                             if auth_retry or url.endswith('/token'):
-                                raise TraktError('Unauthorized Trakt Call (%s)' % (e.code))
+                                raise TraktError('Trakt Call Authentication Failed (%s)' % (e.code))
                             else:
                                 refresh_token = xbmcaddon.Addon('plugin.video.salts').getSetting('trakt_refresh_token')
                                 if refresh_token:
