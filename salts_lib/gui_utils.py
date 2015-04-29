@@ -38,6 +38,8 @@ def get_pin():
     CENTER_X = 2
     
     class PinAuthDialog(xbmcgui.WindowXMLDialog):
+        auth = False
+        
         def onInit(self):
             self.pin_edit_control = self.__add_editcontrol(30, 240, 40, 450)
             self.setFocus(self.pin_edit_control)
@@ -67,7 +69,6 @@ def get_pin():
 
         def onClick(self, control):
             #print 'onClick: %s' % (control)
-            self.auth = False
             if control == AUTH_BUTTON:
                 if not self.__get_token():
                     return
@@ -115,4 +116,3 @@ def get_pin():
         builtin = "XBMC.Notification(%s, Trakt Authorization Complete, 3000, %s)" % (_SALTS.get_name(), ICON_PATH)
         xbmc.executebuiltin(builtin)
     del dialog
-

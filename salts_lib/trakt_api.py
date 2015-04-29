@@ -68,13 +68,10 @@ class Trakt_API():
                 raise TraktError('Can not refresh trakt token. Attempt to reauthorize SALTS.')
             
         result = self.__call_trakt(url, data=data, auth=False, cached=False)
-        try:
-            self.token = result['access_token']
-            xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', self.token)
-            xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', result['refresh_token'])
-            return result
-        except KeyError:
-            raise TraktError('Trakt Authentication Failed')
+        self.token = result['access_token']
+        xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', self.token)
+        xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', result['refresh_token'])
+        return True
     
     def show_list(self, slug, section, username=None, cached=True):
         if not username:
@@ -379,6 +376,9 @@ class Trakt_API():
                                 raise TransientTraktError('Temporary Trakt Error: ' + str(e))
                         elif e.code == 401 or e.code == 405:
                             if auth_retry or url.endswith('/token'):
+                                self.token = None
+                                xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', '')
+                                xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', '')
                                 raise TraktError('Trakt Call Authentication Failed (%s)' % (e.code))
                             else:
                                 self.get_token()
