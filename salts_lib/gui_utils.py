@@ -71,6 +71,8 @@ def get_pin():
             #print 'onClick: %s' % (control)
             if control == AUTH_BUTTON:
                 if not self.__get_token():
+                    builtin = "XBMC.Notification(%s, Trakt.tv PIN Authorization Failed, 5000, %s)" % (_SALTS.get_name(), ICON_PATH)
+                    xbmc.executebuiltin(builtin)
                     return
                 self.auth = True
 
@@ -90,13 +92,13 @@ def get_pin():
         def __get_token(self):
             pin = self.pin_edit_control.getText().strip()
             if pin:
-                trakt_api = Trakt_API(use_https=use_https, timeout=trakt_timeout)
-                result = trakt_api.get_token(pin=pin)
                 try:
+                    trakt_api = Trakt_API(use_https=use_https, timeout=trakt_timeout)
+                    result = trakt_api.get_token(pin=pin)
                     _SALTS.set_setting('trakt_oauth_token', result['access_token'])
                     _SALTS.set_setting('trakt_refresh_token', result['refresh_token'])
                     return True
-                except KeyError:
+                except:
                     return False
             return False
         
