@@ -71,8 +71,9 @@ def main_menu():
 def settings_menu():
     _SALTS.add_directory({'mode': MODES.SCRAPERS}, {'title': 'Scraper Sort Order'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.RES_SETTINGS}, {'title': 'Url Resolver Settings'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.GET_PIN}, {'title': 'Authorize SALTS to access my trakt.tv account'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.ADDON_SETTINGS}, {'title': 'Add-on Settings'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.AUTO_CONF}, {'title': 'Auto-Configure SALTS'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.GET_PIN}, {'title': 'Authorize SALTS to access my trakt.tv account'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.SHOW_VIEWS}, {'title': 'Set Default Views'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.BROWSE_URLS}, {'title': 'Remove Cached Url(s)'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -123,6 +124,31 @@ def addon_settings():
 def get_pin():
     gui_utils.get_pin()
 
+@url_dispatcher.register(MODES.AUTO_CONF)
+def auto_conf():
+    dialog = xbmcgui.Dialog()
+    line1 = 'This will set some settings to values that have been found to'
+    line2 = 'be effective. The following settings will be changed:'
+    line3 = 'Scraper Sort Order, Source Sorting, Calendar Start Day, Trakt Timeout, Scraper Timeout'
+    ret = dialog.yesno('SALTS', line1, line2, line3, 'Go Back', 'Continue')
+    if ret:
+        _SALTS.set_setting('trakt_timeout', '60')
+        _SALTS.set_setting('calendar-day', '-1')
+        _SALTS.set_setting('source_timeout', '20')
+        _SALTS.set_setting('enable_sort', 'true')
+        _SALTS.set_setting('sort1_field', '2')
+        _SALTS.set_setting('sort2_field', '5')
+        _SALTS.set_setting('sort3_field', '1')
+        _SALTS.set_setting('sort4_field', '3')
+        _SALTS.set_setting('sort5_field', '4')
+        sso = ['Local', 'DirectDownload.tv', 'VKBox', 'NoobRoom', 'movietv.to', 'stream-tv.co', 'streamallthis.is', 'GVCenter', 'hdtvshows.net', 'clickplay.to', 'IceFilms',
+               'ororo.tv', 'hdmz', 'niter.tv', 'yify.tv', 'MovieNight', 'cmz', 'viooz.ac', 'view47', 'MoviesHD', 'OnlineMovies', 'MoviesOnline7', 'wmo.ch', 'zumvo.com',
+               'alluc.com', 'MyVideoLinks.eu', 'OneClickWatch', 'RLSSource.net', 'TVRelease.Net', 'FilmStreaming.in', 'PrimeWire', 'CartoonHD', 'WatchFree.to', 'pftv',
+               'wso.ch', 'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131', 'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies',
+               'iStreamHD', 'afdah', 'filmikz.ch', 'movie25']
+        db_connection.set_setting('source_sort_order', '|'.join(sso))
+        
+    
 @url_dispatcher.register(MODES.BROWSE, ['section'])
 def browse_menu(section):
     if section == SECTIONS.TV:
