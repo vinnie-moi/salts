@@ -63,11 +63,11 @@ elif P_MODE == P_MODES.PROCESSES:
         builtin = 'XBMC.Notification(%s,Process Mode not supported on this platform falling back to Thread Mode, 7500, %s)'
         xbmc.executebuiltin(builtin % (ADDON.get_name(), ICON_PATH))
 
-token = ADDON.get_setting('trakt_oauth_token')
+TOKEN = ADDON.get_setting('trakt_oauth_token')
 use_https = ADDON.get_setting('use_https') == 'true'
 trakt_timeout = int(ADDON.get_setting('trakt_timeout'))
 list_size = int(ADDON.get_setting('list_size'))
-trakt_api = Trakt_API(token, use_https, list_size, trakt_timeout)
+trakt_api = Trakt_API(TOKEN, use_https, list_size, trakt_timeout)
 db_connection = DB_Connection()
 
 THEME_LIST = ['Shine', 'Luna_Blue', 'Iconic']
@@ -784,7 +784,7 @@ def get_current_view():
 
 def bookmark_exists(slug, season, episode):
     if ADDON.get_setting('trakt_bookmark') == 'true':
-        if token:
+        if TOKEN:
             bookmark = trakt_api.get_bookmark(slug, season, episode)
         else:
             bookmark = None
@@ -805,7 +805,7 @@ def get_resume_choice(slug, season, episode):
 
 def get_bookmark(slug, season, episode):
     if ADDON.get_setting('trakt_bookmark') == 'true':
-        if token:
+        if TOKEN:
             bookmark = trakt_api.get_bookmark(slug, season, episode)
         else:
             bookmark = None
