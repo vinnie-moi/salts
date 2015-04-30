@@ -129,7 +129,7 @@ def auto_conf():
     dialog = xbmcgui.Dialog()
     line1 = 'This will set some settings to values that have been found to'
     line2 = 'be effective. The following settings will be changed:'
-    line3 = 'Scraper Sort Order, Source Sorting, Calendar Start Day, Trakt Timeout, Scraper Timeout'
+    line3 = '[COLOR red]Scraper Sort Order, Source Sorting, Calendar Start Day, Trakt Timeout, Scraper Timeout[/COLOR]'
     ret = dialog.yesno('SALTS', line1, line2, line3, 'Go Back', 'Continue')
     if ret:
         _SALTS.set_setting('trakt_timeout', '60')
@@ -147,6 +147,8 @@ def auto_conf():
                'wso.ch', 'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131', 'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies',
                'iStreamHD', 'afdah', 'filmikz.ch', 'movie25']
         db_connection.set_setting('source_sort_order', '|'.join(sso))
+        builtin = "XBMC.Notification(%s,Auto-configure Complete, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
+        xbmc.executebuiltin(builtin)
         
     
 @url_dispatcher.register(MODES.BROWSE, ['section'])
