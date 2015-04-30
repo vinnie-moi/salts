@@ -767,7 +767,10 @@ def get_current_view():
 
 def bookmark_exists(slug, season, episode):
     if ADDON.get_setting('trakt_bookmark') == 'true':
-        bookmark = trakt_api.get_bookmark(slug, season, episode)
+        if token:
+            bookmark = trakt_api.get_bookmark(slug, season, episode)
+        else:
+            bookmark = None
         return bookmark is not None
     else:
         return db_connection.bookmark_exists(slug, season, episode)
@@ -785,7 +788,10 @@ def get_resume_choice(slug, season, episode):
 
 def get_bookmark(slug, season, episode):
     if ADDON.get_setting('trakt_bookmark') == 'true':
-        bookmark = trakt_api.get_bookmark(slug, season, episode)
+        if token:
+            bookmark = trakt_api.get_bookmark(slug, season, episode)
+        else:
+            bookmark = None
     else:
         bookmark = db_connection.get_bookmark(slug, season, episode)
     return bookmark
