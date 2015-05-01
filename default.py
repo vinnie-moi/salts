@@ -183,7 +183,7 @@ def browse_menu(section):
 #         if utils.menu_on('friends'): add_refresh_item({'mode': MODES.FRIENDS, 'section': section}, 'Friends Activity [COLOR red][I](Temporarily Broken)[/I][/COLOR]', utils.art('friends.png'), utils.art('fanart.jpg'))
     if utils.menu_on('search'): _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'}, img=utils.art(search_img), fanart=utils.art('fanart.jpg'))
     if utils.menu_on('search'): add_recent_search({'mode': MODES.RECENT_SEARCH, 'section': section}, utils.art(search_img))
-    if utils.menu_on('search'): _SALTS.add_directory({'mode': MODES.SAVED_SEARCHES, 'section': section}, {'title': 'Saved Searches'}, img=utils.art(search_img), fanart=utils.art('fanart.jpg'))
+    if utils.menu_on('search'): add_saved_search({'mode': MODES.SAVED_SEARCHES, 'section': section}, utils.art(search_img))
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def add_refresh_item(queries, label, thumb, fanart):
@@ -205,6 +205,15 @@ def add_recent_search(queries, thumb):
     liz.addContextMenuItems(menu_items)
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
     
+def add_saved_search(queries, thumb):
+    liz = xbmcgui.ListItem('Saved Searches', iconImage=thumb, thumbnailImage=thumb)
+    liz.setProperty('fanart_image', utils.art('fanart.jpg'))
+    menu_items = []
+    menu_queries = {'mode': MODES.CLEAR_SAVED, 'section': queries['section']}
+    menu_items.append(('Clear All Saved', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
+    liz.addContextMenuItems(menu_items)
+    xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
+
 @url_dispatcher.register(MODES.FORCE_REFRESH, ['refresh_mode'], ['section', 'slug', 'username'])
 def force_refresh(refresh_mode, section=None, slug=None, username=None):
     builtin = "XBMC.Notification(%s,Forcing Refresh, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
@@ -800,6 +809,14 @@ def save_search(section, query):
 def delete_search(search_id):
     db_connection.delete_search(search_id)
     xbmc.executebuiltin("XBMC.Container.Refresh")
+
+@url_dispatcher.register(MODES.CLEAR_SAVED, ['section'])
+def clear_saved(section):
+    for search in db_connection.get_searches(section):
+        db_connection.delete_search(search[0])
+
+    builtin = 'XBMC.Notification(%s,Saved %s Searches Cleared , 2500, %s)'
+    xbmc.executebuiltin(builtin % (_SALTS.get_name(), section, ICON_PATH))
 
 @url_dispatcher.register(MODES.SEARCH_RESULTS, ['section', 'query'], ['page'])
 def search_results(section, query, page=1):
