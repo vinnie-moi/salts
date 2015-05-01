@@ -182,8 +182,8 @@ def browse_menu(section):
 #     if TOKEN:
 #         if utils.menu_on('friends'): add_refresh_item({'mode': MODES.FRIENDS, 'section': section}, 'Friends Activity [COLOR red][I](Temporarily Broken)[/I][/COLOR]', utils.art('friends.png'), utils.art('fanart.jpg'))
     if utils.menu_on('search'): _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': 'Search'}, img=utils.art(search_img), fanart=utils.art('fanart.jpg'))
-    if utils.menu_on('search'): add_recent_search({'mode': MODES.RECENT_SEARCH, 'section': section}, utils.art(search_img))
-    if utils.menu_on('search'): add_saved_search({'mode': MODES.SAVED_SEARCHES, 'section': section}, utils.art(search_img))
+    if utils.menu_on('search'): add_search_item({'mode': MODES.RECENT_SEARCH, 'section': section}, utils.art(search_img), 'Recent Searches', MODES.CLEAR_RECENT)
+    if utils.menu_on('search'): add_search_item({'mode': MODES.SAVED_SEARCHES, 'section': section}, utils.art(search_img), 'Saved Searches', MODES.CLEAR_SAVED)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def add_refresh_item(queries, label, thumb, fanart):
@@ -196,24 +196,15 @@ def add_refresh_item(queries, label, thumb, fanart):
     liz.addContextMenuItems(menu_items)
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
 
-def add_recent_search(queries, thumb):
-    liz = xbmcgui.ListItem('Recent Searches', iconImage=thumb, thumbnailImage=thumb)
+def add_search_item(queries, thumb, title, clear_mode):
+    liz = xbmcgui.ListItem(title, iconImage=thumb, thumbnailImage=thumb)
     liz.setProperty('fanart_image', utils.art('fanart.jpg'))
     menu_items = []
-    menu_queries = {'mode': MODES.CLEAR_RECENT, 'section': queries['section']}
-    menu_items.append(('Clear All Recent', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
+    menu_queries = {'mode': clear_mode, 'section': queries['section']}
+    menu_items.append(('Clear All %s' % (title), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
     liz.addContextMenuItems(menu_items)
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
     
-def add_saved_search(queries, thumb):
-    liz = xbmcgui.ListItem('Saved Searches', iconImage=thumb, thumbnailImage=thumb)
-    liz.setProperty('fanart_image', utils.art('fanart.jpg'))
-    menu_items = []
-    menu_queries = {'mode': MODES.CLEAR_SAVED, 'section': queries['section']}
-    menu_items.append(('Clear All Saved', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
-    liz.addContextMenuItems(menu_items)
-    xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
-
 @url_dispatcher.register(MODES.FORCE_REFRESH, ['refresh_mode'], ['section', 'slug', 'username'])
 def force_refresh(refresh_mode, section=None, slug=None, username=None):
     builtin = "XBMC.Notification(%s,Forcing Refresh, 2000, %s)" % (_SALTS.get_name(), ICON_PATH)
