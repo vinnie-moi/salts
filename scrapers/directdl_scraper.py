@@ -28,12 +28,12 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://directdownload.tv'
-LOGOUT = 'href="/index/logout"'
-SEARCH_URL = '/index/search/keyword/%s/qualities/%s/from/0/search'
+SEARCH_URL = '/api?key=%s&%s&keyword=%s'
+API_KEY = 'AFBF8E33A19787D1'
 
-Q_ORDER = ['pdtv', 'dsr', 'dvdrip', 'hdtv', 'realhd', 'webdl', 'webdl1080p']
+Q_ORDER = ['PDTV', 'DSR', 'DVDRIP', 'HDTV', '720P', 'WEBDL', 'WEBDL1080P']
 Q_DICT = dict((quality, i) for i, quality in enumerate(Q_ORDER))
-QUALITY_MAP = {'pdtv': QUALITIES.MEDIUM, 'dsr': QUALITIES.MEDIUM, 'dvdrip': QUALITIES.HIGH, 'hdtv': QUALITIES.HIGH, 'realhd': QUALITIES.HD, 'webdl': QUALITIES.HD, 'webdl1080p': QUALITIES.HD}
+QUALITY_MAP = {'PDTV': QUALITIES.MEDIUM, 'DSR': QUALITIES.MEDIUM, 'DVDRIP': QUALITIES.HIGH, 'HDTV': QUALITIES.HIGH, '720P': QUALITIES.HD, 'WEBDL': QUALITIES.HD, 'WEBDL1080P': QUALITIES.HD}
 
 class DirectDownload_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -81,14 +81,15 @@ class DirectDownload_Scraper(scraper.Scraper):
                         continue
                     
                     if result['quality'] in match_quality:
-                        for link in result['links']:
-                            if re.search('\.rar(\.|$)', link['url']):
+                        for key in result['links']:
+                            url = result['links'][key][0]
+                            if re.search('\.rar(\.|$)', url):
                                 continue
                             
                             # validate url since host validation fails for real-debrid; mark links direct to avoid unusable check
-                            if urlresolver.HostedMediaFile(link['url']):
-                                hostname = urlparse.urlparse(link['url']).hostname
-                                hoster = {'multi-part': False, 'class': self, 'views': None, 'url': link['url'], 'rating': None, 'host': hostname,
+                            if urlresolver.HostedMediaFile(url):
+                                hostname = urlparse.urlparse(url).hostname
+                                hoster = {'multi-part': False, 'class': self, 'views': None, 'url': url, 'rating': None, 'host': hostname,
                                         'quality': QUALITY_MAP[result['quality']], 'dd_qual': result['quality'], 'direct': True}
                                 hosters.append(hoster)
 
@@ -124,9 +125,6 @@ class DirectDownload_Scraper(scraper.Scraper):
     def get_settings(cls):
         settings = super(DirectDownload_Scraper, cls).get_settings()
         settings = cls._disable_sub_check(settings)
-        name = cls.get_name()
-        settings.append('         <setting id="%s-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>' % (name))
-        settings.append('         <setting id="%s-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>' % (name))
         return settings
 
     def search(self, video_type, title, year):
@@ -143,38 +141,17 @@ class DirectDownload_Scraper(scraper.Scraper):
         return results
 
     def _http_get(self, url, data=None, cache_limit=8):
-        # return all uncached blank pages if no user or pass
-        if not self.username or not self.password:
-            return ''
-
         if 'search?query' in url:
             log_utils.log('Translating Search Url: %s' % (url), xbmc.LOGDEBUG)
             url = self.__translate_search(url)
 
-        html = super(DirectDownload_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
-
-        fake = None
-        try:
-            js_result = json.loads(html)
-            fake = False
-            fake = js_result[0]['fake']
-        except: pass
-
-        if fake or (fake is None and not re.search(LOGOUT, html)):
-            log_utils.log('Logging in for url (%s)' % (url), xbmc.LOGDEBUG)
-            self.__login()
-            html = super(DirectDownload_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
-
-        return html
+        return super(DirectDownload_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
 
     def __translate_search(self, url):
         query = urlparse.parse_qs(urlparse.urlparse(url).query)
-        quality = re.sub('\s', '', query['quality'][0]) if 'quality' in query else ','.join(Q_ORDER)
-        return urlparse.urljoin(self.base_url, (SEARCH_URL % (urllib.quote(query['query'][0]), quality)))
-
-    def __login(self):
-        url = self.base_url
-        data = {'username': self.username, 'password': self.password, 'Login': 'Login'}
-        html = super(DirectDownload_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
-        if not re.search(LOGOUT, html):
-            raise Exception('directdownload.tv login failed')
+        if 'quality' in query:
+            q_list = re.sub('\s', '', query['quality'][0].upper()).split(',')
+        else:
+            q_list = Q_ORDER
+        quality = '&'.join(['quality[]=%s' % (q) for q in q_list])
+        return urlparse.urljoin(self.base_url, (SEARCH_URL % (API_KEY, quality, urllib.quote_plus(query['query'][0]))))
