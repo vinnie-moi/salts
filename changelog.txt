@@ -1,4 +1,17 @@
-[B]Version 1.0.0~beta7[/B]
+[B]Version 1.0.0~beta9[/B]
+- Add trakt.tv PIN auth
+- Add auto-config option
+- Add ability to clear all saved searches
+- Migrate directdownload.tv scraper to API
+- Fix movienight scraper
+- Fix zumvo
+- Fix afdah scraper
+- Fix pftv scraper
+- Fix ch131 scraper
+- Improve cartoonhd scraper
+- Fix trakt bookmarks when no token
+
+[B]Version 1.0.0~beta8[/B]
 - Add hidden progress
 - Improve vkbox scraper
 
