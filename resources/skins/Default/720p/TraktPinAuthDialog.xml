@@ -35,7 +35,7 @@
 				<label>Trakt Account Authorization</label>
 				<align>center</align>
 				<aligny>center</aligny>
-				<textcolor>selected</textcolor>
+				<textcolor>darkorange</textcolor>
 				<shadowcolor>black</shadowcolor>
 			</control>
 			<control type="button">
