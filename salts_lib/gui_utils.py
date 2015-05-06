@@ -104,8 +104,9 @@ def get_pin():
         
         # have to add edit controls programatically because getControl() (hard) crashes XBMC on them
         def __add_editcontrol(self, x, y, height, width):
-            temp = xbmcgui.ControlEdit(0, 0, 0, 0, '', font='font12', textColor='0xFFFFFFFF', focusTexture='button-focus2.png',
-                                       noFocusTexture='button-nofocus.png', _alignment=CENTER_Y | CENTER_X)
+            media_path = os.path.join(_SALTS.get_path(), 'resources', 'skins', 'Default', 'media')
+            temp = xbmcgui.ControlEdit(0, 0, 0, 0, '', font='font12', textColor='0xFFFFFFFF', focusTexture=os.path.join(media_path, 'button-focus2.png'),
+                                       noFocusTexture=os.path.join(media_path, 'button-nofocus.png'), _alignment=CENTER_Y | CENTER_X)
             temp.setPosition(x, y)
             temp.setHeight(height)
             temp.setWidth(width)
