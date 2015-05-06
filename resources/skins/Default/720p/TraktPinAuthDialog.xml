@@ -85,25 +85,27 @@ SALTS can be used without a trakt.tv account, but to take full advantage of SALT
 				<description>Authorize Button</description>
 				<posx>30</posx>
 				<posy>460</posy>
-				<width>140</width>
+				<width>130</width>
 				<height>40</height>
 				<align>center</align>
 				<aligny>center</aligny>
 				<label>Authorize</label>
 				<font>font12_title</font>
+				<textoffsetx>10</textoffsetx>
 				<ondown>201</ondown>
 				<onright>201</onright>
 			</control>
 			<control type="button" id="201">
 				<description>Later Button</description>
-				<posx>180</posx>
+				<posx>170</posx>
 				<posy>460</posy>
-				<width>150</width>
+				<width>170</width>
 				<height>40</height>
 				<align>center</align>
 				<aligny>center</aligny>
 				<label>Remind Me Later</label>
 				<font>font12_title</font>
+				<textoffsetx>10</textoffsetx>
 				<onup>200</onup>
 				<onleft>200</onleft>
 				<ondown>202</ondown>
@@ -111,14 +113,15 @@ SALTS can be used without a trakt.tv account, but to take full advantage of SALT
 			</control>
 			<control type="button" id="202">
 				<description>Never Button</description>
-				<posx>340</posx>
+				<posx>350</posx>
 				<posy>460</posy>
-				<width>140</width>
+				<width>130</width>
 				<height>40</height>
 				<align>center</align>
 				<aligny>center</aligny>
 				<label>No Thanks</label>
 				<font>font12_title</font>
+				<textoffsetx>10</textoffsetx>
 				<onup>201</onup>
 				<onleft>201</onleft>
 			</control>
