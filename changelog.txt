@@ -1,3 +1,6 @@
+[B]Version 1.0.0~beta10[/B]
+- Improvements to PIN Dialog
+
 [B]Version 1.0.0~beta9[/B]
 - Add trakt.tv PIN auth
 - Add auto-config option
