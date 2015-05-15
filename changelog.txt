@@ -1,3 +1,6 @@
+[B]Version 1.0.0[/B]
+- Minor PIN Dialog improvements
+
 [B]Version 1.0.0~beta10[/B]
 - Improvements to PIN Dialog
 
