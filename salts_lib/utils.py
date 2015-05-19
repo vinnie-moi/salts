@@ -77,6 +77,7 @@ if xbmc.getCondVisibility('System.HasAddon(script.salts.themepak)'):
 else:
     themepak_path = ADDON.get_path()
 THEME_PATH = os.path.join(themepak_path, 'art', 'themes', THEME)
+PLACE_POSTER = os.path.join(ADDON.get_path(), 'art', 'place_poster.png')
 
 def art(name):
     return os.path.join(THEME_PATH, name)

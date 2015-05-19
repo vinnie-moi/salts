@@ -77,5 +77,4 @@ HOST_Q[QUALITIES.HD] = ['thefile', 'sharesix', 'mightyupload', 'filenuke', 'huge
 
 Q_ORDER = {QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD: 4}
 
-PLACE_POSTER = 'http://trakt.tv/assets/placeholders/medium/poster-18881023d1e4a11a82fb8e39e2c1559e.png'
 IMG_SIZES = ['full', 'medium', 'thumb']
