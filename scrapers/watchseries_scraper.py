@@ -51,7 +51,7 @@ class WS_Scraper(scraper.Scraper):
             return match.group(1)
 
     def format_source_label(self, item):
-        return '[%s] %s' % (item['quality'], item['host'])
+        return '[%s] %s (%s/100)' % (item['quality'], item['host'], item['rating'])
 
     def get_sources(self, video):
         source_url = self.get_url(video)
@@ -60,7 +60,7 @@ class WS_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             try:
-                match = re.search('English Links -.*?</tbody>\s*</table>', html, re.DOTALL)
+                match = re.search('>English Audio.*?</tbody>\s*</table>', html, re.DOTALL)
                 if match:
                     fragment = match.group(0)
                     pattern = 'href\s*=\s*"([^"]*)"\s+class\s*=\s*"buttonlink"\s+title\s*=([^\s]*).*?<span class="percent"[^>]+>\s+(\d+)%\s+</span>'
@@ -68,7 +68,6 @@ class WS_Scraper(scraper.Scraper):
                         url, host, rating = match.groups()
                         source = {'multi-part': False, 'url': url, 'host': host, 'quality': self._get_quality(video, host, QUALITIES.HIGH), 'class': self, 'views': None, 'direct': False}
                         source['rating'] = int(rating)
-                        if source['rating'] == 60: source['rating'] = None  # rating seems to default to 60, so force to Unknown
                         sources.append(source)
             except Exception as e:
                 log_utils.log('Failure During %s get sources: %s' % (self.get_name(), str(e)))
