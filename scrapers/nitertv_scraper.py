@@ -103,7 +103,7 @@ class Niter_Scraper(scraper.Scraper):
 
             for match in re.finditer('pic=([^&<]+)', html):
                 video_id = match.group(1)
-                hoster = {'multi-part': False, 'host': 'niter.tv', 'class': self, 'quality': QUALITIES.HD, 'views': None, 'rating': None, 'url': video_id, 'direct': True}
+                hoster = {'multi-part': False, 'host': 'niter.tv', 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'url': video_id, 'direct': True}
                 hosters.append(hoster)
         return hosters
 

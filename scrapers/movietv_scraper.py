@@ -64,7 +64,7 @@ class MovieTV_Scraper(scraper.Scraper):
                     html = '{"url":"%s"}' % (match.group(1))
                 else:
                     return hosters
-                quality = QUALITIES.HD
+                quality = QUALITIES.HD720
             else:
                 quality = QUALITIES.HIGH
 

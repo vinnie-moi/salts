@@ -81,7 +81,7 @@ class VKBox_Scraper(scraper.Scraper):
                     for lang in langs:
                         if lang['lang'] == 'en':
                             stream_url = STREAM_URL % (str(int(lang['apple']) + magic_num), str(int(lang['google']) + magic_num), lang['microsoft'])
-                            hoster = {'multi-part': False, 'url': stream_url, 'host': 'vk.com', 'class': self, 'quality': QUALITIES.HD, 'views': None, 'rating': None, 'direct': False}
+                            hoster = {'multi-part': False, 'url': stream_url, 'host': 'vk.com', 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'direct': False}
                             hosters.append(hoster)
                             break
                     else:

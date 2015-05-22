@@ -64,7 +64,7 @@ class ClickPlay_Scraper(scraper.Scraper):
                 proxy_link = proxy_link.split('*', 1)[-1]
                 stream_url = GKDecrypter.decrypter(198, 128).decrypt(proxy_link, base64.urlsafe_b64decode('bW5pcUpUcUJVOFozS1FVZWpTb00='), 'ECB').split('\0')[0]
                 if 'vk.com' in stream_url.lower():
-                    hoster = {'multi-part': False, 'host': 'vk.com', 'class': self, 'url': stream_url, 'quality': QUALITIES.HD, 'views': None, 'rating': None, 'direct': False}
+                    hoster = {'multi-part': False, 'host': 'vk.com', 'class': self, 'url': stream_url, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'direct': False}
                     hosters.append(hoster)
                 elif 'picasaweb' in stream_url.lower():
                     html = self._http_get(stream_url, cache_limit=.5)

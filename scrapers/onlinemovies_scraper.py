@@ -29,7 +29,8 @@ BASE_URL = 'http://onlinemovies.pro'
 QUALITY_MAP = {}
 QUALITY_MAP[QUALITIES.LOW] = ['CAM']
 QUALITY_MAP[QUALITIES.HIGH] = ['HDRIP']
-QUALITY_MAP[QUALITIES.HD] = ['720', '1080', 'BLURAY']
+QUALITY_MAP[QUALITIES.HD720] = ['720', 'BLURAY']
+QUALITY_MAP[QUALITIES.HD1080] = ['1080']
 
 class OnlineMovies_Scraper(scraper.Scraper):
     base_url = BASE_URL

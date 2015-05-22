@@ -27,9 +27,7 @@ from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-QUALITY_MAP = {'HD 720P': QUALITIES.HD, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH, 'DVD SCREENER': QUALITIES.HIGH}
-# BROKEN_RESOLVERS = ['180UPLOAD', 'HUGEFILES', 'VIDPLAY']
-BROKEN_RESOLVERS = []
+QUALITY_MAP = {'HD 720P': QUALITIES.HD720, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH, 'DVD SCREENER': QUALITIES.HIGH}
 BASE_URL = 'http://www.icefilms.info'
 
 class IceFilms_Scraper(scraper.Scraper):
@@ -56,8 +54,6 @@ class IceFilms_Scraper(scraper.Scraper):
         match = re.search('url=(.*)', html)
         if match:
             url = urllib.unquote_plus(match.group(1))
-            if url.upper() in BROKEN_RESOLVERS:
-                url = None
             return url
 
     def format_source_label(self, item):
@@ -99,8 +95,6 @@ class IceFilms_Scraper(scraper.Scraper):
                         source = {'multi-part': False, 'quality': quality, 'class': self, 'label': label, 'rating': None, 'views': None, 'direct': False}
                         host = re.sub('(<[^>]+>|</span>)', '', host_fragment)
                         source['host'] = host.lower()
-                        if host.upper() in BROKEN_RESOLVERS:
-                            continue
 
                         url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=999&iqs=&url=&m=-999&cap=&sec=%s&t=%s' % (link_id, secret, t)
                         source['url'] = url

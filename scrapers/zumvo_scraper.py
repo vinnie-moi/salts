@@ -29,7 +29,7 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://zumvo.me'
-QUALITY_MAP = {'HD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW, 'BR-RIP': QUALITIES.HD, 'UNKNOWN': QUALITIES.MEDIUM, 'SD': QUALITIES.HIGH}
+QUALITY_MAP = {'HD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW, 'BR-RIP': QUALITIES.HD720, 'UNKNOWN': QUALITIES.MEDIUM, 'SD': QUALITIES.HIGH}
 
 
 class Zumvo_Scraper(scraper.Scraper):

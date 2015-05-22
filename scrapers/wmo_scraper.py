@@ -26,7 +26,6 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://watchmovies-online.ch'
-QUALITY_MAP = {'HD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW, 'BR-RIP': QUALITIES.HD, 'UNKNOWN': QUALITIES.MEDIUM, 'DVD-RIP': QUALITIES.HIGH, '1080P BLURAY': QUALITIES.HD}
 
 class WMO_Scraper(scraper.Scraper):
     base_url = BASE_URL

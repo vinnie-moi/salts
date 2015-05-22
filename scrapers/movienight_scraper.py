@@ -25,7 +25,7 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://movienight.ws'
-QUALITY_MAP = {'SD': QUALITIES.HIGH, 'HD': QUALITIES.HD}
+QUALITY_MAP = {'SD': QUALITIES.HIGH, 'HD': QUALITIES.HD720}
 
 class MovieNight_Scraper(scraper.Scraper):
     base_url = BASE_URL

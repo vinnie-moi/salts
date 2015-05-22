@@ -62,7 +62,7 @@ class MoviesHD_Scraper(scraper.Scraper):
             if match:
                 hash_url = match.group(1)
                 if hash_url.startswith('//'): hash_url = 'http:' + hash_url
-                hoster = {'multi-part': False, 'url': hash_url, 'host': 'videomega.tv', 'class': self, 'quality': QUALITIES.HD, 'views': None, 'rating': None, 'up': None, 'down': None, 'direct': False}
+                hoster = {'multi-part': False, 'url': hash_url, 'host': 'videomega.tv', 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'up': None, 'down': None, 'direct': False}
                 match = re.search('class="rating">([^%]+).*?class="nb-votes">(\d+)', html, re.DOTALL)
                 if match:
                     rating, votes = match.groups()

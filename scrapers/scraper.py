@@ -437,19 +437,16 @@ class Scraper(object):
                     best_result = results[0]
                 else:
                     best_qorder = 0
-                    best_qstr = ''
                     for result in results:
                         match = re.search('\[(.*)\]$', result['title'])
                         if match:
                             q_str = match.group(1)
                             quality = self._blog_get_quality(video, q_str, '')
                             # print 'result: |%s|%s|%s|%s|' % (result, q_str, quality, Q_ORDER[quality])
-                            if Q_ORDER[quality] >= best_qorder:
-                                if Q_ORDER[quality] > best_qorder or (quality == QUALITIES.HD and '1080' in q_str and '1080' not in best_qstr):
-                                    # print 'Setting best as: |%s|%s|%s|%s|' % (result, q_str, quality, Q_ORDER[quality])
-                                    best_qstr = q_str
-                                    best_result = result
-                                    best_qorder = Q_ORDER[quality]
+                            if Q_ORDER[quality] > best_qorder:
+                                # print 'Setting best as: |%s|%s|%s|%s|' % (result, q_str, quality, Q_ORDER[quality])
+                                best_result = result
+                                best_qorder = Q_ORDER[quality]
 
                 url = best_result['url']
                 self.db_connection.set_related_url(video.video_type, video.title, video.year, self.get_name(), url)
@@ -497,8 +494,10 @@ class Scraper(object):
 
     def _width_get_quality(self, width):
         width = int(width)
-        if width >= 1280:
-            quality = QUALITIES.HD
+        if width > 1280:
+            quality = QUALITIES.HD1080
+        elif width > 800:
+            quality = QUALITIES.HD720
         elif width > 640:
             quality = QUALITIES.HIGH
         elif width > 320:
@@ -509,8 +508,10 @@ class Scraper(object):
 
     def _height_get_quality(self, height):
         height = int(height)
-        if height > 480:
-            quality = QUALITIES.HD
+        if height > 800:
+            quality = QUALITIES.HD1080
+        elif height > 480:
+            quality = QUALITIES.HD720
         elif height >= 400:
             quality = QUALITIES.HIGH
         elif height > 200:

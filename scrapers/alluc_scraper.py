@@ -38,7 +38,8 @@ QUALITY_MAP = {
                QUALITIES.LOW: ['DVDSCR', 'CAMRIP', 'HDCAM'],
                QUALITIES.MEDIUM: [],
                QUALITIES.HIGH: ['BDRIP', 'BRRIP', 'HDRIP'],
-               QUALITIES.HD: ['720P', '1080P']}
+               QUALITIES.HD720: ['720P'],
+               QUALITIES.HD1080: ['1080P']}
 
 class Alluc_Scraper(scraper.Scraper):
     base_url = BASE_URL

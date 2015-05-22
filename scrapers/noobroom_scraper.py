@@ -65,7 +65,7 @@ class NoobRoom_Scraper(scraper.Scraper):
             return response.geturl()
 
     def format_source_label(self, item):
-        label = '[%s] (%s) %s (%s/100) ' % (item['quality'], item['res'], item['host'], item['rating'])
+        label = '[%s] %s (%s/100) ' % (item['quality'], item['host'], item['rating'])
         return label
 
     def get_sources(self, video):
@@ -81,7 +81,7 @@ class NoobRoom_Scraper(scraper.Scraper):
                 has_1080p = True
 
             if video.video_type == VIDEO_TYPES.MOVIE:
-                quality = QUALITIES.HD
+                quality = QUALITIES.HD720
             else:
                 quality = QUALITIES.HIGH
 
@@ -92,16 +92,12 @@ class NoobRoom_Scraper(scraper.Scraper):
 
                 url = url.replace('&amp;', '&')
                 host = '%s (%s)' % (host, status)
-                hoster = {'multi-part': False, 'host': host, 'class': self, 'url': url, 'quality': quality, 'views': None, 'rating': 100 - int(load), 'direct': True, 'res': '720p'}
-                if quality == QUALITIES.HD:
-                    hoster['res'] = '720p'
-                else:
-                    hoster['res'] = '480p'
+                hoster = {'multi-part': False, 'host': host, 'class': self, 'url': url, 'quality': quality, 'views': None, 'rating': 100 - int(load), 'direct': True}
                 hosters.append(hoster)
 
                 if self.include_paid and has_1080p:
                     url += '&hd=1'
-                    hoster = {'multi-part': False, 'host': host, 'class': self, 'url': url, 'quality': QUALITIES.HD, 'views': None, 'rating': 100 - int(load), 'direct': True, 'res': '1080p'}
+                    hoster = {'multi-part': False, 'host': host, 'class': self, 'url': url, 'quality': QUALITIES.HD1080, 'views': None, 'rating': 100 - int(load), 'direct': True}
                     hosters.append(hoster)
         return hosters
 

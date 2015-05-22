@@ -68,7 +68,7 @@ class IStreamHD_Scraper(scraper.Scraper):
             hoster = {'multi-part': False, 'class': self, 'rating': None, 'host': 'vk.com', 'direct': False}
             # episodes seem to be consistently available in HD, but movies only in SD
             if video.video_type == VIDEO_TYPES.EPISODE:
-                hoster['quality'] = QUALITIES.HD
+                hoster['quality'] = QUALITIES.HD720
             else:
                 hoster['quality'] = QUALITIES.HIGH
             match = re.search('Views</strong>:\s+(\d+)\s+', html, re.I)
