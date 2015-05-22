@@ -327,7 +327,7 @@ def filter_quality(video_type, hosters):
     if qual_filter == 0:
         return hosters
     elif qual_filter == 1:
-        keep_qual = [QUALITIES.HD]
+        keep_qual = [QUALITIES.HD720, QUALITIES.HD1080]
     else:
         keep_qual = [QUALITIES.LOW, QUALITIES.MEDIUM, QUALITIES.HIGH]
 

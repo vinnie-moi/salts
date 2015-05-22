@@ -38,7 +38,7 @@ CONTENT_TYPES = __enum(TVSHOWS='tvshows', MOVIES='movies', SEASONS='seasons', EP
 TRAKT_SECTIONS = {SECTIONS.TV: 'shows', SECTIONS.MOVIES: 'movies'}
 TRAKT_SORT = __enum(TITLE='title', ACTIVITY='activity', MOST_COMPLETED='most-completed', LEAST_COMPLETED='least-completed', RECENTLY_AIRED='recently-aired', PREVIOUSLY_AIRED='previously-aired')
 SORT_MAP = [TRAKT_SORT.ACTIVITY, TRAKT_SORT.TITLE, TRAKT_SORT.MOST_COMPLETED, TRAKT_SORT.LEAST_COMPLETED, TRAKT_SORT.RECENTLY_AIRED, TRAKT_SORT.PREVIOUSLY_AIRED]
-QUALITIES = __enum(LOW='Low', MEDIUM='Medium', HIGH='High', HD='HD')
+QUALITIES = __enum(LOW='Low', MEDIUM='Medium', HIGH='High', HD720='720P HD', HD1080='1080P HD')
 DIRS = __enum(UP='up', DOWN='down')
 P_MODES = __enum(THREADS=0, PROCESSES=1, NONE=2)
 WATCHLIST_SLUG = 'watchlist_slug'
@@ -52,7 +52,7 @@ PROGRESS = __enum(OFF=0, WINDOW=1, BACKGROUND=2)
 # sort keys need to be defined such that "best" have highest values
 # unknown (i.e. None) is always worst
 SORT_KEYS = {}
-SORT_KEYS['quality'] = {None: 0, QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD: 4}
+SORT_KEYS['quality'] = {None: 0, QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD720: 4, QUALITIES.HD1080: 5}
 SORT_LIST = ['none', 'source', 'quality', 'views', 'rating', 'direct']
 SORT_SIGNS = {'0': -1, '1': 1}  # 0 = Best to Worst; 1 = Worst to Best
 
@@ -67,14 +67,15 @@ BLOG_Q_MAP = {}
 BLOG_Q_MAP[QUALITIES.LOW] = [' CAM ', ' TS ', ' R6 ']
 BLOG_Q_MAP[QUALITIES.MEDIUM] = ['-XVID', '-MP4']
 BLOG_Q_MAP[QUALITIES.HIGH] = ['HDRIP', 'DVDRIP', 'BRRIP', 'BDRIP', '480P']
-BLOG_Q_MAP[QUALITIES.HD] = ['720', '1080']
+BLOG_Q_MAP[QUALITIES.HD720] = ['720']
+BLOG_Q_MAP[QUALITIES.HD1080] = ['1080']
 
 HOST_Q = {}
 HOST_Q[QUALITIES.LOW] = ['youwatch', 'allmyvideos', 'played.to', 'gorillavid']
 HOST_Q[QUALITIES.MEDIUM] = ['primeshare', 'exashare', 'bestreams', 'flashx', 'vidto', 'vodlocker', 'thevideo', 'vidzi', 'vidbull', 'realvid', 'nosvideo', 'daclips', 'sharerepo', 'zalaa']
 HOST_Q[QUALITIES.HIGH] = ['vidspot', 'mrfile', 'divxstage', 'streamcloud', 'mooshare']
-HOST_Q[QUALITIES.HD] = ['thefile', 'sharesix', 'mightyupload', 'filenuke', 'hugefiles', '180upload', 'vidxden', 'billionuploads', 'movshare', 'nowvideo']
+HOST_Q[QUALITIES.HD720] = ['thefile', 'sharesix', 'mightyupload', 'filenuke', 'hugefiles', '180upload', 'vidxden', 'billionuploads', 'movshare', 'nowvideo']
 
-Q_ORDER = {QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD: 4}
+Q_ORDER = {QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD720: 4, QUALITIES.HD1080: 5}
 
 IMG_SIZES = ['full', 'medium', 'thumb']
