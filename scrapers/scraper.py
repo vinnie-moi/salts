@@ -254,13 +254,15 @@ class Scraper(object):
         cj = cookielib.LWPCookieJar(cookie_file)
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         urllib2.install_opener(opener)
+
+        try: cj.load(ignore_discard=True)
+        except: pass
         for key in cookies:
             c = cookielib.Cookie(0, key, cookies[key], port=None, port_specified=False, domain=domain, domain_specified=True,
                                 domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=False, comment=None,
                                 comment_url=None, rest={})
             cj.set_cookie(c)
-        try: cj.load(ignore_discard=True)
-        except: pass
+        cj.save(ignore_discard=True, ignore_expires=True)
         return cj
 
     def _do_recaptcha(self, key, tries=None, max_tries=None):
