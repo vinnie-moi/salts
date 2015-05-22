@@ -87,7 +87,7 @@ class NoobRoom_Scraper(scraper.Scraper):
 
             for match in re.finditer("class='hoverz'.*?href='([^']+)'>([^<]+)\s+\(([^)]+).*?>(\d+)%", html, re.DOTALL):
                 url, host, status, load = match.groups()
-                if not self.include_paid and status.upper() == 'PAID':
+                if not self.include_paid and status.upper() == 'PREMIUM':
                     continue
 
                 url = url.replace('&amp;', '&')
