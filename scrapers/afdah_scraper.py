@@ -24,7 +24,7 @@ import string
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import QUALITIES
-BASE_URL = 'http://afdah.com'
+BASE_URL = 'http://afdah.tv'
 
 class Afdah_Scraper(scraper.Scraper):
     base_url = BASE_URL
