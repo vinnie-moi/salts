@@ -82,9 +82,11 @@ class NoobRoom_Scraper(scraper.Scraper):
 
             if video.video_type == VIDEO_TYPES.MOVIE:
                 quality = QUALITIES.HD720
+                paid_quality = QUALITIES.HD1080
             else:
                 quality = QUALITIES.HIGH
-
+                paid_quality = QUALITIES.HD720
+                
             for match in re.finditer("class='hoverz'.*?href='([^']+)'>([^<]+)\s+\(([^)]+).*?>(\d+)%", html, re.DOTALL):
                 url, host, status, load = match.groups()
                 if not self.include_paid and status.upper() == 'PREMIUM':
@@ -96,8 +98,9 @@ class NoobRoom_Scraper(scraper.Scraper):
                 hosters.append(hoster)
 
                 if self.include_paid and has_1080p:
+                    
                     url += '&hd=1'
-                    hoster = {'multi-part': False, 'host': host, 'class': self, 'url': url, 'quality': QUALITIES.HD1080, 'views': None, 'rating': 100 - int(load), 'direct': True}
+                    hoster = {'multi-part': False, 'host': host, 'class': self, 'url': url, 'quality': paid_quality, 'views': None, 'rating': 100 - int(load), 'direct': True}
                     hosters.append(hoster)
         return hosters
 
