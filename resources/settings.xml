@@ -13,6 +13,7 @@
 	    <setting id="show_unknown" type="bool" label="     Show episodes with unknown air date" default="true" enable="eq(-2,false)"/>
 	    <setting id="TV_search_head" type="number" default="-1" visible="false"/>
 	    <setting id="Movies_search_head" type="number" default="-1" visible="false"/>
+	    <setting id="cookie_debug" type="bool" default="false" visible="false"/>
 	</category>
 
 	<category label="User Interface">

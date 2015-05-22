@@ -234,6 +234,8 @@ class Scraper(object):
             request.add_unredirected_header('Referer', referer)
             for key in headers: request.add_header(key, headers[key])
             response = urllib2.urlopen(request, timeout=timeout)
+            if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
+                log_utils.log('Response Cookies: %s' % (self.cookies_as_str(cj)), xbmc.LOGDEBUG)
             cj.save(ignore_discard=True, ignore_expires=True)
             if response.info().get('Content-Encoding') == 'gzip':
                 buf = StringIO(response.read())
@@ -257,14 +259,31 @@ class Scraper(object):
 
         try: cj.load(ignore_discard=True)
         except: pass
+        if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
+            log_utils.log('Before Cookies: %s' % (self.cookies_as_str(cj)), xbmc.LOGDEBUG)
         for key in cookies:
             c = cookielib.Cookie(0, key, cookies[key], port=None, port_specified=False, domain=domain, domain_specified=True,
                                 domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=False, comment=None,
                                 comment_url=None, rest={})
             cj.set_cookie(c)
         cj.save(ignore_discard=True, ignore_expires=True)
+        if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
+            log_utils.log('After Cookies: %s' % (self.cookies_as_str(cj)), xbmc.LOGDEBUG)
         return cj
 
+    def cookies_as_str(self, cj):
+        s = ''
+        c = cj._cookies
+        for domain in c:
+            s += '{%s: ' % (domain)
+            for path in c[domain]:
+                s += '{%s: ' % (path)
+                for cookie in c[domain][path]:
+                    s += '{%s=%s}' % (cookie, c[domain][path][cookie].value)
+                s += '}'
+            s += '} '
+        return s
+                    
     def _do_recaptcha(self, key, tries=None, max_tries=None):
         challenge_url = CAPTCHA_BASE_URL + '/challenge?k=%s' % (key)
         html = self._cached_http_get(challenge_url, CAPTCHA_BASE_URL, timeout=DEFAULT_TIMEOUT, cache_limit=0)
