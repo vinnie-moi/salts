@@ -866,50 +866,45 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
     begin = time.time()
     fails = {}
     got_timeouts = False
-    xbmc.executebuiltin('Dialog.Close(all, true)')
-    with gui_utils.ProgressDialog('Getting All Sources', utils.make_progress_msg(video_type, title, year, season, episode)) as pd:
-        for cls in utils.relevant_scrapers(video_type):
-            scraper = cls(max_timeout)
-            if utils.P_MODE == P_MODES.NONE:
-                hosters += scraper.get_sources(video)
-                if max_results > 0 and len(hosters) >= max_results:
-                    break
-            else:
-                worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
-                utils.increment_setting('%s_try' % (cls.get_name()))
-                worker_count += 1
-                workers.append(worker)
-                fails[cls.get_name()] = True
-    
-        # collect results from workers
-        if utils.P_MODE != P_MODES.NONE:
-            total = worker_count
-            while worker_count > 0:
-                try:
-                    log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
-                    result = q.get(True, timeout)
-                    log_utils.log('Got %s Source Results' % (len(result['hosters'])), xbmc.LOGDEBUG)
-                    worker_count -= 1
-                    hosters += result['hosters']
-                    del fails[result['name']]
-                    progress = (total - worker_count) * 100 / total
-                    pd.update(progress, line2='Received %s links from %s' % (len(result['hosters']), result['name']))
-                    if max_timeout > 0:
-                        timeout = max_timeout - (time.time() - begin)
-                        if timeout < 0: timeout = 0
-                except utils.Empty:
-                    log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
-                    utils.record_timeouts(fails)
-                    got_timeouts = True
-                    break
-    
-                if max_results > 0 and len(hosters) >= max_results:
-                    log_utils.log('Exceeded max results: %s/%s' % (max_results, len(hosters)))
-                    break
-    
-            else:
-                got_timeouts = False
-                log_utils.log('All source results received')
+    for cls in utils.relevant_scrapers(video_type):
+        scraper = cls(max_timeout)
+        if utils.P_MODE == P_MODES.NONE:
+            hosters += scraper.get_sources(video)
+            if max_results > 0 and len(hosters) >= max_results:
+                break
+        else:
+            worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
+            utils.increment_setting('%s_try' % (cls.get_name()))
+            worker_count += 1
+            workers.append(worker)
+            fails[cls.get_name()] = True
+
+    # collect results from workers
+    if utils.P_MODE != P_MODES.NONE:
+        while worker_count > 0:
+            try:
+                log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
+                result = q.get(True, timeout)
+                log_utils.log('Got %s Source Results' % (len(result['hosters'])), xbmc.LOGDEBUG)
+                worker_count -= 1
+                hosters += result['hosters']
+                del fails[result['name']]
+                if max_timeout > 0:
+                    timeout = max_timeout - (time.time() - begin)
+                    if timeout < 0: timeout = 0
+            except utils.Empty:
+                log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
+                utils.record_timeouts(fails)
+                got_timeouts = True
+                break
+
+            if max_results > 0 and len(hosters) >= max_results:
+                log_utils.log('Exceeded max results: %s/%s' % (max_results, len(hosters)))
+                break
+
+        else:
+            got_timeouts = False
+            log_utils.log('All source results received')
 
     total = len(workers)
     timeouts = len(fails)
