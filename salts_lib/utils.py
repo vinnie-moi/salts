@@ -430,18 +430,17 @@ def parallel_get_sources(q, cls, video):
     result = {'name': cls.get_name(), 'hosters': hosters}
     q.put(result)
 
-def parallel_get_url(q, cls, video):
-    scraper_instance = cls(int(ADDON.get_setting('source_timeout')))
+def parallel_get_url(q, scraper, video):
     if P_MODE == P_MODES.THREADS:
         worker = threading.current_thread()
     elif P_MODE == P_MODES.PROCESSES:
         worker = multiprocessing.current_process()
 
-    log_utils.log('Starting %s (%s) for %s url' % (worker.name, worker, cls.get_name()), xbmc.LOGDEBUG)
-    url = scraper_instance.get_url(video)
-    log_utils.log('%s returned url %s from %s' % (cls.get_name(), url, worker), xbmc.LOGDEBUG)
+    log_utils.log('Starting %s (%s) for %s url' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
+    url = scraper.get_url(video)
+    log_utils.log('%s returned url %s from %s' % (scraper.get_name(), url, worker), xbmc.LOGDEBUG)
     related = {}
-    related['class'] = scraper_instance
+    related['class'] = scraper
     if not url: url = ''
     related['url'] = url
     related['name'] = related['class'].get_name()

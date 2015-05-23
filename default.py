@@ -1167,9 +1167,10 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
     video = ScraperVideo(video_type, title, year, slug, season, episode, ep_title, ep_airdate)
     with gui_utils.ProgressDialog('Set Related Url', utils.make_progress_msg(video_type, title, year, season, episode)) as pd:
         for cls in utils.relevant_scrapers(video_type, order_matters=True):
+            scraper = cls(max_timeout)
             if utils.P_MODE == P_MODES.NONE:
                 related = {}
-                related['class'] = cls(max_timeout)
+                related['class'] = scraper
                 url = related['class'].get_url(video)
                 if not url: url = ''
                 related['url'] = url
@@ -1177,11 +1178,11 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
                 related['label'] = '[%s] %s' % (related['name'], related['url'])
                 related_list.append(related)
             else:
-                worker = utils.start_worker(q, utils.parallel_get_url, [cls, video])
+                worker = utils.start_worker(q, utils.parallel_get_url, [scraper, video])
                 utils.increment_setting('%s_try' % (cls.get_name()))
                 worker_count += 1
                 workers.append(worker)
-                related = {'class': cls(max_timeout), 'name': cls.get_name(), 'label': '[%s]' % (cls.get_name()), 'url': ''}
+                related = {'class': scraper, 'name': cls.get_name(), 'label': '[%s]' % (cls.get_name()), 'url': ''}
                 related_list.append(related)
     
         # collect results from workers

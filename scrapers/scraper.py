@@ -59,9 +59,10 @@ DEFAULT_TIMEOUT = 30
 class Scraper(object):
     __metaclass__ = abc.ABCMeta
     base_url = BASE_URL
+    db_connection = None
 
     def __init__(self, timeout=DEFAULT_TIMEOUT):
-        self.db_connection = DB_Connection()
+        pass
 
     @abstractclassmethod
     def provides(cls):
@@ -189,6 +190,7 @@ class Scraper(object):
         temp_video_type = video.video_type
         if video.video_type == VIDEO_TYPES.EPISODE: temp_video_type = VIDEO_TYPES.TVSHOW
         url = None
+        self.create_db_connection()
 
         result = self.db_connection.get_related_url(temp_video_type, video.title, video.year, self.get_name())
         if result:
@@ -219,8 +221,8 @@ class Scraper(object):
         if headers is None: headers = {}
         referer = headers['Referer'] if 'Referer' in headers else url
         log_utils.log('Getting Url: %s cookie=|%s| data=|%s| extra headers=|%s|' % (url, cookies, data, headers))
-        db_connection = DB_Connection()
-        _, html = db_connection.get_cached_url(url, cache_limit)
+        self.create_db_connection()
+        _, html = self.db_connection.get_cached_url(url, cache_limit)
         if html:
             log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
             return html
@@ -247,7 +249,7 @@ class Scraper(object):
             log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), xbmc.LOGWARNING)
             return ''
 
-        db_connection.cache_url(url, html)
+        self.db_connection.cache_url(url, html)
         return html
 
     def _set_cookies(self, base_url, cookies):
@@ -410,6 +412,7 @@ class Scraper(object):
     
     def _blog_get_url(self, video, delim='.'):
         url = None
+        self.create_db_connection()
         result = self.db_connection.get_related_url(video.video_type, video.title, video.year, self.get_name(), video.season, video.episode)
         if result:
             url = result[0][0]
@@ -520,3 +523,7 @@ class Scraper(object):
         else:
             quality = QUALITIES.LOW
         return quality
+
+    def create_db_connection(self):
+        if self.db_connection is None:
+            self.db_connection = DB_Connection()
