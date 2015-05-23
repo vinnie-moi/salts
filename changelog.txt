@@ -1,3 +1,9 @@
+[B]Version 1.0.2[/B]
+- Remove progress dialog from get sources (fixes XBMC hang)
+- Add 1080p option to local scraper
+- Fix quality in yify scraper
+- Fix long standing problem w/ noobroom and ororo.tv scraper
+
 [B]Version 1.0.1[/B]
 - Changed default fanart
 - Moved place holder poster to local
