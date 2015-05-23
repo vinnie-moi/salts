@@ -23,7 +23,6 @@ import xbmcaddon
 import json
 import xml.dom.minidom
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.db_utils import DB_Connection
 
 BASE_URL = 'http://www.hdmoviezone.net'
 PHP_URL = 'http://gl.hdmoviezone.net/hdmzgl.php'
@@ -33,7 +32,6 @@ class hdmz_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.db_connection = DB_Connection()
         self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
 
     @classmethod
