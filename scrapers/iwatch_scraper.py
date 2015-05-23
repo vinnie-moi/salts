@@ -21,7 +21,6 @@ import urllib
 import urlparse
 import time
 import xbmcaddon
-from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
