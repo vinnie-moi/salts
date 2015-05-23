@@ -40,6 +40,7 @@ class NoobRoom_Scraper(scraper.Scraper):
         self.username = xbmcaddon.Addon().getSetting('%s-username' % (self.get_name()))
         self.password = xbmcaddon.Addon().getSetting('%s-password' % (self.get_name()))
         self.include_paid = xbmcaddon.Addon().getSetting('%s-include_premium' % (self.get_name())) == 'true'
+        log_utils.log('init: |%s| |%s| |%s| |%s|' % (self.base_url, self.username, self.password, self.include_paid), xbmc.LOGDEBUG)
 
     @classmethod
     def provides(cls):
