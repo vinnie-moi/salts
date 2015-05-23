@@ -81,10 +81,11 @@ class YIFY_Scraper(scraper.Scraper):
                 else:
                     return None
 
+            best_width = 0
             for elem in js_data:
-                if 'type' in elem and elem['type'].startswith('video'):
+                if 'type' in elem and elem['type'].startswith('video') and elem['width'] > best_width:
                     stream_url = elem['url']
-                    break
+                    best_width = elem['width']
                 if 'jscode' in elem:
                     stream_url = self.__parse_fmt(elem['jscode'])
                     break
