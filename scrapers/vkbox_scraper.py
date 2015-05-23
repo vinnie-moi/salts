@@ -22,7 +22,6 @@ import xbmc
 import zipfile
 import StringIO
 import json
-from salts_lib.db_utils import DB_Connection
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
@@ -39,7 +38,6 @@ class VKBox_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.db_connection = DB_Connection()
         self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
 
     @classmethod

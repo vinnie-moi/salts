@@ -21,7 +21,6 @@ import urlparse
 import re
 import xbmcaddon
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.db_utils import DB_Connection
 
 BASE_URL = 'http://view47.com'
 EPID_URL = '/ip.temp/swf/plugins/ipplugins.php'
@@ -32,7 +31,6 @@ class View47_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.db_connection = DB_Connection()
         self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
         if 'www' in self.base_url: self.base_url = BASE_URL  # hack base url to work
 
