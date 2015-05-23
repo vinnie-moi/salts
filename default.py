@@ -866,14 +866,16 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
     begin = time.time()
     fails = {}
     got_timeouts = False
+    xbmc.executebuiltin('Dialog.Close(all, true)')
     with gui_utils.ProgressDialog('Getting All Sources', utils.make_progress_msg(video_type, title, year, season, episode)) as pd:
         for cls in utils.relevant_scrapers(video_type):
+            scraper = cls(max_timeout)
             if utils.P_MODE == P_MODES.NONE:
-                hosters += cls(max_timeout).get_sources(video)
+                hosters += scraper.get_sources(video)
                 if max_results > 0 and len(hosters) >= max_results:
                     break
             else:
-                worker = utils.start_worker(q, utils.parallel_get_sources, [cls, video])
+                worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
                 utils.increment_setting('%s_try' % (cls.get_name()))
                 worker_count += 1
                 workers.append(worker)

@@ -69,7 +69,6 @@ class Afdah_Scraper(scraper.Scraper):
                         plaintext = self._caesar(r.group(1).decode('base-64'), 13).decode('base-64')
                 else:
                     plaintext = embed_html
-                print plaintext
                 hosters += self._get_links(plaintext)
             
             pattern = 'href="([^"]+)".*play_video.gif'

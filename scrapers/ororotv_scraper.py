@@ -35,7 +35,6 @@ class OroroTV_Scraper(scraper.Scraper):
         self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
         self.username = xbmcaddon.Addon().getSetting('%s-username' % (self.get_name()))
         self.password = xbmcaddon.Addon().getSetting('%s-password' % (self.get_name()))
-        log_utils.log('init: |%s| |%s| |%s|' % (self.base_url, self.username, self.password), xbmc.LOGDEBUG)
 
     @classmethod
     def provides(cls):

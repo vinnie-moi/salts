@@ -76,9 +76,7 @@ class Zumvo_Scraper(scraper.Scraper):
                 if match:
                     proxy_link = match.group(1)
                     proxy_link = proxy_link.split('*', 1)[-1]
-                    print proxy_link
                     stream_url = GKDecrypter.decrypter(198, 128).decrypt(proxy_link, base64.urlsafe_b64decode('NlFQU1NQSGJrbXJlNzlRampXdHk='), 'ECB').split('\0')[0]
-                    print stream_url
                     if 'picasaweb' in stream_url:
                         html = self._http_get(stream_url, cache_limit=.5)
                         sources = self.__parse_google(html)

@@ -417,17 +417,16 @@ def reap_workers(workers, timeout=0):
             living_workers.append(worker)
     return living_workers
 
-def parallel_get_sources(q, cls, video):
-    scraper_instance = cls(int(ADDON.get_setting('source_timeout')))
+def parallel_get_sources(q, scraper, video):
     if P_MODE == P_MODES.THREADS:
         worker = threading.current_thread()
     elif P_MODE == P_MODES.PROCESSES:
         worker = multiprocessing.current_process()
 
-    log_utils.log('Starting %s (%s) for %s sources' % (worker.name, worker, cls.get_name()), xbmc.LOGDEBUG)
-    hosters = scraper_instance.get_sources(video)
-    log_utils.log('%s returned %s sources from %s' % (cls.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
-    result = {'name': cls.get_name(), 'hosters': hosters}
+    log_utils.log('Starting %s (%s) for %s sources' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
+    hosters = scraper.get_sources(video)
+    log_utils.log('%s returned %s sources from %s' % (scraper.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
+    result = {'name': scraper.get_name(), 'hosters': hosters}
     q.put(result)
 
 def parallel_get_url(q, scraper, video):
@@ -439,12 +438,8 @@ def parallel_get_url(q, scraper, video):
     log_utils.log('Starting %s (%s) for %s url' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
     url = scraper.get_url(video)
     log_utils.log('%s returned url %s from %s' % (scraper.get_name(), url, worker), xbmc.LOGDEBUG)
-    related = {}
-    related['class'] = scraper
     if not url: url = ''
-    related['url'] = url
-    related['name'] = related['class'].get_name()
-    related['label'] = '[%s] %s' % (related['name'], related['url'])
+    related = {'class': scraper, 'url': url, 'name': scraper.get_name(), 'label': '[%s] %s' % (scraper.get_name(), url)}
     q.put(related)
 
 def parallel_get_progress(q, slug, cached):
