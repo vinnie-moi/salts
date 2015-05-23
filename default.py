@@ -816,7 +816,7 @@ def search_results(section, query, page=1):
 
 @url_dispatcher.register(MODES.SEASONS, ['slug', 'fanart'])
 def browse_seasons(slug, fanart):
-    seasons = trakt_api.get_seasons(slug)
+    seasons = sorted(trakt_api.get_seasons(slug), key=lambda x: x['number'])
     info = {}
     if TOKEN:
         progress = trakt_api.get_show_progress(slug, cached=_SALTS.get_setting('cache_watched') == 'true')
