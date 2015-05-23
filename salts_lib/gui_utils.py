@@ -119,3 +119,19 @@ def get_pin():
         builtin = "XBMC.Notification(%s, Trakt Authorization Complete, 3000, %s)" % (_SALTS.get_name(), ICON_PATH)
         xbmc.executebuiltin(builtin)
     del dialog
+
+class ProgressDialog(object):
+    def __init__(self, heading, line1=None, line2=None, line3=None):
+        self.pd = xbmcgui.DialogProgress()
+        self.pd.create(heading, line1, line2, line3)
+        self.pd.update(0)
+
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, type, value, traceback):
+        self.pd.close()
+        del self.pd
+    
+    def update(self, percent, line1=None, line2=None, line3=None):
+        self.pd.update(percent, line1, line2, line3)

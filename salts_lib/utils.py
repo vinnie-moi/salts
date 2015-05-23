@@ -922,3 +922,10 @@ def sort_progress(episodes, sort_order):
         return sorted(episodes, key=lambda x: iso_2_utc(x['episode']['first_aired']), reverse=True)
     else:  # default sort set to activity
         return sorted(episodes, key=lambda x: x['last_watched_at'], reverse=True)
+
+def make_progress_msg(video_type, title, year, season, episode):
+    progress_msg = '%s: %s' % (video_type, title)
+    if year: progress_msg += ' (%s)' % (year)
+    if video_type == VIDEO_TYPES.EPISODE:
+        progress_msg += ' - S%02dE%02d' % (int(season), int(episode))
+    return progress_msg
