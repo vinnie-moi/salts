@@ -70,7 +70,7 @@ list_size = int(ADDON.get_setting('list_size'))
 trakt_api = Trakt_API(TOKEN, use_https, list_size, trakt_timeout)
 db_connection = DB_Connection()
 
-THEME_LIST = ['Shine', 'Luna_Blue', 'Iconic', 'Simple']
+THEME_LIST = ['Shine', 'Luna_Blue', 'Iconic', 'Simple', 'SALTy']
 THEME = THEME_LIST[int(ADDON.get_setting('theme'))]
 if xbmc.getCondVisibility('System.HasAddon(script.salts.themepak)'):
     themepak_path = xbmcaddon.Addon('script.salts.themepak').getAddonInfo('path')
@@ -80,7 +80,13 @@ THEME_PATH = os.path.join(themepak_path, 'art', 'themes', THEME)
 PLACE_POSTER = os.path.join(ADDON.get_path(), 'resources', 'place_poster.png')
 
 def art(name):
-    return os.path.join(THEME_PATH, name)
+    path = os.path.join(THEME_PATH, name)
+    if not xbmcvfs.exists(path):
+        if name == 'fanart.jpg':
+            path = os.path.join(ADDON.get_path(), name)
+        else:
+            path.replace('.png', '.jpg')
+    return path
 
 def choose_list(username=None):
     lists = trakt_api.get_lists(username)
