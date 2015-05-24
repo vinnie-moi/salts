@@ -1,3 +1,9 @@
+[B]Version 1.0.3[/B]
+- Sort seasons
+- Add SALTy theme
+- Allow fanart fallbacks and png/jpg fallbacks
+- Fix bug with multithreaded db access in scrapers resolve_link()
+
 [B]Version 1.0.2[/B]
 - Remove progress dialog from get sources (fixes XBMC hang)
 - Add 1080p option to local scraper
