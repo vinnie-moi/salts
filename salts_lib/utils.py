@@ -929,9 +929,14 @@ def make_progress_msg(video_type, title, year, season, episode):
         progress_msg += ' - S%02dE%02d' % (int(season), int(episode))
     return progress_msg
 
-def _(string_id):
+def i8n(string_id):
     try:
         return ADDON.get_string(strings.STRINGS[string_id]).encode('utf-8', 'ignore')
     except Exception as e:
         log_utils.log('Failed String Lookup: %s (%s)' % (string_id, e))
         return string_id
+
+def notify(header=None, msg='', duration=2000):
+    if header is None: header = ADDON.get_name()
+    builtin = "XBMC.Notification(%s,%s, %s, %s)" % (header, msg, duration, ICON_PATH)
+    xbmc.executebuiltin(builtin)

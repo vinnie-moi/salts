@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: TV Addons Addons\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Kodi Translation Team\n"
+"Last-Translator: TV Addons Translation Team\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,5 +23,202 @@ msgid "TV Shows"
 msgstr ""
 
 msgctxt "#30002"
+msgid "Movie"
+msgstr ""
+
+msgctxt "#30003"
+msgid "TV Show"
+msgstr ""
+
+msgctxt "#30004"
 msgid "Settings"
 msgstr ""
+
+msgctxt "#30005"
+msgid "Scraper Sort Order"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Url Resolver Settings"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Add-on Settings"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Auto-Configure SALTS"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Authorize SALTS to access my trakt.tv account"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Set Default Views"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Remove Cached Url(s)"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Trending %s"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Popular %s"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Recently Updated %s"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Recommended %s"
+msgstr ""
+
+msgctxt "#30016"
+msgid "My %s Collection"
+msgstr ""
+
+msgctxt "#30017"
+msgid "My Favorites"
+msgstr ""
+
+msgctxt "#30018"
+msgid "My Subscriptions"
+msgstr ""
+
+msgctxt "#30019"
+msgid "My Watchlist"
+msgstr ""
+
+msgctxt "#30020"
+msgid "My Lists"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Other Lists"
+msgstr ""
+
+msgctxt "#30022"
+msgid "My Next Episodes"
+msgstr ""
+
+msgctxt "#30023"
+msgid "My Calendar"
+msgstr ""
+
+msgctxt "#30024"
+msgid "General Calendar"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Premiere Calendar"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Recent Searches"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Saved Searches"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Force Refresh"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Clear All %s"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Forcing Refresh"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Force Refresh Complete"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Enable All Scrapers"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Disable All Scrapers"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Enable Scraper"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Disable Scraper"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Move Up"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Move Down"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Move To..."
+msgstr ""
+
+msgctxt "#30040"
+msgid "Enter New Position (1 - %s)"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Set Default %s View"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Set a view then select this item to set the default %s view"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Import"
+msgstr ""
+
+msgctxt "#30044"
+msgid "%s View Set to: %s"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Delete [B][COLOR red]ENTIRE[/COLOR][/B] Url Cache"
+msgstr ""
+
+msgctxt "#30046"
+msgid "This will set some settings to values that have been found to"
+msgstr ""
+
+msgctxt "#30047"
+msgid "be effective. The following settings will be changed:"
+msgstr ""
+
+msgctxt "#30048"
+msgid "[COLOR red]Scraper Sort Order, Source Sorting, Calendar Start Day, Trakt Timeout, Scraper Timeout[/COLOR]"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Go Back"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Continue"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Auto-configure Complete"
+msgstr ""
+
