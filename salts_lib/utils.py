@@ -930,8 +930,8 @@ def make_progress_msg(video_type, title, year, season, episode):
     return progress_msg
 
 def _(string_id):
-    if string_id in strings.STRINGS:
+    try:
         return ADDON.get_string(strings.STRINGS[string_id]).encode('utf-8', 'ignore')
-    else:
-        log_utils.log('String ID Missing: %s' % (string_id))
+    except Exception as e:
+        log_utils.log('Failed String Lookup: %s (%s)' % (string_id, e))
         return string_id
