@@ -70,7 +70,7 @@ trakt_api = Trakt_API(TOKEN, use_https, list_size, trakt_timeout)
 db_connection = DB_Connection()
 
 THEME_LIST = ['Shine', 'Luna_Blue', 'Iconic', 'Simple', 'SALTy', 'SALTy (Blended)', 'SALTy (Blue)', 'SALTy (Frog)', 'SALTy (Green)',
-              'SALTy (Macaw)', 'SALTier (Green)', 'SALTier (Orange)', 'SALTier (Red)']
+              'SALTy (Macaw)', 'SALTier (Green)', 'SALTier (Orange)', 'SALTier (Red)', 'IGDB']
 THEME = THEME_LIST[int(ADDON.get_setting('theme'))]
 if xbmc.getCondVisibility('System.HasAddon(script.salts.themepak)'):
     themepak_path = xbmcaddon.Addon('script.salts.themepak').getAddonInfo('path')
