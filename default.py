@@ -32,6 +32,7 @@ from salts_lib.url_dispatcher import URL_Dispatcher
 from salts_lib.srt_scraper import SRT_Scraper
 from salts_lib.trakt_api import Trakt_API, TransientTraktError, TraktNotFoundError, TraktError
 from salts_lib import utils
+from salts_lib.utils import _
 from salts_lib import log_utils
 from salts_lib import gui_utils
 from salts_lib.constants import *
@@ -55,9 +56,9 @@ def main_menu():
     if _SALTS.get_setting('auto-disable') != DISABLE_SETTINGS.OFF:
         utils.do_disable_check()
 
-    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': 'Movies'}, img=utils.art('movies.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': 'TV Shows'}, img=utils.art('television.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.SETTINGS}, {'title': 'Settings'}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': _('Movies')}, img=utils.art('movies.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': _('TV Shows')}, img=utils.art('television.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.SETTINGS}, {'title': _('Settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
 
     if not TOKEN:
         last_reminder = int(_SALTS.get_setting('last_reminder'))

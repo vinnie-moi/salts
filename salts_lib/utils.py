@@ -27,10 +27,9 @@ import xbmcaddon
 import xbmcvfs
 import log_utils
 import sys
-import hashlib
 import urlparse
-import shutil
 import urllib
+import strings
 from constants import *
 from scrapers import *  # import all scrapers into this namespace
 from addon.common.addon import Addon
@@ -929,3 +928,10 @@ def make_progress_msg(video_type, title, year, season, episode):
     if video_type == VIDEO_TYPES.EPISODE:
         progress_msg += ' - S%02dE%02d' % (int(season), int(episode))
     return progress_msg
+
+def _(string_id):
+    if string_id in strings.STRINGS:
+        return ADDON.get_string(strings.STRINGS[string_id]).encode('utf-8', 'ignore')
+    else:
+        log_utils.log('String ID Missing: %s' % (string_id))
+        return string_id
