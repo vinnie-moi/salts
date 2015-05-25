@@ -424,11 +424,11 @@ def browse_lists(section):
 
         menu_items = []
         queries = {'mode': MODES.SET_FAV_LIST, 'slug': ids['slug'], 'section': section}
-        menu_items.append(('Set as Favorites List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i8n('set_fav_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.SET_SUB_LIST, 'slug': ids['slug'], 'section': section}
-        menu_items.append(('Set as Subscription List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i8n('set_sub_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.COPY_LIST, 'slug': COLLECTION_SLUG, 'section': section, 'target_slug': ids['slug']}
-        menu_items.append(('Import from Collection', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i8n('import_collection'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         liz.addContextMenuItems(menu_items, replaceItems=True)
 
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=True, totalItems=totalItems)
@@ -436,7 +436,7 @@ def browse_lists(section):
 
 @url_dispatcher.register(MODES.OTHER_LISTS, ['section'])
 def browse_other_lists(section):
-    liz = xbmcgui.ListItem(label='Add another user\'s list', iconImage=utils.art('add_other.png'), thumbnailImage=utils.art('add_other.png'))
+    liz = xbmcgui.ListItem(label=i8n('add_other_list'), iconImage=utils.art('add_other.png'), thumbnailImage=utils.art('add_other.png'))
     liz.setProperty('fanart_image', utils.art('fanart.jpg'))
     liz_url = _SALTS.build_plugin_url({'mode': MODES.ADD_OTHER_LIST, 'section': section})
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
@@ -475,15 +475,15 @@ def browse_other_lists(section):
         menu_items = []
         if found:
             queries = {'mode': MODES.FORCE_REFRESH, 'refresh_mode': MODES.SHOW_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
-            menu_items.append(('Force Refresh', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i8n('force_refresh'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
             queries = {'mode': MODES.COPY_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
-            menu_items.append(('Copy to My List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i8n('copy_to_my_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.ADD_OTHER_LIST, 'section': section, 'username': other_list[0]}
-        menu_items.append(('Add more from %s' % (other_list[0]), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i8n('add_more_from') % (other_list[0]), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.REMOVE_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
-        menu_items.append(('Remove List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i8n('remove_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.RENAME_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0], 'name': name}
-        menu_items.append(('Rename List', 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i8n('rename_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         liz.addContextMenuItems(menu_items, replaceItems=True)
 
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=True, totalItems=totalItems)
@@ -497,7 +497,7 @@ def remove_list(section, username, slug):
 @url_dispatcher.register(MODES.RENAME_LIST, ['section', 'slug', 'username', 'name'])
 def rename_list(section, slug, username, name):
     keyboard = xbmc.Keyboard()
-    keyboard.setHeading('Enter the new name (blank to reset)')
+    keyboard.setHeading(i8n('new_name_heading'))
     keyboard.setDefault(name)
     keyboard.doModal()
     if keyboard.isConfirmed():
@@ -509,7 +509,7 @@ def rename_list(section, slug, username, name):
 def add_other_list(section, username=None):
     if username is None:
         keyboard = xbmc.Keyboard()
-        keyboard.setHeading('Enter username of list owner')
+        keyboard.setHeading(i8n('username_list_owner'))
         keyboard.doModal()
         if keyboard.isConfirmed():
             username = keyboard.getText()
@@ -526,9 +526,8 @@ def show_list(section, slug, username=None):
         try:
             items = trakt_api.show_list(slug, section, username)
         except TraktNotFoundError:
-            msg = 'List Does Not Exist: %s' % (slug)
-            builtin = 'XBMC.Notification(%s,%s, 5000, %s)'
-            xbmc.executebuiltin(builtin % (_SALTS.get_name(), msg, ICON_PATH))
+            msg = i8n('list_not_exist') % (slug)
+            utils.notify(msg=msg, duration=5000)
             log_utils.log(msg, xbmc.LOGWARNING)
             return
 
@@ -609,10 +608,9 @@ def get_progress(cache_override=False):
         
         total = len(workers)
         if worker_count > 0:
-            timeout_msg = 'Progress Timeouts: %s/%s' % (worker_count, total)
+            timeout_msg = i8n('progress_timeouts') % (worker_count, total)
+            utils.notify(msg=timeout_msg, duration=5000)
             log_utils.log(timeout_msg, xbmc.LOGWARNING)
-            builtin = 'XBMC.Notification(%s,%s, 5000, %s)'
-            xbmc.executebuiltin(builtin % (_SALTS.get_name(), timeout_msg, ICON_PATH))
         workers = utils.reap_workers(workers)
     
     return workers, utils.sort_progress(episodes, sort_order=SORT_MAP[int(_SALTS.get_setting('sort_progress'))])
@@ -631,7 +629,7 @@ def show_progress():
     
                 menu_items = []
                 queries = {'mode': MODES.SEASONS, 'slug': show['ids']['slug'], 'fanart': fanart}
-                menu_items.append(('Browse Seasons', 'Container.Update(%s)' % (_SALTS.build_plugin_url(queries))),)
+                menu_items.append((i8n('browse_seasons'), 'Container.Update(%s)' % (_SALTS.build_plugin_url(queries))),)
     
                 liz, liz_url = make_episode_item(show, episode['episode'], menu_items=menu_items)
                 label = liz.getLabel()
@@ -648,7 +646,7 @@ def manage_subscriptions(section):
     slug = _SALTS.get_setting('%s_sub_slug' % (section))
     if slug:
         next_run = utils.get_next_run(MODES.UPDATE_SUBS)
-        label = 'Update Subscriptions: (Next Run: [COLOR %s]%s[/COLOR])'
+        label = i8n('update_subs')
         if _SALTS.get_setting('auto-' + MODES.UPDATE_SUBS) == 'true':
             color = 'green'
             run_str = next_run.strftime("%Y-%m-%d %I:%M:%S %p")
@@ -661,16 +659,16 @@ def manage_subscriptions(section):
         liz_url = _SALTS.build_plugin_url({'mode': MODES.UPDATE_SUBS, 'section': section})
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
         if section == SECTIONS.TV:
-            liz = xbmcgui.ListItem(label='Clean-Up Subscriptions', iconImage=utils.art('clean_up.png'), thumbnailImage=utils.art('clean_up.png'))
+            liz = xbmcgui.ListItem(label=i8n('cleanup_subs'), iconImage=utils.art('clean_up.png'), thumbnailImage=utils.art('clean_up.png'))
             liz.setProperty('fanart_image', utils.art('fanart.jpg'))
             liz_url = _SALTS.build_plugin_url({'mode': MODES.CLEAN_SUBS})
             xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
-    show_pickable_list(slug, 'Pick a list to use for Subscriptions', MODES.PICK_SUB_LIST, section)
+    show_pickable_list(slug, i8n('pick_sub_list'), MODES.PICK_SUB_LIST, section)
 
 @url_dispatcher.register(MODES.SHOW_FAVORITES, ['section'])
 def show_favorites(section):
     slug = _SALTS.get_setting('%s_fav_slug' % (section))
-    show_pickable_list(slug, 'Pick a list to use for Favorites', MODES.PICK_FAV_LIST, section)
+    show_pickable_list(slug, i8n('pick_fav_list'), MODES.PICK_FAV_LIST, section)
 
 @url_dispatcher.register(MODES.PICK_SUB_LIST, ['mode', 'section'])
 @url_dispatcher.register(MODES.PICK_FAV_LIST, ['mode', 'section'])
@@ -703,9 +701,7 @@ def search(section, search_text=None):
         if keyboard.isConfirmed():
             search_text = keyboard.getText()
             if not search_text:
-                msg = 'Blank Searches are not allowed'
-                builtin = 'XBMC.Notification(%s,%s, 5000, %s)'
-                xbmc.executebuiltin(builtin % (_SALTS.get_name(), msg, ICON_PATH))
+                utils.notify(msg=i8n('blank_searches'), duration=5000)
                 return
             else:
                 break

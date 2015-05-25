@@ -68,5 +68,24 @@ STRINGS = {
            'auto_conf_line3': 30048,
            'go_back': 30049,
            'continue': 30050,
-           'auto_conf_complete': 30051
+           'auto_conf_complete': 30051,
+           'set_fav_list': 30052,
+           'set_sub_list': 30053,
+           'import_collection': 30054,
+           'add_other_list': 30055,
+           'copy_to_my_list': 30056,
+           'add_more_from': 30057,
+           'remove_list': 30058,
+           'rename_list': 30059,
+           'new_name_heading': 30060,
+           'username_list_owner': 30061,
+           'list_not_exist': 30062,
+           'progress_timeouts': 30063,
+           'browse_seasons': 30064,
+           'update_subs': 30065,
+           'cleanup_subs': 30066,
+           'pick_sub_list': 30067,
+           'pick_fav_list': 30068,
+           'blank_searches': 30069
+           
 }

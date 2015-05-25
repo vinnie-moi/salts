@@ -221,3 +221,75 @@ msgctxt "#30051"
 msgid "Auto-configure Complete"
 msgstr ""
 
+msgctxt "#30052"
+msgid "Set as Favorites List"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Set as Subscription List"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Import from Collection"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Add another user's list"
+msgstr ""
+
+msgctxt "#30056"
+msgid "Copy to My List"
+msgstr ""
+
+msgctxt "#30057"
+msgid "Add more from %s"
+msgstr ""
+
+msgctxt "#30058"
+msgid "Remove List"
+msgstr ""
+
+msgctxt "#30059"
+msgid "Rename List"
+msgstr ""
+
+msgctxt "#30060"
+msgid "Enter the new name (blank to reset)"
+msgstr ""
+
+msgctxt "#30061"
+msgid "Enter username of list owner"
+msgstr ""
+
+msgctxt "#30062"
+msgid "List Does Not Exist: %s"
+msgstr ""
+
+msgctxt "#30063"
+msgid "Progress Timeouts: %s/%s"
+msgstr ""
+
+msgctxt "#30064"
+msgid "Browse Seasons"
+msgstr ""
+
+msgctxt "#30065"
+msgid "Update Subscriptions: (Next Run: [COLOR %s]%s[/COLOR])"
+msgstr ""
+
+msgctxt "#30066"
+msgid "Clean-Up Subscriptions"
+msgstr ""
+
+msgctxt "#30067"
+msgid "Pick a list to use for Subscriptions"
+msgstr ""
+
+msgctxt "#30068"
+msgid "Pick a list to use for Favorites"
+msgstr ""
+
+msgctxt "#30069"
+msgid "Blank Searches are not allowed"
+msgstr ""
+
