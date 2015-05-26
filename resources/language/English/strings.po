@@ -293,3 +293,367 @@ msgctxt "#30069"
 msgid "Blank Searches are not allowed"
 msgstr ""
 
+msgctxt "#30070"
+msgid "Save Search"
+msgstr ""
+
+msgctxt "#30071"
+msgid "Remove from Recent"
+msgstr ""
+
+msgctxt "#30072"
+msgid "Delete Search"
+msgstr ""
+
+msgctxt "#30073"
+msgid "Recent %s Searches Cleared"
+msgstr ""
+
+msgctxt "#30074"
+msgid "Saved %s Searches Cleared"
+msgstr ""
+
+msgctxt "#30075"
+msgid "Scraper Timeouts: %s/%s"
+msgstr ""
+
+msgctxt "#30076"
+msgid "No Useable Sources Found%s"
+msgstr ""
+
+msgctxt "#30077"
+msgid "Choose a subtitle to download"
+msgstr ""
+
+msgctxt "#30078"
+msgid "Link Resolve Failed: %s"
+msgstr ""
+
+msgctxt "#30079"
+msgid "All sources failed to play"
+msgstr ""
+
+msgctxt "#30080"
+msgid "Choose your stream"
+msgstr ""
+
+msgctxt "#30081"
+msgid "Set Related Url"
+msgstr ""
+
+msgctxt "#30082"
+msgid "Received result from: %s"
+msgstr ""
+
+msgctxt "#30083"
+msgid "Url To Change (%s)"
+msgstr ""
+
+msgctxt "#30084"
+msgid "Related %s url at %s"
+msgstr ""
+
+msgctxt "#30085"
+msgid "[COLOR blue]%s[/COLOR] Related Url Set"
+msgstr ""
+
+msgctxt "#30086"
+msgid "Manual Search"
+msgstr ""
+
+msgctxt "#30087"
+msgid "Select Related"
+msgstr ""
+
+msgctxt "#30088"
+msgid "Enter Search"
+msgstr ""
+
+msgctxt "#30089"
+msgid "Scraper does not support searching"
+msgstr ""
+
+#. Do not translate the word "unrate", it's required by the API
+msgctxt "#30090"
+msgid "Enter Rating (unrate, or 1-10)"
+msgstr ""
+
+msgctxt "#30091"
+msgid "Input TVShow ID"
+msgstr ""
+
+msgctxt "#30092"
+msgid "Item Added to Collection"
+msgstr ""
+
+msgctxt "#30093"
+msgid "Item Removed from Collection"
+msgstr ""
+
+msgctxt "#30094"
+msgid "Item Added to List"
+msgstr ""
+
+msgctxt "#30095"
+msgid "List Copied: (A:%s/ E:%s/ S:%s)"
+msgstr ""
+
+msgctxt "#30096"
+msgid "TV"
+msgstr ""
+
+msgctxt "#30097"
+msgid "Marked as %s"
+msgstr ""
+
+msgctxt "#30098"
+msgid "Updating Subscriptions..."
+msgstr ""
+
+msgctxt "#30099"
+msgid "Next Update in %0.1f hours"
+msgstr ""
+
+msgctxt "#30100"
+msgid "Are you sure you want to delete the url cache?"
+msgstr ""
+
+msgctxt "#30101"
+msgid "This will slow things down until all urls are re-cached"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Keep"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Delete"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Flush web cache"
+msgstr ""
+
+msgctxt "#30105"
+msgid "DB Reset Successful"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Reset only allowed on sqlite DBs"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Select Export Directory"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Enter Export Filename"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Export Successful"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Exported to %s"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Export"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Export Failed"
+msgstr ""
+
+msgctxt "#30113"
+msgid "Select Import File"
+msgstr ""
+
+msgctxt "#30114"
+msgid "Import Success"
+msgstr ""
+
+msgctxt "#30115"
+msgid "Imported from %s"
+msgstr ""
+
+msgctxt "#30116"
+msgid "Import"
+msgstr ""
+
+msgctxt "#30117"
+msgid "Import Failed"
+msgstr ""
+
+msgctxt "#30118"
+msgid "Remove from List"
+msgstr ""
+
+msgctxt "#30119"
+msgid "Subscribe"
+msgstr ""
+
+msgctxt "#30120"
+msgid "Require Aired Only?'"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Require Page Only?"
+msgstr ""
+
+msgctxt "#30122"
+msgid "Next Page"
+msgstr ""
+
+msgctxt "#30123"
+msgid "Previous Week"
+msgstr ""
+
+msgctxt "#30124"
+msgid "Next Week"
+msgstr ""
+
+msgctxt "#30125"
+msgid "Mark as Unwatched"
+msgstr ""
+
+msgctxt "#30126"
+msgid "Mark as Watched"
+msgstr ""
+
+msgctxt "#30127"
+msgid "Rate on trakt.tv"
+msgstr ""
+
+msgctxt "#30128"
+msgid "Set as Season View"
+msgstr ""
+
+msgctxt "#30129"
+msgid "Unavailable"
+msgstr ""
+
+msgctxt "#30130"
+msgid "Select Source"
+msgstr ""
+
+msgctxt "#30131"
+msgid "Download Source"
+msgstr ""
+
+msgctxt "#30132"
+msgid "Show Information"
+msgstr ""
+
+msgctxt "#30133"
+msgid "Add Show to List"
+msgstr ""
+
+msgctxt "#30134"
+msgid "Set Related Show Url (Search)"
+msgstr ""
+
+msgctxt "#30135"
+msgid "Set Related Url (Manual)"
+msgstr ""
+
+msgctxt "#30136"
+msgid "Remove from Collection"
+msgstr ""
+
+msgctxt "#30137"
+msgid "Add to Collection"
+msgstr ""
+
+msgctxt "#30138"
+msgid "Add to List"
+msgstr ""
+
+msgctxt "#30139"
+msgid "Add to Library"
+msgstr ""
+
+msgctxt "#30140"
+msgid "Set Addic7ed TVShowID"
+msgstr ""
+
+msgctxt "#30141"
+msgid "Use Default episode matching"
+msgstr ""
+
+msgctxt "#30142"
+msgid "Use Episode Title matching"
+msgstr ""
+
+msgctxt "#30143"
+msgid "Set Related Url (Search)"
+msgstr ""
+
+msgctxt "#30144"
+msgid "Play Trailer"
+msgstr ""
+
+msgctxt "#30145"
+msgid "Pick a list"
+msgstr ""
+
+msgctxt "#30146"
+msgid "No Lists exist for user: %s"
+msgstr ""
+
+msgctxt "#30147"
+msgid "Scraper Automatically Disabled"
+msgstr ""
+
+msgctxt "#30148"
+msgid "The [COLOR blue]%s[/COLOR] scraper timed out on [COLOR red]%s%%[/COLOR] of %s requests"
+msgstr ""
+
+msgctxt "#30149"
+msgid "Each timeout wastes system resources and time."
+msgstr ""
+
+msgctxt "#30150"
+msgid "([I]If you keep it enabled, consider increasing the scraper timeout.[/I])"
+msgstr ""
+
+msgctxt "#30151"
+msgid "Keep Enabled"
+msgstr ""
+
+msgctxt "#30152"
+msgid "Disable It"
+msgstr ""
+
+msgctxt "#30153"
+msgid "Trakt Bookmark Exists"
+msgstr ""
+
+msgctxt "#30154"
+msgid "Local Bookmark Exists"
+msgstr ""
+
+msgctxt "#30155"
+msgid "Resume from %s"
+msgstr ""
+
+msgctxt "#30156"
+msgid "Start from beginning"
+msgstr ""
+
+msgctxt "#30157"
+msgid "Resume"
+msgstr ""
+
+msgctxt "#30158"
+msgid "Downloading: %s..."
+msgstr ""
+
+msgctxt "#30159"
+msgid "Download Complete: %s"
+msgstr ""
+
+msgctxt "#30160"
+msgid "Error (%s) during download: %s"
+msgstr ""
