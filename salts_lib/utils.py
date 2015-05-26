@@ -79,7 +79,7 @@ else:
 THEME_PATH = os.path.join(themepak_path, 'art', 'themes', THEME)
 PLACE_POSTER = os.path.join(ADDON.get_path(), 'resources', 'place_poster.png')
 
-def i8n(string_id):
+def i18n(string_id):
     try:
         return ADDON.get_string(strings.STRINGS[string_id]).encode('utf-8', 'ignore')
     except Exception as e:
@@ -105,11 +105,11 @@ def choose_list(username=None):
     if username is None: lists.insert(0, {'name': 'watchlist', 'ids': {'slug': WATCHLIST_SLUG}})
     if lists:
         dialog = xbmcgui.Dialog()
-        index = dialog.select(i8n('pick_a_list'), [list_data['name'] for list_data in lists])
+        index = dialog.select(i18n('pick_a_list'), [list_data['name'] for list_data in lists])
         if index > -1:
             return lists[index]['ids']['slug']
     else:
-        notify(msg=i8n('no_lists_for_user') % (username), duration=5000)
+        notify(msg=i18n('no_lists_for_user') % (username), duration=5000)
 
 def show_id(show):
     queries = {}
@@ -736,13 +736,13 @@ def do_disable_check():
             if success_rate < disable_thresh:
                 if auto_disable == DISABLE_SETTINGS.ON:
                     ADDON.set_setting('%s-enable' % (cls.get_name()), 'false')
-                    notify(msg='[COLOR blue]%s[/COLOR] %s' % (i8n('scraper_disabled')), duration=5000)
+                    notify(msg='[COLOR blue]%s[/COLOR] %s' % (i18n('scraper_disabled')), duration=5000)
                 elif auto_disable == DISABLE_SETTINGS.PROMPT:
                     dialog = xbmcgui.Dialog()
-                    line1 = i8n('disable_line1') % (cls.get_name(), 100 - success_rate, tries)
-                    line2 = i8n('disable_line2')
-                    line3 = i8n('disable_line3')
-                    ret = dialog.yesno('SALTS', line1, line2, line3, i8n('keep_enabled'), i8n('disable_it'))
+                    line1 = i18n('disable_line1') % (cls.get_name(), 100 - success_rate, tries)
+                    line2 = i18n('disable_line2')
+                    line3 = i18n('disable_line3')
+                    ret = dialog.yesno('SALTS', line1, line2, line3, i18n('keep_enabled'), i18n('disable_it'))
                     if ret:
                         ADDON.set_setting('%s-enable' % (cls.get_name()), 'false')
 
@@ -807,12 +807,12 @@ def bookmark_exists(slug, season, episode):
 def get_resume_choice(slug, season, episode):
     if ADDON.get_setting('trakt_bookmark') == 'true':
         resume_point = '%s%%' % (trakt_api.get_bookmark(slug, season, episode))
-        header = i8n('trakt_bookmark_exists')
+        header = i18n('trakt_bookmark_exists')
     else:
         resume_point = format_time(db_connection.get_bookmark(slug, season, episode))
-        header = i8n('local_bookmark_exists')
-    question = i8n('resume_from') % (resume_point)
-    return xbmcgui.Dialog().yesno(header, question, '', '', i8n('start_from_beginning'), i8n('resume')) == 1
+        header = i18n('local_bookmark_exists')
+    question = i18n('resume_from') % (resume_point)
+    return xbmcgui.Dialog().yesno(header, question, '', '', i18n('start_from_beginning'), i18n('resume')) == 1
 
 def get_bookmark(slug, season, episode):
     if ADDON.get_setting('trakt_bookmark') == 'true':
@@ -865,7 +865,7 @@ def download_media(url, path, file_name):
             else:
                 dialog = xbmcgui.DialogProgressBG()
 
-            dialog.create('Stream All The Sources', i8n('downloading') % (file_name))
+            dialog.create('Stream All The Sources', i18n('downloading') % (file_name))
             dialog.update(0)
         while True:
             data = response.read(CHUNK_SIZE)
@@ -886,7 +886,7 @@ def download_media(url, path, file_name):
             elif progress == PROGRESS.BACKGROUND:
                 dialog.update(percent_progress, 'Stream All The Sources')
         else:
-            notify(msg=i8n('download_complete') % (file_name), duration=5000)
+            notify(msg=i18n('download_complete') % (file_name), duration=5000)
             log_utils.log('Download Complete: %s -> %s' % (url, full_path), xbmc.LOGDEBUG)
 
         file_desc.close()
@@ -895,7 +895,7 @@ def download_media(url, path, file_name):
 
     except Exception as e:
         log_utils.log('Error (%s) during download: %s -> %s' % (str(e), url, file_name), xbmc.LOGERROR)
-        notify(msg=i8n('download_error') % (str(e), file_name), duration=5000)
+        notify(msg=i18n('download_error') % (str(e), file_name), duration=5000)
 
 def get_extension(url, response):
     filename = url2name(url)

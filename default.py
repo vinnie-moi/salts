@@ -32,7 +32,7 @@ from salts_lib.url_dispatcher import URL_Dispatcher
 from salts_lib.srt_scraper import SRT_Scraper
 from salts_lib.trakt_api import Trakt_API, TransientTraktError, TraktNotFoundError, TraktError
 from salts_lib import utils
-from salts_lib.utils import i8n
+from salts_lib.utils import i18n
 from salts_lib import log_utils
 from salts_lib import gui_utils
 from salts_lib.constants import *
@@ -56,9 +56,9 @@ def main_menu():
     if _SALTS.get_setting('auto-disable') != DISABLE_SETTINGS.OFF:
         utils.do_disable_check()
 
-    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': i8n('movies')}, img=utils.art('movies.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': i8n('tv_shows')}, img=utils.art('television.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.SETTINGS}, {'title': i8n('settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.MOVIES}, {'title': i18n('movies')}, img=utils.art('movies.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.BROWSE, 'section': SECTIONS.TV}, {'title': i18n('tv_shows')}, img=utils.art('television.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.SETTINGS}, {'title': i18n('settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
 
     if not TOKEN:
         last_reminder = int(_SALTS.get_setting('last_reminder'))
@@ -70,24 +70,24 @@ def main_menu():
 
 @url_dispatcher.register(MODES.SETTINGS)
 def settings_menu():
-    _SALTS.add_directory({'mode': MODES.SCRAPERS}, {'title': i8n('scraper_sort_order')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.RES_SETTINGS}, {'title': i8n('url_resolver_settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.ADDON_SETTINGS}, {'title': i8n('addon_settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.AUTO_CONF}, {'title': i8n('auto_config')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.GET_PIN}, {'title': i8n('auth_salts')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.SHOW_VIEWS}, {'title': i8n('set_default_views')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    _SALTS.add_directory({'mode': MODES.BROWSE_URLS}, {'title': i8n('remove_cached_urls')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.SCRAPERS}, {'title': i18n('scraper_sort_order')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.RES_SETTINGS}, {'title': i18n('url_resolver_settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.ADDON_SETTINGS}, {'title': i18n('addon_settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.AUTO_CONF}, {'title': i18n('auto_config')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.GET_PIN}, {'title': i18n('auth_salts')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.SHOW_VIEWS}, {'title': i18n('set_default_views')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.BROWSE_URLS}, {'title': i18n('remove_cached_urls')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.SHOW_VIEWS)
 def show_views():
     for content_type in ['movies', 'tvshows', 'seasons', 'episodes']:
-        _SALTS.add_directory({'mode': MODES.BROWSE_VIEW, 'content_type': content_type}, {'title': i8n('set_default_x_view') % (content_type.capitalize())}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+        _SALTS.add_directory({'mode': MODES.BROWSE_VIEW, 'content_type': content_type}, {'title': i18n('set_default_x_view') % (content_type.capitalize())}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 @url_dispatcher.register(MODES.BROWSE_VIEW, ['content_type'])
 def browse_view(content_type):
-    _SALTS.add_directory({'mode': MODES.SET_VIEW, 'content_type': content_type}, {'title': i8n('set_view_instr') % (content_type.capitalize())}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.SET_VIEW, 'content_type': content_type}, {'title': i18n('set_view_instr') % (content_type.capitalize())}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     utils.set_view(content_type, False)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
@@ -97,12 +97,12 @@ def set_default_view(content_type):
     if current_view:
         _SALTS.set_setting('%s_view' % (content_type), current_view)
         view_name = xbmc.getInfoLabel('Container.Viewmode')
-        utils.notify(msg=i8n('view_set') % (content_type.capitalize(), view_name))
+        utils.notify(msg=i18n('view_set') % (content_type.capitalize(), view_name))
 
 @url_dispatcher.register(MODES.BROWSE_URLS)
 def browse_urls():
     urls = db_connection.get_all_urls(order_matters=True)
-    _SALTS.add_directory({'mode': MODES.FLUSH_CACHE}, {'title': '***%s***' % (i8n('delete_cache'))}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.FLUSH_CACHE}, {'title': '***%s***' % (i18n('delete_cache'))}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     for url in urls:
         _SALTS.add_directory({'mode': MODES.DELETE_URL, 'url': url[0]}, {'title': url[0]}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -127,10 +127,10 @@ def get_pin():
 @url_dispatcher.register(MODES.AUTO_CONF)
 def auto_conf():
     dialog = xbmcgui.Dialog()
-    line1 = i8n('auto_conf_line1')
-    line2 = i8n('auto_conf_line2')
-    line3 = i8n('auto_conf_line3')
-    ret = dialog.yesno('SALTS', line1, line2, line3, i8n('go_back'), i8n('continue'))
+    line1 = i18n('auto_conf_line1')
+    line2 = i18n('auto_conf_line2')
+    line3 = i18n('auto_conf_line3')
+    ret = dialog.yesno('SALTS', line1, line2, line3, i18n('go_back'), i18n('continue'))
     if ret:
         _SALTS.set_setting('trakt_timeout', '60')
         _SALTS.set_setting('calendar-day', '-1')
@@ -147,43 +147,43 @@ def auto_conf():
                'wso.ch', 'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131', 'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies',
                'iStreamHD', 'afdah', 'filmikz.ch', 'movie25']
         db_connection.set_setting('source_sort_order', '|'.join(sso))
-        utils.notify(msg=i8n('auto_conf_complete'))
+        utils.notify(msg=i18n('auto_conf_complete'))
     
 @url_dispatcher.register(MODES.BROWSE, ['section'])
 def browse_menu(section):
     if section == SECTIONS.TV:
-        section_label = i8n('tv_shows')
-        section_label2 = i8n('tv_show')
+        section_label = i18n('tv_shows')
+        section_label2 = i18n('tv_show')
         search_img = 'television_search.png'
     else:
-        section_label = i8n('movies')
-        section_label2 = i8n('movie')
+        section_label = i18n('movies')
+        section_label2 = i18n('movie')
         search_img = 'movies_search.png'
 
-    if utils.menu_on('trending'): _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': i8n('trending') % (section_label)}, img=utils.art('trending.png'), fanart=utils.art('fanart.jpg'))
-    if utils.menu_on('popular'): _SALTS.add_directory({'mode': MODES.POPULAR, 'section': section}, {'title': i8n('popular') % (section_label)}, img=utils.art('popular.png'), fanart=utils.art('fanart.jpg'))
-    if utils.menu_on('recent'): _SALTS.add_directory({'mode': MODES.RECENT, 'section': section}, {'title': i8n('recently_updated') % (section_label)}, img=utils.art('recent.png'), fanart=utils.art('fanart.jpg'))
+    if utils.menu_on('trending'): _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': i18n('trending') % (section_label)}, img=utils.art('trending.png'), fanart=utils.art('fanart.jpg'))
+    if utils.menu_on('popular'): _SALTS.add_directory({'mode': MODES.POPULAR, 'section': section}, {'title': i18n('popular') % (section_label)}, img=utils.art('popular.png'), fanart=utils.art('fanart.jpg'))
+    if utils.menu_on('recent'): _SALTS.add_directory({'mode': MODES.RECENT, 'section': section}, {'title': i18n('recently_updated') % (section_label)}, img=utils.art('recent.png'), fanart=utils.art('fanart.jpg'))
     if TOKEN:
-        if utils.menu_on('recommended'): _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': i8n('recommended') % (section_label)}, img=utils.art('recommended.png'), fanart=utils.art('fanart.jpg'))
-        if utils.menu_on('collection'): add_refresh_item({'mode': MODES.SHOW_COLLECTION, 'section': section}, i8n('my_collection') % (section_label2), utils.art('collection.png'), utils.art('fanart.jpg'))
-        if utils.menu_on('favorites'): _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES, 'section': section}, {'title': i8n('my_favorites')}, img=utils.art('my_favorites.png'), fanart=utils.art('fanart.jpg'))
-        if utils.menu_on('subscriptions'): _SALTS.add_directory({'mode': MODES.MANAGE_SUBS, 'section': section}, {'title': i8n('my_subscriptions')}, img=utils.art('my_subscriptions.png'), fanart=utils.art('fanart.jpg'))
-        if utils.menu_on('watchlist'): _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': i8n('my_watchlist')}, img=utils.art('my_watchlist.png'), fanart=utils.art('fanart.jpg'))
-        if utils.menu_on('my_lists'): _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': i8n('my_lists')}, img=utils.art('my_lists.png'), fanart=utils.art('fanart.jpg'))
-#     if utils.menu_on('other_lists'): _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': i8n('other_lists')}, img=utils.art('other_lists.png'), fanart=utils.art('fanart.jpg'))
+        if utils.menu_on('recommended'): _SALTS.add_directory({'mode': MODES.RECOMMEND, 'section': section}, {'title': i18n('recommended') % (section_label)}, img=utils.art('recommended.png'), fanart=utils.art('fanart.jpg'))
+        if utils.menu_on('collection'): add_refresh_item({'mode': MODES.SHOW_COLLECTION, 'section': section}, i18n('my_collection') % (section_label2), utils.art('collection.png'), utils.art('fanart.jpg'))
+        if utils.menu_on('favorites'): _SALTS.add_directory({'mode': MODES.SHOW_FAVORITES, 'section': section}, {'title': i18n('my_favorites')}, img=utils.art('my_favorites.png'), fanart=utils.art('fanart.jpg'))
+        if utils.menu_on('subscriptions'): _SALTS.add_directory({'mode': MODES.MANAGE_SUBS, 'section': section}, {'title': i18n('my_subscriptions')}, img=utils.art('my_subscriptions.png'), fanart=utils.art('fanart.jpg'))
+        if utils.menu_on('watchlist'): _SALTS.add_directory({'mode': MODES.SHOW_WATCHLIST, 'section': section}, {'title': i18n('my_watchlist')}, img=utils.art('my_watchlist.png'), fanart=utils.art('fanart.jpg'))
+        if utils.menu_on('my_lists'): _SALTS.add_directory({'mode': MODES.MY_LISTS, 'section': section}, {'title': i18n('my_lists')}, img=utils.art('my_lists.png'), fanart=utils.art('fanart.jpg'))
+#     if utils.menu_on('other_lists'): _SALTS.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': i18n('other_lists')}, img=utils.art('other_lists.png'), fanart=utils.art('fanart.jpg'))
     if section == SECTIONS.TV:
         if TOKEN:
-            if utils.menu_on('progress'): add_refresh_item({'mode': MODES.SHOW_PROGRESS}, i8n('my_next_episodes'), utils.art('my_progress.png'), utils.art('fanart.jpg'))
-            if utils.menu_on('my_cal'): add_refresh_item({'mode': MODES.MY_CAL}, i8n('my_calendar'), utils.art('my_calendar.png'), utils.art('fanart.jpg'))
-        if utils.menu_on('general_cal'): add_refresh_item({'mode': MODES.CAL}, i8n('general_calendar'), utils.art('calendar.png'), utils.art('fanart.jpg'))
-        if utils.menu_on('premiere_cal'): add_refresh_item({'mode': MODES.PREMIERES}, i8n('premiere_calendar'), utils.art('premiere_calendar.png'), utils.art('fanart.jpg'))
+            if utils.menu_on('progress'): add_refresh_item({'mode': MODES.SHOW_PROGRESS}, i18n('my_next_episodes'), utils.art('my_progress.png'), utils.art('fanart.jpg'))
+            if utils.menu_on('my_cal'): add_refresh_item({'mode': MODES.MY_CAL}, i18n('my_calendar'), utils.art('my_calendar.png'), utils.art('fanart.jpg'))
+        if utils.menu_on('general_cal'): add_refresh_item({'mode': MODES.CAL}, i18n('general_calendar'), utils.art('calendar.png'), utils.art('fanart.jpg'))
+        if utils.menu_on('premiere_cal'): add_refresh_item({'mode': MODES.PREMIERES}, i18n('premiere_calendar'), utils.art('premiere_calendar.png'), utils.art('fanart.jpg'))
 #         if TOKEN:
 #             if utils.menu_on('friends'): add_refresh_item({'mode': MODES.FRIENDS_EPISODE, 'section': section}, 'Friends Episode Activity [COLOR red][I](Temporarily Broken)[/I][/COLOR]', utils.art('friends_episode.png'), utils.art('fanart.jpg'))
 #     if TOKEN:
 #         if utils.menu_on('friends'): add_refresh_item({'mode': MODES.FRIENDS, 'section': section}, 'Friends Activity [COLOR red][I](Temporarily Broken)[/I][/COLOR]', utils.art('friends.png'), utils.art('fanart.jpg'))
-    if utils.menu_on('search'): _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': i8n('search')}, img=utils.art(search_img), fanart=utils.art('fanart.jpg'))
-    if utils.menu_on('search'): add_search_item({'mode': MODES.RECENT_SEARCH, 'section': section}, utils.art(search_img), i8n('recent_searches'), MODES.CLEAR_RECENT)
-    if utils.menu_on('search'): add_search_item({'mode': MODES.SAVED_SEARCHES, 'section': section}, utils.art(search_img), i8n('saved_searches'), MODES.CLEAR_SAVED)
+    if utils.menu_on('search'): _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': i18n('search')}, img=utils.art(search_img), fanart=utils.art('fanart.jpg'))
+    if utils.menu_on('search'): add_search_item({'mode': MODES.RECENT_SEARCH, 'section': section}, utils.art(search_img), i18n('recent_searches'), MODES.CLEAR_RECENT)
+    if utils.menu_on('search'): add_search_item({'mode': MODES.SAVED_SEARCHES, 'section': section}, utils.art(search_img), i18n('saved_searches'), MODES.CLEAR_SAVED)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def add_refresh_item(queries, label, thumb, fanart):
@@ -192,7 +192,7 @@ def add_refresh_item(queries, label, thumb, fanart):
     menu_items = []
     refresh_queries = {'mode': MODES.FORCE_REFRESH, 'refresh_mode': queries['mode']}
     if 'section' in queries: refresh_queries.update({'section': queries['section']})
-    menu_items.append((i8n('force_refresh'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(refresh_queries))),)
+    menu_items.append((i18n('force_refresh'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(refresh_queries))),)
     liz.addContextMenuItems(menu_items)
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
 
@@ -201,13 +201,13 @@ def add_search_item(queries, thumb, title, clear_mode):
     liz.setProperty('fanart_image', utils.art('fanart.jpg'))
     menu_items = []
     menu_queries = {'mode': clear_mode, 'section': queries['section']}
-    menu_items.append((i8n('clear_all') % (title), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
+    menu_items.append((i18n('clear_all') % (title), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
     liz.addContextMenuItems(menu_items)
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
     
 @url_dispatcher.register(MODES.FORCE_REFRESH, ['refresh_mode'], ['section', 'slug', 'username'])
 def force_refresh(refresh_mode, section=None, slug=None, username=None):
-    utils.notify(msg=i8n('forcing_refresh'))
+    utils.notify(msg=i18n('forcing_refresh'))
     log_utils.log('Forcing refresh for mode: |%s|%s|%s|%s|' % (refresh_mode, section, slug, username))
     now = datetime.datetime.now()
     offset = int(_SALTS.get_setting('calendar-day'))
@@ -237,24 +237,24 @@ def force_refresh(refresh_mode, section=None, slug=None, username=None):
         return
 
     log_utils.log('Force refresh complete: |%s|%s|%s|%s|' % (refresh_mode, section, slug, username))
-    utils.notify(msg=i8n('force_refresh_complete'))
+    utils.notify(msg=i18n('force_refresh_complete'))
 
 @url_dispatcher.register(MODES.SCRAPERS)
 def scraper_settings():
     scrapers = utils.relevant_scrapers(None, True, True)
     if _SALTS.get_setting('toggle_enable') == 'true':
-        label = '**%s**' % (i8n('enable_all_scrapers'))
+        label = '**%s**' % (i18n('enable_all_scrapers'))
     else:
-        label = '**%s**' % (i8n('disable_all_scrapers'))
+        label = '**%s**' % (i18n('disable_all_scrapers'))
     _SALTS.add_directory({'mode': MODES.TOGGLE_ALL}, {'title': label}, img=utils.art('scraper.png'), fanart=utils.art('fanart.jpg'))
 
     for i, cls in enumerate(scrapers):
         label = '%s (Provides: %s)' % (cls.get_name(), str(list(cls.provides())).replace("'", ""))
         if not utils.scraper_enabled(cls.get_name()):
             label = '[COLOR darkred]%s[/COLOR]' % (label)
-            toggle_label = i8n('enable_scraper')
+            toggle_label = i18n('enable_scraper')
         else:
-            toggle_label = i8n('disable_scraper')
+            toggle_label = i18n('disable_scraper')
         label = '%s. %s (Success: %s%%)' % (i + 1, label, utils.calculate_success(cls.get_name()))
         liz = xbmcgui.ListItem(label=label, iconImage=utils.art('scraper.png'), thumbnailImage=utils.art('scraper.png'))
         liz.setProperty('fanart_image', utils.art('fanart.jpg'))
@@ -265,13 +265,13 @@ def scraper_settings():
         menu_items = []
         if i > 0:
             queries = {'mode': MODES.MOVE_SCRAPER, 'name': cls.get_name(), 'direction': DIRS.UP, 'other': scrapers[i - 1].get_name()}
-            menu_items.append((i8n('move_up'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i18n('move_up'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         if i < len(scrapers) - 1:
             queries = {'mode': MODES.MOVE_SCRAPER, 'name': cls.get_name(), 'direction': DIRS.DOWN, 'other': scrapers[i + 1].get_name()}
-            menu_items.append((i8n('move_down'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i18n('move_down'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
         queries = {'mode': MODES.MOVE_TO, 'name': cls.get_name()}
-        menu_items.append((i8n('move_to'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('move_to'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
         queries = {'mode': MODES.TOGGLE_SCRAPER, 'name': cls.get_name()}
         menu_items.append((toggle_label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
@@ -284,7 +284,7 @@ def scraper_settings():
 def move_to(name):
     dialog = xbmcgui.Dialog()
     sort_key = utils.make_source_sort_key()
-    new_pos = dialog.numeric(0, i8n('new_pos') % (len(sort_key)))
+    new_pos = dialog.numeric(0, i18n('new_pos') % (len(sort_key)))
     if new_pos:
         new_pos = int(new_pos)
         old_key = sort_key[name]
@@ -424,11 +424,11 @@ def browse_lists(section):
 
         menu_items = []
         queries = {'mode': MODES.SET_FAV_LIST, 'slug': ids['slug'], 'section': section}
-        menu_items.append((i8n('set_fav_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('set_fav_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.SET_SUB_LIST, 'slug': ids['slug'], 'section': section}
-        menu_items.append((i8n('set_sub_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('set_sub_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.COPY_LIST, 'slug': COLLECTION_SLUG, 'section': section, 'target_slug': ids['slug']}
-        menu_items.append((i8n('import_collection'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('import_collection'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         liz.addContextMenuItems(menu_items, replaceItems=True)
 
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=True, totalItems=totalItems)
@@ -436,7 +436,7 @@ def browse_lists(section):
 
 @url_dispatcher.register(MODES.OTHER_LISTS, ['section'])
 def browse_other_lists(section):
-    liz = xbmcgui.ListItem(label=i8n('add_other_list'), iconImage=utils.art('add_other.png'), thumbnailImage=utils.art('add_other.png'))
+    liz = xbmcgui.ListItem(label=i18n('add_other_list'), iconImage=utils.art('add_other.png'), thumbnailImage=utils.art('add_other.png'))
     liz.setProperty('fanart_image', utils.art('fanart.jpg'))
     liz_url = _SALTS.build_plugin_url({'mode': MODES.ADD_OTHER_LIST, 'section': section})
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
@@ -475,15 +475,15 @@ def browse_other_lists(section):
         menu_items = []
         if found:
             queries = {'mode': MODES.FORCE_REFRESH, 'refresh_mode': MODES.SHOW_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
-            menu_items.append((i8n('force_refresh'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i18n('force_refresh'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
             queries = {'mode': MODES.COPY_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
-            menu_items.append((i8n('copy_to_my_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i18n('copy_to_my_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.ADD_OTHER_LIST, 'section': section, 'username': other_list[0]}
-        menu_items.append((i8n('add_more_from') % (other_list[0]), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('add_more_from') % (other_list[0]), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.REMOVE_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0]}
-        menu_items.append((i8n('remove_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('remove_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         queries = {'mode': MODES.RENAME_LIST, 'section': section, 'slug': other_list[1], 'username': other_list[0], 'name': name}
-        menu_items.append((i8n('rename_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('rename_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         liz.addContextMenuItems(menu_items, replaceItems=True)
 
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=True, totalItems=totalItems)
@@ -497,7 +497,7 @@ def remove_list(section, username, slug):
 @url_dispatcher.register(MODES.RENAME_LIST, ['section', 'slug', 'username', 'name'])
 def rename_list(section, slug, username, name):
     keyboard = xbmc.Keyboard()
-    keyboard.setHeading(i8n('new_name_heading'))
+    keyboard.setHeading(i18n('new_name_heading'))
     keyboard.setDefault(name)
     keyboard.doModal()
     if keyboard.isConfirmed():
@@ -509,7 +509,7 @@ def rename_list(section, slug, username, name):
 def add_other_list(section, username=None):
     if username is None:
         keyboard = xbmc.Keyboard()
-        keyboard.setHeading(i8n('username_list_owner'))
+        keyboard.setHeading(i18n('username_list_owner'))
         keyboard.doModal()
         if keyboard.isConfirmed():
             username = keyboard.getText()
@@ -526,7 +526,7 @@ def show_list(section, slug, username=None):
         try:
             items = trakt_api.show_list(slug, section, username)
         except TraktNotFoundError:
-            msg = i8n('list_not_exist') % (slug)
+            msg = i18n('list_not_exist') % (slug)
             utils.notify(msg=msg, duration=5000)
             log_utils.log(msg, xbmc.LOGWARNING)
             return
@@ -608,7 +608,7 @@ def get_progress(cache_override=False):
         
         total = len(workers)
         if worker_count > 0:
-            timeout_msg = i8n('progress_timeouts') % (worker_count, total)
+            timeout_msg = i18n('progress_timeouts') % (worker_count, total)
             utils.notify(msg=timeout_msg, duration=5000)
             log_utils.log(timeout_msg, xbmc.LOGWARNING)
         workers = utils.reap_workers(workers)
@@ -629,7 +629,7 @@ def show_progress():
     
                 menu_items = []
                 queries = {'mode': MODES.SEASONS, 'slug': show['ids']['slug'], 'fanart': fanart}
-                menu_items.append((i8n('browse_seasons'), 'Container.Update(%s)' % (_SALTS.build_plugin_url(queries))),)
+                menu_items.append((i18n('browse_seasons'), 'Container.Update(%s)' % (_SALTS.build_plugin_url(queries))),)
     
                 liz, liz_url = make_episode_item(show, episode['episode'], menu_items=menu_items)
                 label = liz.getLabel()
@@ -646,7 +646,7 @@ def manage_subscriptions(section):
     slug = _SALTS.get_setting('%s_sub_slug' % (section))
     if slug:
         next_run = utils.get_next_run(MODES.UPDATE_SUBS)
-        label = i8n('update_subs')
+        label = i18n('update_subs')
         if _SALTS.get_setting('auto-' + MODES.UPDATE_SUBS) == 'true':
             color = 'green'
             run_str = next_run.strftime("%Y-%m-%d %I:%M:%S %p")
@@ -659,16 +659,16 @@ def manage_subscriptions(section):
         liz_url = _SALTS.build_plugin_url({'mode': MODES.UPDATE_SUBS, 'section': section})
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
         if section == SECTIONS.TV:
-            liz = xbmcgui.ListItem(label=i8n('cleanup_subs'), iconImage=utils.art('clean_up.png'), thumbnailImage=utils.art('clean_up.png'))
+            liz = xbmcgui.ListItem(label=i18n('cleanup_subs'), iconImage=utils.art('clean_up.png'), thumbnailImage=utils.art('clean_up.png'))
             liz.setProperty('fanart_image', utils.art('fanart.jpg'))
             liz_url = _SALTS.build_plugin_url({'mode': MODES.CLEAN_SUBS})
             xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=False)
-    show_pickable_list(slug, i8n('pick_sub_list'), MODES.PICK_SUB_LIST, section)
+    show_pickable_list(slug, i18n('pick_sub_list'), MODES.PICK_SUB_LIST, section)
 
 @url_dispatcher.register(MODES.SHOW_FAVORITES, ['section'])
 def show_favorites(section):
     slug = _SALTS.get_setting('%s_fav_slug' % (section))
-    show_pickable_list(slug, i8n('pick_fav_list'), MODES.PICK_FAV_LIST, section)
+    show_pickable_list(slug, i18n('pick_fav_list'), MODES.PICK_FAV_LIST, section)
 
 @url_dispatcher.register(MODES.PICK_SUB_LIST, ['mode', 'section'])
 @url_dispatcher.register(MODES.PICK_FAV_LIST, ['mode', 'section'])
@@ -701,7 +701,7 @@ def search(section, search_text=None):
         if keyboard.isConfirmed():
             search_text = keyboard.getText()
             if not search_text:
-                utils.notify(msg=i8n('blank_searches'), duration=5000)
+                utils.notify(msg=i18n('blank_searches'), duration=5000)
                 return
             else:
                 break
@@ -720,10 +720,10 @@ def search(section, search_text=None):
 def recent_searches(section):
     if section == SECTIONS.TV:
         search_img = 'television_search.png'
-        section_label = i8n('tv')
+        section_label = i18n('tv')
     else:
         search_img = 'movies_search.png'
-        section_label = i8n('movies')
+        section_label = i18n('movies')
     head = int(_SALTS.get_setting('%s_search_head' % (section)))
     for i in reversed(range(0, SEARCH_HISTORY)):
         index = (i + head + 1) % SEARCH_HISTORY
@@ -736,9 +736,9 @@ def recent_searches(section):
         liz.setProperty('fanart_image', utils.art('fanart.png'))
         menu_items = []
         menu_queries = {'mode': MODES.SAVE_SEARCH, 'section': section, 'query': search_text}
-        menu_items.append((i8n('save_search'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
+        menu_items.append((i18n('save_search'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
         menu_queries = {'mode': MODES.DELETE_RECENT, 'section': section, 'index': index}
-        menu_items.append((i8n('remove_from_recent'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
+        menu_items.append((i18n('remove_from_recent'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(menu_queries))),)
         liz.addContextMenuItems(menu_items)
         queries = {'mode': MODES.SEARCH_RESULTS, 'section': section, 'query': search_text}
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
@@ -748,17 +748,17 @@ def recent_searches(section):
 def saved_searches(section):
     if section == SECTIONS.TV:
         search_img = 'television_search.png'
-        section_label = i8n('tv')
+        section_label = i18n('tv')
     else:
         search_img = 'movies_search.png'
-        section_label = i8n('movies')
+        section_label = i18n('movies')
     for search in db_connection.get_searches(section, order_matters=True):
         label = '[%s Search] %s' % (section_label, search[1])
         liz = xbmcgui.ListItem(label=label, iconImage=utils.art(search_img), thumbnailImage=utils.art(search_img))
         liz.setProperty('fanart_image', utils.art('fanart.png'))
         menu_items = []
         refresh_queries = {'mode': MODES.DELETE_SEARCH, 'search_id': search[0]}
-        menu_items.append((i8n('delete_search'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(refresh_queries))),)
+        menu_items.append((i18n('delete_search'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(refresh_queries))),)
         liz.addContextMenuItems(menu_items)
         queries = {'mode': MODES.SEARCH_RESULTS, 'section': section, 'query': search[1]}
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), _SALTS.build_plugin_url(queries), liz, isFolder=True)
@@ -768,7 +768,7 @@ def saved_searches(section):
 def clear_recent(section):
     for i in range(0, SEARCH_HISTORY):
         db_connection.set_setting('%s_search_%s' % (section, i), '')
-    utils.notify(msg=i8n('recent_cleared'), duration=2500)
+    utils.notify(msg=i18n('recent_cleared'), duration=2500)
 
 @url_dispatcher.register(MODES.DELETE_RECENT, ['section', 'index'])
 def delete_recent(section, index):
@@ -802,7 +802,7 @@ def delete_search(search_id):
 def clear_saved(section):
     for search in db_connection.get_searches(section):
         db_connection.delete_search(search[0])
-    utils.notify(msg=i8n('saved_cleared'), duration=2500)
+    utils.notify(msg=i18n('saved_cleared'), duration=2500)
 
 @url_dispatcher.register(MODES.SEARCH_RESULTS, ['section', 'query'], ['page'])
 def search_results(section, query, page=1):
@@ -905,7 +905,7 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
     timeouts = len(fails)
     workers = utils.reap_workers(workers)
     try:
-        timeout_msg = i8n('scraper_timeout') % (timeouts, total) if got_timeouts and timeouts else ''
+        timeout_msg = i18n('scraper_timeout') % (timeouts, total) if got_timeouts and timeouts else ''
         if not hosters:
             log_utils.log('No Sources found for: |%s|' % (video))
             msg = ' (%s)' % timeout_msg if timeout_msg else ''
@@ -929,7 +929,7 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
         if not hosters:
             log_utils.log('No Useable Sources found for: |%s|' % (video))
             msg = ' (%s)' % timeout_msg if timeout_msg else ''
-            utils.notify(msg=i8n('no_useable_sources') % (msg), duration=5000)
+            utils.notify(msg=i18n('no_useable_sources') % (msg), duration=5000)
             return False
 
         pseudo_tv = xbmcgui.Window(10000).getProperty('PseudoTVRunning')
@@ -990,7 +990,7 @@ def download_subtitles(language, title, year, season, episode):
     index = 0
     if len(sub_labels) > 1:
         dialog = xbmcgui.Dialog()
-        index = dialog.select(i8n('choose_subtitle'), sub_labels)
+        index = dialog.select(i18n('choose_subtitle'), sub_labels)
 
     if subs and index > -1:
         return srt_scraper.download_subtitle(subs[index]['url'])
@@ -1008,7 +1008,7 @@ def play_source(mode, hoster_url, video_type, slug, season='', episode=''):
         if not stream_url or not isinstance(stream_url, basestring):
             try: msg = stream_url.msg
             except: msg = hoster_url
-            utils.notify(msg=i8n('resolve_failed') % (msg), duration=7500)
+            utils.notify(msg=i18n('resolve_failed') % (msg), duration=7500)
             return False
 
     resume_point = 0
@@ -1094,7 +1094,7 @@ def auto_play_sources(hosters, video_type, slug, season, episode):
         if play_source(MODES.GET_SOURCES, hoster_url, video_type, slug, season, episode):
             return True
     else:
-        msg = i8n('all_sources_failed')
+        msg = i18n('all_sources_failed')
         log_utils.log(msg, xbmc.LOGERROR)
         utils.notify(msg=msg, duration=5000)
 
@@ -1108,7 +1108,7 @@ def pick_source_dialog(hosters):
         item['label'] = label
 
     dialog = xbmcgui.Dialog()
-    index = dialog.select(i8n('choose_stream'), [item['label'] for item in hosters if 'label' in item])
+    index = dialog.select(i18n('choose_stream'), [item['label'] for item in hosters if 'label' in item])
     if index > -1:
         try:
             if hosters[index]['url']:
@@ -1153,7 +1153,7 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
     if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
     begin = time.time()
     video = ScraperVideo(video_type, title, year, slug, season, episode, ep_title, ep_airdate)
-    with gui_utils.ProgressDialog(i8n('set_related_url'), utils.make_progress_msg(video_type, title, year, season, episode)) as pd:
+    with gui_utils.ProgressDialog(i18n('set_related_url'), utils.make_progress_msg(video_type, title, year, season, episode)) as pd:
         scrapers = utils.relevant_scrapers(video_type, order_matters=True)
         total = len(scrapers)
         result_count = 0
@@ -1163,7 +1163,7 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
                 url = scraper.get_url(video)
                 if not url: url = ''
                 result_count += 1
-                pd.update(result_count * 100 / total, line2=i8n('recv_result') % (scraper.get_name()))
+                pd.update(result_count * 100 / total, line2=i18n('recv_result') % (scraper.get_name()))
             else:
                 url = ''
                 worker = utils.start_worker(q, utils.parallel_get_url, [scraper, video])
@@ -1189,7 +1189,7 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
                             del fails[result['name']]
                     worker_count -= 1
                     progress = (total - worker_count) * 100 / total
-                    pd.update(progress, line2=i8n('recv_result') % (result['name']))
+                    pd.update(progress, line2=i18n('recv_result') % (result['name']))
                     if max_timeout > 0:
                         timeout = max_timeout - (time.time() - begin)
                         if timeout < 0: timeout = 0
@@ -1202,7 +1202,7 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
 
     total = len(workers)
     timeouts = len(fails)
-    timeout_msg = i8n('scraper_timeout') % (timeouts, total) if timeouts else ''
+    timeout_msg = i18n('scraper_timeout') % (timeouts, total) if timeouts else ''
     if timeout_msg:
         utils.notify(msg=timeout_msg, duration=5000)
         for related in related_list:
@@ -1212,23 +1212,23 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
     workers = utils.reap_workers(workers)
     try:
         dialog = xbmcgui.Dialog()
-        index = dialog.select(i8n('url_to_change') % (video_type), [related['label'] for related in related_list])
+        index = dialog.select(i18n('url_to_change') % (video_type), [related['label'] for related in related_list])
         if index > -1:
             if mode == MODES.SET_URL_MANUAL:
                 keyboard = xbmc.Keyboard()
-                keyboard.setHeading(i8n('rel_url_at') % (video_type, related_list[index]['name']))
+                keyboard.setHeading(i18n('rel_url_at') % (video_type, related_list[index]['name']))
                 keyboard.setDefault(related_list[index]['url'])
                 keyboard.doModal()
                 if keyboard.isConfirmed():
                     new_url = keyboard.getText()
                     utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], new_url, season, episode)
-                    utils.notify(msg=i8n('rel_url_set') % (related_list[index]['name']), duration=5000)
+                    utils.notify(msg=i18n('rel_url_set') % (related_list[index]['name']), duration=5000)
             elif mode == MODES.SET_URL_SEARCH:
                 temp_title = title
                 temp_year = year
                 while True:
                     dialog = xbmcgui.Dialog()
-                    choices = [i8n('manual_search')]
+                    choices = [i18n('manual_search')]
                     try:
                         log_utils.log('Searching for: |%s|%s|' % (temp_title, temp_year), xbmc.LOGDEBUG)
                         results = related_list[index]['class'].search(video_type, temp_title, temp_year)
@@ -1236,10 +1236,10 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
                             choice = result['title']
                             if result['year']: choice = '%s (%s)' % (choice, result['year'])
                             choices.append(choice)
-                        results_index = dialog.select(i8n('select_related'), choices)
+                        results_index = dialog.select(i18n('select_related'), choices)
                         if results_index == 0:
                             keyboard = xbmc.Keyboard()
-                            keyboard.setHeading(i8n('enter_search'))
+                            keyboard.setHeading(i18n('enter_search'))
                             text = temp_title
                             if temp_year: text = '%s (%s)' % (text, temp_year)
                             keyboard.setDefault(text)
@@ -1250,13 +1250,13 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
                                 temp_year = match.group(2) if match.group(2) else ''
                         elif results_index > 0:
                             utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], results[results_index - 1]['url'], season, episode)
-                            utils.notify(msg=i8n('rel_url_set') % (related_list[index]['name']), duration=5000)
+                            utils.notify(msg=i18n('rel_url_set') % (related_list[index]['name']), duration=5000)
                             break
                         else:
                             break
                     except NotImplementedError:
                         log_utils.log('%s Scraper does not support searching.' % (related_list[index]['class'].get_name()))
-                        utils.notify(msg=i8n('scraper_no_search'), duration=5000)
+                        utils.notify(msg=i18n('scraper_no_search'), duration=5000)
                         break
     finally:
         utils.reap_workers(workers, None)
@@ -1279,7 +1279,7 @@ def rate_media(section, id_type, show_id, season='', episode=''):
     else:
         item = {id_type: show_id}
         keyboard = xbmc.Keyboard()
-        keyboard.setHeading(i8n('enter_rating'))
+        keyboard.setHeading(i18n('enter_rating'))
         while True:
             keyboard.doModal()
             if keyboard.isConfirmed():
@@ -1298,7 +1298,7 @@ def edit_tvshow_id(title, year=''):
     srt_scraper = SRT_Scraper()
     tvshow_id = srt_scraper.get_tvshow_id(title, year)
     keyboard = xbmc.Keyboard()
-    keyboard.setHeading(i8n('input_tvshow_id'))
+    keyboard.setHeading(i18n('input_tvshow_id'))
     if tvshow_id:
         keyboard.setDefault(str(tvshow_id))
     keyboard.doModal()
@@ -1324,10 +1324,10 @@ def manage_collection(mode, section, id_type, show_id):
     item = {id_type: show_id}
     if mode == MODES.ADD_TO_COLL:
         trakt_api.add_to_collection(section, item)
-        msg = i8n('item_to_collection')
+        msg = i18n('item_to_collection')
     else:
         trakt_api.remove_from_collection(section, item)
-        msg = i8n('item_from_collection')
+        msg = i18n('item_from_collection')
     utils.notify(msg=msg)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
@@ -1335,7 +1335,7 @@ def manage_collection(mode, section, id_type, show_id):
 def add_to_list(section, id_type, show_id, slug=None):
     response = add_many_to_list(section, {id_type: show_id}, slug)
     if response is not None:
-        utils.notify(msg=i8n('item_to_list'))
+        utils.notify(msg=i18n('item_to_list'))
     #xbmc.executebuiltin("XBMC.Container.Refresh")
 
 def add_many_to_list(section, items, slug=None):
@@ -1360,7 +1360,7 @@ def copy_list(section, slug, username=None, target_slug=None):
         copy_item = {'type': TRAKT_SECTIONS[section][:-1], query['id_type']: query['show_id']}
         copy_items.append(copy_item)
     response = add_many_to_list(section, copy_items, target_slug)
-    utils.notify(msg=i8n('list_copied') % (response['inserted'], response['already_exist'], response['skipped']), duration=5000)
+    utils.notify(msg=i18n('list_copied') % (response['inserted'], response['already_exist'], response['skipped']), duration=5000)
 
 @url_dispatcher.register(MODES.TOGGLE_TITLE, ['slug'])
 def toggle_title(slug):
@@ -1378,8 +1378,8 @@ def toggle_watched(section, id_type, show_id, watched=True, season='', episode='
     log_utils.log('In Watched: |%s|%s|%s|%s|%s|%s|' % (section, id_type, show_id, season, episode, watched), xbmc.LOGDEBUG)
     item = {id_type: show_id}
     trakt_api.set_watched(section, item, season, episode, watched)
-    w_str = i8n('Watched') if watched else i8n('Unwatched')
-    utils.notify(msg=i8n('marked_as') % (w_str), duration=5000)
+    w_str = i18n('Watched') if watched else i18n('Unwatched')
+    utils.notify(msg=i18n('marked_as') % (w_str), duration=5000)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.URL_EXISTS, ['slug'])
@@ -1405,7 +1405,7 @@ def update_subscriptions():
     dialog = None
     if _SALTS.get_setting(MODES.UPDATE_SUBS + '-notify') == 'true':
         dialog = xbmcgui.DialogProgressBG()
-        dialog.create('Stream All The Sources', i8n('updating_subscriptions'))
+        dialog.create('Stream All The Sources', i18n('updating_subscriptions'))
         dialog.update(0)
 
     update_strms(SECTIONS.TV, dialog)
@@ -1422,7 +1422,7 @@ def update_subscriptions():
     if _SALTS.get_setting(MODES.UPDATE_SUBS + '-notify') == 'true':
         dialog.close()
         if _SALTS.get_setting('auto-' + MODES.UPDATE_SUBS) == 'true':
-            utils.notify(msg=i8n('next_update') % (float(_SALTS.get_setting(MODES.UPDATE_SUBS + '-interval'))), duration=5000)
+            utils.notify(msg=i18n('next_update') % (float(_SALTS.get_setting(MODES.UPDATE_SUBS + '-interval'))), duration=5000)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 def update_strms(section, dialog=None):
@@ -1469,52 +1469,52 @@ def clean_subs():
 @url_dispatcher.register(MODES.FLUSH_CACHE)
 def flush_cache():
     dlg = xbmcgui.Dialog()
-    ln1 = i8n('flush_cache_line1')
-    ln2 = i8n('flush_cache_line2')
+    ln1 = i18n('flush_cache_line1')
+    ln2 = i18n('flush_cache_line2')
     ln3 = ''
-    yes = i8n('keep')
-    no = i8n('delete')
-    if dlg.yesno(i8n('flush_web_cache'), ln1, ln2, ln3, yes, no):
+    yes = i18n('keep')
+    no = i18n('delete')
+    if dlg.yesno(i18n('flush_web_cache'), ln1, ln2, ln3, yes, no):
         db_connection.flush_cache()
 
 @url_dispatcher.register(MODES.RESET_DB)
 def reset_db():
     if db_connection.reset_db():
-        message = i8n('db_reset_success')
+        message = i18n('db_reset_success')
     else:
-        message = i8n('db_on_sqlite')
+        message = i18n('db_on_sqlite')
     utils.notify(msg=message)
 
 @url_dispatcher.register(MODES.EXPORT_DB)
 def export_db():
     try:
         dialog = xbmcgui.Dialog()
-        export_path = dialog.browse(0, i8n('select_export_dir'), 'files')
+        export_path = dialog.browse(0, i18n('select_export_dir'), 'files')
         if export_path:
             export_path = xbmc.translatePath(export_path)
-            keyboard = xbmc.Keyboard('export.csv', i8n('enter_export_name'))
+            keyboard = xbmc.Keyboard('export.csv', i18n('enter_export_name'))
             keyboard.doModal()
             if keyboard.isConfirmed():
                 export_filename = keyboard.getText()
                 export_file = export_path + export_filename
                 db_connection.export_from_db(export_file)
-                utils.notify(header=i8n('export_successful'), msg=i8n('exported_to'))
+                utils.notify(header=i18n('export_successful'), msg=i18n('exported_to'))
     except Exception as e:
         log_utils.log('Export Failed: %s' % (e), xbmc.LOGERROR)
-        utils.notify(header=i8n('export'), msg=i8n('export_failed'))
+        utils.notify(header=i18n('export'), msg=i18n('export_failed'))
 
 @url_dispatcher.register(MODES.IMPORT_DB)
 def import_db():
     try:
         dialog = xbmcgui.Dialog()
-        import_file = dialog.browse(1, i8n('select_import_file'), 'files')
+        import_file = dialog.browse(1, i18n('select_import_file'), 'files')
         if import_file:
             import_file = xbmc.translatePath(import_file)
             db_connection.import_into_db(import_file)
-            utils.notify(header=i8n('import_success'), msg=i8n('imported_from'))
+            utils.notify(header=i18n('import_success'), msg=i18n('imported_from'))
     except Exception as e:
         log_utils.log('Import Failed: %s' % (e), xbmc.LOGERROR)
-        utils.notify(header=i8n('import'), msg=i8n('import_failed'))
+        utils.notify(header=i18n('import'), msg=i18n('import_failed'))
         raise
 
 @url_dispatcher.register(MODES.ADD_TO_LIBRARY, ['video_type', 'title', 'year', 'slug'])
@@ -1633,20 +1633,20 @@ def make_dir_from_list(section, list_data, slug=None, query=None, page=None):
         if slug and slug != COLLECTION_SLUG:
             queries = {'mode': MODES.REM_FROM_LIST, 'slug': slug, 'section': section}
             queries.update(show_id)
-            menu_items.append((i8n('remove_from_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i18n('remove_from_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
         sub_slug = _SALTS.get_setting('%s_sub_slug' % (section))
         if TOKEN and sub_slug:
             if sub_slug != slug:
                 queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section'], 'slug': sub_slug}
                 queries.update(show_id)
-                menu_items.append((i8n('subscribe'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+                menu_items.append((i18n('subscribe'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
             elif section == SECTIONS.TV:
                 show_slug = show['ids']['slug']
                 if utils.show_requires_source(show_slug):
-                    label = i8n('require_aired_only')
+                    label = i18n('require_aired_only')
                 else:
-                    label = i8n('require_page_only')
+                    label = i18n('require_page_only')
                 queries = {'mode': MODES.URL_EXISTS, 'slug': show_slug}
                 menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
@@ -1665,7 +1665,7 @@ def make_dir_from_list(section, list_data, slug=None, query=None, page=None):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
 
     if query and page and totalItems >= int(_SALTS.get_setting('list_size')):
-        meta = {'title': '%s >>' % (i8n('next_page'))}
+        meta = {'title': '%s >>' % (i18n('next_page'))}
         query['page'] = int(page) + 1
         _SALTS.add_directory(query, meta, img=utils.art('nextpage.png'), fanart=utils.art('fanart.jpg'), is_folder=True)
 
@@ -1680,7 +1680,7 @@ def make_dir_from_cal(mode, start_date, days):
     last_str = datetime.datetime.strftime(last_week, '%Y-%m-%d')
     next_str = datetime.datetime.strftime(next_week, '%Y-%m-%d')
 
-    liz = xbmcgui.ListItem(label='<< %s' % (i8n('previous_week')), iconImage=utils.art('previous.png'), thumbnailImage=utils.art('previous.png'))
+    liz = xbmcgui.ListItem(label='<< %s' % (i18n('previous_week')), iconImage=utils.art('previous.png'), thumbnailImage=utils.art('previous.png'))
     liz.setProperty('fanart_image', utils.art('fanart.jpg'))
 
     liz_url = _SALTS.build_plugin_url({'mode': mode, 'start_date': last_str})
@@ -1724,7 +1724,7 @@ def make_dir_from_cal(mode, start_date, days):
 
         menu_items = []
         queries = {'mode': MODES.SEASONS, 'slug': show['ids']['slug'], 'fanart': fanart}
-        menu_items.append((i8n('browse_seasons'), 'Container.Update(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('browse_seasons'), 'Container.Update(%s)' % (_SALTS.build_plugin_url(queries))),)
 
         liz, liz_url = make_episode_item(show, episode, show_subs=False, menu_items=menu_items)
         label = liz.getLabel()
@@ -1734,7 +1734,7 @@ def make_dir_from_cal(mode, start_date, days):
         liz.setLabel(label)
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=(liz.getProperty('isPlayable') != 'true'), totalItems=totalItems)
 
-    liz = xbmcgui.ListItem(label='%s >>' % (i8n('next_week')), iconImage=utils.art('next.png'), thumbnailImage=utils.art('next.png'))
+    liz = xbmcgui.ListItem(label='%s >>' % (i18n('next_week')), iconImage=utils.art('next.png'), thumbnailImage=utils.art('next.png'))
     liz.setProperty('fanart_image', utils.art('fanart.jpg'))
     liz_url = _SALTS.build_plugin_url({'mode': mode, 'start_date': next_str})
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=True)
@@ -1751,20 +1751,20 @@ def make_season_item(season, info, slug, fanart):
 
     if 'playcount' in info and info['playcount']:
         watched = False
-        label = i8n('mark_as_unwatched')
+        label = i18n('mark_as_unwatched')
     else:
         watched = True
-        label = i8n('mark_as_watched')
+        label = i18n('mark_as_watched')
 
     if TOKEN:
         queries = {'mode': MODES.RATE, 'section': SECTIONS.TV, 'season': season['number'], 'id_type': 'slug', 'show_id': slug}
-        menu_items.append((i8n('rate_on_trakt'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('rate_on_trakt'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
         queries = {'mode': MODES.TOGGLE_WATCHED, 'section': SECTIONS.TV, 'season': season['number'], 'id_type': 'slug', 'show_id': slug, 'watched': watched}
         menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     queries = {'mode': MODES.SET_VIEW, 'content_type': CONTENT_TYPES.SEASONS}
-    menu_items.append((i8n('set_as_season_view'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+    menu_items.append((i18n('set_as_season_view'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     liz.addContextMenuItems(menu_items, replaceItems=True)
     return liz
@@ -1779,7 +1779,7 @@ def make_episode_item(show, episode, show_subs=True, menu_items=None):
 
     if 'first_aired' in episode: utc_air_time = utils.iso_2_utc(episode['first_aired'])
     try: time_str = time.asctime(time.localtime(utc_air_time))
-    except: time_str = i8n('unavailable')
+    except: time_str = i18n('unavailable')
 
     log_utils.log('First Aired: Title: %s S/E: %s/%s fa: %s, utc: %s, local: %s' %
                   (show['title'], episode['season'], episode['number'], episode['first_aired'], utc_air_time, time_str), xbmc.LOGDEBUG)
@@ -1821,7 +1821,7 @@ def make_episode_item(show, episode, show_subs=True, menu_items=None):
             runstring = 'PlayMedia(%s)' % _SALTS.build_plugin_url(queries)
         else:
             runstring = 'Container.Update(%s)' % _SALTS.build_plugin_url(queries)
-        menu_items.insert(0, (i8n('select_source'), runstring),)
+        menu_items.insert(0, (i18n('select_source'), runstring),)
 
     if _SALTS.get_setting('show_download') == 'true':
         queries = {'mode': MODES.DOWNLOAD_SOURCE, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['number'],
@@ -1830,24 +1830,24 @@ def make_episode_item(show, episode, show_subs=True, menu_items=None):
             runstring = 'RunPlugin(%s)' % _SALTS.build_plugin_url(queries)
         else:
             runstring = 'Container.Update(%s)' % _SALTS.build_plugin_url(queries)
-        menu_items.append((i8n('download_source'), runstring),)
+        menu_items.append((i18n('download_source'), runstring),)
 
     if menu_items and menu_items[0][0] == 'Select Source':
-        menu_items.append((i8n('show_information'), 'XBMC.Action(Info)'),)
+        menu_items.append((i18n('show_information'), 'XBMC.Action(Info)'),)
     else:
-        menu_items.insert(0, (i8n('show_information'), 'XBMC.Action(Info)'),)
+        menu_items.insert(0, (i18n('show_information'), 'XBMC.Action(Info)'),)
 
     show_id = utils.show_id(show)
     queries = {'mode': MODES.ADD_TO_LIST, 'section': SECTIONS.TV}
     queries.update(show_id)
-    menu_items.append((i8n('add_show_to_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+    menu_items.append((i18n('add_show_to_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     if 'watched' in episode and episode['watched']:
         watched = False
-        label = i8n('mark_as_unwatched')
+        label = i18n('mark_as_unwatched')
     else:
         watched = True
-        label = i8n('mark_as_watched')
+        label = i18n('mark_as_watched')
 
     if TOKEN:
         show_id = utils.show_id(show)
@@ -1857,17 +1857,17 @@ def make_episode_item(show, episode, show_subs=True, menu_items=None):
             queries.update({'id_type': 'imdb', 'show_id': show['ids']['imdb']})
         else:
             queries.update(show_id)
-        menu_items.append((i8n('rate_on_trakt'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('rate_on_trakt'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
         queries = {'mode': MODES.TOGGLE_WATCHED, 'section': SECTIONS.TV, 'season': episode['season'], 'episode': episode['number'], 'watched': watched}
         queries.update(show_id)
         menu_items.append((label, 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     queries = {'mode': MODES.SET_URL_SEARCH, 'video_type': VIDEO_TYPES.TVSHOW, 'title': show['title'], 'year': show['year'], 'slug': show['ids']['slug']}
-    menu_items.append((i8n('set_rel_show_url_search'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+    menu_items.append((i18n('set_rel_show_url_search'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
     queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'],
                'episode': episode['number'], 'ep_title': episode['title'], 'ep_airdate': air_date, 'slug': show['ids']['slug']}
-    menu_items.append((i8n('set_rel_url_manual'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+    menu_items.append((i18n('set_rel_url_manual'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     liz.addContextMenuItems(menu_items, replaceItems=True)
     return liz, liz_url
@@ -1905,7 +1905,7 @@ def make_item(section_params, show, menu_items=None):
             runstring = 'PlayMedia(%s)' % _SALTS.build_plugin_url(queries)
         else:
             runstring = 'Container.Update(%s)' % _SALTS.build_plugin_url(queries)
-        menu_items.insert(0, (i8n('select_source'), runstring),)
+        menu_items.insert(0, (i18n('select_source'), runstring),)
 
     if section_params['next_mode'] == MODES.GET_SOURCES and _SALTS.get_setting('show_download') == 'true':
         queries = {'mode': MODES.DOWNLOAD_SOURCE, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
@@ -1913,22 +1913,22 @@ def make_item(section_params, show, menu_items=None):
             runstring = 'RunPlugin(%s)' % _SALTS.build_plugin_url(queries)
         else:
             runstring = 'Container.Update(%s)' % _SALTS.build_plugin_url(queries)
-        menu_items.append((i8n('download_source'), runstring),)
+        menu_items.append((i18n('download_source'), runstring),)
 
     if TOKEN:
         show_id = utils.show_id(show)
         if 'in_collection' in show and show['in_collection']:
             queries = {'mode': MODES.REM_FROM_COLL, 'section': section_params['section']}
             queries.update(show_id)
-            menu_items.append((i8n('remove_from_collection'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i18n('remove_from_collection'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
         else:
             queries = {'mode': MODES.ADD_TO_COLL, 'section': section_params['section']}
             queries.update(show_id)
-            menu_items.append((i8n('add_to_collection'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+            menu_items.append((i18n('add_to_collection'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
         queries = {'mode': MODES.ADD_TO_LIST, 'section': section_params['section']}
         queries.update(show_id)
-        menu_items.append((i8n('add_to_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('add_to_list'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
         queries = {'mode': MODES.RATE, 'section': section_params['section']}
         # favor imdb_id for ratings to work with official trakt addon
@@ -1936,18 +1936,18 @@ def make_item(section_params, show, menu_items=None):
             queries.update({'id_type': 'imdb', 'show_id': show['ids']['imdb']})
         else:
             queries.update(show_id)
-        menu_items.append((i8n('rate_on_trakt'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.append((i18n('rate_on_trakt'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     queries = {'mode': MODES.ADD_TO_LIBRARY, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
-    menu_items.append((i8n('add_to_library'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+    menu_items.append((i18n('add_to_library'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     if TOKEN:
         if 'watched' in show and show['watched']:
             watched = False
-            label = i8n('mark_as_unwatched')
+            label = i18n('mark_as_unwatched')
         else:
             watched = True
-            label = i8n('mark_as_watched')
+            label = i18n('mark_as_watched')
 
         if watched or section_params['section'] == SECTIONS.MOVIES:
             queries = {'mode': MODES.TOGGLE_WATCHED, 'section': section_params['section'], 'watched': watched}
@@ -1957,28 +1957,28 @@ def make_item(section_params, show, menu_items=None):
     if section_params['section'] == SECTIONS.TV and _SALTS.get_setting('enable-subtitles') == 'true':
         queries = {'mode': MODES.EDIT_TVSHOW_ID, 'title': show['title'], 'year': show['year']}
         runstring = 'RunPlugin(%s)' % _SALTS.build_plugin_url(queries)
-        menu_items.append((i8n('set_addicted_tvshowid'), runstring,))
+        menu_items.append((i18n('set_addicted_tvshowid'), runstring,))
 
     if section_params['section'] == SECTIONS.TV:
         if slug in utils.get_force_title_list():
-            label = i8n('use_def_ep_matching')
+            label = i18n('use_def_ep_matching')
         else:
-            label = i8n('use_ep_title_match')
+            label = i18n('use_ep_title_match')
         queries = {'mode': MODES.TOGGLE_TITLE, 'slug': slug}
         runstring = 'RunPlugin(%s)' % _SALTS.build_plugin_url(queries)
         menu_items.append((label, runstring,))
 
     queries = {'mode': MODES.SET_URL_SEARCH, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
-    menu_items.append((i8n('set_rel_url_search'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+    menu_items.append((i18n('set_rel_url_search'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
     queries = {'mode': MODES.SET_URL_MANUAL, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'slug': slug}
-    menu_items.append((i8n('set_rel_url_manual'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+    menu_items.append((i18n('set_rel_url_manual'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     if len(menu_items) < 10 and 'trailer' in info:
         queries = {'mode': MODES.PLAY_TRAILER, 'stream_url': info['trailer']}
-        menu_items.insert(-3, (i8n('play_trailer'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
+        menu_items.insert(-3, (i18n('play_trailer'), 'RunPlugin(%s)' % (_SALTS.build_plugin_url(queries))),)
 
     if len(menu_items) < 10:
-        menu_items.insert(0, (i8n('show_information'), 'XBMC.Action(Info)'),)
+        menu_items.insert(0, (i18n('show_information'), 'XBMC.Action(Info)'),)
 
     liz.addContextMenuItems(menu_items, replaceItems=True)
 
