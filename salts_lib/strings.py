@@ -177,5 +177,10 @@ STRINGS = {
            'resume': 30157,
            'downloading': 30158,
            'download_complete': 30159,
-           'download_error': 30160
+           'download_error': 30160,
+           # 30161 - 30169 used in TraktPinAuthDialog
+           'pin_auth_failed': 30170,
+           'remind_in_24hrs': 30171,
+           'use_addon_settings': 30172,
+           'trakt_auth_complete': 30173
 }

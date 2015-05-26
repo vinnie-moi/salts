@@ -20,6 +20,8 @@ import xbmcgui
 import time
 import xbmc
 import os
+import utils
+from utils import i18n
 from trakt_api import Trakt_API
 from addon.common.addon import Addon
 
@@ -71,19 +73,16 @@ def get_pin():
             #print 'onClick: %s' % (control)
             if control == AUTH_BUTTON:
                 if not self.__get_token():
-                    builtin = "XBMC.Notification(%s, Trakt.tv PIN Authorization Failed, 5000, %s)" % (_SALTS.get_name(), ICON_PATH)
-                    xbmc.executebuiltin(builtin)
+                    utils.notify(msg=i18n('pin_auth_failed'), duration=5000)
                     return
                 self.auth = True
 
             if control == LATER_BUTTON:
-                builtin = "XBMC.Notification(%s, You will be reminded in 24 hours, 5000, %s)" % (_SALTS.get_name(), ICON_PATH)
-                xbmc.executebuiltin(builtin)
+                utils.notify(msg=i18n('remind_in_24hrs'), duration=5000)
                 _SALTS.set_setting('last_reminder', str(int(time.time())))
 
             if control == NEVER_BUTTON:
-                builtin = "XBMC.Notification(%s, Use Addon Settings later if you change your mind, 5000, %s)" % (_SALTS.get_name(), ICON_PATH)
-                xbmc.executebuiltin(builtin)
+                utils.notify(msg=i18n('use_addon_settings'), duration=5000)
                 _SALTS.set_setting('last_reminder', '-1')
 
             if control in [AUTH_BUTTON, LATER_BUTTON, NEVER_BUTTON]:
@@ -116,8 +115,7 @@ def get_pin():
     dialog = PinAuthDialog('TraktPinAuthDialog.xml', _SALTS.get_path())
     dialog.doModal()
     if dialog.auth:
-        builtin = "XBMC.Notification(%s, Trakt Authorization Complete, 3000, %s)" % (_SALTS.get_name(), ICON_PATH)
-        xbmc.executebuiltin(builtin)
+        utils.notify(msg=i18n('trakt_auth_complete'), duration=3000)
     del dialog
 
 class ProgressDialog(object):
