@@ -151,15 +151,9 @@ def auto_conf():
     
 @url_dispatcher.register(MODES.BROWSE, ['section'])
 def browse_menu(section):
-    if section == SECTIONS.TV:
-        section_label = i18n('tv_shows')
-        section_label2 = i18n('tv_show')
-        search_img = 'television_search.png'
-    else:
-        section_label = i18n('movies')
-        section_label2 = i18n('movie')
-        search_img = 'movies_search.png'
-
+    section_params = utils.get_section_params(section)
+    section_label = section_params['label_plural']
+    section_label2 = section_params['label_single']
     if utils.menu_on('trending'): _SALTS.add_directory({'mode': MODES.TRENDING, 'section': section}, {'title': i18n('trending') % (section_label)}, img=utils.art('trending.png'), fanart=utils.art('fanart.jpg'))
     if utils.menu_on('popular'): _SALTS.add_directory({'mode': MODES.POPULAR, 'section': section}, {'title': i18n('popular') % (section_label)}, img=utils.art('popular.png'), fanart=utils.art('fanart.jpg'))
     if utils.menu_on('recent'): _SALTS.add_directory({'mode': MODES.RECENT, 'section': section}, {'title': i18n('recently_updated') % (section_label)}, img=utils.art('recent.png'), fanart=utils.art('fanart.jpg'))
@@ -181,9 +175,9 @@ def browse_menu(section):
 #             if utils.menu_on('friends'): add_refresh_item({'mode': MODES.FRIENDS_EPISODE, 'section': section}, 'Friends Episode Activity [COLOR red][I](Temporarily Broken)[/I][/COLOR]', utils.art('friends_episode.png'), utils.art('fanart.jpg'))
 #     if TOKEN:
 #         if utils.menu_on('friends'): add_refresh_item({'mode': MODES.FRIENDS, 'section': section}, 'Friends Activity [COLOR red][I](Temporarily Broken)[/I][/COLOR]', utils.art('friends.png'), utils.art('fanart.jpg'))
-    if utils.menu_on('search'): _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': i18n('search')}, img=utils.art(search_img), fanart=utils.art('fanart.jpg'))
-    if utils.menu_on('search'): add_search_item({'mode': MODES.RECENT_SEARCH, 'section': section}, utils.art(search_img), i18n('recent_searches'), MODES.CLEAR_RECENT)
-    if utils.menu_on('search'): add_search_item({'mode': MODES.SAVED_SEARCHES, 'section': section}, utils.art(search_img), i18n('saved_searches'), MODES.CLEAR_SAVED)
+    if utils.menu_on('search'): _SALTS.add_directory({'mode': MODES.SEARCH, 'section': section}, {'title': i18n('search')}, img=utils.art(section_params['search_img']), fanart=utils.art('fanart.jpg'))
+    if utils.menu_on('search'): add_search_item({'mode': MODES.RECENT_SEARCH, 'section': section}, utils.art(section_params['search_img']), i18n('recent_searches'), MODES.CLEAR_RECENT)
+    if utils.menu_on('search'): add_search_item({'mode': MODES.SAVED_SEARCHES, 'section': section}, utils.art(section_params['search_img']), i18n('saved_searches'), MODES.CLEAR_SAVED)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def add_refresh_item(queries, label, thumb, fanart):
@@ -694,8 +688,9 @@ def set_list(mode, slug, section):
 
 @url_dispatcher.register(MODES.SEARCH, ['section'])
 def search(section, search_text=None):
+    section_params = utils.get_section_params(section)
     keyboard = xbmc.Keyboard()
-    keyboard.setHeading('Search %s' % (section))
+    keyboard.setHeading('Search %s' % (section_params['label_plural']))
     while True:
         keyboard.doModal()
         if keyboard.isConfirmed():
@@ -718,12 +713,7 @@ def search(section, search_text=None):
 
 @url_dispatcher.register(MODES.RECENT_SEARCH, ['section'])
 def recent_searches(section):
-    if section == SECTIONS.TV:
-        search_img = 'television_search.png'
-        section_label = i18n('tv')
-    else:
-        search_img = 'movies_search.png'
-        section_label = i18n('movies')
+    section_params = utils.get_section_params(section)
     head = int(_SALTS.get_setting('%s_search_head' % (section)))
     for i in reversed(range(0, SEARCH_HISTORY)):
         index = (i + head + 1) % SEARCH_HISTORY
@@ -731,8 +721,8 @@ def recent_searches(section):
         if not search_text:
             break
 
-        label = '[%s Search] %s' % (section_label, search_text)
-        liz = xbmcgui.ListItem(label=label, iconImage=utils.art(search_img), thumbnailImage=utils.art(search_img))
+        label = '[%s Search] %s' % (section_params['label_single'], search_text)
+        liz = xbmcgui.ListItem(label=label, iconImage=utils.art(section_params['search_img']), thumbnailImage=utils.art(section_params['search_img']))
         liz.setProperty('fanart_image', utils.art('fanart.png'))
         menu_items = []
         menu_queries = {'mode': MODES.SAVE_SEARCH, 'section': section, 'query': search_text}
@@ -746,15 +736,10 @@ def recent_searches(section):
 
 @url_dispatcher.register(MODES.SAVED_SEARCHES, ['section'])
 def saved_searches(section):
-    if section == SECTIONS.TV:
-        search_img = 'television_search.png'
-        section_label = i18n('tv')
-    else:
-        search_img = 'movies_search.png'
-        section_label = i18n('movies')
+    section_params = utils.get_section_params(section)
     for search in db_connection.get_searches(section, order_matters=True):
-        label = '[%s Search] %s' % (section_label, search[1])
-        liz = xbmcgui.ListItem(label=label, iconImage=utils.art(search_img), thumbnailImage=utils.art(search_img))
+        label = '[%s Search] %s' % (section_params['label_single'], search[1])
+        liz = xbmcgui.ListItem(label=label, iconImage=utils.art(section_params['search_img']), thumbnailImage=utils.art(section_params['search_img']))
         liz.setProperty('fanart_image', utils.art('fanart.png'))
         menu_items = []
         refresh_queries = {'mode': MODES.DELETE_SEARCH, 'search_id': search[0]}

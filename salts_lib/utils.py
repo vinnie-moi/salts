@@ -296,11 +296,18 @@ def get_section_params(section):
         section_params['folder'] = True
         section_params['video_type'] = VIDEO_TYPES.TVSHOW
         section_params['content_type'] = CONTENT_TYPES.TVSHOWS
+        section_params['search_img'] = 'television_search.png'
+        section_params['label_plural'] = i18n('tv_shows')
+        section_params['label_single'] = i18n('tv_show')
     else:
         section_params['next_mode'] = MODES.GET_SOURCES
         section_params['folder'] = ADDON.get_setting('source-win') == 'Directory' and ADDON.get_setting('auto-play') == 'false'
         section_params['video_type'] = VIDEO_TYPES.MOVIE
         section_params['content_type'] = CONTENT_TYPES.MOVIES
+        section_params['search_img'] = 'movies_search.png'
+        section_params['label_plural'] = i18n('movies')
+        section_params['label_single'] = i18n('movie')
+
     return section_params
 
 def filename_from_title(title, video_type, year=None):
