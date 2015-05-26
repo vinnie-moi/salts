@@ -182,5 +182,8 @@ STRINGS = {
            'pin_auth_failed': 30170,
            'remind_in_24hrs': 30171,
            'use_addon_settings': 30172,
-           'trakt_auth_complete': 30173
+           'trakt_auth_complete': 30173,
+           'enabled': 30174,
+           'base_url': 30175,
+           'page_existence': 30176
 }

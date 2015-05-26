@@ -30,6 +30,7 @@ from StringIO import StringIO
 import gzip
 import datetime
 from salts_lib import log_utils
+from salts_lib import strings
 from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
@@ -55,6 +56,13 @@ COOKIEPATH = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 SHORT_MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 Q_LIST = [item[0] for item in sorted(Q_ORDER.items(), key=lambda x:x[1])]
+
+def i18n(string_id):
+    try:
+        return xbmcaddon.Addon().getLocalizedString(strings.STRINGS[string_id]).encode('utf-8', 'ignore')
+    except Exception as e:
+        log_utils.log('Failed String Lookup: %s (%s)' % (string_id, e))
+        return string_id
 
 abstractstaticmethod = abc.abstractmethod
 class abstractclassmethod(classmethod):
@@ -184,9 +192,9 @@ class Scraper(object):
         the existing settings.xml fragment is removed and replaced by the new string
         """
         name = cls.get_name()
-        return ['         <setting id="%s-enable" type="bool" label="%s Enabled" default="true" visible="true"/>' % (name, name),
-                    '         <setting id="%s-base_url" type="text" label="     Base Url" default="%s" visible="eq(-1,true)"/>' % (name, cls.base_url),
-                    '         <setting id="%s-sub_check" type="bool" label="     Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>' % (name),
+        return ['         <setting id="%s-enable" type="bool" label="%s %s" default="true" visible="true"/>' % (name, name, i18n('enabled')),
+                    '         <setting id="%s-base_url" type="text" label="    %s" default="%s" visible="eq(-1,true)"/>' % (name, i18n('base_url'), cls.base_url),
+                    '         <setting id="%s-sub_check" type="bool" label="    %s" default="true" visible="eq(-2,true)"/>' % (name, i18n('page_existence')),
                     '         <setting id="%s_try" type="number" default="0" visible="false"/>' % (name),
                     '         <setting id="%s_fail" type="number" default="0" visible="false"/>' % (name),
                     '         <setting id="%s_check" type="number" default="0" visible="false"/>' % (name), ]

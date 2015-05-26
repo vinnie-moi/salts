@@ -709,3 +709,576 @@ msgstr ""
 msgctxt "#30173"
 msgid "Trakt Authorization Complete"
 msgstr ""
+
+msgctxt "#30174"
+msgid "Enabled"
+msgstr ""
+
+msgctxt "#30175"
+msgid "Base Url"
+msgstr ""
+
+msgctxt "#30176"
+msgid "Include in Page Existence checks?"
+msgstr ""
+
+msgctxt "#30500"
+msgid "Addon Theme"
+msgstr ""
+
+msgctxt "#30501"
+msgid "Parallel Mode"
+msgstr ""
+
+msgctxt "#30502"
+msgid "Calendar Start Day (0=Today)"
+msgstr ""
+
+msgctxt "#30503"
+msgid "Show air time on calendars"
+msgstr ""
+
+msgctxt "#30504"
+msgid "My Collection Sort Order"
+msgstr ""
+
+msgctxt "#30505"
+msgid "My Next Episodes Sort Order"
+msgstr ""
+
+msgctxt "#30506"
+msgid "Show unaired episodes in My Next Episodes"
+msgstr ""
+
+msgctxt "#30507"
+msgid "Show Season 0 in Seasons View"
+msgstr ""
+
+msgctxt "#30508"
+msgid "Show unaired episodes in Seasons"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30509"
+msgid "    Show an Indicator on Unaired Episodes"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30510"
+msgid "    Show episodes with unknown air date"
+msgstr ""
+
+msgctxt "#30511"
+msgid "Off"
+msgstr ""
+
+msgctxt "#30512"
+msgid "24 Hour"
+msgstr ""
+
+msgctxt "#30513"
+msgid "12 Hour"
+msgstr ""
+
+msgctxt "#30514"
+msgid "Previously Collected"
+msgstr ""
+
+msgctxt "#30515"
+msgid "Recently Collected"
+msgstr ""
+
+msgctxt "#30516"
+msgid "Title"
+msgstr ""
+
+msgctxt "#30517"
+msgid "Year"
+msgstr ""
+
+msgctxt "#30518"
+msgid "Activity"
+msgstr ""
+
+msgctxt "#30519"
+msgid "Title"
+msgstr ""
+
+msgctxt "#30520"
+msgid "Most Completed"
+msgstr ""
+
+msgctxt "#30521"
+msgid "Least Completed"
+msgstr ""
+
+msgctxt "#30522"
+msgid "Recently Aired"
+msgstr ""
+
+msgctxt "#30523"
+msgid "Previously Aired"
+msgstr ""
+
+msgctxt "#30524"
+msgid "Show Trending"
+msgstr ""
+
+msgctxt "#30525"
+msgid "Show Popular"
+msgstr ""
+
+msgctxt "#30526"
+msgid "Show Recently Updated"
+msgstr ""
+
+msgctxt "#30527"
+msgid "Show Recommended"
+msgstr ""
+
+msgctxt "#30528"
+msgid "Show My Collection"
+msgstr ""
+
+msgctxt "#30529"
+msgid "Show My Favorites"
+msgstr ""
+
+msgctxt "#30530"
+msgid "Show My Subscriptions"
+msgstr ""
+
+msgctxt "#30531"
+msgid "Show My Watchlist"
+msgstr ""
+
+msgctxt "#30532"
+msgid "Show My Lists"
+msgstr ""
+
+msgctxt "#30533"
+msgid "Show Other Lists"
+msgstr ""
+
+msgctxt "#30534"
+msgid "Show My Next Episodes"
+msgstr ""
+
+msgctxt "#30535"
+msgid "Show My Calendar"
+msgstr ""
+
+msgctxt "#30536"
+msgid "Show General Calendar"
+msgstr ""
+
+msgctxt "#30537"
+msgid "Show Premiere Calendar"
+msgstr ""
+
+msgctxt "#30538"
+msgid "Show Friends"
+msgstr ""
+
+msgctxt "#30539"
+msgid "Show Search"
+msgstr ""
+
+msgctxt "#30540"
+msgid "Default Views"
+msgstr ""
+
+msgctxt "#30541"
+msgid "Default Movies View (0 = None)"
+msgstr ""
+
+msgctxt "#30542"
+msgid "Default TV Shows View (0 = None)"
+msgstr ""
+
+msgctxt "#30543"
+msgid "Default Seasons View (0 = None)"
+msgstr ""
+
+msgctxt "#30544"
+msgid "Default Episodes View (0 = None)"
+msgstr ""
+
+msgctxt "#30545"
+msgid "General"
+msgstr ""
+
+msgctxt "#30546"
+msgid "User Interface"
+msgstr ""
+
+msgctxt "#30547"
+msgid "How do I authorize SALTS to access my trakt.tv account?"
+msgstr ""
+
+msgctxt "#30548"
+msgid "Use HTTPS"
+msgstr ""
+
+msgctxt "#30549"
+msgid "Trakt Timeout (seconds) (0=No Limit)"
+msgstr ""
+
+msgctxt "#30550"
+msgid "Trakt Page Size"
+msgstr ""
+
+msgctxt "#30551"
+msgid "Maximum Progress Size (0=No Limit)"
+msgstr ""
+
+msgctxt "#30552"
+msgid "Use Trakt Bookmarks"
+msgstr ""
+
+msgctxt "#30553"
+msgid "Cache watched status"
+msgstr ""
+
+msgctxt "#30554"
+msgid "Cache Collection"
+msgstr ""
+
+msgctxt "#30555"
+msgid "Include People"
+msgstr ""
+
+msgctxt "#30556"
+msgid "Minimum Image Size"
+msgstr ""
+
+msgctxt "#30557"
+msgid "Library Integration"
+msgstr ""
+
+msgctxt "#30558"
+msgid "TV Show Folder"
+msgstr ""
+
+msgctxt "#30559"
+msgid "Movie Folder"
+msgstr ""
+
+msgctxt "#30560"
+msgid "Automatically Update Subscriptions"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30561"
+msgid "     Update Interval (hours)"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30562"
+msgid "    During StartUp?"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30563"
+msgid "     During Playback?"
+msgstr ""
+
+msgctxt "#30564"
+msgid "Require Site Page for Movies?"
+msgstr ""
+
+msgctxt "#30565"
+msgid "Include specials in library?"
+msgstr ""
+
+msgctxt "#30566"
+msgid "Include episodes with unknown air dates"
+msgstr ""
+
+msgctxt "#30567"
+msgid "Update Library Afterward?"
+msgstr ""
+
+msgctxt "#30568"
+msgid "Show Notifications?"
+msgstr ""
+
+msgctxt "#30569"
+msgid "Include Movies?"
+msgstr ""
+
+msgctxt "#30570"
+msgid "Prune Ended Shows?"
+msgstr ""
+
+msgctxt "#30571"
+msgid "Source Management"
+msgstr ""
+
+msgctxt "#30572"
+msgid "Auto-Play Sources"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30573"
+msgid "    Source Selection Method"
+msgstr ""
+
+msgctxt "#30574"
+msgid "Show Download Option"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30575"
+msgid "    Show Download Progress"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30576"
+msgid "    TV Show Download Folder"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30577"
+msgid "    Movie Download Folder"
+msgstr ""
+
+msgctxt "#30578"
+msgid "Scraper Timeout (seconds) (0=No Limit)"
+msgstr ""
+
+msgctxt "#30579"
+msgid "Maximum Source Results (0=No Limit)"
+msgstr ""
+
+msgctxt "#30580"
+msgid "Filter Top Unusable Sources (0=None)"
+msgstr ""
+
+msgctxt "#30581"
+msgid "Source Exclusion List"
+msgstr ""
+
+msgctxt "#30582"
+msgid "Allowed TV Show Quality"
+msgstr ""
+
+msgctxt "#30583"
+msgid "Allowed Movie Quality"
+msgstr ""
+
+msgctxt "#30584"
+msgid "Match episode air date when season & episode fails"
+msgstr ""
+
+msgctxt "#30585"
+msgid "Match episode title when season & episode fails"
+msgstr ""
+
+msgctxt "#30586"
+msgid "Automatically disable slow scrapers"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30587"
+msgid "    Check Frequency (requests)"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30588"
+msgid "    Minimum Allowed Success Percentage"
+msgstr ""
+
+msgctxt "#30589"
+msgid "Window"
+msgstr ""
+
+msgctxt "#30590"
+msgid "Background"
+msgstr ""
+
+msgctxt "#30591"
+msgid "Source Sorting"
+msgstr ""
+
+msgctxt "#30592"
+msgid "Sort Sources"
+msgstr ""
+
+msgctxt "#30593"
+msgid "Drop Sources with unknown sort values"
+msgstr ""
+
+msgctxt "#30594"
+msgid "1st Sort Key"
+msgstr ""
+
+msgctxt "#30595"
+msgid "1st Sort Key Order"
+msgstr ""
+
+msgctxt "#30596"
+msgid "2nd Sort Key"
+msgstr ""
+
+msgctxt "#30597"
+msgid "2nd Sort Key Order"
+msgstr ""
+
+msgctxt "#30598"
+msgid "3rd Sort Key"
+msgstr ""
+
+msgctxt "#30599"
+msgid "3rd Sort Key Order"
+msgstr ""
+
+msgctxt "#30600"
+msgid "4th Sort Key"
+msgstr ""
+
+msgctxt "#30601"
+msgid "4th Sort Key Order"
+msgstr ""
+
+msgctxt "#30602"
+msgid "5th Sort Key"
+msgstr ""
+
+msgctxt "#30603"
+msgid "5th Sort Key Order"
+msgstr ""
+
+msgctxt "#30604"
+msgid "None"
+msgstr ""
+
+msgctxt "#30605"
+msgid "Source"
+msgstr ""
+
+msgctxt "#30606"
+msgid "Quality"
+msgstr ""
+
+msgctxt "#30607"
+msgid "Views"
+msgstr ""
+
+msgctxt "#30608"
+msgid "Rating"
+msgstr ""
+
+msgctxt "#30609"
+msgid "Direct"
+msgstr ""
+
+msgctxt "#30610"
+msgid "Best to Worst"
+msgstr ""
+
+msgctxt "#30611"
+msgid "Worst to Best"
+msgstr ""
+
+msgctxt "#30612"
+msgid "Base Url"
+msgstr ""
+
+msgctxt "#30613"
+msgid "Include in Page Existence checks?"
+msgstr ""
+
+msgctxt "#30614"
+msgid "Subtitles work only for TV Shows currently"
+msgstr ""
+
+msgctxt "#30615"
+msgid "Enable Subtitles"
+msgstr ""
+
+msgctxt "#30616"
+msgid "Show subtitle indicators"
+msgstr ""
+
+msgctxt "#30617"
+msgid "Subtitle Language"
+msgstr ""
+
+msgctxt "#30618"
+msgid "Require Hearing Impaired"
+msgstr ""
+
+msgctxt "#30619"
+msgid "Require HD"
+msgstr ""
+
+msgctxt "#30620"
+msgid "Download Subtitles on playback"
+msgstr ""
+
+msgctxt "#30621"
+msgid "Subtitle Download Folder"
+msgstr ""
+
+msgctxt "#30622"
+msgid "Show Subtitles on Playback"
+msgstr ""
+
+msgctxt "#30623"
+msgid "Use a MySQL DB"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30624"
+msgid "    Address"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30625"
+msgid "    Port"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30626"
+msgid "    Username"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30627"
+msgid "    Password"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30628"
+msgid "    Database"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30629"
+msgid "    Upgrade DB during XBMC startup"
+msgstr ""
+
+msgctxt "#30630"
+msgid "Flush webpage cache..."
+msgstr ""
+
+msgctxt "#30631"
+msgid "Reset SALTS DB ([COLOR red]SQLITE Only[/COLOR])"
+msgstr ""
+
+msgctxt "#30632"
+msgid "Export data from SALTS DB"
+msgstr ""
+
+msgctxt "#30633"
+msgid "Import data into SALTS DB"
+msgstr ""
+
+msgctxt "#30634"
+msgid "Subtitles"
+msgstr ""
+
+msgctxt "#30635"
+msgid "Database"
+msgstr ""
