@@ -23,6 +23,7 @@ import json
 import xbmcaddon
 import xbmc
 from salts_lib import log_utils
+from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
@@ -124,8 +125,8 @@ class Niter_Scraper(scraper.Scraper):
     def get_settings(cls):
         settings = super(Niter_Scraper, cls).get_settings()
         name = cls.get_name()
-        settings.append('         <setting id="%s-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>' % (name))
-        settings.append('         <setting id="%s-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>' % (name))
+        settings.append('         <setting id="%s-username" type="text" label="     %s" default="" visible="eq(-6,true)"/>' % (name, i18n('username')))
+        settings.append('         <setting id="%s-password" type="text" label="     %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('password')))
         return settings
 
     def _http_get(self, url, data=None, auth=True, cache_limit=8):

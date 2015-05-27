@@ -21,6 +21,7 @@ import urlparse
 import xbmcaddon
 import xbmc
 from salts_lib import log_utils
+from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
@@ -87,7 +88,7 @@ class OroroTV_Scraper(scraper.Scraper):
         html = self._http_get(url, cache_limit=.25)
         results = []
         norm_title = self._normalize_title(title)
-        include_paid = xbmcaddon.Addon().getSetting('%s-include_paid' % (self.get_name())) == 'true'
+        include_paid = xbmcaddon.Addon().getSetting('%s-include_premium' % (self.get_name())) == 'true'
         for match in re.finditer('<span class=\'value\'>(\d{4})(.*?)href="([^"]+)[^>]+>([^<]+)', html, re.DOTALL):
             match_year, middle, url, match_title = match.groups()
             if not include_paid and video_type == VIDEO_TYPES.MOVIE and 'paid accounts' in middle:
@@ -101,12 +102,12 @@ class OroroTV_Scraper(scraper.Scraper):
 
     @classmethod
     def get_settings(cls):
+        settings = super(OroroTV_Scraper, cls).get_settings()
         name = cls.get_name()
-        return ['         <setting id="%s-enable" type="bool" label="%s Enabled" default="true" visible="true"/>' % (name, name),
-                    '         <setting id="%s-base_url" type="text" label="     Base Url" default="%s" visible="eq(-1,true)"/>' % (name, cls.base_url),
-                    '         <setting id="%s-username" type="text" label="     Username" default="" visible="eq(-2,true)"/>' % (name),
-                    '         <setting id="%s-password" type="text" label="     Password" option="hidden" default="" visible="eq(-3,true)"/>' % (name),
-                    '         <setting id="%s-include_paid" type="bool" label="     Include Paid content" default="false" visible="eq(-4,true)"/>' % (name)]
+        settings.append('         <setting id="%s-username" type="text" label="     %s" default="" visible="eq(-6,true)"/>' % (name, i18n('username')))
+        settings.append('         <setting id="%s-password" type="text" label="     %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('password')))
+        settings.append('         <setting id="%s-include_premium" type="bool" label="     %s" default="false" visible="eq(-8,true)"/>' % (name, i18n('include_premium')))
+        return settings
 
     def _http_get(self, url, data=None, cache_limit=8):
         # return all uncached blank pages if no user or pass

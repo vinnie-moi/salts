@@ -23,6 +23,7 @@ import urlparse
 import xbmcaddon
 import xbmc
 from salts_lib import log_utils
+from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 from salts_lib.constants import USER_AGENT
@@ -138,9 +139,9 @@ class NoobRoom_Scraper(scraper.Scraper):
     def get_settings(cls):
         settings = super(NoobRoom_Scraper, cls).get_settings()
         name = cls.get_name()
-        settings.append('         <setting id="%s-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>' % (name))
-        settings.append('         <setting id="%s-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>' % (name))
-        settings.append('         <setting id="%s-include_premium" type="bool" label="     Include Premium" default="false" visible="eq(-8,true)"/>' % (name))
+        settings.append('         <setting id="%s-username" type="text" label="     %s" default="" visible="eq(-6,true)"/>' % (name, i18n('username')))
+        settings.append('         <setting id="%s-password" type="text" label="     %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('password')))
+        settings.append('         <setting id="%s-include_premium" type="bool" label="     %s" default="false" visible="eq(-8,true)"/>' % (name, i18n('include_premium')))
         return settings
 
     def _http_get(self, url, data=None, cache_limit=8):

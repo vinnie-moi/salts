@@ -20,6 +20,7 @@ import re
 import urlparse
 import xbmcaddon
 import time
+from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
@@ -75,7 +76,7 @@ class WSO_Scraper(scraper.Scraper):
     def get_settings(cls):
         settings = super(WSO_Scraper, cls).get_settings()
         name = cls.get_name()
-        settings.append('         <setting id="%s-max_pages" type="slider" range="1,50" option="int" label="     Maximum Pages" default="1" visible="eq(-6,true)"/>' % (name))
+        settings.append('         <setting id="%s-max_pages" type="slider" range="1,50" option="int" label="     %s" default="1" visible="eq(-6,true)"/>' % (name, i18n('max_pages')))
         return settings
 
     def search(self, video_type, title, year):
@@ -103,6 +104,11 @@ class WSO_Scraper(scraper.Scraper):
         for page in xrange(1, self.max_pages + 1):
             url = show_url
             if page > 1: url += '%s/page/%s' % (show_url, page)
+            # if page is blank, don't continue getting pages
+            html = self._http_get(url, cache_limit=2)
+            if not html:
+                return
+
             ep_url = super(WSO_Scraper, self)._default_get_episode_url(url, video, episode_pattern, title_pattern, airdate_pattern)
             if ep_url is not None:
                 return ep_url

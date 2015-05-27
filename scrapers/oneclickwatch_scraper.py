@@ -21,6 +21,7 @@ import urlparse
 import re
 import xbmcaddon
 from salts_lib import log_utils
+from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 
 BASE_URL = 'http://oneclickwatch.ws'
@@ -76,8 +77,8 @@ class OneClickWatch_Scraper(scraper.Scraper):
         settings = super(OneClickWatch_Scraper, cls).get_settings()
         settings = cls._disable_sub_check(settings)
         name = cls.get_name()
-        settings.append('         <setting id="%s-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>' % (name))
-        settings.append('         <setting id="%s-select" type="enum" label="     Automatically Select" values="Most Recent|Highest Quality" default="0" visible="eq(-7,true)"/>' % (name))
+        settings.append('         <setting id="%s-filter" type="slider" range="0,180" option="int" label="     %s" default="30" visible="eq(-6,true)"/>' % (name, i18n('filter_results_days')))
+        settings.append('         <setting id="%s-select" type="enum" label="     %s" lvalues="30636|30637" default="0" visible="eq(-7,true)"/>' % (name, i18n('auto_select')))
         return settings
 
     def search(self, video_type, title, year):

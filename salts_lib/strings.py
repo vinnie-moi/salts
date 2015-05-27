@@ -187,5 +187,9 @@ STRINGS = {
            'base_url': 30175,
            'page_existence': 30176,
            'username': 30177,
-           'password': 30178
+           'password': 30178,
+           'filter_results_days': 30179,
+           'auto_select': 30180,
+           'include_premium': 30181,
+           'max_pages': 30182
 }

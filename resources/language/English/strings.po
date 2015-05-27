@@ -722,6 +722,30 @@ msgctxt "#30176"
 msgid "Include in Page Existence checks?"
 msgstr ""
 
+msgctxt "#30177"
+msgid "Username"
+msgstr ""
+
+msgctxt "#30178"
+msgid "Password"
+msgstr ""
+
+msgctxt "#30179"
+msgid "Filter results older than (0=No Filter) (days)"
+msgstr ""
+
+msgctxt "#30180"
+msgid "Automatically Select"
+msgstr ""
+
+msgctxt "#30181"
+msgid "Include Premium"
+msgstr ""
+
+msgctxt "#30182"
+msgid "Maximum Pages"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
@@ -1282,3 +1306,12 @@ msgstr ""
 msgctxt "#30635"
 msgid "Database"
 msgstr ""
+
+msgctxt "#30636"
+msgid "Most Recent"
+msgstr ""
+
+msgctxt "#30637"
+msgid "Highest Quality"
+msgstr ""
+
