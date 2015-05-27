@@ -1,3 +1,8 @@
+[B]Version 1.0.4[/B]
+- Add all strings to po file to start translation
+- Add new themes from DK, mjbxx, and flthemi
+- Improve wso scraper
+
 [B]Version 1.0.3[/B]
 - Sort seasons
 - Add SALTy theme
