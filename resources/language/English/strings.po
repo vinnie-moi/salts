@@ -746,6 +746,42 @@ msgctxt "#30182"
 msgid "Maximum Pages"
 msgstr ""
 
+msgctxt "#30183"
+msgid "No Sources Found"
+msgstr ""
+
+msgctxt "#30184"
+msgid "Season"
+msgstr ""
+
+msgctxt "#30185"
+msgid "DISABLED"
+msgstr ""
+
+msgctxt "#30186"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30187"
+msgid "Watched"
+msgstr ""
+
+msgctxt "#30188"
+msgid "Unwatched"
+msgstr ""
+
+msgctxt "#30189"
+msgid "Updating"
+msgstr ""
+
+msgctxt "#30190"
+msgid "Failed to create directory"
+msgstr ""
+
+msgctxt "#30191"
+msgid "Failed to write file"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
@@ -1313,5 +1349,13 @@ msgstr ""
 
 msgctxt "#30637"
 msgid "Highest Quality"
+msgstr ""
+
+msgctxt "#30638"
+msgid "Prompt"
+msgstr ""
+
+msgctxt "#30639"
+msgid "On"
 msgstr ""
 

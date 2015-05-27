@@ -97,14 +97,15 @@ class WSO_Scraper(scraper.Scraper):
         return results
 
     def _get_episode_url(self, show_url, video):
-        episode_pattern = 'class="PostHeader">\s*<a\s+href="([^"]+)[^>]+title="[^"]+[Ss]%02d[Ee]%02d[ "]' % (int(video.season), int(video.episode))
+        episode_pattern = '<h2>\s*<a\s+href="([^"]+)[^>]+title="[^"]+[Ss]%02d[Ee]%02d[ "]' % (int(video.season), int(video.episode))
         title_pattern = ''
-        airdate_pattern = 'class="PostHeader">\s*<a\s+href="([^"]+)[^>]+title="[^"]+{year} {p_month} {p_day}[ \)"]'
+        airdate_pattern = '<h2>\s*<a\s+href="([^"]+)[^>]+title="[^"]+{year} {p_month} {p_day}[ \)"]'
 
         for page in xrange(1, self.max_pages + 1):
             url = show_url
             if page > 1: url += '%s/page/%s' % (show_url, page)
             # if page is blank, don't continue getting pages
+            url = urlparse.urljoin(self.base_url, url)
             html = self._http_get(url, cache_limit=2)
             if not html:
                 return

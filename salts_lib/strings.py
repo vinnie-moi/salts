@@ -191,5 +191,14 @@ STRINGS = {
            'filter_results_days': 30179,
            'auto_select': 30180,
            'include_premium': 30181,
-           'max_pages': 30182
+           'max_pages': 30182,
+           'no_sources': 30183,
+           'season': 30184,
+           'disabled': 30185,
+           'search': 30186,
+           'watched': 30187,
+           'unwatched': 30188,
+           'updating': 30189,
+           'failed_create_dir': 30190,
+           'failed_write_file': 30191
 }

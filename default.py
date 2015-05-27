@@ -646,7 +646,7 @@ def manage_subscriptions(section):
             run_str = next_run.strftime("%Y-%m-%d %I:%M:%S %p")
         else:
             color = 'red'
-            run_str = 'DISABLED'
+            run_str = i18n('disabled')
         label = label % (color, run_str)
         liz = xbmcgui.ListItem(label=label, iconImage=utils.art('update_subscriptions.png'), thumbnailImage=utils.art('update_subscriptions.png'))
         liz.setProperty('fanart_image', utils.art('fanart.jpg'))
@@ -690,7 +690,7 @@ def set_list(mode, slug, section):
 def search(section, search_text=None):
     section_params = utils.get_section_params(section)
     keyboard = xbmc.Keyboard()
-    keyboard.setHeading('Search %s' % (section_params['label_plural']))
+    keyboard.setHeading('%s %s' % (i18n('search'), section_params['label_plural']))
     while True:
         keyboard.doModal()
         if keyboard.isConfirmed():
@@ -721,7 +721,7 @@ def recent_searches(section):
         if not search_text:
             break
 
-        label = '[%s Search] %s' % (section_params['label_single'], search_text)
+        label = '[%s %s] %s' % (section_params['label_single'], i18n('search'), search_text)
         liz = xbmcgui.ListItem(label=label, iconImage=utils.art(section_params['search_img']), thumbnailImage=utils.art(section_params['search_img']))
         liz.setProperty('fanart_image', utils.art('fanart.png'))
         menu_items = []
@@ -738,7 +738,7 @@ def recent_searches(section):
 def saved_searches(section):
     section_params = utils.get_section_params(section)
     for search in db_connection.get_searches(section, order_matters=True):
-        label = '[%s Search] %s' % (section_params['label_single'], search[1])
+        label = '[%s %s] %s' % (section_params['label_single'], i18n('search'), search[1])
         liz = xbmcgui.ListItem(label=label, iconImage=utils.art(section_params['search_img']), thumbnailImage=utils.art(section_params['search_img']))
         liz.setProperty('fanart_image', utils.art('fanart.png'))
         menu_items = []
@@ -893,7 +893,8 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
         timeout_msg = i18n('scraper_timeout') % (timeouts, total) if got_timeouts and timeouts else ''
         if not hosters:
             log_utils.log('No Sources found for: |%s|' % (video))
-            msg = ' (%s)' % timeout_msg if timeout_msg else ''
+            msg = i18n('no_sources')
+            msg += ' (%s)' % timeout_msg if timeout_msg else ''
             utils.notify(msg=msg, duration=5000)
             return False
 
@@ -1363,7 +1364,7 @@ def toggle_watched(section, id_type, show_id, watched=True, season='', episode='
     log_utils.log('In Watched: |%s|%s|%s|%s|%s|%s|' % (section, id_type, show_id, season, episode, watched), xbmc.LOGDEBUG)
     item = {id_type: show_id}
     trakt_api.set_watched(section, item, season, episode, watched)
-    w_str = i18n('Watched') if watched else i18n('Unwatched')
+    w_str = i18n('watched') if watched else i18n('unwatched')
     utils.notify(msg=i18n('marked_as') % (w_str), duration=5000)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
@@ -1424,7 +1425,7 @@ def update_strms(section, dialog=None):
     for i, item in enumerate(items):
         if dialog:
             percent_progress = i * 100 / length
-            dialog.update(percent_progress, 'Stream All The Sources', 'Updating %s: %s (%s)' % (section, re.sub(' \(\d{4}\)$', '', item['title']), item['year']))
+            dialog.update(percent_progress, 'Stream All The Sources', '%s %s: %s (%s)' % (i18n('updating'), section, re.sub(' \(\d{4}\)$', '', item['title']), item['year']))
         add_to_library(section_params['video_type'], item['title'], item['year'], item['ids']['slug'])
 
 @url_dispatcher.register(MODES.CLEAN_SUBS)
@@ -1726,7 +1727,7 @@ def make_dir_from_cal(mode, start_date, days):
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def make_season_item(season, info, slug, fanart):
-    label = 'Season %s' % (season['number'])
+    label = '%s %s' % (i18n('season'), season['number'])
     season['images']['fanart'] = {}
     season['images']['fanart']['full'] = fanart
     liz = utils.make_list_item(label, season)
