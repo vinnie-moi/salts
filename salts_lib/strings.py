@@ -185,5 +185,7 @@ STRINGS = {
            'trakt_auth_complete': 30173,
            'enabled': 30174,
            'base_url': 30175,
-           'page_existence': 30176
+           'page_existence': 30176,
+           'username': 30177,
+           'password': 30178
 }

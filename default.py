@@ -32,7 +32,7 @@ from salts_lib.url_dispatcher import URL_Dispatcher
 from salts_lib.srt_scraper import SRT_Scraper
 from salts_lib.trakt_api import Trakt_API, TransientTraktError, TraktNotFoundError, TraktError
 from salts_lib import utils
-from salts_lib.utils import i18n
+from salts_lib.trans_utils import i18n
 from salts_lib import log_utils
 from salts_lib import gui_utils
 from salts_lib.constants import *

@@ -22,6 +22,7 @@ import xbmcaddon
 import xbmc
 import urllib
 from salts_lib import log_utils
+from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
@@ -92,8 +93,8 @@ class HDTVShows_Scraper(scraper.Scraper):
         name = cls.get_name()
         return ['         <setting id="%s-enable" type="bool" label="%s Enabled" default="true" visible="true"/>' % (name, name),
                     '         <setting id="%s-base_url" type="text" label="     Base Url" default="%s" visible="eq(-1,true)"/>' % (name, cls.base_url),
-                    '         <setting id="%s-username" type="text" label="     Username" default="" visible="eq(-2,true)"/>' % (name),
-                    '         <setting id="%s-password" type="text" label="     Password" option="hidden" default="" visible="eq(-3,true)"/>' % (name)]
+                    '         <setting id="%s-username" type="text" label="     %s" default="" visible="eq(-2,true)"/>' % (name, i18n('username')),
+                    '         <setting id="%s-password" type="text" label="     %s" option="hidden" default="" visible="eq(-3,true)"/>' % (name, i18n('password'))]
 
     def _http_get(self, url, data=None, cache_limit=8):
         # return all uncached blank pages if no user or pass

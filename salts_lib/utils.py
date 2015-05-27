@@ -29,8 +29,8 @@ import log_utils
 import sys
 import urlparse
 import urllib
-import strings
 from constants import *
+from trans_utils import i18n
 from scrapers import *  # import all scrapers into this namespace
 from addon.common.addon import Addon
 from trakt_api import Trakt_API
@@ -78,13 +78,6 @@ else:
     themepak_path = ADDON.get_path()
 THEME_PATH = os.path.join(themepak_path, 'art', 'themes', THEME)
 PLACE_POSTER = os.path.join(ADDON.get_path(), 'resources', 'place_poster.png')
-
-def i18n(string_id):
-    try:
-        return ADDON.get_string(strings.STRINGS[string_id]).encode('utf-8', 'ignore')
-    except Exception as e:
-        log_utils.log('Failed String Lookup: %s (%s)' % (string_id, e))
-        return string_id
 
 def notify(header=None, msg='', duration=2000):
     if header is None: header = ADDON.get_name()

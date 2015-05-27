@@ -21,7 +21,7 @@ import time
 import xbmc
 import os
 import utils
-from utils import i18n
+from trans_utils import i18n
 from trakt_api import Trakt_API
 from addon.common.addon import Addon
 

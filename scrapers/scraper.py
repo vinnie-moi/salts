@@ -30,7 +30,7 @@ from StringIO import StringIO
 import gzip
 import datetime
 from salts_lib import log_utils
-from salts_lib import strings
+from salts_lib.trans_utils import i18n
 from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
@@ -56,13 +56,6 @@ COOKIEPATH = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 SHORT_MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 Q_LIST = [item[0] for item in sorted(Q_ORDER.items(), key=lambda x:x[1])]
-
-def i18n(string_id):
-    try:
-        return xbmcaddon.Addon().getLocalizedString(strings.STRINGS[string_id]).encode('utf-8', 'ignore')
-    except Exception as e:
-        log_utils.log('Failed String Lookup: %s (%s)' % (string_id, e))
-        return string_id
 
 abstractstaticmethod = abc.abstractmethod
 class abstractclassmethod(classmethod):
