@@ -26,6 +26,7 @@ import xbmc
 import xbmcvfs
 import urllib2
 import urlresolver
+import json
 from addon.common.addon import Addon
 from salts_lib.db_utils import DB_Connection
 from salts_lib.url_dispatcher import URL_Dispatcher
@@ -1023,6 +1024,7 @@ def play_source(mode, hoster_url, video_type, slug, season='', episode=''):
 
             ep_meta = trakt_api.get_episode_details(slug, season, episode)
             show_meta = trakt_api.get_show_details(slug)
+            win.setProperty('script.trakt.ids', json.dumps(show_meta['ids']))
             people = trakt_api.get_people(SECTIONS.TV, slug) if _SALTS.get_setting('include_people') == 'true' else None
             info = utils.make_info(ep_meta, show_meta, people)
             images = {}
@@ -1037,13 +1039,14 @@ def play_source(mode, hoster_url, video_type, slug, season='', episode=''):
             path = _SALTS.get_setting('movie-download-folder')
             file_name = utils.filename_from_title(slug, video_type)
 
-            item = trakt_api.get_movie_details(slug)
+            movie_meta = trakt_api.get_movie_details(slug)
+            win.setProperty('script.trakt.ids', json.dumps(movie_meta['ids']))
             people = trakt_api.get_people(SECTIONS.MOVIES, slug) if _SALTS.get_setting('include_people') == 'true' else None
-            info = utils.make_info(item, people=people)
-            art = utils.make_art(item)
+            info = utils.make_info(movie_meta, people=people)
+            art = utils.make_art(movie_meta)
 
-            path = make_path(path, video_type, item['title'], item['year'])
-            file_name = utils.filename_from_title(item['title'], video_type, item['year'])
+            path = make_path(path, video_type, movie_meta['title'], movie_meta['year'])
+            file_name = utils.filename_from_title(movie_meta['title'], video_type, movie_meta['year'])
     except TransientTraktError as e:
         log_utils.log('During Playback: %s' % (str(e)), xbmc.LOGWARNING)  # just log warning if trakt calls fail and leave meta and art blank
 
