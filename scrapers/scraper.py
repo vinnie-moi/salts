@@ -277,7 +277,7 @@ class Scraper(object):
         if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
             log_utils.log('Before Cookies: %s' % (self.cookies_as_str(cj)), xbmc.LOGDEBUG)
         for key in cookies:
-            c = cookielib.Cookie(0, key, cookies[key], port=None, port_specified=False, domain=domain, domain_specified=True,
+            c = cookielib.Cookie(0, key, str(cookies[key]), port=None, port_specified=False, domain=domain, domain_specified=True,
                                 domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=False, comment=None,
                                 comment_url=None, rest={})
             cj.set_cookie(c)

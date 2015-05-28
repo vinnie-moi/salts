@@ -446,6 +446,12 @@
          <setting id="wso.ch_fail" type="number" default="0" visible="false"/>
          <setting id="wso.ch_check" type="number" default="0" visible="false"/>
          <setting id="wso.ch-max_pages" type="slider" range="1,50" option="int" label="     Maximum Pages" default="1" visible="eq(-6,true)"/>
+         <setting id="xmovies8-enable" type="bool" label="xmovies8 Enabled" default="true" visible="true"/>
+         <setting id="xmovies8-base_url" type="text" label="    Base Url" default="http://xmovies8.co" visible="eq(-1,true)"/>
+         <setting id="xmovies8-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="xmovies8_try" type="number" default="0" visible="false"/>
+         <setting id="xmovies8_fail" type="number" default="0" visible="false"/>
+         <setting id="xmovies8_check" type="number" default="0" visible="false"/>
          <setting id="yify.tv-enable" type="bool" label="yify.tv Enabled" default="true" visible="true"/>
          <setting id="yify.tv-base_url" type="text" label="    Base Url" default="http://yify.tv" visible="eq(-1,true)"/>
          <setting id="yify.tv-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
