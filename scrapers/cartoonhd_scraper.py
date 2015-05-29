@@ -93,7 +93,7 @@ class CartoonHD_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         results = []
         html = self. _http_get(self.base_url, cache_limit=0)
-        match = re.search("var\s+token\s*=\s*'([^']+)", html)
+        match = re.search("var\s+tok\s*=\s*'([^']+)", html)
         if match:
             token = match.group(1)
             

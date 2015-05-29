@@ -25,7 +25,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'HD': QUALITIES.HIGH, 'HDTV': QUALITIES.HIGH, 'DVD': QUALITIES.HIGH, '3D': QUALITIES.HIGH, 'CAM': QUALITIES.LOW}
-BASE_URL = 'http://www.iwatchonline.to'
+BASE_URL = 'http://www.iwatchonline.ag'
 
 class IWatchOnline_Scraper(scraper.Scraper):
     base_url = BASE_URL
