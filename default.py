@@ -613,6 +613,7 @@ def get_progress(cache_override=False):
 @url_dispatcher.register(MODES.SHOW_PROGRESS)
 def show_progress():
     try:
+        workers = []
         workers, progress = get_progress()
         for episode in progress:
             log_utils.log('Episode: Sort Keys: Tile: |%s| Last Watched: |%s| Percent: |%s%%| Completed: |%s|' % (episode['show']['title'], episode['last_watched_at'], episode['percent_completed'], episode['completed']), xbmc.LOGDEBUG)
