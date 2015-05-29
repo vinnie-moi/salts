@@ -450,9 +450,8 @@ class Scraper(object):
                 results = self.search(video.video_type, fallback_search, video.year)
             if results:
                 # TODO: First result isn't always the most recent...
-                if select == 0:
-                    best_result = results[0]
-                else:
+                best_result = results[0]
+                if select != 0:
                     best_qorder = 0
                     for result in results:
                         match = re.search('\[(.*)\]$', result['title'])
