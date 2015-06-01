@@ -1,3 +1,9 @@
+[B]Version 1.0.5[/B]
+- Add better integration with script.trakt
+- Add xmovies8 scraper
+- fix iwatchonline and cartoonhd scraper
+- Minor code fixes
+
 [B]Version 1.0.4[/B]
 - Add all strings to po file to start translation
 - Add new themes from DK, mjbxx, and flthemi
