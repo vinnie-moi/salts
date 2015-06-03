@@ -18,4 +18,9 @@
         <website>http://tvaddons.ag/</website>
 		<forum>http://forums.tvaddons.ag/forums/180-TKNORRIS-RELEASE-REPOSITORY</forum>
 	</extension>
+    <extension point="xbmc.addon.repository" name="TVAddons script.module.urlresolver Repository">
+        <info compressed="false">https://offshoregit.com/tvaresolvers/tva-smu-repository/raw/master/addons.xml</info>
+        <checksum>https://offshoregit.com/tvaresolvers/tva-smu-repository/raw/master/addons.xml.md5</checksum>
+        <datadir zip="true">https://offshoregit.com/tvaresolvers/tva-smu-repository/raw/master/zips/</datadir>
+    </extension>
 </addon>
