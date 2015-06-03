@@ -1,3 +1,6 @@
+[B]Version 1.0.6[/B]
+- Add new TVA UrlResolver Repo (TESTING!)
+
 [B]Version 1.0.5[/B]
 - Add better integration with script.trakt
 - Add xmovies8 scraper
