@@ -86,7 +86,6 @@ class TubeMotion_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/search/')
         search_url += '?%s' % (urllib.quote_plus(title))
         html = self._http_get(search_url, multipart_data=FORM_DATA % (title), cache_limit=.25)
-        print html
         results = []
         pattern = 'class=\'box\'.*?href="([^"]+).*?alt=\'([^\']+)'
         for match in re.finditer(pattern, html, re.DOTALL):
