@@ -70,13 +70,22 @@ class TubeMotion_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            for match in re.finditer('trbidi="on"(.*?)<br(.*?)</div>', html, re.DOTALL):
-                q_str, fragment = match.groups()
-                for match2 in re.finditer('href="([^"]+)', fragment):
-                    stream_url = match2.group(1)
-                    host = urlparse.urlparse(stream_url).hostname
-                    hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': self._blog_get_quality(video, q_str, host), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
-                    hosters.append(hoster)
+            r = re.search("class='main_content'>(.*?)MarketGidComposite End", html, re.DOTALL)
+            if r:
+                fragment = r.group(1)
+                lines = fragment.split('\n')
+                q_str = 'HDRIP'
+                for line in lines:
+                    if line.startswith('<a'):
+                        match = re.search('href="([^"]+)', line)
+                        if match:
+                            stream_url = match.group(1)
+                            host = urlparse.urlparse(stream_url).hostname
+                            hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': self._blog_get_quality(video, q_str, host), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                            hosters.append(hoster)
+                    elif not line.startswith('http://'):
+                        q_str = line
+
         return hosters
 
     def get_url(self, video):
