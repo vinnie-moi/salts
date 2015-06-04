@@ -228,7 +228,7 @@ class Scraper(object):
 
         return url
 
-    def _cached_http_get(self, url, base_url, timeout, cookies=None, data=None, headers=None, cache_limit=8):
+    def _cached_http_get(self, url, base_url, timeout, cookies=None, data=None, multipart_data=None, headers=None, cache_limit=8):
         if cookies is None: cookies = {}
         if timeout == 0: timeout = None
         if headers is None: headers = {}
@@ -243,6 +243,10 @@ class Scraper(object):
         try:
             cj = self._set_cookies(base_url, cookies)
             if data is not None: data = urllib.urlencode(data, True)
+            if multipart_data is not None:
+                headers['Content-Type'] = 'multipart/form-data; boundary=X-X-X'
+                data = multipart_data
+
             request = urllib2.Request(url, data=data)
             request.add_header('User-Agent', USER_AGENT)
             request.add_unredirected_header('Host', request.get_host())
