@@ -21,6 +21,7 @@ import urlparse
 import re
 import urlparse
 import xbmcaddon
+from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 
 BASE_URL = 'http://tubemotion.com'
@@ -70,10 +71,9 @@ class TubeMotion_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            r = re.search("class='main_content'>(.*?)MarketGidComposite End", html, re.DOTALL)
-            if r:
-                fragment = r.group(1)
-                lines = fragment.split('\n')
+            fragment = dom_parser.parse_dom(html, 'div', {'class': 'main_content'})
+            if fragment:
+                lines = fragment[0].split('\n')
                 q_str = 'HDRIP'
                 for line in lines:
                     if line.startswith('<a'):
@@ -96,19 +96,21 @@ class TubeMotion_Scraper(scraper.Scraper):
         search_url += '?%s' % (urllib.quote_plus(title))
         html = self._http_get(search_url, multipart_data=FORM_DATA % (title), cache_limit=.25)
         results = []
-        pattern = 'class=\'box\'.*?href="([^"]+).*?alt=\'([^\']+)'
-        for match in re.finditer(pattern, html, re.DOTALL):
-            url, match_title_year = match.groups()
-            match = re.search('(.*?)(?:\s+\(?(\d{4})\)?)', match_title_year)
+        elements = dom_parser.parse_dom(html, 'div', {'class': 'box'})
+        for element in elements:
+            match = re.search('href="([^"]+).*?alt=\'([^\']+)', element, re.DOTALL)
             if match:
-                match_title, match_year = match.groups()
-            else:
-                match_title = match_title_year
-                match_year = ''
-            
-            if not year or not match_year or year == match_year:
-                result = {'title': match_title, 'year': match_year, 'url': urlparse.urlparse(url).path}
-                results.append(result)
+                url, match_title_year = match.groups()
+                match = re.search('(.*?)(?:\s+\(?(\d{4})\)?)', match_title_year)
+                if match:
+                    match_title, match_year = match.groups()
+                else:
+                    match_title = match_title_year
+                    match_year = ''
+                
+                if not year or not match_year or year == match_year:
+                    result = {'title': match_title, 'year': match_year, 'url': urlparse.urlparse(url).path}
+                    results.append(result)
         return results
 
     def _http_get(self, url, data=None, multipart_data=None, headers=None, cache_limit=8):
