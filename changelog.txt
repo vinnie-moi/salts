@@ -1,3 +1,10 @@
+[B]Version 1.0.8[/B]
+- Add tubemotion scraper
+- Fix clickplay.to
+- Add cloudflare detection/solve
+- Add yify-streaming scraper
+- Add Mint Movies scraper
+
 [B]Version 1.0.7[/B]
 - Remove TVA UrlResolver Repo
 
