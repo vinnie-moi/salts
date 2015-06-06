@@ -31,6 +31,7 @@ import gzip
 import datetime
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
+from salts_lib import cloudflare
 from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
@@ -262,6 +263,14 @@ class Scraper(object):
                 html = f.read()
             else:
                 html = response.read()
+        except urllib2.HTTPError as e:
+            if e.code == 503 and 'cf-browser-verification' in e.read():
+                html = cloudflare.solve(url, cj)
+                if not html:
+                    return ''
+            else:
+                log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), xbmc.LOGWARNING)
+                return ''
         except Exception as e:
             log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), xbmc.LOGWARNING)
             return ''
