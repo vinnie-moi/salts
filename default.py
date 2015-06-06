@@ -142,10 +142,10 @@ def auto_conf():
         _SALTS.set_setting('sort3_field', '1')
         _SALTS.set_setting('sort4_field', '3')
         _SALTS.set_setting('sort5_field', '4')
-        sso = ['Local', 'DirectDownload.tv', 'VKBox', 'NoobRoom', 'movietv.to', 'stream-tv.co', 'streamallthis.is', 'GVCenter', 'hdtvshows.net', 'clickplay.to', 'IceFilms',
-               'ororo.tv', 'afdah.org', 'xmovies8', 'hdmz', 'niter.tv', 'yify.tv', 'MovieNight', 'cmz', 'viooz.ac', 'view47', 'MoviesHD', 'OnlineMovies', 'MoviesOnline7', 'wmo.ch', 
-               'zumvo.com', 'alluc.com', 'MyVideoLinks.eu', 'OneClickWatch', 'RLSSource.net', 'TVRelease.Net', 'FilmStreaming.in', 'PrimeWire', 'CartoonHD', 'WatchFree.to', 'pftv',
-               'wso.ch', 'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131', 'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies',
+        sso = ['Local', 'DirectDownload.tv', 'VKBox', 'NoobRoom', 'yify-streaming', 'stream-tv.co', 'streamallthis.is', 'GVCenter', 'hdtvshows.net', 'clickplay.to', 'IceFilms',
+               'ororo.tv', 'afdah.org', 'xmovies8', 'hdmz', 'niter.tv', 'yify.tv', 'movietv.to', 'MovieNight', 'cmz', 'viooz.ac', 'view47', 'MoviesHD', 'OnlineMovies', 'MoviesOnline7', 'wmo.ch',
+               'zumvo.com', 'alluc.com', 'MyVideoLinks.eu', 'OneClickWatch', 'tubemotion', 'RLSSource.net', 'TVRelease.Net', 'FilmStreaming.in', 'PrimeWire', 'CartoonHD', 'WatchFree.to',
+               'pftv', 'wso.ch', 'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131', 'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies',
                'iStreamHD', 'afdah', 'filmikz.ch', 'movie25']
         db_connection.set_setting('source_sort_order', '|'.join(sso))
         utils.notify(msg=i18n('auto_conf_complete'))
