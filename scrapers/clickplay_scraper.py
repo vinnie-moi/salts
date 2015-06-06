@@ -21,6 +21,7 @@ import urlparse
 import xbmcaddon
 import urllib
 import base64
+from salts_lib import dom_parser
 from salts_lib import GKDecrypter
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
@@ -71,7 +72,14 @@ class ClickPlay_Scraper(scraper.Scraper):
                         for source in sources:
                             hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': sources[source], 'host': 'clickplay.to', 'rating': None, 'views': None, 'direct': True}
                             hosters.append(hoster)
-
+            else:
+                ele = dom_parser.parse_dom(html, 'video')
+                if ele:
+                    stream_url = dom_parser.parse_dom(ele, 'source', ret='src')
+                    if stream_url:
+                        hoster = {'multi-part': False, 'url': stream_url[0], 'class': self, 'quality': QUALITIES.HD720, 'host': 'clickplay.to', 'rating': None, 'views': None, 'direct': True}
+                        hosters.append(hoster)
+                        
         return hosters
 
     def __parse_google(self, html):
