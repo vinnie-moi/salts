@@ -68,19 +68,20 @@ class MintMovies_Scraper(scraper.Scraper):
             if match:
                 link = match.group(1)
                 link_format = link[-3:]
-                hoster = {'multi-part': False, 'host': self.get_name(), 'class': self, 'quality': FORMATS[link_format], 'views': None, 'rating': None, 'url': link, 'direct': True}
+                hoster = {'multi-part': False, 'host': self.get_name(), 'class': self, 'quality': FORMATS.get(link_format, QUALITIES.HD720), 'views': None, 'rating': None, 'url': link, 'direct': True}
                 hosters.append(hoster)
                 
                 # check for other resolutions
-                formats = FORMATS
-                del formats[link_format]
-                for test_format in formats:
-                    test_link = link.replace(link_format, test_format)
-                    try:
-                        urllib2.urlopen(test_link)
-                        hoster = {'multi-part': False, 'host': self.get_name(), 'class': self, 'quality': FORMATS[test_format], 'views': None, 'rating': None, 'url': test_link, 'direct': True}
-                        hosters.append(hoster)
-                    except urllib2.HTTPError: pass
+                if 'googleusercontent' in link:
+                    formats = FORMATS
+                    del formats[link_format]
+                    for test_format in formats:
+                        test_link = link.replace(link_format, test_format)
+                        try:
+                            urllib2.urlopen(test_link)
+                            hoster = {'multi-part': False, 'host': self.get_name(), 'class': self, 'quality': FORMATS[test_format], 'views': None, 'rating': None, 'url': test_link, 'direct': True}
+                            hosters.append(hoster)
+                        except urllib2.HTTPError: pass
 
         return hosters
 
