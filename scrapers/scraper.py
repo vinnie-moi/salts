@@ -549,6 +549,20 @@ class Scraper(object):
             quality = QUALITIES.LOW
         return quality
 
+    def _gv_get_quality(self, stream_url):
+        if 'itag=18' in stream_url or '=m18' in stream_url:
+            return QUALITIES.MEDIUM
+        elif 'itag=22' in stream_url or '=m22' in stream_url:
+            return QUALITIES.HD720
+        elif 'itag=34' in stream_url or '=m34' in stream_url:
+            return QUALITIES.HIGH
+        elif 'itag=35' in stream_url or '=m35' in stream_url:
+            return QUALITIES.HIGH
+        elif 'itag=37' in stream_url or '=m37' in stream_url:
+            return QUALITIES.HD1080
+        else:
+            return QUALITIES.HIGH
+    
     def create_db_connection(self):
         if P_MODE == P_MODES.THREADS:
             worker_id = threading.current_thread().ident
