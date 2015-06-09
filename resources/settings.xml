@@ -145,12 +145,6 @@
          <setting id="alluc.com_try" type="number" default="0" visible="false"/>
          <setting id="alluc.com_fail" type="number" default="0" visible="false"/>
          <setting id="alluc.com_check" type="number" default="0" visible="false"/>
-         <setting id="CartoonHD-enable" type="bool" label="CartoonHD Enabled" default="true" visible="true"/>
-         <setting id="CartoonHD-base_url" type="text" label="    Base Url" default="http://www.cartoonhd.tv" visible="eq(-1,true)"/>
-         <setting id="CartoonHD-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
-         <setting id="CartoonHD_try" type="number" default="0" visible="false"/>
-         <setting id="CartoonHD_fail" type="number" default="0" visible="false"/>
-         <setting id="CartoonHD_check" type="number" default="0" visible="false"/>
          <setting id="ch131-enable" type="bool" label="ch131 Enabled" default="true" visible="true"/>
          <setting id="ch131-base_url" type="text" label="    Base Url" default="http://www.ch131.me" visible="eq(-1,true)"/>
          <setting id="ch131-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -187,6 +181,14 @@
          <setting id="FilmStreaming.in_try" type="number" default="0" visible="false"/>
          <setting id="FilmStreaming.in_fail" type="number" default="0" visible="false"/>
          <setting id="FilmStreaming.in_check" type="number" default="0" visible="false"/>
+         <setting id="Flixanity-enable" type="bool" label="Flixanity Enabled" default="true" visible="true"/>
+         <setting id="Flixanity-base_url" type="text" label="    Base Url" default="http://www.flixanity.tv" visible="eq(-1,true)"/>
+         <setting id="Flixanity-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="Flixanity_try" type="number" default="0" visible="false"/>
+         <setting id="Flixanity_fail" type="number" default="0" visible="false"/>
+         <setting id="Flixanity_check" type="number" default="0" visible="false"/>
+         <setting id="Flixanity-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>
+         <setting id="Flixanity-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>
          <setting id="GVCenter-enable" type="bool" label="GVCenter Enabled" default="true" visible="true"/>
          <setting id="GVCenter-base_url" type="text" label="    Base Url" default="http://www.gearscenter.com/" visible="eq(-1,true)"/>
          <setting id="GVCenter-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
