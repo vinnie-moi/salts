@@ -61,10 +61,13 @@ class MoviesHD_Scraper(scraper.Scraper):
                 hash_url = match.group(1)
                 if hash_url.startswith('//'): hash_url = 'http:' + hash_url
                 hoster = {'multi-part': False, 'url': hash_url, 'host': 'videomega.tv', 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'up': None, 'down': None, 'direct': False}
-                match = re.search('class="rating">([^%]+).*?class="nb-votes">(\d+)', html, re.DOTALL)
+                match = re.search('class="rating">([^%<]*).*?class="nb-votes">(\d+)', html, re.DOTALL)
                 if match:
                     rating, votes = match.groups()
-                    hoster['rating'] = int(rating)
+                    if rating:
+                        hoster['rating'] = int(rating)
+                    else:
+                        hoster['rating'] = 0
                     hoster['up'] = int(round(hoster['rating'] * int(votes) / 100.0))
                     hoster['down'] = int(int(votes) - hoster['up'])
                 hosters.append(hoster)
@@ -74,7 +77,7 @@ class MoviesHD_Scraper(scraper.Scraper):
         return super(MoviesHD_Scraper, self)._default_get_url(video)
 
     def search(self, video_type, title, year):
-        search_url = urlparse.urljoin(self.base_url, '/search/')
+        search_url = urlparse.urljoin(self.base_url, '/?s=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
         results = []
