@@ -171,7 +171,7 @@ def solve(url, cj, wait=True):
             response = urllib2.urlopen(request)
             final = response.read()
         except urllib2.HTTPError as e:
-            log_utils.log('Cloud Flare Error: %s' % (e.code), xbmc.LOGWARNING)
+            log_utils.log('CloudFlare Error: %s on url: %s' % (e.code, url), xbmc.LOGWARNING)
             return False
 
         if cj:
