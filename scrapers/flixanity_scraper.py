@@ -65,7 +65,7 @@ class Flixanity_Scraper(scraper.Scraper):
             for match in re.finditer(pattern, html, re.DOTALL | re.I):
                 url = match.group(1)
                 host = urlparse.urlsplit(url).hostname.lower()
-                if 'googlevideo' in host:
+                if 'google' in host:
                     direct = True
                     host = self.get_name()
                     quality = self._gv_get_quality(url)

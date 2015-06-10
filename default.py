@@ -27,6 +27,7 @@ import xbmcvfs
 import urllib2
 import urlresolver
 import json
+import xml.etree.ElementTree as ET
 from addon.common.addon import Addon
 from salts_lib.db_utils import DB_Connection
 from salts_lib.url_dispatcher import URL_Dispatcher
@@ -75,6 +76,7 @@ def settings_menu():
     _SALTS.add_directory({'mode': MODES.RES_SETTINGS}, {'title': i18n('url_resolver_settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.ADDON_SETTINGS}, {'title': i18n('addon_settings')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.AUTO_CONF}, {'title': i18n('auto_config')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    _SALTS.add_directory({'mode': MODES.RESET_BASE_URL}, {'title': i18n('reset_base_url')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.GET_PIN}, {'title': i18n('auth_salts')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.SHOW_VIEWS}, {'title': i18n('set_default_views')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     _SALTS.add_directory({'mode': MODES.BROWSE_URLS}, {'title': i18n('remove_cached_urls')}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
@@ -124,6 +126,19 @@ def addon_settings():
 @url_dispatcher.register(MODES.GET_PIN)
 def get_pin():
     gui_utils.get_pin()
+
+@url_dispatcher.register(MODES.RESET_BASE_URL)
+def reset_base_url():
+    xml_path = os.path.join(_SALTS.get_path(), 'resources', 'settings.xml')
+    tree = ET.parse(xml_path)
+    for category in tree.getroot().findall('category'):
+        if category.get('label').startswith('Scrapers '):
+            for setting in category.findall('setting'):
+                if setting.get('id').endswith('-base_url'):
+                    log_utils.log('Resetting: %s -> %s' % (setting.get('id'), setting.get('default')), xbmc.LOGDEBUG)
+                    _SALTS.set_setting(setting.get('id'), setting.get('default'))
+
+    utils.notify(msg=i18n('reset_complete'))
 
 @url_dispatcher.register(MODES.AUTO_CONF)
 def auto_conf():

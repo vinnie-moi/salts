@@ -782,6 +782,14 @@ msgctxt "#30191"
 msgid "Failed to write file"
 msgstr ""
 
+msgctxt "#30192"
+msgid "Reset All Scraper Base Urls to Default"
+msgstr ""
+
+msgctxt "#30193"
+msgid "Base Url Reset Complete"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
@@ -1358,4 +1366,3 @@ msgstr ""
 msgctxt "#30639"
 msgid "On"
 msgstr ""
-

@@ -1,3 +1,11 @@
+[B]Version 1.0.9[/B]
+- Add PlayboxHD scraper
+- Remove hdtvshows.net scraper
+- Switch cartoonhd scraper to flixanity scraper.
+- Fix movieshd scraper
+- Tweak MintMovies
+- Add Base Url Reset function
+
 [B]Version 1.0.8[/B]
 - Add tubemotion scraper
 - Fix clickplay.to
