@@ -5,6 +5,7 @@
 - Fix movieshd scraper
 - Tweak MintMovies
 - Add Base Url Reset function
+- Minor Fixes
 
 [B]Version 1.0.8[/B]
 - Add tubemotion scraper
