@@ -72,6 +72,7 @@ class Stream_Scraper(scraper.Scraper):
                         break
 
             # assume we must be on the mail.ru link now
+            # TODO: Once mail.ru resolver is pushed, this code needs to be removed
             match = re.search("iframe\s+src='([^']+)", html)
             if match:
                 new_url = match.group(1)
