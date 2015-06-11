@@ -1043,7 +1043,7 @@ msgstr ""
 
 #. Keep 4 spaces at the beginning of string 
 msgctxt "#30562"
-msgid "    During StartUp?"
+msgid "     During StartUp?"
 msgstr ""
 
 #. Keep 4 spaces at the beginning of string 
