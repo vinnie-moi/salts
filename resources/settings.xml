@@ -368,6 +368,12 @@
          <setting id="RLSSource.net_check" type="number" default="0" visible="false"/>
          <setting id="RLSSource.net-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>
          <setting id="RLSSource.net-select" type="enum" label="     Automatically Select" values="Most Recent|Highest Quality" default="0" visible="eq(-7,true)"/>
+         <setting id="Shush.se-enable" type="bool" label="Shush.se Enabled" default="true" visible="true"/>
+         <setting id="Shush.se-base_url" type="text" label="    Base Url" default="http://shush.se" visible="eq(-1,true)"/>
+         <setting id="Shush.se-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="Shush.se_try" type="number" default="0" visible="false"/>
+         <setting id="Shush.se_fail" type="number" default="0" visible="false"/>
+         <setting id="Shush.se_check" type="number" default="0" visible="false"/>
          <setting id="SolarMovie-enable" type="bool" label="SolarMovie Enabled" default="true" visible="true"/>
          <setting id="SolarMovie-base_url" type="text" label="    Base Url" default="http://www.solarmovie.is" visible="eq(-1,true)"/>
          <setting id="SolarMovie-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -406,15 +412,15 @@
          <setting id="UFlix.org_try" type="number" default="0" visible="false"/>
          <setting id="UFlix.org_fail" type="number" default="0" visible="false"/>
          <setting id="UFlix.org_check" type="number" default="0" visible="false"/>
+    </category>
+	
+    <category label="Scrapers 4">
          <setting id="vidics.ch-enable" type="bool" label="vidics.ch Enabled" default="true" visible="true"/>
          <setting id="vidics.ch-base_url" type="text" label="    Base Url" default="http://www.vidics.ch" visible="eq(-1,true)"/>
          <setting id="vidics.ch-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="vidics.ch_try" type="number" default="0" visible="false"/>
          <setting id="vidics.ch_fail" type="number" default="0" visible="false"/>
          <setting id="vidics.ch_check" type="number" default="0" visible="false"/>
-    </category>
-	
-    <category label="Scrapers 4">
          <setting id="view47-enable" type="bool" label="view47 Enabled" default="true" visible="true"/>
          <setting id="view47-base_url" type="text" label="    Base Url" default="http://view47.com" visible="eq(-1,true)"/>
          <setting id="view47-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
