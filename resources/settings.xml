@@ -369,7 +369,7 @@
          <setting id="RLSSource.net-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>
          <setting id="RLSSource.net-select" type="enum" label="     Automatically Select" values="Most Recent|Highest Quality" default="0" visible="eq(-7,true)"/>
          <setting id="Shush.se-enable" type="bool" label="Shush.se Enabled" default="true" visible="true"/>
-         <setting id="Shush.se-base_url" type="text" label="    Base Url" default="" visible="eq(-1,true)"/>
+         <setting id="Shush.se-base_url" type="text" label="    Base Url" default="http://shush.se" visible="eq(-1,true)"/>
          <setting id="Shush.se-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="Shush.se_try" type="number" default="0" visible="false"/>
          <setting id="Shush.se_fail" type="number" default="0" visible="false"/>
