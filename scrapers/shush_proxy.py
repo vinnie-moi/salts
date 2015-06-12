@@ -25,11 +25,13 @@ from salts_lib import pyaes
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 
+BASE_URL = 'http://shush.se'
 PY_URL = 'http://omaha.watchkodi.com/shush_scraper.dat'
 KEY = base64.decodestring('YV9sb25nX2Flc19rZXlfZm9yX3NodXNoX3NjcmFwZXI=')
 IV = '\0' * 16
 
 class Shush_Proxy(scraper.Scraper):
+    base_url = BASE_URL
     
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
