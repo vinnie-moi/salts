@@ -1,3 +1,4 @@
 /.project
 /.pydevproject
 *.pyc
+/scrapers/shush_scraper.py
