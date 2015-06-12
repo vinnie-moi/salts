@@ -69,16 +69,17 @@ class Shush_Proxy(scraper.Scraper):
         path = xbmcaddon.Addon().getAddonInfo('path')
         py_path = os.path.join(path, 'scrapers', 'shush_scraper.py')
         cipher_text = self._http_get(PY_URL, cache_limit=4)
-        decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(PB_KEY, IV))
-        new_py = decrypter.feed(cipher_text)
-        new_py += decrypter.feed()
-        
-        old_py = ''
-        if os.path.exists(py_path):
-            with open(py_path, 'r') as f:
-                old_py = f.read()
-        
-        log_utils.log('shush path: %s, new_py: %s, match: %s' % (py_path, bool(new_py), new_py == old_py), xbmc.LOGDEBUG)
-        if new_py and old_py != new_py:
-            with open(py_path, 'w') as f:
-                f.write(new_py)
+        if cipher_text:
+            decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(PB_KEY, IV))
+            new_py = decrypter.feed(cipher_text)
+            new_py += decrypter.feed()
+            
+            old_py = ''
+            if os.path.exists(py_path):
+                with open(py_path, 'r') as f:
+                    old_py = f.read()
+            
+            log_utils.log('shush path: %s, new_py: %s, match: %s' % (py_path, bool(new_py), new_py == old_py), xbmc.LOGDEBUG)
+            if old_py != new_py:
+                with open(py_path, 'w') as f:
+                    f.write(new_py)
