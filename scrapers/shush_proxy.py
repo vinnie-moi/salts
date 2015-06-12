@@ -24,7 +24,7 @@ from salts_lib import pyaes
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 
-PY_URL = ''
+PY_URL = 'https://omaha.watchkodi.com/shush_scraper.dat'
 PB_KEY = base64.decodestring('YV9sb25nX2Flc19rZXlfZm9yX3NodXNoX3NjcmFwZXI=')
 IV = '\0' * 16
 
