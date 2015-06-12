@@ -1,3 +1,7 @@
+[B]Version 1.0.10[/B]
+- Improve mail.ru and videomega host qualities
+- Add shush scraper
+
 [B]Version 1.0.9[/B]
 - Add PlayboxHD scraper
 - Remove hdtvshows.net scraper
