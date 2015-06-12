@@ -20,6 +20,7 @@ import xbmcaddon
 import xbmc
 import os
 import base64
+import time
 from salts_lib import pyaes
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -33,8 +34,12 @@ class Shush_Proxy(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
         self.__update_scraper_py()
-        import shush_scraper
-        self.__scraper = shush_scraper.Shush_Scraper(timeout)
+        try:
+            import shush_scraper
+            self.__scraper = shush_scraper.Shush_Scraper(timeout)
+        except Exception as e:
+            log_utils.log('Failure during shush scraper creation: %s' % (e), xbmc.LOGWARNING)
+            self.__scraper = None
    
     @classmethod
     def provides(cls):
@@ -45,22 +50,30 @@ class Shush_Proxy(scraper.Scraper):
         return 'Shush.se'
     
     def resolve_link(self, link):
-        return self.__scraper.resolve_link(link)
+        if self.__scraper is not None:
+            return self.__scraper.resolve_link(link)
     
     def format_source_label(self, item):
-        return self.__scraper.format_source_label(item)
+        if self.__scraper is not None:
+            return self.__scraper.format_source_label(item)
     
     def get_sources(self, video):
-        return self.__scraper.get_sources(video)
+        if self.__scraper is not None:
+            return self.__scraper.get_sources(video)
             
     def get_url(self, video):
-        return self.__scraper.get_url(video)
+        if self.__scraper is not None:
+            return self.__scraper.get_url(video)
     
     def search(self, video_type, title, year):
-        return self.__scraper.search(video_type, title, year)
+        if self.__scraper is not None:
+            return self.__scraper.search(video_type, title, year)
+        else:
+            return []
     
     def _get_episode_url(self, show_url, video):
-        return self.__scraper._get_episode_url(show_url, video)
+        if self.__scraper is not None:
+            return self.__scraper._get_episode_url(show_url, video)
 
     def _http_get(self, url, cache_limit=8):
         return super(Shush_Proxy, self)._cached_http_get(url, '', self.timeout, cache_limit=cache_limit)
@@ -68,18 +81,20 @@ class Shush_Proxy(scraper.Scraper):
     def __update_scraper_py(self):
         path = xbmcaddon.Addon().getAddonInfo('path')
         py_path = os.path.join(path, 'scrapers', 'shush_scraper.py')
-        cipher_text = self._http_get(PY_URL, cache_limit=4)
-        if cipher_text:
-            decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(KEY, IV))
-            new_py = decrypter.feed(cipher_text)
-            new_py += decrypter.feed()
-            
-            old_py = ''
-            if os.path.exists(py_path):
-                with open(py_path, 'r') as f:
-                    old_py = f.read()
-            
-            log_utils.log('shush path: %s, new_py: %s, match: %s' % (py_path, bool(new_py), new_py == old_py), xbmc.LOGDEBUG)
-            if old_py != new_py:
-                with open(py_path, 'w') as f:
-                    f.write(new_py)
+        exists = os.path.exists(py_path)
+        if  not exists or (exists and os.path.getmtime(py_path) < time.time() - (4 * 60 * 60)):
+            cipher_text = self._http_get(PY_URL, cache_limit=4)
+            if cipher_text:
+                decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(KEY, IV))
+                new_py = decrypter.feed(cipher_text)
+                new_py += decrypter.feed()
+                
+                old_py = ''
+                if os.path.exists(py_path):
+                    with open(py_path, 'r') as f:
+                        old_py = f.read()
+                
+                log_utils.log('shush path: %s, new_py: %s, match: %s' % (py_path, bool(new_py), new_py == old_py), xbmc.LOGDEBUG)
+                if old_py != new_py:
+                    with open(py_path, 'w') as f:
+                        f.write(new_py)
