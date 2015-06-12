@@ -32,6 +32,7 @@ IV = '\0' * 16
 class Shush_Proxy(scraper.Scraper):
     
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
+        self.timeout = timeout
         self.__update_scraper_py()
         try:
             import shush_scraper
