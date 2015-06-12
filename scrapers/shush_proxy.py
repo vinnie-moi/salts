@@ -25,7 +25,7 @@ from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 
 PY_URL = 'https://omaha.watchkodi.com/shush_scraper.dat'
-PB_KEY = base64.decodestring('YV9sb25nX2Flc19rZXlfZm9yX3NodXNoX3NjcmFwZXI=')
+KEY = base64.decodestring('YV9sb25nX2Flc19rZXlfZm9yX3NodXNoX3NjcmFwZXI=')
 IV = '\0' * 16
 
 class Shush_Proxy(scraper.Scraper):
@@ -70,7 +70,7 @@ class Shush_Proxy(scraper.Scraper):
         py_path = os.path.join(path, 'scrapers', 'shush_scraper.py')
         cipher_text = self._http_get(PY_URL, cache_limit=4)
         if cipher_text:
-            decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(PB_KEY, IV))
+            decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(KEY, IV))
             new_py = decrypter.feed(cipher_text)
             new_py += decrypter.feed()
             
