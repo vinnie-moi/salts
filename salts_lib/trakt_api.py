@@ -238,7 +238,7 @@ class Trakt_API():
         url = '/shows/%s/progress/watched' % (slug)
         params = {}
         if full: params['extended'] = 'full,images'
-        if hidden: params['include_hidden'] = 'true'
+        if hidden: params['hidden'] = 'true'
         if specials: params['specials'] = 'true'
             
         return self.__call_trakt(url, params=params, cached=cached)
