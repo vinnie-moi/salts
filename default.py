@@ -816,7 +816,7 @@ def browse_seasons(slug, fanart):
     seasons = sorted(trakt_api.get_seasons(slug), key=lambda x: x['number'])
     info = {}
     if TOKEN:
-        progress = trakt_api.get_show_progress(slug, cached=_SALTS.get_setting('cache_watched') == 'true')
+        progress = trakt_api.get_show_progress(slug, hidden=True, specials=True, cached=_SALTS.get_setting('cache_watched') == 'true')
         info = utils.make_seasons_info(progress)
 
     totalItems = len(seasons)
@@ -834,7 +834,7 @@ def browse_episodes(slug, season):
     show = trakt_api.get_show_details(slug)
     episodes = trakt_api.get_episodes(slug, season)
     if TOKEN:
-        progress = trakt_api.get_show_progress(slug, cached=_SALTS.get_setting('cache_watched') == 'true')
+        progress = trakt_api.get_show_progress(slug, hidden=True, specials=True, cached=_SALTS.get_setting('cache_watched') == 'true')
         episodes = utils.make_episodes_watched(episodes, progress)
 
     totalItems = len(episodes)
