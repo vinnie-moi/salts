@@ -950,13 +950,16 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
 def filter_unusable_hosters(hosters):
     filtered_hosters = []
     filter_max = int(_SALTS.get_setting('filter_unusable'))
+    unk_hosts = {}
     for i, hoster in enumerate(hosters):
         if i < filter_max and 'direct' in hoster and hoster['direct'] == False:
             hmf = urlresolver.HostedMediaFile(host=hoster['host'], media_id='dummy')  # use dummy media_id to force host validation
             if not hmf:
                 log_utils.log('Unusable source %s (%s) from %s' % (hoster['url'], hoster['host'], hoster['class'].get_name()), xbmc.LOGINFO)
+                unk_hosts[hoster['host']] = unk_hosts.get(hoster['host'], 0) + 1
                 continue
         filtered_hosters.append(hoster)
+    log_utils.log('Discarded Hosts: %s' % (sorted(unk_hosts.items(), key=lambda x: x[1], reverse=True)), xbmc.LOGDEBUG)
     return filtered_hosters
 
 @url_dispatcher.register(MODES.RESOLVE_SOURCE, ['mode', 'class_url', 'video_type', 'slug', 'class_name'], ['season', 'episode'])
