@@ -21,6 +21,7 @@ import urlparse
 import re
 import xbmcaddon
 from salts_lib import log_utils
+from salts_lib import dom_parser
 from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
@@ -95,9 +96,15 @@ class TVReleaseNet_Scraper(scraper.Scraper):
         else:
             search_url += '&cat=Movies-XviD,Movies-720p,Movies-480p'
         html = self._http_get(search_url, cache_limit=.25)
-        pattern = "posts_table.*?<a[^>]+>(?P<quality>[^<]+).*?href='(?P<url>[^']+)'>(?P<post_title>[^<]+).*?(?P<date>[^>]+)</td></tr>"
-        date_format = '%Y-%m-%d %H:%M:%S'
-        return self._blog_proc_results(html, pattern, date_format, video_type, title, year)
+        tables = dom_parser.parse_dom(html, 'table', {'class': 'posts_table'})
+        if tables:
+            del tables[0]
+            html = ''.join(tables)
+            pattern = "<a[^>]+>(?P<quality>[^<]+).*?href='(?P<url>[^']+)'>(?P<post_title>[^<]+).*?(?P<date>[^>]+)</td></tr>"
+            date_format = '%Y-%m-%d %H:%M:%S'
+            return self._blog_proc_results(html, pattern, date_format, video_type, title, year)
+        else:
+            return []
 
     def _http_get(self, url, cache_limit=8):
         return super(TVReleaseNet_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
