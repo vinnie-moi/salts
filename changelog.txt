@@ -1,3 +1,9 @@
+[B]Version 1.0.13[/B]
+- Minor code improvements
+- cloudflare improvements
+- Remove tubemotion scraper
+- Fix tv-release.net scraper
+
 [B]Version 1.0.12[/B]
 - Fix shush base url
 
