@@ -256,7 +256,7 @@ class Scraper(object):
             response = urllib2.urlopen(request, timeout=timeout)
             if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
                 log_utils.log('Response Cookies: %s' % (self.cookies_as_str(cj)), xbmc.LOGDEBUG)
-            cj.save(ignore_discard=True, ignore_expires=True)
+            cj.save(ignore_discard=True)
             if response.info().get('Content-Encoding') == 'gzip':
                 buf = StringIO(response.read())
                 f = gzip.GzipFile(fileobj=buf)
@@ -285,7 +285,7 @@ class Scraper(object):
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         urllib2.install_opener(opener)
 
-        try: cj.load()
+        try: cj.load(ignore_discard=True)
         except: pass
         if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
             log_utils.log('Before Cookies: %s' % (self.cookies_as_str(cj)), xbmc.LOGDEBUG)
@@ -294,7 +294,7 @@ class Scraper(object):
                                 domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=False, comment=None,
                                 comment_url=None, rest={})
             cj.set_cookie(c)
-        cj.save()
+        cj.save(ignore_discard=True)
         if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
             log_utils.log('After Cookies: %s' % (self.cookies_as_str(cj)), xbmc.LOGDEBUG)
         return cj
