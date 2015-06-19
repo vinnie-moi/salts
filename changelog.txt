@@ -1,4 +1,4 @@
-[B]Version 1.0.13[/B]
+[B]Version 1.0.14[/B]
 - Minor code improvements
 - cloudflare improvements
 - Remove tubemotion scraper
