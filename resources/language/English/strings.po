@@ -395,7 +395,7 @@ msgid "Item Added to List"
 msgstr ""
 
 msgctxt "#30095"
-msgid "List Copied: (A:%s/ E:%s/ S:%s)"
+msgid "List Copied: (A:%s/E:%s/S:%s)"
 msgstr ""
 
 msgctxt "#30096"
