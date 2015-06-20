@@ -51,7 +51,7 @@ class XMovies8_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            for match in re.finditer('href="([^"]+)">(\d+)x(\d+)', html):
+            for match in re.finditer('href="([^"]+)[^>]*>(\d+)x(\d+)', html):
                 stream_url, width, _ = match.groups()
                 hoster = {'multi-part': False, 'host': 'xmovies8', 'class': self, 'quality': self._width_get_quality(width), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                 hosters.append(hoster)
