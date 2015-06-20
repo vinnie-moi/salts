@@ -924,8 +924,8 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
         if _SALTS.get_setting('enable_sort') == 'true':
             if _SALTS.get_setting('filter-unknown') == 'true':
                 hosters = utils.filter_unknown_hosters(hosters)
-        SORT_KEYS['source'] = utils.make_source_sort_key()
-        hosters.sort(key=utils.get_sort_key)
+            SORT_KEYS['source'] = utils.make_source_sort_key()
+            hosters.sort(key=utils.get_sort_key)
 
         hosters = filter_unusable_hosters(hosters)
 
