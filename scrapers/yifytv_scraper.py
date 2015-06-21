@@ -162,7 +162,7 @@ class YIFY_Scraper(scraper.Scraper):
                     for post in data['posts']:
                         result = {'title': post['title'], 'year': post['year'], 'url': post['link'].replace(self.base_url, '')}
                         results.append(result)
-                except:
+                except ValueError:
                     log_utils.log('Invalid JSON in yify.tv: %s' % (fragment), xbmc.LOGWARNING)
         return results
 
