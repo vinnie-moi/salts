@@ -146,10 +146,11 @@ class Playbox_Scraper(scraper.Scraper):
             except ValueError:
                 log_utils.log('Invalid JSON returned for: %s' % (search_url), xbmc.LOGWARNING)
             else:
-                for item in js_data['data']['films']:
-                    result_url = RESULT_URL % (video_type, item['id'])
-                    result = {'title': item['title'], 'url': result_url, 'year': ''}
-                    results.append(result)
+                if 'films' in js_data['data']:
+                    for item in js_data['data']['films']:
+                        result_url = RESULT_URL % (video_type, item['id'])
+                        result = {'title': item['title'], 'url': result_url, 'year': ''}
+                        results.append(result)
         return results
 
     def _http_get(self, url, data=None, cache_limit=8):

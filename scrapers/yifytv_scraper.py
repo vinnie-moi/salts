@@ -152,14 +152,18 @@ class YIFY_Scraper(scraper.Scraper):
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
         results = []
-        pattern = 'var\s+posts\s+=\s+(.*);'
+        pattern = 'var\s+posts\s*=\s*(.*);'
         match = re.search(pattern, html)
         if match:
             fragment = match.group(1)
-            data = json.loads(fragment)
-            for post in data['posts']:
-                result = {'title': post['title'], 'year': post['year'], 'url': post['link'].replace(self.base_url, '')}
-                results.append(result)
+            if fragment and fragment != 'null':
+                try:
+                    data = json.loads(fragment)
+                    for post in data['posts']:
+                        result = {'title': post['title'], 'year': post['year'], 'url': post['link'].replace(self.base_url, '')}
+                        results.append(result)
+                except:
+                    log_utils.log('Invalid JSON in yify.tv: %s' % (fragment), xbmc.LOGWARNING)
         return results
 
     def _http_get(self, url, data=None, cache_limit=8):
