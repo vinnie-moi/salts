@@ -1,3 +1,10 @@
+[B]Version 1.0.15[/B]
+- Fix xmovies
+- Fix copy list script error
+- Fix sorting bug
+- Improve yify-streaming and playbox scrapers
+- update LosMovies base url
+
 [B]Version 1.0.14[/B]
 - Minor code improvements
 - cloudflare improvements
