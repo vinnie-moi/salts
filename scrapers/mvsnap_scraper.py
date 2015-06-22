@@ -26,6 +26,7 @@ from salts_lib import log_utils
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import Q_ORDER
 
 BASE_URL = 'https://mvsnap.com'
 
@@ -56,11 +57,14 @@ class Mvsnap_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            fragment = dom_parser.parse_dom(html, 'div', {'class': 'row_media'})
+            fragment = dom_parser.parse_dom(html, 'select', {'id': 'myDropdown'})
             if fragment:
                 fragment = fragment[0]
-                for stream_url in dom_parser.parse_dom(fragment, 'input', ret='value'):
-                    hoster = {'multi-part': False, 'host': 'mvsnap', 'class': self, 'quality': QUALITIES.MEDIUM, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                for match in re.finditer('<option\s+value="([^"]+)">([^<]+)', fragment):
+                    stream_url, q_str = match.groups()
+                    quality = self._blog_get_quality(video, q_str, '')
+                    if Q_ORDER[quality] > Q_ORDER[QUALITIES.MEDIUM]: quality = QUALITIES.MEDIUM
+                    hoster = {'multi-part': False, 'host': 'mvsnap', 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                     hosters.append(hoster)
         return hosters
 
@@ -76,11 +80,11 @@ class Mvsnap_Scraper(scraper.Scraper):
             try:
                 js_data = json.loads(html)
             except ValueError:
-                log_utils.log('No JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
+                log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
             else:
                 if 'movies' in js_data:
                     for item in js_data['movies']:
-                        if item['title'] != 'movies':
+                        if item['type'] != 'movies':
                             continue
                         
                         match = re.search('(.*)(?:\s+\((\d{4})\))', item['title'])
