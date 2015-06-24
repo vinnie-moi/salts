@@ -76,7 +76,6 @@ class VKBox_Scraper(scraper.Scraper):
                 else:
                     try: langs = json_data['langs']
                     except: langs = json_data
-                    print langs
                     for lang in langs:
                         if lang['lang'] in ['en', '']:
                             stream_url = STREAM_URL % (str(int(lang['apple']) + magic_num), str(int(lang['google']) + magic_num), lang['microsoft'])
