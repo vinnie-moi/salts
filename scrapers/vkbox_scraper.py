@@ -76,8 +76,9 @@ class VKBox_Scraper(scraper.Scraper):
                 else:
                     try: langs = json_data['langs']
                     except: langs = json_data
+                    print langs
                     for lang in langs:
-                        if lang['lang'] == 'en':
+                        if lang['lang'] in ['en', '']:
                             stream_url = STREAM_URL % (str(int(lang['apple']) + magic_num), str(int(lang['google']) + magic_num), lang['microsoft'])
                             hoster = {'multi-part': False, 'url': stream_url, 'host': 'vk.com', 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'direct': False}
                             hosters.append(hoster)
