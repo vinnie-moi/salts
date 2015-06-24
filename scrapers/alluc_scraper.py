@@ -85,20 +85,24 @@ class Alluc_Scraper(scraper.Scraper):
             search_url = self.__translate_search(url, search_type)
             html = self._http_get(search_url, cache_limit=.5)
             if html:
-                js_result = json.loads(html)
-                if js_result['status'] == 'success':
-                    for result in js_result['result']:
-                        if len(result['hosterurls']) > 1: continue
-                        if result['extension'] == 'rar': continue
-                        
-                        stream_url = result['hosterurls'][0]['url']
-                        if stream_url not in seen_urls:
-                            if self.__title_check(video, result['title']):
-                                host = urlparse.urlsplit(stream_url).hostname.lower()
-                                quality = self._get_quality(video, host, self._get_title_quality(result['title']))
-                                hoster = {'multi-part': False, 'class': self, 'views': None, 'url': stream_url, 'rating': None, 'host': host, 'quality': quality, 'direct': False}
-                                hosters.append(hoster)
-                                seen_urls.add(stream_url)
+                try:
+                    js_result = json.loads(html)
+                except ValueError:
+                    log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
+                else:
+                    if js_result['status'] == 'success':
+                        for result in js_result['result']:
+                            if len(result['hosterurls']) > 1: continue
+                            if result['extension'] == 'rar': continue
+                            
+                            stream_url = result['hosterurls'][0]['url']
+                            if stream_url not in seen_urls:
+                                if self.__title_check(video, result['title']):
+                                    host = urlparse.urlsplit(stream_url).hostname.lower()
+                                    quality = self._get_quality(video, host, self._get_title_quality(result['title']))
+                                    hoster = {'multi-part': False, 'class': self, 'views': None, 'url': stream_url, 'rating': None, 'host': host, 'quality': quality, 'direct': False}
+                                    hosters.append(hoster)
+                                    seen_urls.add(stream_url)
         return hosters
         
     def __title_check(self, video, title):
