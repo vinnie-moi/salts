@@ -71,7 +71,7 @@ class VKBox_Scraper(scraper.Scraper):
             if html:
                 try:
                     json_data = json.loads(html)
-                except:
+                except ValueError:
                     log_utils.log('No JSON returned: %s' % (url), xbmc.LOGWARNING)
                 else:
                     try: langs = json_data['langs']
