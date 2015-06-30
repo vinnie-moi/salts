@@ -24,7 +24,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW}
-BASE_URL = 'http://movie25.cm'
+BASE_URL = 'http://movie25.ag'
 
 class Movie25_Scraper(scraper.Scraper):
     base_url = BASE_URL
