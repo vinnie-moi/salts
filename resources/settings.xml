@@ -250,7 +250,7 @@
          <setting id="MintMovies_fail" type="number" default="0" visible="false"/>
          <setting id="MintMovies_check" type="number" default="0" visible="false"/>
          <setting id="movie25-enable" type="bool" label="movie25 Enabled" default="true" visible="true"/>
-         <setting id="movie25-base_url" type="text" label="    Base Url" default="http://movie25.cm" visible="eq(-1,true)"/>
+         <setting id="movie25-base_url" type="text" label="    Base Url" default="http://movie25.ag" visible="eq(-1,true)"/>
          <setting id="movie25-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="movie25_try" type="number" default="0" visible="false"/>
          <setting id="movie25_fail" type="number" default="0" visible="false"/>

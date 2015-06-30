@@ -71,7 +71,7 @@ class Movie25_Scraper(scraper.Scraper):
 
             for match in re.finditer('id="link_name">\s*([^<]+).*?href="([^"]+)', html, re.DOTALL):
                 host, url = match.groups()
-                host = host.lower()
+                host = host.lower().strip()
                 hoster = {'multi-part': False, 'host': host, 'class': self, 'url': url, 'quality': self._get_quality(video, host, quality), 'rating': None, 'views': None, 'direct': False}
                 hosters.append(hoster)
         return hosters
