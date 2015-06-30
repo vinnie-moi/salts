@@ -26,7 +26,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib import dom_parser
 
 BASE_URL = 'http://yify-streaming.com'
-CATAGORIES = {VIDEO_TYPES.MOVIE: 'category-movies', VIDEO_TYPES.EPISODE: 'category-tv-series'}
+CATEGORIES = {VIDEO_TYPES.MOVIE: 'category-movies', VIDEO_TYPES.EPISODE: 'category-tv-series'}
 
 class YifyStreaming_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -112,7 +112,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/?s=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
-        elements = dom_parser.parse_dom(html, 'li', {'class': '[^"]+%s' % (CATAGORIES[video_type])})
+        elements = dom_parser.parse_dom(html, 'li', {'class': '[^"]+%s' % (CATEGORIES[video_type])})
         results = []
         for element in elements:
             match = re.search('href="([^"]+)[^>]+>\s*([^<]+)', element, re.DOTALL)
