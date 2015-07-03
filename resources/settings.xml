@@ -446,7 +446,7 @@
          <setting id="WatchFree.to_fail" type="number" default="0" visible="false"/>
          <setting id="WatchFree.to_check" type="number" default="0" visible="false"/>
          <setting id="WatchSeries-enable" type="bool" label="WatchSeries Enabled" default="true" visible="true"/>
-         <setting id="WatchSeries-base_url" type="text" label="    Base Url" default="http://watchseries.sx" visible="eq(-1,true)"/>
+         <setting id="WatchSeries-base_url" type="text" label="    Base Url" default="http://watchseries.ag" visible="eq(-1,true)"/>
          <setting id="WatchSeries-sub_check" type="bool" label="    Include in Page Existence checks?" default="false" visible="eq(-2,true)"/>
          <setting id="WatchSeries_try" type="number" default="0" visible="false"/>
          <setting id="WatchSeries_fail" type="number" default="0" visible="false"/>

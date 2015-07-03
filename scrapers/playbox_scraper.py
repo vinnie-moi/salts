@@ -89,6 +89,15 @@ class Playbox_Scraper(scraper.Scraper):
                             direct = True
                             quality = self._gv_get_quality(stream_url)
                             host = self.get_name()
+                        elif stream['server'] == 'amvideo':
+                            for match in re.finditer('<IFRAME\s+SRC="([^"]+)', stream_url):
+                                embed_url = match.group(1)
+                                host = urlparse.urlparse(embed_url).hostname.lower()
+                                quality = self._get_quality(video, host, QUALITIES.HIGH)
+                                source = {'multi-part': False, 'url': embed_url, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'direct': False}
+                                if 'quality' in stream: source['resolution'] = stream['quality']
+                                sources.append(source)
+                            continue
                         else:
                             direct = False
                             host = urlparse.urlparse(stream_url).hostname.lower()
