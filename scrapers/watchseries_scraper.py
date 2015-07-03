@@ -24,7 +24,7 @@ from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://watchseries.sx'
+BASE_URL = 'http://watchseries.ag'
 
 class WS_Scraper(scraper.Scraper):
     base_url = BASE_URL
