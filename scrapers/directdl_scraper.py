@@ -74,7 +74,6 @@ class DirectDownload_Scraper(scraper.Scraper):
                         temp_quality = re.sub('\s', '', query['quality'][0])
                         match_quality = temp_quality.split(',')
     
-                    import urlresolver
                     sxe_str = '.S%02dE%02d.' % (int(video.season), int(video.episode))
                     airdate_str = video.ep_airdate.strftime('.%Y.%m.%d.')
                     for result in js_result:
@@ -87,12 +86,10 @@ class DirectDownload_Scraper(scraper.Scraper):
                                 if re.search('\.rar(\.|$)', url):
                                     continue
                                 
-                                # validate url since host validation fails for real-debrid; mark links direct to avoid unusable check
-                                if urlresolver.HostedMediaFile(url):
-                                    hostname = urlparse.urlparse(url).hostname
-                                    hoster = {'multi-part': False, 'class': self, 'views': None, 'url': url, 'rating': None, 'host': hostname,
-                                            'quality': QUALITY_MAP[result['quality']], 'dd_qual': result['quality'], 'direct': True}
-                                    hosters.append(hoster)
+                                hostname = urlparse.urlparse(url).hostname
+                                hoster = {'multi-part': False, 'class': self, 'views': None, 'url': url, 'rating': None, 'host': hostname,
+                                        'quality': QUALITY_MAP[result['quality']], 'dd_qual': result['quality'], 'direct': False}
+                                hosters.append(hoster)
 
         return hosters
 
