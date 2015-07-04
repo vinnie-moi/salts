@@ -20,6 +20,7 @@ import urllib
 import urlparse
 import re
 import xbmcaddon
+import base64
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
@@ -48,9 +49,12 @@ class Movie25_Scraper(scraper.Scraper):
         if match:
             return match.group(1)
         else:
-            match = re.search('<IFRAME SRC="(?:/?tz\.php\?url=)?([^"]+)', html, re.DOTALL | re.I)
+            match = re.search('<IFRAME SRC="(?:/?tz\.php\?url=external\.php\?url=)?([^"]+)', html, re.DOTALL | re.I)
             if match:
-                return match.group(1)
+                try:
+                    return base64.b64decode(match.group(1))
+                except TypeError:
+                    return match.group(1)
             else:
                 return link
 
