@@ -51,7 +51,10 @@ class IStreamHD_Scraper(scraper.Scraper):
         html = self._http_get(url, cache_limit=0)
         match = re.search('id="videoFrame".*?src="([^"]+)', html, re.DOTALL)
         if match:
-            return match.group(1)
+            stream_url = match.group(1)
+            stream_url = stream_url.replace('http://shisqo.atwebpages.com/index.php?url=', '')
+            stream_url = urllib.unquote(stream_url)
+            return stream_url
 
     def format_source_label(self, item):
         label = '[%s] %s (%s views) (%s/100) ' % (item['quality'], item['host'], item['views'], item['rating'])
