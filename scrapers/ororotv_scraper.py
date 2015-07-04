@@ -59,7 +59,7 @@ class OroroTV_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             if video.video_type == VIDEO_TYPES.MOVIE:
-                quality = QUALITIES.HD
+                quality = QUALITIES.HD720
                 match = re.search('data-href="([^"]+)', html)
                 if match:
                     source_url = match.group(1)
