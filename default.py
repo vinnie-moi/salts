@@ -1005,7 +1005,10 @@ def play_source(mode, hoster_url, direct, video_type, slug, season='', episode='
     if hoster_url is None:
         return False
 
-    if not direct:
+    if direct:
+        log_utils.log('Treating url as direct: %s' % (hoster_url))
+        stream_url = hoster_url
+    else:
         hmf = urlresolver.HostedMediaFile(url=hoster_url)
         if not hmf:
             log_utils.log('hoster_url not supported by urlresolver (continuing): %s' % (hoster_url))
@@ -1017,9 +1020,6 @@ def play_source(mode, hoster_url, direct, video_type, slug, season='', episode='
                 except: msg = hoster_url
                 utils.notify(msg=i18n('resolve_failed') % (msg), duration=7500)
                 return False
-    else:
-        log_utils.log('Treating url as direct: %s' % (hoster_url))
-        stream_url = hoster_url
 
     resume_point = 0
     if mode not in [MODES.DOWNLOAD_SOURCE, MODES.DIRECT_DOWNLOAD]:
