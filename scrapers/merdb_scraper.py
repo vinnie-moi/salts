@@ -108,7 +108,6 @@ class MerDB_Scraper(scraper.Scraper):
         search_url += '&advanced_search=Search'
 
         html = self._http_get(search_url, cache_limit=.25)
-        print html
         pattern = r'class="list_box_title.+?href="(.+?)" title="Watch (.+?)"?\(?([0-9]{4})?\)?"?>'
         results = []
         for match in re.finditer(pattern, html):
