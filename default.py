@@ -1103,7 +1103,7 @@ def auto_play_sources(hosters, video_type, slug, season, episode):
 
         hoster_url = item['class'].resolve_link(item['url'])
         log_utils.log('Auto Playing: %s' % (hoster_url), xbmc.LOGDEBUG)
-        if play_source(MODES.GET_SOURCES, hoster_url, video_type, slug, season, episode):
+        if play_source(MODES.GET_SOURCES, hoster_url, item['direct'], video_type, slug, season, episode):
             return True
     else:
         msg = i18n('all_sources_failed')
