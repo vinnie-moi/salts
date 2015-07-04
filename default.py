@@ -940,8 +940,8 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
             auto_play_sources(hosters, video_type, slug, season, episode)
         else:
             if dialog or (dialog is None and _SALTS.get_setting('source-win') == 'Dialog'):
-                stream_url = pick_source_dialog(hosters)
-                return play_source(mode, stream_url, video_type, slug, season, episode)
+                stream_url, direct = pick_source_dialog(hosters)
+                return play_source(mode, stream_url, direct, video_type, slug, season, episode)
             else:
                 pick_source_dir(mode, hosters, video_type, slug, season, episode)
     finally:
@@ -962,9 +962,9 @@ def filter_unusable_hosters(hosters):
     log_utils.log('Discarded Hosts: %s' % (sorted(unk_hosts.items(), key=lambda x: x[1], reverse=True)), xbmc.LOGDEBUG)
     return filtered_hosters
 
-@url_dispatcher.register(MODES.RESOLVE_SOURCE, ['mode', 'class_url', 'video_type', 'slug', 'class_name'], ['season', 'episode'])
-@url_dispatcher.register(MODES.DIRECT_DOWNLOAD, ['mode', 'class_url', 'video_type', 'slug', 'class_name'], ['season', 'episode'])
-def resolve_source(mode, class_url, video_type, slug, class_name, season='', episode=''):
+@url_dispatcher.register(MODES.RESOLVE_SOURCE, ['mode', 'class_url', 'direct', 'video_type', 'slug', 'class_name'], ['season', 'episode'])
+@url_dispatcher.register(MODES.DIRECT_DOWNLOAD, ['mode', 'class_url', 'direct', 'video_type', 'slug', 'class_name'], ['season', 'episode'])
+def resolve_source(mode, class_url, direct, video_type, slug, class_name, season='', episode=''):
     for cls in utils.relevant_scrapers(video_type):
         if cls.get_name() == class_name:
             scraper_instance = cls()
@@ -976,7 +976,7 @@ def resolve_source(mode, class_url, video_type, slug, class_name, season='', epi
     hoster_url = scraper_instance.resolve_link(class_url)
     if mode == MODES.DIRECT_DOWNLOAD:
         _SALTS.end_of_directory()
-    return play_source(mode, hoster_url, video_type, slug, season, episode)
+    return play_source(mode, hoster_url, direct, video_type, slug, season, episode)
 
 @url_dispatcher.register(MODES.PLAY_TRAILER, ['stream_url'])
 def play_trailer(stream_url):
@@ -1001,21 +1001,25 @@ def download_subtitles(language, title, year, season, episode):
     if subs and index > -1:
         return srt_scraper.download_subtitle(subs[index]['url'])
 
-def play_source(mode, hoster_url, video_type, slug, season='', episode=''):
+def play_source(mode, hoster_url, direct, video_type, slug, season='', episode=''):
     if hoster_url is None:
         return False
 
-    hmf = urlresolver.HostedMediaFile(url=hoster_url)
-    if not hmf:
-        log_utils.log('hoster_url not supported by urlresolver: %s' % (hoster_url))
-        stream_url = hoster_url
+    if not direct:
+        hmf = urlresolver.HostedMediaFile(url=hoster_url)
+        if not hmf:
+            log_utils.log('hoster_url not supported by urlresolver (continuing): %s' % (hoster_url))
+            stream_url = hoster_url
+        else:
+            stream_url = hmf.resolve()
+            if not stream_url or not isinstance(stream_url, basestring):
+                try: msg = stream_url.msg
+                except: msg = hoster_url
+                utils.notify(msg=i18n('resolve_failed') % (msg), duration=7500)
+                return False
     else:
-        stream_url = hmf.resolve()
-        if not stream_url or not isinstance(stream_url, basestring):
-            try: msg = stream_url.msg
-            except: msg = hoster_url
-            utils.notify(msg=i18n('resolve_failed') % (msg), duration=7500)
-            return False
+        log_utils.log('Treating url as direct: %s' % (hoster_url))
+        stream_url = hoster_url
 
     resume_point = 0
     if mode not in [MODES.DOWNLOAD_SOURCE, MODES.DIRECT_DOWNLOAD]:
@@ -1121,10 +1125,12 @@ def pick_source_dialog(hosters):
         try:
             if hosters[index]['url']:
                 hoster_url = hosters[index]['class'].resolve_link(hosters[index]['url'])
-                log_utils.log('Attempting to play url: %s' % hoster_url)
-                return hoster_url
+                log_utils.log('Attempting to play url: %s as direct: %s' % (hoster_url, hosters[index]['direct']))
+                return hoster_url, hosters[index]['direct']
         except Exception as e:
             log_utils.log('Error (%s) while trying to resolve %s' % (str(e), hosters[index]['url']), xbmc.LOGERROR)
+
+    return None, None
 
 def pick_source_dir(mode, hosters, video_type, slug, season='', episode=''):
     if mode == MODES.DOWNLOAD_SOURCE:
@@ -1144,7 +1150,7 @@ def pick_source_dir(mode, hosters, video_type, slug, season='', episode=''):
         item['label'] = label
 
         # log_utils.log(item, xbmc.LOGDEBUG)
-        queries = {'mode': next_mode, 'class_url': item['url'], 'video_type': video_type, 'slug': slug, 'season': season, 'episode': episode, 'class_name': item['class'].get_name()}
+        queries = {'mode': next_mode, 'class_url': item['url'], 'direct': item['direct'], 'video_type': video_type, 'slug': slug, 'season': season, 'episode': episode, 'class_name': item['class'].get_name()}
         _SALTS.add_directory(queries, infolabels={'title': item['label']}, is_folder=folder, img='', fanart='', total_items=hosters_len)
 
     _SALTS.end_of_directory()
