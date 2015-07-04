@@ -82,9 +82,17 @@ class MovieNight_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/?s=%s' % (urllib.quote_plus(title)))
         html = self._http_get(search_url, cache_limit=.25)
         for match in re.finditer('class="home_post_cont.*?href="([^"]+).*?/&quot;&gt;(.*?)&lt;', html, re.DOTALL):
-            link, match_title = match.groups()
-            result = {'url': link.replace(self.base_url, ''), 'title': match_title, 'year': ''}
-            results.append(result)
+            link, match_title_year = match.groups()
+            match = re.search('(.*?)(?:\s+\(?(\d{4})\)?)', match_title_year)
+            if match:
+                match_title, match_year = match.groups()
+            else:
+                match_title = match_title_year
+                match_year = ''
+
+            if not year or not match_year or year == match_year:
+                result = {'url': link.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
+                results.append(result)
 
         return results
 
