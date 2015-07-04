@@ -30,7 +30,6 @@ from salts_lib.constants import QUALITIES
 BASE_URL = 'http://zumvo.me'
 QUALITY_MAP = {'HD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW, 'BR-RIP': QUALITIES.HD720, 'UNKNOWN': QUALITIES.MEDIUM, 'SD': QUALITIES.HIGH}
 
-
 class Zumvo_Scraper(scraper.Scraper):
     base_url = BASE_URL
 
@@ -71,7 +70,6 @@ class Zumvo_Scraper(scraper.Scraper):
             match = re.search('href="([^"]+)"\s*class="btn-watch"', html)
             if match:
                 html = self._http_get(match.group(1), cache_limit=0)
-
                 match = re.search('proxy\.link":\s*"([^"&]+)', html)
                 if match:
                     proxy_link = match.group(1)
@@ -120,9 +118,35 @@ class Zumvo_Scraper(scraper.Scraper):
 
     def _http_get(self, url, cache_limit=8):
         html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
-        match = re.search("document.cookie='([^']+)", html)
-        if match:
-            key, value = match.group(1).split('=')
+        if 'sucuri_cloudproxy_js' in html:
+            key, value = self.__get_cookie(html)
+            if key and value:
+                cookies = {key: value}
+            else:
+                cookies = {}
             log_utils.log('Setting Zumvo cookie: %s: %s' % (key, value), xbmc.LOGDEBUG)
-            html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies={key: value}, cache_limit=0)
+            html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, cache_limit=0)
         return html
+    
+    def __get_cookie(self, html):
+        match = re.search("S\s*=\s*'([^']+)", html)
+        if match:
+            s = base64.b64decode(match.group(1))
+            s = s.replace(' ', '')
+            s = re.sub('String\.fromCharCode\(([^)]+)\)', r'chr(\1)', s)
+            s = re.sub('\.slice\((\d+),(\d+)\)', r'[\1:\2]', s)
+            s = re.sub('\.charAt\(([^)]+)\)', r'[\1]', s)
+            s = re.sub('\.substr\((\d+),(\d+)\)', r'[\1:\1+\2]', s)
+            s = re.sub(';location.reload\(\);', '', s)
+            s = re.sub(r'\n', '', s)
+            s = re.sub(r'document\.cookie', 'cookie', s)
+            try:
+                cookie = ''
+                exec(s)
+                match = re.match('([^=]+)=(.*)', cookie)
+                if match:
+                    return match.groups()
+            except Exception as e:
+                log_utils.log('Exception during zumvo js: %s' % (e), xbmc.LOGWARNING)
+        
+        return None, None
