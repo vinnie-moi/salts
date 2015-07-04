@@ -80,13 +80,22 @@ class FilmStreaming_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/?s=')
         search_url += urllib.quote_plus('%s %s' % (title, year))
         html = self._http_get(search_url, cache_limit=.25)
+        print html
         results = []
         if not re.search('I am sorry, what are you looking for', html, re.I):
-            pattern = 'FilmBaslik">.*?href="([^"]+)"\s+title="([^"]+)\s+\((\d{4})\)'
+            pattern = 'FilmBaslik">.*?href="([^"]+)"\s+title="([^"]+)'
             for match in re.finditer(pattern, html, re.DOTALL):
-                url, title, match_year = match.groups('')
+                print match.groups()
+                url, match_title_year = match.groups()
+                match = re.search('(.*?)(?:\s+\(?(\d{4})\)?)', match_title_year)
+                if match:
+                    match_title, match_year = match.groups()
+                else:
+                    match_title = match_title_year
+                    match_year = ''
+                
                 if not year or not match_year or year == match_year:
-                    result = {'url': url.replace(self.base_url, ''), 'title': title, 'year': match_year}
+                    result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
                     results.append(result)
         return results
 
