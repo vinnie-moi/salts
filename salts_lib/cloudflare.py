@@ -29,6 +29,13 @@ import log_utils
 import xbmc
 from salts_lib.constants import USER_AGENT
 
+class NoRedirection(urllib2.HTTPErrorProcessor):
+    def http_response(self, request, response):
+        log_utils.log('Stopping Redirect', xbmc.LOGDEBUG)
+        return response
+
+    https_response = http_response
+
 def solve_equation(equation):
     try:
         offset = 1 if equation[0] == '+' else 0
@@ -102,7 +109,14 @@ def solve(url, cj, wait=True):
         request = urllib2.Request(url)
         for key in headers: request.add_header(key, headers[key])
         try:
+            opener = urllib2.build_opener(NoRedirection)
+            urllib2.install_opener(opener)
             response = urllib2.urlopen(request)
+            if response.getcode() in [301, 302, 303, 307]:
+                cj.extract_cookies(response, request)
+                request = urllib2.Request(response.info().getheader('location'))
+                for key in headers: request.add_header(key, headers[key])
+                response = urllib2.urlopen(request)
             final = response.read()
         except urllib2.HTTPError as e:
             log_utils.log('CloudFlare Error: %s on url: %s' % (e.code, url), xbmc.LOGWARNING)
