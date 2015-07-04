@@ -21,7 +21,7 @@ import urlparse
 import xbmcaddon
 from salts_lib.constants import VIDEO_TYPES
 
-BASE_URL = 'http://stream-tv.co'
+BASE_URL = 'http://stream-tv1.net'
 BASE_EP_URL = 'http://stream-tv-series.me'
 
 class StreamTV_Scraper(scraper.Scraper):
