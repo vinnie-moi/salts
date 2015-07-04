@@ -1,3 +1,10 @@
+[B]Version 1.0.18[/B]
+- Fix yify-streaming
+- Fix watchseries
+- Improve noobroom scraper
+- Improve playbox scraper
+- Make cookie handling manual (Experimental)
+
 [B]Version 1.0.17[/B]
 - Fix xmovies scraper
 - Fix movie25 scraper
