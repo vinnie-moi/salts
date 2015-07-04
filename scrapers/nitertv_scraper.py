@@ -48,47 +48,13 @@ class Niter_Scraper(scraper.Scraper):
         return 'niter.tv'
 
     def resolve_link(self, link):
-        url = '/player/pk/pk/plugins/player_p2.php'
-        url = urlparse.urljoin(self.base_url, url)
-        data = {'url': link}
-        html = ''
-        stream_url = None
-        tries = 1
-        while tries <= MAX_TRIES:
-            html = self._http_get(url, data=data, auth=False, cache_limit=0)
-            log_utils.log('Initial Data (%s): |%s|' % (tries, html), xbmc.LOGDEBUG)
-            if html.strip():
-                break
-            tries += 1
-        else:
-            return None
-
-        try:
-            js_data = json.loads(html)
-            if 'captcha' in js_data[0]:
-                tries = 1
-                while tries <= MAX_TRIES:
-                    data['type'] = js_data[0]['captcha']
-                    captcha_result = self._do_recaptcha(js_data[0]['k'], tries, MAX_TRIES)
-                    data['chall'] = captcha_result['recaptcha_challenge_field']
-                    data['res'] = captcha_result['recaptcha_response_field']
-                    html = self._http_get(url, data=data, auth=False, cache_limit=0)
-                    log_utils.log('2nd Data (%s): %s' % (tries, html), xbmc.LOGDEBUG)
-                    if html:
-                        js_data = json.loads(html)
-                        if 'captcha' not in js_data[0]:
-                            break
-                    tries += 1
-                else:
-                    return None
-
-            for elem in js_data:
-                if elem['type'].startswith('video'):
-                    stream_url = elem['url']
-        except ValueError:
-            return None
-
-        return stream_url
+        if 'vidbux' not in link:
+            html = self._http_get(link, cache_limit=.5)
+            match = re.search('file\s*:\s*"([^"]+)', html)
+            if match:
+                return match.group(1)
+        
+        return link
 
     def format_source_label(self, item):
         return '[%s] %s' % (item['quality'], item['host'])
@@ -100,10 +66,21 @@ class Niter_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
 
-            for match in re.finditer('pic=([^&<]+)', html):
-                video_id = match.group(1)
-                hoster = {'multi-part': False, 'host': 'niter.tv', 'class': self, 'quality': QUALITIES.HD1080, 'views': None, 'rating': None, 'url': video_id, 'direct': True}
-                hosters.append(hoster)
+            match = re.search('emb=([^<]+)', html)
+            if match:
+                embeds = match.group(1)
+                for stream_url in embeds.split('&'):
+                    if stream_url.startswith('vb='):
+                        stream_url = 'http://www.vidbux.com/%s' % (stream_url[3:])
+                        host = 'vidbux.com'
+                        direct = False
+                    else:
+                        stream_url = stream_url.replace('emb=', '')
+                        host = 'niter.tv'
+                        direct = True
+                    quality = self._get_quality(video, host, QUALITIES.HD1080)
+                    hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': direct}
+                    hosters.append(hoster)
         return hosters
 
     def get_url(self, video):
