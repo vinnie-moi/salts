@@ -60,11 +60,11 @@ class Mvsnap_Scraper(scraper.Scraper):
             fragment = dom_parser.parse_dom(html, 'select', {'id': 'myDropdown'})
             if fragment:
                 fragment = fragment[0]
-                for match in re.finditer('<option\s+value="([^"]+)">([^<]+)', fragment):
-                    stream_url, q_str = match.groups()
-                    quality = self._blog_get_quality(video, q_str, '')
-                    if Q_ORDER[quality] > Q_ORDER[QUALITIES.MEDIUM]: quality = QUALITIES.MEDIUM
-                    hoster = {'multi-part': False, 'host': 'mvsnap', 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                for match in re.finditer('<option\s+value="([^"]+)', fragment):
+                    stream_url = match.group(1)
+                    stream_url = urlparse.urljoin(self.base_url, stream_url)
+                    stream_url = self._http_get(stream_url, allow_redirect=False, cache_limit=.5)
+                    hoster = {'multi-part': False, 'host': 'mvsnap', 'class': self, 'quality': self._gv_get_quality(stream_url), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                     hosters.append(hoster)
         return hosters
 
@@ -98,5 +98,5 @@ class Mvsnap_Scraper(scraper.Scraper):
                         results.append(result)
         return results
 
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(Mvsnap_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
+    def _http_get(self, url, data=None, allow_redirect=True, cache_limit=8):
+        return super(Mvsnap_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, allow_redirect=allow_redirect, cache_limit=cache_limit)
