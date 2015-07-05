@@ -1,3 +1,18 @@
+[B]Version 1.0.19[/B]
+- Better handle direct sources
+- Fix stream-tv scraper
+- Fix merdb scraper
+- Improve directdownload scraper
+- Fix i-streamhd scraper
+- Remove onlinemovies scraper
+- Fix zumvo scraper
+- Fix ororo.tv movies
+- Fix yify-streaming scraper
+- View view47 scraper
+- Fix movies25 scraper
+- Fix film-streaming.in scraper
+- Fix mvsnap scraper 
+
 [B]Version 1.0.18[/B]
 - Fix yify-streaming
 - Fix watchseries
