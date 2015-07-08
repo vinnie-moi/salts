@@ -88,7 +88,7 @@ class Playbox_Scraper(scraper.Scraper):
                         if stream['server'] == 'ggvideo':
                             direct = True
                             quality = self._gv_get_quality(stream_url)
-                            host = self.get_name()
+                            host = self._get_direct_hostname(stream_url)
                         elif stream['server'] == 'amvideo':
                             for match in re.finditer('<IFRAME\s+SRC="([^"]+)', stream_url):
                                 embed_url = match.group(1)

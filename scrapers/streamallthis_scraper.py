@@ -85,7 +85,7 @@ class Stream_Scraper(scraper.Scraper):
                         js_data = json.loads(html)
                         for video in js_data['videos']:
                             stream_url = video['url'] + '|Cookie=%s' % (self.__get_stream_cookies())
-                            hoster = {'multi-part': False, 'host': 'streamallthis.is', 'class': self, 'url': stream_url, 'quality': self.__set_quality(video['key'][:-1]), 'views': None, 'rating': None, 'direct': True}
+                            hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'url': stream_url, 'quality': self.__set_quality(video['key'][:-1]), 'views': None, 'rating': None, 'direct': True}
                             hosters.append(hoster)
         return hosters
 

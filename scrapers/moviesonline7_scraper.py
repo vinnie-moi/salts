@@ -76,7 +76,7 @@ class MO7_Scraper(scraper.Scraper):
                 if match:
                     stream_url = urlparse.urljoin(self.base_url, BUY_VIDS_URL % (match.group(1), vid_num))
                     if stream_url:
-                        hoster = {'multi-part': False, 'host': 'moviesonline7.co', 'url': stream_url, 'class': self, 'rating': None, 'views': None, 'quality': quality, 'direct': True}
+                        hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'url': stream_url, 'class': self, 'rating': None, 'views': None, 'quality': quality, 'direct': True}
                         hosters.append(hoster)
 
         return hosters
