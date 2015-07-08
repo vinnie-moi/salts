@@ -67,7 +67,7 @@ class Flixanity_Scraper(scraper.Scraper):
                 host = urlparse.urlsplit(url).hostname.lower()
                 if 'google' in host:
                     direct = True
-                    host = self.get_name()
+                    host = 'gvideo'
                     quality = self._gv_get_quality(url)
                 else:
                     direct = False
