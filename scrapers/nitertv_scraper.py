@@ -76,7 +76,7 @@ class Niter_Scraper(scraper.Scraper):
                         direct = False
                     else:
                         stream_url = stream_url.replace('emb=', '')
-                        host = 'niter.tv'
+                        host = self._get_direct_hostname(stream_url)
                         direct = True
                     quality = self._get_quality(video, host, QUALITIES.HD1080)
                     hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': direct}

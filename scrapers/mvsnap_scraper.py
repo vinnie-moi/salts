@@ -64,7 +64,7 @@ class Mvsnap_Scraper(scraper.Scraper):
                     stream_url = match.group(1)
                     stream_url = urlparse.urljoin(self.base_url, stream_url)
                     stream_url = self._http_get(stream_url, allow_redirect=False, cache_limit=.5)
-                    hoster = {'multi-part': False, 'host': 'mvsnap', 'class': self, 'quality': self._gv_get_quality(stream_url), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                    hoster = {'multi-part': False, 'host': self._gv_get_quality(stream_url), 'class': self, 'quality': self._gv_get_quality(stream_url), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                     hosters.append(hoster)
         return hosters
 
