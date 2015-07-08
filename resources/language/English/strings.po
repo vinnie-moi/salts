@@ -1000,9 +1000,7 @@ msgctxt "#30550"
 msgid "Trakt Page Size"
 msgstr ""
 
-msgctxt "#30551"
-msgid "Maximum Progress Size (0=No Limit)"
-msgstr ""
+# 30551 removed
 
 msgctxt "#30552"
 msgid "Use Trakt Bookmarks"
