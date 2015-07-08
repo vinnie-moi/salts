@@ -1119,9 +1119,11 @@ def pick_source_dir(mode, hosters, video_type, slug, season='', episode=''):
     if mode == MODES.DOWNLOAD_SOURCE:
         next_mode = MODES.DIRECT_DOWNLOAD
         folder = True
+        playable = 'false'
     else:
         next_mode = MODES.RESOLVE_SOURCE
         folder = False
+        playable = 'true'
 
     hosters_len = len(hosters)
     for item in hosters:
@@ -1134,7 +1136,10 @@ def pick_source_dir(mode, hosters, video_type, slug, season='', episode=''):
 
         # log_utils.log(item, xbmc.LOGDEBUG)
         queries = {'mode': next_mode, 'class_url': item['url'], 'direct': item['direct'], 'video_type': video_type, 'slug': slug, 'season': season, 'episode': episode, 'class_name': item['class'].get_name()}
-        _SALTS.add_directory(queries, infolabels={'title': item['label']}, is_folder=folder, img='', fanart='', total_items=hosters_len)
+        url = _SALTS.build_plugin_url(queries)
+        list_item = xbmcgui.ListItem(item['label'])
+        list_item.setProperty('isPlayable', playable)
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, list_item, isFolder=folder, totalItems=hosters_len)
 
     _SALTS.end_of_directory()
 
@@ -1875,6 +1880,8 @@ def make_item(section_params, show, menu_items=None):
     info = utils.make_info(show, people=people)
     if not section_params['folder']:
         liz.setProperty('IsPlayable', 'true')
+    else:
+        liz.setProperty('IsPlayable', 'false')
 
     if 'TotalEpisodes' in info:
         liz.setProperty('TotalEpisodes', str(info['TotalEpisodes']))
