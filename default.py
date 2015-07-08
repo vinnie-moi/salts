@@ -858,50 +858,44 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
     worker_count = 0
     hosters = []
     workers = []
-    video = ScraperVideo(video_type, title, year, slug, season, episode, ep_title, ep_airdate)
-    if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
+    q = utils.Queue()
     begin = time.time()
     fails = {}
     got_timeouts = False
+    video = ScraperVideo(video_type, title, year, slug, season, episode, ep_title, ep_airdate)
     for cls in utils.relevant_scrapers(video_type):
         scraper = cls(max_timeout)
-        if utils.P_MODE == P_MODES.NONE:
-            hosters += scraper.get_sources(video)
-            if max_results > 0 and len(hosters) >= max_results:
-                break
-        else:
-            worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
-            utils.increment_setting('%s_try' % (cls.get_name()))
-            worker_count += 1
-            workers.append(worker)
-            fails[cls.get_name()] = True
+        worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
+        utils.increment_setting('%s_try' % (cls.get_name()))
+        worker_count += 1
+        workers.append(worker)
+        fails[cls.get_name()] = True
 
     # collect results from workers
-    if utils.P_MODE != P_MODES.NONE:
-        while worker_count > 0:
-            try:
-                log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
-                result = q.get(True, timeout)
-                log_utils.log('Got %s Source Results' % (len(result['hosters'])), xbmc.LOGDEBUG)
-                worker_count -= 1
-                hosters += result['hosters']
-                del fails[result['name']]
-                if max_timeout > 0:
-                    timeout = max_timeout - (time.time() - begin)
-                    if timeout < 0: timeout = 0
-            except utils.Empty:
-                log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
-                utils.record_timeouts(fails)
-                got_timeouts = True
-                break
+    while worker_count > 0:
+        try:
+            log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
+            result = q.get(True, timeout)
+            log_utils.log('Got %s Source Results' % (len(result['hosters'])), xbmc.LOGDEBUG)
+            worker_count -= 1
+            hosters += result['hosters']
+            del fails[result['name']]
+            if max_timeout > 0:
+                timeout = max_timeout - (time.time() - begin)
+                if timeout < 0: timeout = 0
+        except utils.Empty:
+            log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
+            utils.record_timeouts(fails)
+            got_timeouts = True
+            break
 
-            if max_results > 0 and len(hosters) >= max_results:
-                log_utils.log('Exceeded max results: %s/%s' % (max_results, len(hosters)))
-                break
+        if max_results > 0 and len(hosters) >= max_results:
+            log_utils.log('Exceeded max results: %s/%s' % (max_results, len(hosters)))
+            break
 
-        else:
-            got_timeouts = False
-            log_utils.log('All source results received')
+    else:
+        got_timeouts = False
+        log_utils.log('All source results received')
 
     total = len(workers)
     timeouts = len(fails)
