@@ -562,7 +562,6 @@ def get_progress(cache_override=False):
     timeout = max_timeout = int(_SALTS.get_setting('trakt_timeout'))
     watched_list = trakt_api.get_watched(SECTIONS.TV, full=True, cached=cached)
     hidden = dict.fromkeys([item['show']['ids']['slug'] for item in trakt_api.get_hidden_progress(cached=cached)])
-    episodes = []
     worker_count = 0
     workers = []
     shows = {}
@@ -579,6 +578,7 @@ def get_progress(cache_override=False):
         shows[watched['show']['ids']['slug']] = watched['show']
         shows[watched['show']['ids']['slug']]['last_watched_at'] = watched['last_watched_at']
 
+    episodes = []
     while worker_count > 0:
         try:
             log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
@@ -842,12 +842,10 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
     if max_timeout == 0: timeout = None
     max_results = int(_SALTS.get_setting('source_results'))
     worker_count = 0
-    hosters = []
     workers = []
     q = utils.Queue()
     begin = time.time()
     fails = {}
-    got_timeouts = False
     video = ScraperVideo(video_type, title, year, slug, season, episode, ep_title, ep_airdate)
     for cls in utils.relevant_scrapers(video_type):
         scraper = cls(max_timeout)
@@ -858,6 +856,8 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
         fails[cls.get_name()] = True
 
     # collect results from workers
+    hosters = []
+    got_timeouts = False
     while worker_count > 0:
         try:
             log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
