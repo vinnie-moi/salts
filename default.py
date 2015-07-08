@@ -602,12 +602,12 @@ def get_progress(cache_override=False):
     else:
         log_utils.log('All progress results received')
         
-        total = len(workers)
-        if worker_count > 0:
-            timeout_msg = i18n('progress_timeouts') % (worker_count, total)
-            utils.notify(msg=timeout_msg, duration=5000)
-            log_utils.log(timeout_msg, xbmc.LOGWARNING)
-        workers = utils.reap_workers(workers)
+    total = len(workers)
+    if worker_count > 0:
+        timeout_msg = i18n('progress_timeouts') % (worker_count, total)
+        utils.notify(msg=timeout_msg, duration=5000)
+        log_utils.log(timeout_msg, xbmc.LOGWARNING)
+    workers = utils.reap_workers(workers)
     
     return workers, utils.sort_progress(episodes, sort_order=SORT_MAP[int(_SALTS.get_setting('sort_progress'))])
 
