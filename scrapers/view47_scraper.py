@@ -70,7 +70,7 @@ class View47_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            div = dom_parser.parse_dom(html, 'div', {'class': 'new_server'})
+            div = dom_parser.parse_dom(html, 'div', {'class': 'tab_ep'})
             if div:
                 div = div[0]
                 for match in re.finditer('href="([^"]+)(?:.*?>){2}([^<]+)', div):
