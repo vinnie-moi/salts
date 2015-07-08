@@ -26,7 +26,6 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://www.mintmovies.net'
-FORMATS = {'m18': QUALITIES.MEDIUM, 'm22': QUALITIES.HD720, 'm37': QUALITIES.HD1080}
 
 class MintMovies_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -67,22 +66,8 @@ class MintMovies_Scraper(scraper.Scraper):
             match = re.search('src="([^"]+)', fragment)
             if match:
                 link = match.group(1)
-                link_format = link[-3:]
-                hoster = {'multi-part': False, 'host': self.get_name(), 'class': self, 'quality': FORMATS.get(link_format, QUALITIES.HD720), 'views': None, 'rating': None, 'url': link, 'direct': True}
+                hoster = {'multi-part': False, 'host': self._get_direct_hostname(link), 'class': self, 'quality': self._gv_get_quality(link), 'views': None, 'rating': None, 'url': link, 'direct': True}
                 hosters.append(hoster)
-                
-                # check for other resolutions
-                if 'googleusercontent' in link:
-                    formats = FORMATS
-                    del formats[link_format]
-                    for test_format in formats:
-                        test_link = link.replace(link_format, test_format)
-                        try:
-                            urllib2.urlopen(test_link)
-                            hoster = {'multi-part': False, 'host': self.get_name(), 'class': self, 'quality': FORMATS[test_format], 'views': None, 'rating': None, 'url': test_link, 'direct': True}
-                            hosters.append(hoster)
-                        except urllib2.HTTPError: pass
-
         return hosters
 
     def get_url(self, video):
