@@ -202,5 +202,6 @@ STRINGS = {
            'failed_create_dir': 30190,
            'failed_write_file': 30191,
            'reset_base_url': 30192,
-           'reset_complete': 30193
+           'reset_complete': 30193,
+           'req_result': 30194
 }

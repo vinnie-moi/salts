@@ -790,6 +790,10 @@ msgctxt "#30193"
 msgid "Base Url Reset Complete"
 msgstr ""
 
+msgctxt "#30194"
+msgid "Requesting Url for: %s"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""

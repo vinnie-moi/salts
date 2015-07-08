@@ -47,7 +47,7 @@ SORT_FIELDS = [(SORT_LIST[int(ADDON.get_setting('sort1_field'))], SORT_SIGNS[ADD
 last_check = datetime.datetime.fromtimestamp(0)
 
 P_MODE = int(ADDON.get_setting('parallel_mode'))
-if P_MODE == P_MODES.THREADS:
+if P_MODE in [P_MODES.THREADS, P_MODES.NONE]:
     import threading
     from Queue import Queue, Empty
 elif P_MODE == P_MODES.PROCESSES:
@@ -416,8 +416,13 @@ def start_worker(q, func, args):
         worker = threading.Thread(target=func, args=([q] + args))
     elif P_MODE == P_MODES.PROCESSES:
         worker = multiprocessing.Process(target=func, args=([q] + args))
-    worker.daemon = True
-    worker.start()
+    else:
+        worker = None
+        func(*([q] + args))
+
+    if worker:
+        worker.daemon = True
+        worker.start()
     return worker
 
 def reap_workers(workers, timeout=0):
@@ -427,32 +432,33 @@ def reap_workers(workers, timeout=0):
     log_utils.log('In Reap: %s' % (workers), xbmc.LOGDEBUG)
     living_workers = []
     for worker in workers:
-        log_utils.log('Reaping: %s' % (worker.name), xbmc.LOGDEBUG)
-        worker.join(timeout)
-        if worker.is_alive():
-            log_utils.log('Worker %s still running' % (worker.name), xbmc.LOGDEBUG)
-            living_workers.append(worker)
+        if worker:
+            log_utils.log('Reaping: %s' % (worker.name), xbmc.LOGDEBUG)
+            worker.join(timeout)
+            if worker.is_alive():
+                log_utils.log('Worker %s still running' % (worker.name), xbmc.LOGDEBUG)
+                living_workers.append(worker)
     return living_workers
 
 def parallel_get_sources(q, scraper, video):
-    if P_MODE == P_MODES.THREADS:
+    if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
         worker = threading.current_thread()
     elif P_MODE == P_MODES.PROCESSES:
         worker = multiprocessing.current_process()
 
-    log_utils.log('Starting %s (%s) for %s sources' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
+    log_utils.log('Worker: %s (%s) for %s sources' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
     hosters = scraper.get_sources(video)
     log_utils.log('%s returned %s sources from %s' % (scraper.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
     result = {'name': scraper.get_name(), 'hosters': hosters}
     q.put(result)
 
 def parallel_get_url(q, scraper, video):
-    if P_MODE == P_MODES.THREADS:
+    if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
         worker = threading.current_thread()
     elif P_MODE == P_MODES.PROCESSES:
         worker = multiprocessing.current_process()
 
-    log_utils.log('Starting %s (%s) for %s url' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
+    log_utils.log('Worker: %s (%s) for %s url' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
     url = scraper.get_url(video)
     log_utils.log('%s returned url %s from %s' % (scraper.get_name(), url, worker), xbmc.LOGDEBUG)
     if not url: url = ''
@@ -460,12 +466,12 @@ def parallel_get_url(q, scraper, video):
     q.put(related)
 
 def parallel_get_progress(q, slug, cached):
-    if P_MODE == P_MODES.THREADS:
+    if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
         worker = threading.current_thread()
     elif P_MODE == P_MODES.PROCESSES:
         worker = multiprocessing.current_process()
 
-    log_utils.log('Starting %s (%s) for %s progress' % (worker.name, worker, slug), xbmc.LOGDEBUG)
+    log_utils.log('Worker: %s (%s) for %s progress' % (worker.name, worker, slug), xbmc.LOGDEBUG)
     progress = trakt_api.get_show_progress(slug, full=True, cached=cached)
     progress['slug'] = slug  # add in a hacked slug to be used to match progress up to the show its for
     log_utils.log('Got progress for %s from %s' % (slug, worker), xbmc.LOGDEBUG)

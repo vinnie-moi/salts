@@ -1158,61 +1158,52 @@ def pick_source_dir(mode, hosters, video_type, slug, season='', episode=''):
 @url_dispatcher.register(MODES.SET_URL_MANUAL, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'episode', 'ep_title', 'ep_airdate'])
 @url_dispatcher.register(MODES.SET_URL_SEARCH, ['mode', 'video_type', 'title', 'year', 'slug'], ['season', 'episode', 'ep_title', 'ep_airdate'])
 def set_related_url(mode, video_type, title, year, slug, season='', episode='', ep_title='', ep_airdate=''):
-    related_list = []
     timeout = max_timeout = int(_SALTS.get_setting('source_timeout'))
     if max_timeout == 0: timeout = None
     worker_count = 0
     workers = []
-    fails = {}
-    if utils.P_MODE != P_MODES.NONE: q = utils.Queue()
+    related_list = []
+    q = utils.Queue()
     begin = time.time()
     video = ScraperVideo(video_type, title, year, slug, season, episode, ep_title, ep_airdate)
     with gui_utils.ProgressDialog(i18n('set_related_url'), utils.make_progress_msg(video_type, title, year, season, episode)) as pd:
         scrapers = utils.relevant_scrapers(video_type, order_matters=True)
         total = len(scrapers)
-        result_count = 0
         for cls in scrapers:
             scraper = cls(max_timeout)
-            if utils.P_MODE == P_MODES.NONE:
-                url = scraper.get_url(video)
-                if not url: url = ''
-                result_count += 1
-                pd.update(result_count * 100 / total, line2=i18n('recv_result') % (scraper.get_name()))
-            else:
-                url = ''
-                worker = utils.start_worker(q, utils.parallel_get_url, [scraper, video])
-                utils.increment_setting('%s_try' % (cls.get_name()))
-                worker_count += 1
-                workers.append(worker)
-            related = {'class': scraper, 'url': url, 'name': cls.get_name(), 'label': '[%s] %s' % (cls.get_name(), url)}
-            related_list.append(related)
+            worker = utils.start_worker(q, utils.parallel_get_url, [scraper, video])
+            utils.increment_setting('%s_try' % (cls.get_name()))
+            related_list.append({'class': scraper, 'url': '', 'name': cls.get_name(), 'label': '[%s]' % (cls.get_name())})
+            worker_count += 1
+            progress = worker_count * 50 / total
+            pd.update(progress, line2=i18n('req_result') % (cls.get_name()))
+            workers.append(worker)
     
         # collect results from workers
-        if utils.P_MODE != P_MODES.NONE:
-            fails = dict.fromkeys([item['name'] for item in related_list], True)
-            total = worker_count
-            while worker_count > 0:
-                try:
-                    log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
-                    result = q.get(True, timeout)
-                    log_utils.log('Got result: %s' % (result), xbmc.LOGDEBUG)
-                    # related_list.append(result)
-                    for i, item in enumerate(related_list):
-                        if item['name'] == result['name']:
-                            related_list[i] = result
-                            del fails[result['name']]
-                    worker_count -= 1
-                    progress = (total - worker_count) * 100 / total
-                    pd.update(progress, line2=i18n('recv_result') % (result['name']))
-                    if max_timeout > 0:
-                        timeout = max_timeout - (time.time() - begin)
-                        if timeout < 0: timeout = 0
-                except utils.Empty:
-                    log_utils.log('Get Url Timeout', xbmc.LOGWARNING)
-                    utils.record_timeouts(fails)
-                    break
-            else:
-                log_utils.log('All source results received')
+        fails = dict.fromkeys([item['name'] for item in related_list], True)
+        total = worker_count
+        while worker_count > 0:
+            try:
+                log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
+                result = q.get(True, timeout)
+                log_utils.log('Got result: %s' % (result), xbmc.LOGDEBUG)
+                # related_list.append(result)
+                for i, item in enumerate(related_list):
+                    if item['name'] == result['name']:
+                        related_list[i] = result
+                        del fails[result['name']]
+                worker_count -= 1
+                progress = ((total - worker_count) * 50 / total) + 50
+                pd.update(progress, line2=i18n('recv_result') % (result['name']))
+                if max_timeout > 0:
+                    timeout = max_timeout - (time.time() - begin)
+                    if timeout < 0: timeout = 0
+            except utils.Empty:
+                log_utils.log('Get Url Timeout', xbmc.LOGWARNING)
+                utils.record_timeouts(fails)
+                break
+        else:
+            log_utils.log('All source results received')
 
     total = len(workers)
     timeouts = len(fails)

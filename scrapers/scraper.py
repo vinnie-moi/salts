@@ -42,7 +42,7 @@ from salts_lib.constants import BLOG_Q_MAP
 from salts_lib.constants import P_MODES
 
 P_MODE = int(xbmcaddon.Addon().getSetting('parallel_mode'))
-if P_MODE == P_MODES.THREADS:
+if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
     import threading
 elif P_MODE == P_MODES.PROCESSES:
     try:
@@ -577,7 +577,7 @@ class Scraper(object):
             return QUALITIES.HIGH
     
     def create_db_connection(self):
-        if P_MODE == P_MODES.THREADS:
+        if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
             worker_id = threading.current_thread().ident
         elif P_MODE == P_MODES.PROCESSES:
             worker_id = multiprocessing.current_process().pid
