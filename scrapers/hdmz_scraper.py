@@ -69,7 +69,7 @@ class hdmz_Scraper(scraper.Scraper):
                         if js_data and 'content' in js_data:
                             for item in js_data['content']:
                                 if 'type' in item and item['type'].lower().startswith('video'):
-                                    hoster = {'multi-part': False, 'host': 'hdmoviezone.net', 'url': item['url'], 'class': self, 'rating': None, 'views': None, 'quality': self._width_get_quality(item['width']), 'direct': True}
+                                    hoster = {'multi-part': False, 'host': self._get_direct_hostname(item['url']), 'url': item['url'], 'class': self, 'rating': None, 'views': None, 'quality': self._width_get_quality(item['width']), 'direct': True}
                                     hosters.append(hoster)
 
         return hosters
