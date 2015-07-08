@@ -90,7 +90,10 @@ def show_views():
 
 @url_dispatcher.register(MODES.BROWSE_VIEW, ['content_type'])
 def browse_view(content_type):
-    _SALTS.add_directory({'mode': MODES.SET_VIEW, 'content_type': content_type}, {'title': i18n('set_view_instr') % (content_type.capitalize())}, img=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    url = _SALTS.build_plugin_url({'mode': MODES.SET_VIEW, 'content_type': content_type})
+    list_item = xbmcgui.ListItem(i18n('set_view_instr') % (content_type.capitalize()), iconImage=utils.art('settings.png'), thumbnailImage=utils.art('settings.png'))
+    list_item.setProperty('fanart_image', utils.art('fanart.jpg'))
+    xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, list_item)
     utils.set_view(content_type, False)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
