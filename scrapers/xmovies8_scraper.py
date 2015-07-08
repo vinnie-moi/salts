@@ -67,7 +67,6 @@ class XMovies8_Scraper(scraper.Scraper):
         html = self._http_get(search_url, cache_limit=.25)
         results = []
         norm_title = self._normalize_title(title)
-        print dom_parser.parse_dom(html, 'h3', {'class': 'r'})
         for result in dom_parser.parse_dom(html, 'h3', {'class': 'r'}):
             match = re.search('href="([^"]+)"[^>]*>([^<]+)', result)
             if match:
