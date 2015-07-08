@@ -74,7 +74,7 @@ class GVCenter_Scraper(scraper.Scraper):
                     for match in re.finditer('(http.*?(?:#(\d+)#)?)(?=http|$)', film['film_link']):
                         link, height = match.groups()
                         if height is None: height = 360  # Assumed medium quality if not found
-                        source = {'multi-part': False, 'url': link, 'host': self.get_name(), 'class': self, 'quality': self._height_get_quality(height), 'views': None, 'rating': None, 'direct': True, 'resolution': '%sp' % (height)}
+                        source = {'multi-part': False, 'url': link, 'host': self._get_direct_hostname(link), 'class': self, 'quality': self._height_get_quality(height), 'views': None, 'rating': None, 'direct': True, 'resolution': '%sp' % (height)}
                         sources.append(source)
 
         return sources
