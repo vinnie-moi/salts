@@ -57,29 +57,22 @@ class ClickPlay_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
 
-            match = re.search('proxy\.link=([^"&]+)', html)
-            if match:
-                proxy_link = match.group(1)
-                proxy_link = proxy_link.split('*', 1)[-1]
-                stream_url = GKDecrypter.decrypter(198, 128).decrypt(proxy_link, base64.urlsafe_b64decode('bW5pcUpUcUJVOFozS1FVZWpTb00='), 'ECB').split('\0')[0]
-                if 'vk.com' in stream_url.lower():
-                    hoster = {'multi-part': False, 'host': 'vk.com', 'class': self, 'url': stream_url, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'direct': False}
+            ele = dom_parser.parse_dom(html, 'video')
+            if ele:
+                stream_url = dom_parser.parse_dom(ele, 'source', ret='src')
+                if stream_url:
+                    hoster = {'multi-part': False, 'url': stream_url[0], 'class': self, 'quality': QUALITIES.HD720, 'host': self._get_direct_hostname(stream_url[0]), 'rating': None, 'views': None, 'direct': True}
+                    if hoster['host'] == 'gvideo':
+                        hoster['quality'] = self._gv_get_quality(hoster['url'])
                     hosters.append(hoster)
-                elif 'picasaweb' in stream_url.lower():
-                    html = self._http_get(stream_url, cache_limit=.5)
-                    sources = self.__parse_google(html)
-                    if sources:
-                        for source in sources:
-                            hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': sources[source], 'host': 'clickplay.to', 'rating': None, 'views': None, 'direct': True}
-                            hosters.append(hoster)
-            else:
-                ele = dom_parser.parse_dom(html, 'video')
-                if ele:
-                    stream_url = dom_parser.parse_dom(ele, 'source', ret='src')
-                    if stream_url:
-                        hoster = {'multi-part': False, 'url': stream_url[0], 'class': self, 'quality': QUALITIES.HD720, 'host': 'clickplay.to', 'rating': None, 'views': None, 'direct': True}
-                        hosters.append(hoster)
-                        
+            
+            sources = dom_parser.parse_dom(html, 'iframe', ret='src')
+            for src in sources:
+                if 'facebook' in src: continue
+                host = urlparse.urlparse(src[0]).hostname
+                hoster = {'multi-part': False, 'url': src[0], 'class': self, 'quality': QUALITIES.HD720, 'host': host, 'rating': None, 'views': None, 'direct': False}
+                hosters.append(hoster)
+                
         return hosters
 
     def __parse_google(self, html):
