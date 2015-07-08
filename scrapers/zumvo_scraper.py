@@ -21,7 +21,6 @@ import urlparse
 import re
 import xbmcaddon
 import xbmc
-import base64
 from salts_lib import GKDecrypter
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -118,35 +117,8 @@ class Zumvo_Scraper(scraper.Scraper):
 
     def _http_get(self, url, cache_limit=8):
         html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
-        if 'sucuri_cloudproxy_js' in html:
-            key, value = self.__get_cookie(html)
-            if key and value:
-                cookies = {key: value}
-            else:
-                cookies = {}
-            log_utils.log('Setting Zumvo cookie: %s: %s' % (key, value), xbmc.LOGDEBUG)
-            html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, cache_limit=0)
+        cookie = self._get_sucuri_cookie(html)
+        if cookie:
+            log_utils.log('Setting Zumvo cookie: %s' % (cookie), xbmc.LOGDEBUG)
+            html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookie, cache_limit=0)
         return html
-    
-    def __get_cookie(self, html):
-        match = re.search("S\s*=\s*'([^']+)", html)
-        if match:
-            s = base64.b64decode(match.group(1))
-            s = s.replace(' ', '')
-            s = re.sub('String\.fromCharCode\(([^)]+)\)', r'chr(\1)', s)
-            s = re.sub('\.slice\((\d+),(\d+)\)', r'[\1:\2]', s)
-            s = re.sub('\.charAt\(([^)]+)\)', r'[\1]', s)
-            s = re.sub('\.substr\((\d+),(\d+)\)', r'[\1:\1+\2]', s)
-            s = re.sub(';location.reload\(\);', '', s)
-            s = re.sub(r'\n', '', s)
-            s = re.sub(r'document\.cookie', 'cookie', s)
-            try:
-                cookie = ''
-                exec(s)
-                match = re.match('([^=]+)=(.*)', cookie)
-                if match:
-                    return match.groups()
-            except Exception as e:
-                log_utils.log('Exception during zumvo js: %s' % (e), xbmc.LOGWARNING)
-        
-        return None, None

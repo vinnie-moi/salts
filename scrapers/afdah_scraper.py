@@ -69,6 +69,7 @@ class Afdah_Scraper(scraper.Scraper):
                         plaintext = self._caesar(r.group(1).decode('base-64'), 13).decode('base-64')
                 else:
                     plaintext = embed_html
+                print plaintext
                 hosters += self._get_links(plaintext)
             
             pattern = 'href="([^"]+)".*play_video.gif'
@@ -83,7 +84,7 @@ class Afdah_Scraper(scraper.Scraper):
         hosters = []
         for match in re.finditer('file\s*:\s*"([^"]+).*?label\s*:\s*"([^"]+)', html):
             url, resolution = match.groups()
-            hoster = {'multi-part': False, 'url': url, 'host': 'afdah.com', 'class': self, 'quality': self._height_get_quality(resolution[:-1]), 'rating': None, 'views': None, 'direct': True}
+            hoster = {'multi-part': False, 'url': url, 'host': self._get_direct_hostname(url), 'class': self, 'quality': self._height_get_quality(resolution[:-1]), 'rating': None, 'views': None, 'direct': True}
             hosters.append(hoster)
         return hosters
 

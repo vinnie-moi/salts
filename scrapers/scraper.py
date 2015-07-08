@@ -26,6 +26,7 @@ import xbmcgui
 import os
 import re
 import time
+import base64
 from StringIO import StringIO
 import gzip
 import datetime
@@ -575,6 +576,37 @@ class Scraper(object):
             return QUALITIES.HD1080
         else:
             return QUALITIES.HIGH
+    
+    def _get_sucuri_cookie(self, html):
+        if 'sucuri_cloudproxy_js' in html:
+            match = re.search("S\s*=\s*'([^']+)", html)
+            if match:
+                s = base64.b64decode(match.group(1))
+                s = s.replace(' ', '')
+                s = re.sub('String\.fromCharCode\(([^)]+)\)', r'chr(\1)', s)
+                s = re.sub('\.slice\((\d+),(\d+)\)', r'[\1:\2]', s)
+                s = re.sub('\.charAt\(([^)]+)\)', r'[\1]', s)
+                s = re.sub('\.substr\((\d+),(\d+)\)', r'[\1:\1+\2]', s)
+                s = re.sub(';location.reload\(\);', '', s)
+                s = re.sub(r'\n', '', s)
+                s = re.sub(r'document\.cookie', 'cookie', s)
+                try:
+                    cookie = ''
+                    exec(s)
+                    match = re.match('([^=]+)=(.*)', cookie)
+                    if match:
+                        return {match.group(1): match.group(2)}
+                except Exception as e:
+                    log_utils.log('Exception during sucuri js: %s' % (e), xbmc.LOGWARNING)
+        
+        return {}
+        
+    def _get_direct_hostname(self, link):
+        host = urlparse.urlparse(link).hostname
+        if any([h for h in ['google', 'picasa'] if h in host]):
+            return 'gvideo'
+        else:
+            return self.get_name()
     
     def create_db_connection(self):
         if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
