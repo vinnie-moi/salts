@@ -77,7 +77,7 @@ class Zumvo_Scraper(scraper.Scraper):
                     stream_url = GKDecrypter.decrypter(198, 128).decrypt(proxy_link, base64.urlsafe_b64decode('NlFQU1NQSGJrbXJlNzlRampXdHk='), 'ECB').split('\0')[0]
                     if 'picasa' in stream_url:
                         html = self._http_get(stream_url, cache_limit=.5)
-                        sources = self.__parse_google(html)
+                        sources = self._parse_google(html)
                         if sources:
                             for source in sources:
                                 hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': sources[source], 'host': self._get_direct_hostname(source), 'rating': None, 'views': views, 'direct': True}

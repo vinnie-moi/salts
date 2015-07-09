@@ -62,7 +62,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
                     link = base64.decodestring(match.group(1))
                     if 'picasa' in link:
                         html = self._http_get(link, cache_limit=.5)
-                        sources = self.__parse_google(html)
+                        sources = self._parse_google(html)
                         for source in sources:
                             hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': sources[source], 'host': self._get_direct_hostname(source), 'rating': None, 'views': None, 'direct': True}
                             hosters.append(hoster)

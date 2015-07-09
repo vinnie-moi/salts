@@ -608,7 +608,7 @@ class Scraper(object):
         else:
             return self.get_name()
     
-    def __parse_google(self, html):
+    def _parse_google(self, html):
         pattern = '"url"\s*:\s*"([^"]+)"\s*,\s*"height"\s*:\s*\d+\s*,\s*"width"\s*:\s*(\d+)\s*,\s*"type"\s*:\s*"video/'
         sources = {}
         for match in re.finditer(pattern, html):

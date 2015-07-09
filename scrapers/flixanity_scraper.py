@@ -65,13 +65,14 @@ class Flixanity_Scraper(scraper.Scraper):
             for match in re.finditer(pattern, html, re.DOTALL | re.I):
                 url = match.group(1)
                 host = self._get_direct_hostname(url)
+                print host
                 if host == 'gvideo':
                     direct = True
                     quality = self._gv_get_quality(url)
                 else:
                     direct = False
-                    quality = self._get_quality(video, host, QUALITIES.HD720)
                     host = urlparse.urlparse(url).hostname
+                    quality = self._get_quality(video, host, QUALITIES.HD720)
 
                 source = {'multi-part': False, 'url': url, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'direct': direct}
                 sources.append(source)
