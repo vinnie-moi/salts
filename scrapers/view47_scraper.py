@@ -78,6 +78,8 @@ class View47_Scraper(scraper.Scraper):
                     if host == 'picasa':
                         direct = True
                         quality = QUALITIES.MEDIUM
+                    elif host == '1':
+                        continue
                     else:
                         quality = self._get_quality(video, host, QUALITIES.MEDIUM)
                         direct = False
