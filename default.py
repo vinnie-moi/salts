@@ -1135,7 +1135,8 @@ def pick_source_dir(mode, hosters, video_type, slug, season='', episode=''):
         item['label'] = label
 
         # log_utils.log(item, xbmc.LOGDEBUG)
-        queries = {'mode': next_mode, 'class_url': item['url'], 'direct': item['direct'], 'video_type': video_type, 'slug': slug, 'season': season, 'episode': episode, 'class_name': item['class'].get_name()}
+        queries = {'mode': next_mode, 'class_url': item['url'], 'direct': item['direct'], 'video_type': video_type, 'slug': slug,
+                   'season': season, 'episode': episode, 'class_name': item['class'].get_name(), 'rand': time.time()}
         url = _SALTS.build_plugin_url(queries)
         list_item = xbmcgui.ListItem(item['label'])
         list_item.setProperty('isPlayable', playable)
