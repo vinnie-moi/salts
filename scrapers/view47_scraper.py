@@ -59,7 +59,6 @@ class View47_Scraper(scraper.Scraper):
                     match = re.search('proxy\.link=([^"]+)', html)
                     if match:
                         return match.group(1)
-                    
 
     def format_source_label(self, item):
         return '[%s] %s' % (item['quality'], item['host'])
