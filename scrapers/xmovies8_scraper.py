@@ -24,7 +24,7 @@ from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 
 BASE_URL = 'http://xmovies8.tv'
-SEARCH_URL = 'http://www.google.com/search?q=%s&sitesearch=xmovies8.tv'
+SEARCH_URL = 'http://www.google.com/search?q=%s+site:xmovies8.tv'
 
 class XMovies8_Scraper(scraper.Scraper):
     base_url = BASE_URL
