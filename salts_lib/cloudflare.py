@@ -113,10 +113,13 @@ def solve(url, cj, wait=True):
             urllib2.install_opener(opener)
             response = urllib2.urlopen(request)
             while response.getcode() in [301, 302, 303, 307]:
-                cj.extract_cookies(response, request)
+                if cj:
+                    cj.extract_cookies(response, request)
                 request = urllib2.Request(response.info().getheader('location'))
                 for key in headers: request.add_header(key, headers[key])
-                cj.add_cookie_header(request)
+                if cj:
+                    cj.add_cookie_header(request)
+                    
                 response = urllib2.urlopen(request)
             final = response.read()
         except urllib2.HTTPError as e:
