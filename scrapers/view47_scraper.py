@@ -94,7 +94,6 @@ class View47_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/search.php?q=%s&limit=20&timestamp=%s' % (urllib.quote_plus(title), time.time()))
         html = self._http_get(search_url, cache_limit=.25)
-        print html
         results = []
         items = dom_parser.parse_dom(html, 'li')
         if len(items) >= 2:

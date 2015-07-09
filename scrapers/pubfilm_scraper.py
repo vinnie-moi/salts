@@ -63,7 +63,6 @@ class PubFilm_Scraper(scraper.Scraper):
             if fragment:
                 fragment = fragment[0]
                 views = re.sub('[^\d]', '', fragment)
-                print views
                 
             iframe_items = set(dom_parser.parse_dom(html, 'iframe', ret='src'))
             link_items = set(dom_parser.parse_dom(html, 'a', {'target': 'EZWebPlayer'}, ret='href'))
