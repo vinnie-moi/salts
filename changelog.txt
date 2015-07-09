@@ -1,3 +1,9 @@
+[B]Version 1.0.20[/B]
+- Show google videos as gvideo host
+- Improve several scrapers
+- Tweak parallel code
+- Tweak cloudflare code
+
 [B]Version 1.0.19[/B]
 - Better handle direct sources
 - Fix stream-tv scraper
