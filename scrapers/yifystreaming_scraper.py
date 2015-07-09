@@ -68,15 +68,6 @@ class YifyStreaming_Scraper(scraper.Scraper):
                             hosters.append(hoster)
         return hosters
 
-    def __parse_google(self, html):
-        pattern = '"url"\s*:\s*"([^"]+)"\s*,\s*"height"\s*:\s*\d+\s*,\s*"width"\s*:\s*(\d+)\s*,\s*"type"\s*:\s*"video/'
-        sources = {}
-        for match in re.finditer(pattern, html):
-            url, width = match.groups()
-            url = url.replace('%3D', '=')
-            sources[url] = self._width_get_quality(width)
-        return sources
-
     def get_url(self, video):
         self.create_db_connection()
         url = None
