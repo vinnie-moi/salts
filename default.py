@@ -97,11 +97,11 @@ def browse_view(content_type):
 
 @url_dispatcher.register(MODES.SET_VIEW, ['content_type'])
 def set_default_view(content_type):
-    current_view = utils.get_current_view()
+    current_view = kodi.get_current_view()
     if current_view:
         kodi.set_setting('%s_view' % (content_type), current_view)
         view_name = xbmc.getInfoLabel('Container.Viewmode')
-        utils.notify(msg=i18n('view_set') % (content_type.capitalize(), view_name))
+        kodi.notify(msg=i18n('view_set') % (content_type.capitalize(), view_name))
 
 @url_dispatcher.register(MODES.BROWSE_URLS)
 def browse_urls():
@@ -139,7 +139,7 @@ def reset_base_url():
                     log_utils.log('Resetting: %s -> %s' % (setting.get('id'), setting.get('default')), xbmc.LOGDEBUG)
                     kodi.set_setting(setting.get('id'), setting.get('default'))
 
-    utils.notify(msg=i18n('reset_complete'))
+    kodi.notify(msg=i18n('reset_complete'))
 
 @url_dispatcher.register(MODES.AUTO_CONF)
 def auto_conf():
@@ -164,7 +164,7 @@ def auto_conf():
                'pftv', 'wso.ch', 'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131', 'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies', 'iStreamHD', 'afdah',
                'filmikz.ch', 'movie25']
         db_connection.set_setting('source_sort_order', '|'.join(sso))
-        utils.notify(msg=i18n('auto_conf_complete'))
+        kodi.notify(msg=i18n('auto_conf_complete'))
     
 @url_dispatcher.register(MODES.BROWSE, ['section'])
 def browse_menu(section):
@@ -210,7 +210,7 @@ def add_search_item(queries, label, thumb, clear_mode):
     
 @url_dispatcher.register(MODES.FORCE_REFRESH, ['refresh_mode'], ['section', 'slug', 'username'])
 def force_refresh(refresh_mode, section=None, slug=None, username=None):
-    utils.notify(msg=i18n('forcing_refresh'))
+    kodi.notify(msg=i18n('forcing_refresh'))
     log_utils.log('Forcing refresh for mode: |%s|%s|%s|%s|' % (refresh_mode, section, slug, username))
     now = datetime.datetime.now()
     offset = int(kodi.get_setting('calendar-day'))
@@ -240,7 +240,7 @@ def force_refresh(refresh_mode, section=None, slug=None, username=None):
         return
 
     log_utils.log('Force refresh complete: |%s|%s|%s|%s|' % (refresh_mode, section, slug, username))
-    utils.notify(msg=i18n('force_refresh_complete'))
+    kodi.notify(msg=i18n('force_refresh_complete'))
 
 @url_dispatcher.register(MODES.SCRAPERS)
 def scraper_settings():
@@ -513,7 +513,7 @@ def show_list(section, slug, username=None):
             items = trakt_api.show_list(slug, section, username)
         except TraktNotFoundError:
             msg = i18n('list_not_exist') % (slug)
-            utils.notify(msg=msg, duration=5000)
+            kodi.notify(msg=msg, duration=5000)
             log_utils.log(msg, xbmc.LOGWARNING)
             return
 
@@ -581,7 +581,7 @@ def get_progress(cache_override=False):
     total = len(workers)
     if worker_count > 0:
         timeout_msg = i18n('progress_timeouts') % (worker_count, total)
-        utils.notify(msg=timeout_msg, duration=5000)
+        kodi.notify(msg=timeout_msg, duration=5000)
         log_utils.log(timeout_msg, xbmc.LOGWARNING)
     workers = utils.reap_workers(workers)
     
@@ -670,7 +670,7 @@ def search(section, search_text=None):
         if keyboard.isConfirmed():
             search_text = keyboard.getText()
             if not search_text:
-                utils.notify(msg=i18n('blank_searches'), duration=5000)
+                kodi.notify(msg=i18n('blank_searches'), duration=5000)
                 return
             else:
                 break
@@ -722,7 +722,7 @@ def saved_searches(section):
 def clear_recent(section):
     for i in range(0, SEARCH_HISTORY):
         db_connection.set_setting('%s_search_%s' % (section, i), '')
-    utils.notify(msg=i18n('recent_cleared'), duration=2500)
+    kodi.notify(msg=i18n('recent_cleared'), duration=2500)
 
 @url_dispatcher.register(MODES.DELETE_RECENT, ['section', 'index'])
 def delete_recent(section, index):
@@ -756,7 +756,7 @@ def delete_search(search_id):
 def clear_saved(section):
     for search in db_connection.get_searches(section):
         db_connection.delete_search(search[0])
-    utils.notify(msg=i18n('saved_cleared'), duration=2500)
+    kodi.notify(msg=i18n('saved_cleared'), duration=2500)
 
 @url_dispatcher.register(MODES.SEARCH_RESULTS, ['section', 'query'], ['page'])
 def search_results(section, query, page=1):
@@ -857,11 +857,11 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
             log_utils.log('No Sources found for: |%s|' % (video))
             msg = i18n('no_sources')
             msg += ' (%s)' % timeout_msg if timeout_msg else ''
-            utils.notify(msg=msg, duration=5000)
+            kodi.notify(msg=msg, duration=5000)
             return False
 
         if timeout_msg:
-            utils.notify(msg=timeout_msg, duration=5000)
+            kodi.notify(msg=timeout_msg, duration=5000)
 
         hosters = utils.filter_exclusions(hosters)
         hosters = utils.filter_quality(video_type, hosters)
@@ -877,7 +877,7 @@ def get_sources(mode, video_type, title, year, slug, season='', episode='', ep_t
         if not hosters:
             log_utils.log('No Useable Sources found for: |%s|' % (video))
             msg = ' (%s)' % timeout_msg if timeout_msg else ''
-            utils.notify(msg=i18n('no_useable_sources') % (msg), duration=5000)
+            kodi.notify(msg=i18n('no_useable_sources') % (msg), duration=5000)
             return False
 
         pseudo_tv = xbmcgui.Window(10000).getProperty('PseudoTVRunning')
@@ -963,7 +963,7 @@ def play_source(mode, hoster_url, direct, video_type, slug, season='', episode='
             if not stream_url or not isinstance(stream_url, basestring):
                 try: msg = stream_url.msg
                 except: msg = hoster_url
-                utils.notify(msg=i18n('resolve_failed') % (msg), duration=7500)
+                kodi.notify(msg=i18n('resolve_failed') % (msg), duration=7500)
                 return False
 
     resume_point = 0
@@ -1053,7 +1053,7 @@ def auto_play_sources(hosters, video_type, slug, season, episode):
     else:
         msg = i18n('all_sources_failed')
         log_utils.log(msg, xbmc.LOGERROR)
-        utils.notify(msg=msg, duration=5000)
+        kodi.notify(msg=msg, duration=5000)
 
 def pick_source_dialog(hosters):
     for item in hosters:
@@ -1155,7 +1155,7 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
     timeouts = len(fails)
     timeout_msg = i18n('scraper_timeout') % (timeouts, total) if timeouts else ''
     if timeout_msg:
-        utils.notify(msg=timeout_msg, duration=5000)
+        kodi.notify(msg=timeout_msg, duration=5000)
         for related in related_list:
             if related['name'] in fails:
                 related['label'] = '[COLOR darkred]%s[/COLOR]' % (related['label'])
@@ -1173,7 +1173,7 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
                 if keyboard.isConfirmed():
                     new_url = keyboard.getText()
                     utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], new_url, season, episode)
-                    utils.notify(msg=i18n('rel_url_set') % (related_list[index]['name']), duration=5000)
+                    kodi.notify(msg=i18n('rel_url_set') % (related_list[index]['name']), duration=5000)
             elif mode == MODES.SET_URL_SEARCH:
                 temp_title = title
                 temp_year = year
@@ -1201,13 +1201,13 @@ def set_related_url(mode, video_type, title, year, slug, season='', episode='', 
                                 temp_year = match.group(2) if match.group(2) else ''
                         elif results_index > 0:
                             utils.update_url(video_type, title, year, related_list[index]['name'], related_list[index]['url'], results[results_index - 1]['url'], season, episode)
-                            utils.notify(msg=i18n('rel_url_set') % (related_list[index]['name']), duration=5000)
+                            kodi.notify(msg=i18n('rel_url_set') % (related_list[index]['name']), duration=5000)
                             break
                         else:
                             break
                     except NotImplementedError:
                         log_utils.log('%s Scraper does not support searching.' % (related_list[index]['class'].get_name()))
-                        utils.notify(msg=i18n('scraper_no_search'), duration=5000)
+                        kodi.notify(msg=i18n('scraper_no_search'), duration=5000)
                         break
     finally:
         utils.reap_workers(workers, None)
@@ -1279,14 +1279,14 @@ def manage_collection(mode, section, id_type, show_id):
     else:
         trakt_api.remove_from_collection(section, item)
         msg = i18n('item_from_collection')
-    utils.notify(msg=msg)
+    kodi.notify(msg=msg)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.ADD_TO_LIST, ['section', 'id_type', 'show_id'], ['slug'])
 def add_to_list(section, id_type, show_id, slug=None):
     response = add_many_to_list(section, {id_type: show_id}, slug)
     if response is not None:
-        utils.notify(msg=i18n('item_to_list'))
+        kodi.notify(msg=i18n('item_to_list'))
     #xbmc.executebuiltin("XBMC.Container.Refresh")
 
 def add_many_to_list(section, items, slug=None):
@@ -1314,7 +1314,7 @@ def copy_list(section, slug, username=None, target_slug=None):
     added = sum(response['added'].values())
     exists = sum(response['existing'].values())
     not_found = sum([len(item) for item in response['not_found'].values()])
-    utils.notify(msg=i18n('list_copied') % (added, exists, not_found), duration=5000)
+    kodi.notify(msg=i18n('list_copied') % (added, exists, not_found), duration=5000)
 
 @url_dispatcher.register(MODES.TOGGLE_TITLE, ['slug'])
 def toggle_title(slug):
@@ -1333,7 +1333,7 @@ def toggle_watched(section, id_type, show_id, watched=True, season='', episode='
     item = {id_type: show_id}
     trakt_api.set_watched(section, item, season, episode, watched)
     w_str = i18n('watched') if watched else i18n('unwatched')
-    utils.notify(msg=i18n('marked_as') % (w_str), duration=5000)
+    kodi.notify(msg=i18n('marked_as') % (w_str), duration=5000)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.URL_EXISTS, ['slug'])
@@ -1376,7 +1376,7 @@ def update_subscriptions():
     if kodi.get_setting(MODES.UPDATE_SUBS + '-notify') == 'true':
         dialog.close()
         if kodi.get_setting('auto-' + MODES.UPDATE_SUBS) == 'true':
-            utils.notify(msg=i18n('next_update') % (float(kodi.get_setting(MODES.UPDATE_SUBS + '-interval'))), duration=5000)
+            kodi.notify(msg=i18n('next_update') % (float(kodi.get_setting(MODES.UPDATE_SUBS + '-interval'))), duration=5000)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 def update_strms(section, dialog=None):
@@ -1437,7 +1437,7 @@ def reset_db():
         message = i18n('db_reset_success')
     else:
         message = i18n('db_on_sqlite')
-    utils.notify(msg=message)
+    kodi.notify(msg=message)
 
 @url_dispatcher.register(MODES.EXPORT_DB)
 def export_db():
@@ -1452,10 +1452,10 @@ def export_db():
                 export_filename = keyboard.getText()
                 export_file = export_path + export_filename
                 db_connection.export_from_db(export_file)
-                utils.notify(header=i18n('export_successful'), msg=i18n('exported_to'))
+                kodi.notify(header=i18n('export_successful'), msg=i18n('exported_to'))
     except Exception as e:
         log_utils.log('Export Failed: %s' % (e), xbmc.LOGERROR)
-        utils.notify(header=i18n('export'), msg=i18n('export_failed'))
+        kodi.notify(header=i18n('export'), msg=i18n('export_failed'))
 
 @url_dispatcher.register(MODES.IMPORT_DB)
 def import_db():
@@ -1465,10 +1465,10 @@ def import_db():
         if import_file:
             import_file = xbmc.translatePath(import_file)
             db_connection.import_into_db(import_file)
-            utils.notify(header=i18n('import_success'), msg=i18n('imported_from'))
+            kodi.notify(header=i18n('import_success'), msg=i18n('imported_from'))
     except Exception as e:
         log_utils.log('Import Failed: %s' % (e), xbmc.LOGERROR)
-        utils.notify(header=i18n('import'), msg=i18n('import_failed'))
+        kodi.notify(header=i18n('import'), msg=i18n('import_failed'))
         raise
 
 @url_dispatcher.register(MODES.ADD_TO_LIBRARY, ['video_type', 'title', 'year', 'slug'])
@@ -1950,7 +1950,7 @@ def main(argv=None):
         url_dispatcher.dispatch(mode, queries)
     except (TransientTraktError, TraktError) as e:
         log_utils.log(str(e), xbmc.LOGERROR)
-        utils.notify(msg=str(e), duration=5000)
+        kodi.notify(msg=str(e), duration=5000)
 
 if __name__ == '__main__':
     sys.exit(main())

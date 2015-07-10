@@ -72,16 +72,16 @@ def get_pin():
             #print 'onClick: %s' % (control)
             if control == AUTH_BUTTON:
                 if not self.__get_token():
-                    utils.notify(msg=i18n('pin_auth_failed'), duration=5000)
+                    kodi.notify(msg=i18n('pin_auth_failed'), duration=5000)
                     return
                 self.auth = True
 
             if control == LATER_BUTTON:
-                utils.notify(msg=i18n('remind_in_24hrs'), duration=5000)
+                kodi.notify(msg=i18n('remind_in_24hrs'), duration=5000)
                 kodi.set_setting('last_reminder', str(int(time.time())))
 
             if control == NEVER_BUTTON:
-                utils.notify(msg=i18n('use_addon_settings'), duration=5000)
+                kodi.notify(msg=i18n('use_addon_settings'), duration=5000)
                 kodi.set_setting('last_reminder', '-1')
 
             if control in [AUTH_BUTTON, LATER_BUTTON, NEVER_BUTTON]:
@@ -114,7 +114,7 @@ def get_pin():
     dialog = PinAuthDialog('TraktPinAuthDialog.xml', kodi.get_path())
     dialog.doModal()
     if dialog.auth:
-        utils.notify(msg=i18n('trakt_auth_complete'), duration=3000)
+        kodi.notify(msg=i18n('trakt_auth_complete'), duration=3000)
     del dialog
 
 class ProgressDialog(object):

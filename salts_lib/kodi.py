@@ -18,19 +18,25 @@
 import xbmcaddon
 import xbmcplugin
 import xbmcgui
+import xbmc
+import xbmcvfs
 import urllib
 import urlparse
 import sys
+import os
+import re
 
 addon = xbmcaddon.Addon()
+ICON_PATH = os.path.join(addon.getAddonInfo('path'), 'icon.png')
+
 get_setting = addon.getSetting
 show_settings = addon.openSettings
 
-def set_setting(id, value):
-    addon.setSetting(id, value)
-
 def get_path():
     return addon.getAddonInfo('path')
+
+def set_setting(id, value):
+    addon.setSetting(id, str(value))
 
 def get_version():
     return addon.getAddonInfo('version')
@@ -86,3 +92,26 @@ def parse_query(query):
         else:
             q[key] = queries[key]
     return q
+
+def notify(header=None, msg='', duration=2000):
+    if header is None: header = get_name()
+    builtin = "XBMC.Notification(%s,%s, %s, %s)" % (header, msg, duration, ICON_PATH)
+    xbmc.executebuiltin(builtin)
+
+def get_current_view():
+    skinPath = xbmc.translatePath('special://skin/')
+    xml = os.path.join(skinPath, 'addon.xml')
+    f = xbmcvfs.File(xml)
+    read = f.read()
+    f.close()
+    try: src = re.search('defaultresolution="([^"]+)', read, re.DOTALL).group(1)
+    except: src = re.search('<res.+?folder="([^"]+)', read, re.DOTALL).group(1)
+    src = os.path.join(skinPath, src, 'MyVideoNav.xml')
+    f = xbmcvfs.File(src)
+    read = f.read()
+    f.close()
+    match = re.search('<views>([^<]+)', read, re.DOTALL)
+    if match:
+        views = match.group(1)
+        for view in views.split(','):
+            if xbmc.getInfoLabel('Control.GetLabel(%s)' % (view)): return view

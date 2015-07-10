@@ -58,8 +58,7 @@ elif P_MODE == P_MODES.PROCESSES:
         import threading
         from Queue import Queue, Empty
         P_MODE = P_MODES.THREADS
-        builtin = 'XBMC.Notification(%s,Process Mode not supported on this platform falling back to Thread Mode, 7500, %s)'
-        xbmc.executebuiltin(builtin % (kodi.get_name(), ICON_PATH))
+        kodi.notify(msg='Process Mode not supported on this platform falling back to Thread Mode', duration=7500)
 
 TOKEN = kodi.get_setting('trakt_oauth_token')
 use_https = kodi.get_setting('use_https') == 'true'
@@ -77,11 +76,6 @@ else:
     themepak_path = kodi.get_path()
 THEME_PATH = os.path.join(themepak_path, 'art', 'themes', THEME)
 PLACE_POSTER = os.path.join(kodi.get_path(), 'resources', 'place_poster.png')
-
-def notify(header=None, msg='', duration=2000):
-    if header is None: header = kodi.get_name()
-    builtin = "XBMC.Notification(%s,%s, %s, %s)" % (header, msg, duration, ICON_PATH)
-    xbmc.executebuiltin(builtin)
 
 def art(name):
     path = os.path.join(THEME_PATH, name)
@@ -101,7 +95,7 @@ def choose_list(username=None):
         if index > -1:
             return lists[index]['ids']['slug']
     else:
-        notify(msg=i18n('no_lists_for_user') % (username), duration=5000)
+        kodi.notify(msg=i18n('no_lists_for_user') % (username), duration=5000)
 
 def show_id(show):
     queries = {}
@@ -741,7 +735,7 @@ def do_disable_check():
             if success_rate < disable_thresh:
                 if auto_disable == DISABLE_SETTINGS.ON:
                     kodi.set_setting('%s-enable' % (cls.get_name()), 'false')
-                    notify(msg='[COLOR blue]%s[/COLOR] %s' % (i18n('scraper_disabled')), duration=5000)
+                    kodi.notify(msg='[COLOR blue]%s[/COLOR] %s' % (i18n('scraper_disabled')), duration=5000)
                 elif auto_disable == DISABLE_SETTINGS.PROMPT:
                     dialog = xbmcgui.Dialog()
                     line1 = i18n('disable_line1') % (cls.get_name(), 100 - success_rate, tries)
@@ -754,16 +748,10 @@ def do_disable_check():
 def menu_on(menu):
     return kodi.get_setting('show_%s' % (menu)) == 'true'
 
-def get_setting(setting):
-    return kodi.get_setting(setting)
-
-def set_setting(setting, value):
-    kodi.set_setting(setting, str(value))
-
 def increment_setting(setting):
-    cur_value = get_setting(setting)
+    cur_value = kodi.get_setting(setting)
     cur_value = int(cur_value) if cur_value else 0
-    set_setting(setting, cur_value + 1)
+    kodi.set_setting(setting, cur_value + 1)
 
 def show_requires_source(slug):
     show_str = kodi.get_setting('exists_list')
@@ -779,24 +767,6 @@ def keep_search(section, search_text):
     log_utils.log('Setting %s to %s' % (new_head, search_text), xbmc.LOGDEBUG)
     db_connection.set_setting('%s_search_%s' % (section, new_head), search_text)
     kodi.set_setting('%s_search_head' % (section), str(new_head))
-
-def get_current_view():
-    skinPath = xbmc.translatePath('special://skin/')
-    xml = os.path.join(skinPath, 'addon.xml')
-    f = xbmcvfs.File(xml)
-    read = f.read()
-    f.close()
-    try: src = re.search('defaultresolution="([^"]+)', read, re.DOTALL).group(1)
-    except: src = re.search('<res.+?folder="([^"]+)', read, re.DOTALL).group(1)
-    src = os.path.join(skinPath, src, 'MyVideoNav.xml')
-    f = xbmcvfs.File(src)
-    read = f.read()
-    f.close()
-    match = re.search('<views>([^<]+)', read, re.DOTALL)
-    if match:
-        views = match.group(1)
-        for view in views.split(','):
-            if xbmc.getInfoLabel('Control.GetLabel(%s)' % (view)): return view
 
 def bookmark_exists(slug, season, episode):
     if kodi.get_setting('trakt_bookmark') == 'true':
@@ -891,7 +861,7 @@ def download_media(url, path, file_name):
             elif progress == PROGRESS.BACKGROUND:
                 dialog.update(percent_progress, 'Stream All The Sources')
         else:
-            notify(msg=i18n('download_complete') % (file_name), duration=5000)
+            kodi.notify(msg=i18n('download_complete') % (file_name), duration=5000)
             log_utils.log('Download Complete: %s -> %s' % (url, full_path), xbmc.LOGDEBUG)
 
         file_desc.close()
@@ -900,7 +870,7 @@ def download_media(url, path, file_name):
 
     except Exception as e:
         log_utils.log('Error (%s) during download: %s -> %s' % (str(e), url, file_name), xbmc.LOGERROR)
-        notify(msg=i18n('download_error') % (str(e), file_name), duration=5000)
+        kodi.notify(msg=i18n('download_error') % (str(e), file_name), duration=5000)
 
 def get_extension(url, response):
     filename = url2name(url)
