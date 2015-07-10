@@ -42,12 +42,25 @@ def get_name():
     return addon.getAddonInfo('name')
 
 def get_plugin_url(queries):
-    return sys.argv[0] + '?' + urllib.urlencode(queries)
+    try:
+        query = urllib.urlencode(queries)
+    except UnicodeEncodeError:
+        for k in queries:
+            if isinstance(queries[k], unicode):
+                queries[k] = queries[k].encode('utf-8')
+        query = urllib.urlencode(queries)
+
+    return sys.argv[0] + '?' + query
 
 def end_of_directory(cache_to_disc=True):
     xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=cache_to_disc)
 
-def add_item(queries, label, thumb='', fanart='', is_folder=None, is_playable=None, total_items=0):
+def create_item(queries, label, thumb='', fanart='', is_folder=None, is_playable=None, total_items=0, menu_items=None, replace_menu=False):
+    list_item = xbmcgui.ListItem(label, iconImage=thumb, thumbnailImage=thumb)
+    add_item(queries, list_item, fanart, is_folder, is_playable, total_items, menu_items, replace_menu)
+
+def add_item(queries, list_item, fanart='', is_folder=None, is_playable=None, total_items=0, menu_items=None, replace_menu=False):
+    if menu_items is None: menu_items = []
     if is_folder is None:
         is_folder = False if is_playable else True
 
@@ -56,12 +69,12 @@ def add_item(queries, label, thumb='', fanart='', is_folder=None, is_playable=No
     else:
         playable = 'true' if is_playable else 'false'
 
-    url = get_plugin_url(queries)
-    list_item = xbmcgui.ListItem(label, iconImage=thumb, thumbnailImage=thumb)
-    list_item.setProperty('fanart_image', fanart)
-    list_item.setInfo('video', {'title': label})
+    liz_url = get_plugin_url(queries)
+    if fanart: list_item.setProperty('fanart_image', fanart)
+    list_item.setInfo('video', {'title': list_item.getLabel()})
     list_item.setProperty('isPlayable', playable)
-    xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, list_item, isFolder=is_folder, totalItems=total_items)
+    list_item.addContextMenuItems(menu_items, replaceItems=replace_menu)
+    xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, list_item, isFolder=is_folder, totalItems=total_items)
 
 def parse_query(query):
     q = {'mode': 'main'}
