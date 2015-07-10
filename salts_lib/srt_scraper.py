@@ -24,13 +24,12 @@ import socket
 import xbmc
 import xbmcvfs
 import log_utils
+import kodi
 from constants import VIDEO_TYPES
 from constants import SRT_SOURCE
-from addon.common.addon import Addon
 from db_utils import DB_Connection
 
-_SALTS = Addon('plugin.video.salts')
-ADDON_PATH = _SALTS.get_path()
+ADDON_PATH = kodi.get_path()
 ICON_PATH = os.path.join(ADDON_PATH, 'icon.png')
 MAX_RETRIES = 2
 TEMP_ERRORS = [500, 502, 503, 504]
@@ -38,7 +37,7 @@ USER_AGENT = ("User-Agent:Mozilla/5.0 (Windows NT 6.2; WOW64)"
               "AppleWebKit/537.17 (KHTML, like Gecko)"
               "Chrome/24.0.1312.56")
 BASE_URL = 'http://www.addic7ed.com'
-BASE_PATH = _SALTS.get_setting('subtitle-folder')
+BASE_PATH = kodi.get_setting('subtitle-folder')
 db_connection = DB_Connection()
 
 class SRT_Scraper():
@@ -91,8 +90,8 @@ class SRT_Scraper():
         url = BASE_URL + '/ajax_loadShow.php?show=%s&season=%s&langs=&hd=%s&hi=%s' % (tvshow_id, season, 0, 0)
         html = self.__get_cached_url(url, .25)
         # print html.decode('ascii', 'ignore')
-        req_hi = _SALTS.get_setting('subtitle-hi') == 'true'
-        req_hd = _SALTS.get_setting('subtitle-hd') == 'true'
+        req_hi = kodi.get_setting('subtitle-hi') == 'true'
+        req_hd = kodi.get_setting('subtitle-hd') == 'true'
         items = []
         regex = re.compile('<td>(\d+)</td><td>(\d+)</td><td>.*?</td><td>(.*?)</td><td.*?>(.+?)</td>.*?<td.*?>(.+?)</td><td.*?>(.*?)</td><td.*?>(.*?)</td><td.*?>(.*?)</td><td.*?><a\s+href="(.*?)">.+?</td>',
                          re.DOTALL)

@@ -21,8 +21,8 @@ import csv
 import xbmc
 import xbmcvfs
 import xbmcgui
-from addon.common.addon import Addon
 import log_utils
+import kodi
 
 def enum(**enums):
     return type('Enum', (), enums)
@@ -32,20 +32,18 @@ CSV_MARKERS = enum(REL_URL='***REL_URL***', OTHER_LISTS='***OTHER_LISTS***', SAV
 TRIG_DB_UPG = False
 MAX_TRIES = 5
 
-_SALTS = Addon('plugin.video.salts')
-
 class DB_Connection():
     def __init__(self):
         global db_lib
         global OperationalError
-        self.dbname = _SALTS.get_setting('db_name')
-        self.username = _SALTS.get_setting('db_user')
-        self.password = _SALTS.get_setting('db_pass')
-        self.address = _SALTS.get_setting('db_address')
+        self.dbname = kodi.get_setting('db_name')
+        self.username = kodi.get_setting('db_user')
+        self.password = kodi.get_setting('db_pass')
+        self.address = kodi.get_setting('db_address')
         self.db = None
         self.progress = None
 
-        if _SALTS.get_setting('use_remote_db') == 'true':
+        if kodi.get_setting('use_remote_db') == 'true':
             if self.address is not None and self.username is not None \
             and self.password is not None and self.dbname is not None:
                 import mysql.connector as db_lib
@@ -287,7 +285,7 @@ class DB_Connection():
 
     # intended to be a common method for creating a db from scratch
     def init_database(self):
-        cur_version = _SALTS.get_version()
+        cur_version = kodi.get_version()
         db_version = self.__get_db_version()
         if not TRIG_DB_UPG:
             db_version = cur_version
@@ -331,7 +329,7 @@ class DB_Connection():
             log_utils.log('DB restored from %s' % (self.mig_path))
 
         sql = 'REPLACE INTO db_info (setting, value) VALUES(?,?)'
-        self.__execute(sql, ('version', _SALTS.get_version()))
+        self.__execute(sql, ('version', kodi.get_version()))
 
     def __table_exists(self, table):
         if self.db_type == DB_TYPES.MYSQL:

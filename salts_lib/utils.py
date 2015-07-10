@@ -29,24 +29,23 @@ import log_utils
 import sys
 import urlparse
 import urllib
+import kodi
 from constants import *
 from trans_utils import i18n
 from scrapers import *  # import all scrapers into this namespace
-from addon.common.addon import Addon
 from trakt_api import Trakt_API
 from db_utils import DB_Connection
 
-ADDON = Addon('plugin.video.salts')
-ICON_PATH = os.path.join(ADDON.get_path(), 'icon.png')
-SORT_FIELDS = [(SORT_LIST[int(ADDON.get_setting('sort1_field'))], SORT_SIGNS[ADDON.get_setting('sort1_order')]),
-                (SORT_LIST[int(ADDON.get_setting('sort2_field'))], SORT_SIGNS[ADDON.get_setting('sort2_order')]),
-                (SORT_LIST[int(ADDON.get_setting('sort3_field'))], SORT_SIGNS[ADDON.get_setting('sort3_order')]),
-                (SORT_LIST[int(ADDON.get_setting('sort4_field'))], SORT_SIGNS[ADDON.get_setting('sort4_order')]),
-                (SORT_LIST[int(ADDON.get_setting('sort5_field'))], SORT_SIGNS[ADDON.get_setting('sort5_order')])]
+ICON_PATH = os.path.join(kodi.get_path(), 'icon.png')
+SORT_FIELDS = [(SORT_LIST[int(kodi.get_setting('sort1_field'))], SORT_SIGNS[kodi.get_setting('sort1_order')]),
+                (SORT_LIST[int(kodi.get_setting('sort2_field'))], SORT_SIGNS[kodi.get_setting('sort2_order')]),
+                (SORT_LIST[int(kodi.get_setting('sort3_field'))], SORT_SIGNS[kodi.get_setting('sort3_order')]),
+                (SORT_LIST[int(kodi.get_setting('sort4_field'))], SORT_SIGNS[kodi.get_setting('sort4_order')]),
+                (SORT_LIST[int(kodi.get_setting('sort5_field'))], SORT_SIGNS[kodi.get_setting('sort5_order')])]
 
 last_check = datetime.datetime.fromtimestamp(0)
 
-P_MODE = int(ADDON.get_setting('parallel_mode'))
+P_MODE = int(kodi.get_setting('parallel_mode'))
 if P_MODE in [P_MODES.THREADS, P_MODES.NONE]:
     import threading
     from Queue import Queue, Empty
@@ -60,27 +59,27 @@ elif P_MODE == P_MODES.PROCESSES:
         from Queue import Queue, Empty
         P_MODE = P_MODES.THREADS
         builtin = 'XBMC.Notification(%s,Process Mode not supported on this platform falling back to Thread Mode, 7500, %s)'
-        xbmc.executebuiltin(builtin % (ADDON.get_name(), ICON_PATH))
+        xbmc.executebuiltin(builtin % (kodi.get_name(), ICON_PATH))
 
-TOKEN = ADDON.get_setting('trakt_oauth_token')
-use_https = ADDON.get_setting('use_https') == 'true'
-trakt_timeout = int(ADDON.get_setting('trakt_timeout'))
-list_size = int(ADDON.get_setting('list_size'))
+TOKEN = kodi.get_setting('trakt_oauth_token')
+use_https = kodi.get_setting('use_https') == 'true'
+trakt_timeout = int(kodi.get_setting('trakt_timeout'))
+list_size = int(kodi.get_setting('list_size'))
 trakt_api = Trakt_API(TOKEN, use_https, list_size, trakt_timeout)
 db_connection = DB_Connection()
 
 THEME_LIST = ['Shine', 'Luna_Blue', 'Iconic', 'Simple', 'SALTy', 'SALTy (Blended)', 'SALTy (Blue)', 'SALTy (Frog)', 'SALTy (Green)',
               'SALTy (Macaw)', 'SALTier (Green)', 'SALTier (Orange)', 'SALTier (Red)', 'IGDB']
-THEME = THEME_LIST[int(ADDON.get_setting('theme'))]
+THEME = THEME_LIST[int(kodi.get_setting('theme'))]
 if xbmc.getCondVisibility('System.HasAddon(script.salts.themepak)'):
     themepak_path = xbmcaddon.Addon('script.salts.themepak').getAddonInfo('path')
 else:
-    themepak_path = ADDON.get_path()
+    themepak_path = kodi.get_path()
 THEME_PATH = os.path.join(themepak_path, 'art', 'themes', THEME)
-PLACE_POSTER = os.path.join(ADDON.get_path(), 'resources', 'place_poster.png')
+PLACE_POSTER = os.path.join(kodi.get_path(), 'resources', 'place_poster.png')
 
 def notify(header=None, msg='', duration=2000):
-    if header is None: header = ADDON.get_name()
+    if header is None: header = kodi.get_name()
     builtin = "XBMC.Notification(%s,%s, %s, %s)" % (header, msg, duration, ICON_PATH)
     xbmc.executebuiltin(builtin)
 
@@ -88,7 +87,7 @@ def art(name):
     path = os.path.join(THEME_PATH, name)
     if not xbmcvfs.exists(path):
         if name == 'fanart.jpg':
-            path = os.path.join(ADDON.get_path(), name)
+            path = os.path.join(kodi.get_path(), name)
         else:
             path.replace('.png', '.jpg')
     return path
@@ -181,7 +180,7 @@ def make_list_item(label, meta):
     return listitem
 
 def make_art(show):
-    min_size = int(ADDON.get_setting('image_size'))
+    min_size = int(kodi.get_setting('image_size'))
     art_dict = {'banner': '', 'fanart': art('fanart.jpg'), 'thumb': '', 'poster': PLACE_POSTER}
     if 'images' in show:
         images = show['images']
@@ -294,7 +293,7 @@ def get_section_params(section):
         section_params['label_single'] = i18n('tv_show')
     else:
         section_params['next_mode'] = MODES.GET_SOURCES
-        section_params['folder'] = ADDON.get_setting('source-win') == 'Directory' and ADDON.get_setting('auto-play') == 'false'
+        section_params['folder'] = kodi.get_setting('source-win') == 'Directory' and kodi.get_setting('auto-play') == 'false'
         section_params['video_type'] = VIDEO_TYPES.MOVIE
         section_params['content_type'] = CONTENT_TYPES.MOVIES
         section_params['search_img'] = 'movies_search.png'
@@ -327,7 +326,7 @@ def filter_unknown_hosters(hosters):
     return filtered_hosters
 
 def filter_exclusions(hosters):
-    exclusions = ADDON.get_setting('excl_list')
+    exclusions = kodi.get_setting('excl_list')
     exclusions = exclusions.replace(' ', '')
     exclusions = exclusions.lower()
     if not exclusions: return hosters
@@ -340,7 +339,7 @@ def filter_exclusions(hosters):
     return filtered_hosters
 
 def filter_quality(video_type, hosters):
-    qual_filter = int(ADDON.get_setting('%s_quality' % video_type))
+    qual_filter = int(kodi.get_setting('%s_quality' % video_type))
     if qual_filter == 0:
         return hosters
     elif qual_filter == 1:
@@ -381,9 +380,9 @@ def make_source_sort_key():
     sso = db_connection.get_setting('source_sort_order')
     # migrate sso to db setting
     if sso is None:
-        sso = ADDON.get_setting('source_sort_order')
+        sso = kodi.get_setting('source_sort_order')
         sso = db_connection.set_setting('source_sort_order', sso)
-        ADDON.set_setting('source_sort_order', '')
+        kodi.set_setting('source_sort_order', '')
         
     sort_key = {}
     i = 0
@@ -479,18 +478,18 @@ def parallel_get_progress(q, slug, cached):
 
 # Run a task on startup. Settings and mode values must match task name
 def do_startup_task(task):
-    run_on_startup = ADDON.get_setting('auto-%s' % task) == 'true' and ADDON.get_setting('%s-during-startup' % task) == 'true'
+    run_on_startup = kodi.get_setting('auto-%s' % task) == 'true' and kodi.get_setting('%s-during-startup' % task) == 'true'
     if run_on_startup and not xbmc.abortRequested:
         log_utils.log('Service: Running startup task [%s]' % (task))
         now = datetime.datetime.now()
-        xbmc.executebuiltin('RunPlugin(plugin://%s/?mode=%s)' % (ADDON.get_id(), task))
+        xbmc.executebuiltin('RunPlugin(plugin://%s/?mode=%s)' % (kodi.get_id(), task))
         db_connection.set_setting('%s-last_run' % (task), now.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
 # Run a recurring scheduled task. Settings and mode values must match task name
 def do_scheduled_task(task, isPlaying):
     global last_check
     now = datetime.datetime.now()
-    if ADDON.get_setting('auto-%s' % task) == 'true':
+    if kodi.get_setting('auto-%s' % task) == 'true':
         if last_check < now - datetime.timedelta(minutes=1):
             #log_utils.log('Check Triggered: Last: %s Now: %s' % (last_check, now), xbmc.LOGDEBUG)
             next_run = get_next_run(task)
@@ -503,10 +502,10 @@ def do_scheduled_task(task, isPlaying):
         if now >= next_run:
             is_scanning = xbmc.getCondVisibility('Library.IsScanningVideo')
             if not is_scanning:
-                during_playback = ADDON.get_setting('%s-during-playback' % (task)) == 'true'
+                during_playback = kodi.get_setting('%s-during-playback' % (task)) == 'true'
                 if during_playback or not isPlaying:
                     log_utils.log('Service: Running Scheduled Task: [%s]' % (task))
-                    builtin = 'RunPlugin(plugin://%s/?mode=%s)' % (ADDON.get_id(), task)
+                    builtin = 'RunPlugin(plugin://%s/?mode=%s)' % (kodi.get_id(), task)
                     xbmc.executebuiltin(builtin)
                     db_connection.set_setting('%s-last_run' % task, now.strftime("%Y-%m-%d %H:%M:%S.%f"))
                 else:
@@ -523,17 +522,17 @@ def get_next_run(task):
         last_run = datetime.datetime.strptime(last_run_string, "%Y-%m-%d %H:%M:%S.%f")
     except (TypeError, ImportError):
         last_run = datetime.datetime(*(time.strptime(last_run_string, '%Y-%m-%d %H:%M:%S.%f')[0:6]))
-    interval = datetime.timedelta(hours=float(ADDON.get_setting(task + '-interval')))
+    interval = datetime.timedelta(hours=float(kodi.get_setting(task + '-interval')))
     return (last_run + interval)
 
 def url_exists(video):
     """
     check each source for a url for this video; return True as soon as one is found. If none are found, return False
     """
-    max_timeout = int(ADDON.get_setting('source_timeout'))
+    max_timeout = int(kodi.get_setting('source_timeout'))
     log_utils.log('Checking for Url Existence: |%s|' % (video), xbmc.LOGDEBUG)
     for cls in relevant_scrapers(video.video_type):
-        if ADDON.get_setting('%s-sub_check' % (cls.get_name())) == 'true':
+        if kodi.get_setting('%s-sub_check' % (cls.get_name())) == 'true':
             scraper_instance = cls(max_timeout)
             url = scraper_instance.get_url(video)
             if url:
@@ -557,14 +556,14 @@ def relevant_scrapers(video_type=None, include_disabled=False, order_matters=Fal
 
 def scraper_enabled(name):
     # return true if setting exists and set to true, or setting doesn't exist (i.e. '')
-    return ADDON.get_setting('%s-enable' % (name)) in ['true', '']
+    return kodi.get_setting('%s-enable' % (name)) in ['true', '']
 
 def set_view(content, set_sort):
     # set content type so library shows more views and info
     if content:
         xbmcplugin.setContent(int(sys.argv[1]), content)
 
-    view = ADDON.get_setting('%s_view' % (content))
+    view = kodi.get_setting('%s_view' % (content))
     if view != '0':
         log_utils.log('Setting View to %s (%s)' % (view, content), xbmc.LOGDEBUG)
         xbmc.executebuiltin('Container.SetViewMode(%s)' % (view))
@@ -597,7 +596,7 @@ def make_day(date):
 
 def make_time(utc_ts):
     local_time = time.localtime(utc_ts)
-    if ADDON.get_setting('calendar_time') == '1':
+    if kodi.get_setting('calendar_time') == '1':
         time_format = '%H:%M'
         time_str = time.strftime(time_format, local_time)
     else:
@@ -661,17 +660,17 @@ def format_sub_label(sub):
     return label
 
 def srt_indicators_enabled():
-    return (ADDON.get_setting('enable-subtitles') == 'true' and (ADDON.get_setting('subtitle-indicator') == 'true'))
+    return (kodi.get_setting('enable-subtitles') == 'true' and (kodi.get_setting('subtitle-indicator') == 'true'))
 
 def srt_download_enabled():
-    return (ADDON.get_setting('enable-subtitles') == 'true' and (ADDON.get_setting('subtitle-download') == 'true'))
+    return (kodi.get_setting('enable-subtitles') == 'true' and (kodi.get_setting('subtitle-download') == 'true'))
 
 def srt_show_enabled():
-    return (ADDON.get_setting('enable-subtitles') == 'true' and (ADDON.get_setting('subtitle-show') == 'true'))
+    return (kodi.get_setting('enable-subtitles') == 'true' and (kodi.get_setting('subtitle-show') == 'true'))
 
 def format_episode_label(label, season, episode, srts):
-    req_hi = ADDON.get_setting('subtitle-hi') == 'true'
-    req_hd = ADDON.get_setting('subtitle-hd') == 'true'
+    req_hi = kodi.get_setting('subtitle-hi') == 'true'
+    req_hd = kodi.get_setting('subtitle-hd') == 'true'
     color = 'red'
     percent = 0
     hi = None
@@ -707,13 +706,13 @@ def format_episode_label(label, season, episode, srts):
     return label
 
 def get_force_title_list():
-    filter_str = ADDON.get_setting('force_title_match')
+    filter_str = kodi.get_setting('force_title_match')
     filter_list = filter_str.split('|') if filter_str else []
     return filter_list
 
 def calculate_success(name):
-    tries = ADDON.get_setting('%s_try' % (name))
-    fail = ADDON.get_setting('%s_fail' % (name))
+    tries = kodi.get_setting('%s_try' % (name))
+    fail = kodi.get_setting('%s_fail' % (name))
     tries = int(tries) if tries else 0
     fail = int(fail) if fail else 0
     rate = int(round((fail * 100.0) / tries)) if tries > 0 else 0
@@ -728,20 +727,20 @@ def record_timeouts(fails):
 
 def do_disable_check():
     scrapers = relevant_scrapers()
-    auto_disable = ADDON.get_setting('auto-disable')
-    check_freq = int(ADDON.get_setting('disable-freq'))
-    disable_thresh = int(ADDON.get_setting('disable-thresh'))
+    auto_disable = kodi.get_setting('auto-disable')
+    check_freq = int(kodi.get_setting('disable-freq'))
+    disable_thresh = int(kodi.get_setting('disable-thresh'))
     for cls in scrapers:
         last_check = db_connection.get_setting('%s_check' % (cls.get_name()))
         last_check = int(last_check) if last_check else 0
-        tries = ADDON.get_setting('%s_try' % (cls.get_name()))
+        tries = kodi.get_setting('%s_try' % (cls.get_name()))
         tries = int(tries) if tries else 0
         if tries > 0 and tries / check_freq > last_check / check_freq:
-            ADDON.set_setting('%s_check' % (cls.get_name()), str(tries))
+            kodi.set_setting('%s_check' % (cls.get_name()), str(tries))
             success_rate = calculate_success(cls.get_name())
             if success_rate < disable_thresh:
                 if auto_disable == DISABLE_SETTINGS.ON:
-                    ADDON.set_setting('%s-enable' % (cls.get_name()), 'false')
+                    kodi.set_setting('%s-enable' % (cls.get_name()), 'false')
                     notify(msg='[COLOR blue]%s[/COLOR] %s' % (i18n('scraper_disabled')), duration=5000)
                 elif auto_disable == DISABLE_SETTINGS.PROMPT:
                     dialog = xbmcgui.Dialog()
@@ -750,16 +749,16 @@ def do_disable_check():
                     line3 = i18n('disable_line3')
                     ret = dialog.yesno('SALTS', line1, line2, line3, i18n('keep_enabled'), i18n('disable_it'))
                     if ret:
-                        ADDON.set_setting('%s-enable' % (cls.get_name()), 'false')
+                        kodi.set_setting('%s-enable' % (cls.get_name()), 'false')
 
 def menu_on(menu):
-    return ADDON.get_setting('show_%s' % (menu)) == 'true'
+    return kodi.get_setting('show_%s' % (menu)) == 'true'
 
 def get_setting(setting):
-    return ADDON.get_setting(setting)
+    return kodi.get_setting(setting)
 
 def set_setting(setting, value):
-    ADDON.set_setting(setting, str(value))
+    kodi.set_setting(setting, str(value))
 
 def increment_setting(setting):
     cur_value = get_setting(setting)
@@ -767,7 +766,7 @@ def increment_setting(setting):
     set_setting(setting, cur_value + 1)
 
 def show_requires_source(slug):
-    show_str = ADDON.get_setting('exists_list')
+    show_str = kodi.get_setting('exists_list')
     show_list = show_str.split('|')
     if slug in show_list:
         return True
@@ -775,11 +774,11 @@ def show_requires_source(slug):
         return False
 
 def keep_search(section, search_text):
-    head = int(ADDON.get_setting('%s_search_head' % (section)))
+    head = int(kodi.get_setting('%s_search_head' % (section)))
     new_head = (head + 1) % SEARCH_HISTORY
     log_utils.log('Setting %s to %s' % (new_head, search_text), xbmc.LOGDEBUG)
     db_connection.set_setting('%s_search_%s' % (section, new_head), search_text)
-    ADDON.set_setting('%s_search_head' % (section), str(new_head))
+    kodi.set_setting('%s_search_head' % (section), str(new_head))
 
 def get_current_view():
     skinPath = xbmc.translatePath('special://skin/')
@@ -800,7 +799,7 @@ def get_current_view():
             if xbmc.getInfoLabel('Control.GetLabel(%s)' % (view)): return view
 
 def bookmark_exists(slug, season, episode):
-    if ADDON.get_setting('trakt_bookmark') == 'true':
+    if kodi.get_setting('trakt_bookmark') == 'true':
         if TOKEN:
             bookmark = trakt_api.get_bookmark(slug, season, episode)
         else:
@@ -811,7 +810,7 @@ def bookmark_exists(slug, season, episode):
 
 # returns true if user chooses to resume, else false
 def get_resume_choice(slug, season, episode):
-    if ADDON.get_setting('trakt_bookmark') == 'true':
+    if kodi.get_setting('trakt_bookmark') == 'true':
         resume_point = '%s%%' % (trakt_api.get_bookmark(slug, season, episode))
         header = i18n('trakt_bookmark_exists')
     else:
@@ -821,7 +820,7 @@ def get_resume_choice(slug, season, episode):
     return xbmcgui.Dialog().yesno(header, question, '', '', i18n('start_from_beginning'), i18n('resume')) == 1
 
 def get_bookmark(slug, season, episode):
-    if ADDON.get_setting('trakt_bookmark') == 'true':
+    if kodi.get_setting('trakt_bookmark') == 'true':
         if TOKEN:
             bookmark = trakt_api.get_bookmark(slug, season, episode)
         else:
@@ -840,7 +839,7 @@ def format_time(seconds):
 
 def download_media(url, path, file_name):
     try:
-        progress = int(ADDON.get_setting('down_progress'))
+        progress = int(kodi.get_setting('down_progress'))
         import urllib2
         request = urllib2.Request(url)
         request.add_header('User-Agent', USER_AGENT)

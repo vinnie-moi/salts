@@ -23,7 +23,7 @@ import socket
 import ssl
 import time
 import xbmc
-import xbmcaddon
+import kodi
 import log_utils
 from db_utils import DB_Connection
 from constants import TRAKT_SECTIONS
@@ -60,7 +60,7 @@ class Trakt_API():
             data['code'] = pin
             data['grant_type'] = 'authorization_code'
         else:
-            refresh_token = xbmcaddon.Addon('plugin.video.salts').getSetting('trakt_refresh_token')
+            refresh_token = kodi.get_setting('trakt_refresh_token')
             if refresh_token:
                 data['refresh_token'] = refresh_token
                 data['grant_type'] = 'refresh_token'
@@ -377,14 +377,14 @@ class Trakt_API():
                         elif e.code == 401 or e.code == 405:
                             if auth_retry or url.endswith('/token'):
                                 self.token = None
-                                xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', '')
-                                xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', '')
+                                kodi.get_setting('trakt_oauth_token', '')
+                                kodi.get_setting('trakt_refresh_token', '')
                                 raise TraktError('Trakt Call Authentication Failed (%s)' % (e.code))
                             else:
                                 result = self.get_token()
                                 self.token = result['access_token']
-                                xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_oauth_token', result['access_token'])
-                                xbmcaddon.Addon('plugin.video.salts').setSetting('trakt_refresh_token', result['refresh_token'])
+                                kodi.get_setting('trakt_oauth_token', result['access_token'])
+                                kodi.get_setting('trakt_refresh_token', result['refresh_token'])
                                 auth_retry = True
                         elif e.code == 404:
                             raise TraktNotFoundError()

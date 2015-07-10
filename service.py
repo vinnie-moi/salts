@@ -25,11 +25,11 @@ from salts_lib.db_utils import DB_Connection
 
 MAX_ERRORS = 10
 
-ADDON = xbmcaddon.Addon(id='plugin.video.salts')
-log_utils.log('Service: Installed Version: %s' % (ADDON.getAddonInfo('version')))
+kodi = xbmcaddon.Addon(id='plugin.video.salts')
+log_utils.log('Service: Installed Version: %s' % (kodi.getAddonInfo('version')))
 
 db_connection = DB_Connection()
-if ADDON.getSetting('use_remote_db') == 'false' or ADDON.getSetting('enable_upgrade') == 'true':
+if kodi.getSetting('use_remote_db') == 'false' or kodi.getSetting('enable_upgrade') == 'true':
     db_connection.init_database()
 
 class Service(xbmc.Player):
