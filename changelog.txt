@@ -1,3 +1,8 @@
+[B]Version 1.0.21[/B]
+- Fix input stream error on Isengard
+- Improve scrapers
+- Remove dependency on common.addon
+
 [B]Version 1.0.20[/B]
 - Show google videos as gvideo host
 - Improve several scrapers
