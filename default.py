@@ -897,7 +897,7 @@ def filter_unusable_hosters(hosters):
     filter_max = int(kodi.get_setting('filter_unusable'))
     unk_hosts = {}
     for i, hoster in enumerate(hosters):
-        if i < filter_max and 'direct' in hoster and hoster['direct'] == False:
+        if i < filter_max and 'direct' in hoster and hoster['direct'] == False and hoster['host']:
             hmf = urlresolver.HostedMediaFile(host=hoster['host'], media_id='dummy')  # use dummy media_id to force host validation
             if not hmf:
                 log_utils.log('Unusable source %s (%s) from %s' % (hoster['url'], hoster['host'], hoster['class'].get_name()), xbmc.LOGINFO)
