@@ -90,7 +90,7 @@ class WS_Scraper(scraper.Scraper):
                 res_year = match.group(2)
             else:
                 title = title_year
-                year = ''
+                res_year = ''
             if not year or year == res_year:
                 result = {'url': url, 'title': title, 'year': res_year}
                 results.append(result)
