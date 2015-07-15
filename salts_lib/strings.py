@@ -203,5 +203,6 @@ STRINGS = {
            'failed_write_file': 30191,
            'reset_base_url': 30192,
            'reset_complete': 30193,
-           'req_result': 30194
+           'req_result': 30194,
+           'addded_to_lib': 30195
 }

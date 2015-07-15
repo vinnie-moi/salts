@@ -1477,6 +1477,14 @@ def import_db():
         raise
 
 @url_dispatcher.register(MODES.ADD_TO_LIBRARY, ['video_type', 'title', 'year', 'slug'])
+def man_add_to_library(video_type, title, year, slug):
+    add_to_library(video_type, title, year, slug)
+    if video_type == VIDEO_TYPES.MOVIE and year:
+        msg = '%s (%s)' % (title, year)
+    else:
+        msg = title
+    kodi.notify(msg=i18n('addded_to_lib') % (msg), duration=5000)
+
 def add_to_library(video_type, title, year, slug):
     log_utils.log('Creating .strm for |%s|%s|%s|%s|' % (video_type, title, year, slug), xbmc.LOGDEBUG)
     if video_type == VIDEO_TYPES.TVSHOW:
