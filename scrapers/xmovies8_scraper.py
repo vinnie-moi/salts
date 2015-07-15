@@ -68,14 +68,24 @@ class XMovies8_Scraper(scraper.Scraper):
         results = []
         norm_title = self._normalize_title(title)
         for result in dom_parser.parse_dom(html, 'h3', {'class': 'r'}):
+            print result
             match = re.search('href="([^"]+)"[^>]*>([^<]+)', result)
             if match:
                 url, match_title_year = match.groups()
-                match_title_year = match_title_year.replace('Xmovies8: ', '')
-                match_title_year = re.sub('^Watch ', '', match_title_year)
-                match = re.search('(.*?)\s+\((\d{4})\)', match_title_year)
-                if match:
-                    match_title, match_year = match.groups()
+                if '/movie/' in url:
+                    match_title_year = match_title_year.replace('Xmovies8: ', '')
+                    match_title_year = re.sub('^Watch ', '', match_title_year)
+                    match = re.search('(.*?)\s+\((\d{4})\)', match_title_year)
+                    if match:
+                        match_title, match_year = match.groups()
+                    else:
+                        match_title = match_title_year
+                        match = re.search('(\d{4})/?$', url)
+                        if match:
+                            match_year = match.group(1)
+                        else:
+                            match_year = ''
+
                     if norm_title in self._normalize_title(match_title) and (not year or not match_year or year == match_year):
                         result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
                         results.append(result)
