@@ -1,3 +1,8 @@
+[B]Version 1.0.22[/B]
+- Subscription fix
+- Scraper Fixes
+- Add notification on add to library
+
 [B]Version 1.0.21[/B]
 - Fix input stream error on Isengard
 - Improve scrapers
