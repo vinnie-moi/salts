@@ -69,8 +69,8 @@ class ClickPlay_Scraper(scraper.Scraper):
             sources = dom_parser.parse_dom(html, 'iframe', ret='src')
             for src in sources:
                 if 'facebook' in src: continue
-                host = urlparse.urlparse(src[0]).hostname
-                hoster = {'multi-part': False, 'url': src[0], 'class': self, 'quality': QUALITIES.HD720, 'host': host, 'rating': None, 'views': None, 'direct': False}
+                host = urlparse.urlparse(src).hostname
+                hoster = {'multi-part': False, 'url': src, 'class': self, 'quality': QUALITIES.HIGH, 'host': host, 'rating': None, 'views': None, 'direct': False}
                 hosters.append(hoster)
                 
         return hosters
