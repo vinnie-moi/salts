@@ -68,7 +68,6 @@ class XMovies8_Scraper(scraper.Scraper):
         results = []
         norm_title = self._normalize_title(title)
         for result in dom_parser.parse_dom(html, 'h3', {'class': 'r'}):
-            print result
             match = re.search('href="([^"]+)"[^>]*>([^<]+)', result)
             if match:
                 url, match_title_year = match.groups()
