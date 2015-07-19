@@ -780,12 +780,12 @@ def browse_seasons(slug, fanart):
     utils.set_view(CONTENT_TYPES.SEASONS, False)
     kodi.end_of_directory()
 
-@url_dispatcher.register(MODES.EPISODES, ['slug', 'season'])
-def browse_episodes(slug, season):
-    show = trakt_api.get_show_details(slug)
-    episodes = trakt_api.get_episodes(slug, season)
+@url_dispatcher.register(MODES.EPISODES, ['trakt_id', 'season'])
+def browse_episodes(trakt_id, season):
+    show = trakt_api.get_show_details(trakt_id)
+    episodes = trakt_api.get_episodes(trakt_id, season)
     if TOKEN:
-        progress = trakt_api.get_show_progress(slug, hidden=True, specials=True, cached=kodi.get_setting('cache_watched') == 'true')
+        progress = trakt_api.get_show_progress(trakt_id, hidden=True, specials=True, cached=kodi.get_setting('cache_watched') == 'true')
         episodes = utils.make_episodes_watched(episodes, progress)
 
     totalItems = len(episodes)
@@ -1586,11 +1586,11 @@ def make_dir_from_list(section, list_data, slug=None, query=None, page=None):
         watched_history = trakt_api.get_watched(section, cached=cache_watched)
         for item in watched_history:
             if section == SECTIONS.MOVIES:
-                watched[item['movie']['ids']['slug']] = item['plays'] > 0
+                watched[item['movie']['ids']['trakt']] = item['plays'] > 0
             else:
-                watched[item['show']['ids']['slug']] = len([e for s in item['seasons'] if s['number'] != 0 for e in s['episodes']])
+                watched[item['show']['ids']['trakt']] = len([e for s in item['seasons'] if s['number'] != 0 for e in s['episodes']])
         collection = trakt_api.get_collection(section, full=False, cached=kodi.get_setting('cache_collection') == 'true')
-        in_collection = dict.fromkeys([show['ids']['slug'] for show in collection], True)
+        in_collection = dict.fromkeys([show['ids']['trakt'] for show in collection], True)
 
     for show in list_data:
         menu_items = []
@@ -1616,15 +1616,15 @@ def make_dir_from_list(section, list_data, slug=None, query=None, page=None):
                 menu_items.append((label, 'RunPlugin(%s)' % (kodi.get_plugin_url(queries))),)
 
         if section == SECTIONS.MOVIES:
-            show['watched'] = watched.get(show['ids']['slug'], False)
+            show['watched'] = watched.get(show['ids']['trakt'], False)
         else:
             try:
-                log_utils.log('%s - %s - %s' % (show['ids']['slug'], watched.get(show['ids']['slug'], 'NaN'), show['aired_episodes']), xbmc.LOGDEBUG)
-                show['watched'] = watched[show['ids']['slug']] >= show['aired_episodes']
-                show['watched_count'] = watched[show['ids']['slug']]
+                log_utils.log('%s - %s - %s' % (show['ids']['trakt'], watched.get(show['ids']['trakt'], 'NaN'), show['aired_episodes']), xbmc.LOGDEBUG)
+                show['watched'] = watched[show['ids']['trakt']] >= show['aired_episodes']
+                show['watched_count'] = watched[show['ids']['trakt']]
             except: show['watched'] = False
 
-        show['in_collection'] = in_collection.get(show['ids']['slug'], False)
+        show['in_collection'] = in_collection.get(show['ids']['trakt'], False)
 
         liz, liz_url = make_item(section_params, show, menu_items)
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=totalItems)
@@ -1653,12 +1653,12 @@ def make_dir_from_cal(mode, start_date, days):
     if TOKEN:
         watched_history = trakt_api.get_watched(SECTIONS.TV, cached=cache_watched)
         for item in watched_history:
-            slug = item['show']['ids']['slug']
-            watched[slug] = {}
+            trakt_id = item['show']['ids']['trakt']
+            watched[trakt_id] = {}
             for season in item['seasons']:
-                watched[slug][season['number']] = {}
+                watched[trakt_id][season['number']] = {}
                 for episode in season['episodes']:
-                    watched[slug][season['number']][episode['number']] = True
+                    watched[trakt_id][season['number']][episode['number']] = True
 
     totalItems = len(days)
     for item in days:
@@ -1668,7 +1668,7 @@ def make_dir_from_cal(mode, start_date, days):
         utc_secs = utils.iso_2_utc(episode['first_aired'])
         show_date = datetime.date.fromtimestamp(utc_secs)
 
-        try: episode['watched'] = watched[show['ids']['slug']][episode['season']][episode['number']]
+        try: episode['watched'] = watched[show['ids']['trakt']][episode['season']][episode['number']]
         except: episode['watched'] = False
 
         if show_date < start_date.date():
@@ -1700,7 +1700,7 @@ def make_dir_from_cal(mode, start_date, days):
     kodi.create_item({'mode': mode, 'start_date': next_str}, label, thumb=utils.art('next.png'), fanart=utils.art('fanart.jpg'), is_folder=True)
     kodi.end_of_directory()
 
-def make_season_item(season, info, slug, fanart):
+def make_season_item(season, info, trakt_id, fanart):
     label = '%s %s' % (i18n('season'), season['number'])
     season['images']['fanart'] = {}
     season['images']['fanart']['full'] = fanart
@@ -1717,10 +1717,10 @@ def make_season_item(season, info, slug, fanart):
         label = i18n('mark_as_watched')
 
     if TOKEN:
-        queries = {'mode': MODES.RATE, 'section': SECTIONS.TV, 'season': season['number'], 'id_type': 'slug', 'show_id': slug}
+        queries = {'mode': MODES.RATE, 'section': SECTIONS.TV, 'season': season['number'], 'id_type': 'trakt', 'show_id': trakt_id}
         menu_items.append((i18n('rate_on_trakt'), 'RunPlugin(%s)' % (kodi.get_plugin_url(queries))),)
 
-        queries = {'mode': MODES.TOGGLE_WATCHED, 'section': SECTIONS.TV, 'season': season['number'], 'id_type': 'slug', 'show_id': slug, 'watched': watched}
+        queries = {'mode': MODES.TOGGLE_WATCHED, 'section': SECTIONS.TV, 'season': season['number'], 'id_type': 'trakt', 'show_id': trakt_id, 'watched': watched}
         menu_items.append((label, 'RunPlugin(%s)' % (kodi.get_plugin_url(queries))),)
 
     queries = {'mode': MODES.SET_VIEW, 'content_type': CONTENT_TYPES.SEASONS}

@@ -185,18 +185,18 @@ class Trakt_API():
         params = {'extended': 'full,images', 'auth': True}
         return self.__call_trakt(url, params=params, auth=True, cache_limit=24, cached=cached)
 
-    def get_seasons(self, slug):
-        url = '/shows/%s/seasons' % (slug)
+    def get_seasons(self, show_id):
+        url = '/shows/%s/seasons' % (show_id)
         params = {'extended': 'full,images'}
         return self.__call_trakt(url, params=params, cache_limit=12)
 
-    def get_episodes(self, slug, season):
-        url = '/shows/%s/seasons/%s' % (slug, season)
+    def get_episodes(self, show_id, season):
+        url = '/shows/%s/seasons/%s' % (show_id, season)
         params = {'extended': 'full,images'}
         return self.__call_trakt(url, params=params, cache_limit=1)
 
-    def get_show_details(self, slug):
-        url = '/shows/%s' % (slug)
+    def get_show_details(self, show_id):
+        url = '/shows/%s' % (show_id)
         params = {'extended': 'full,images'}
         return self.__call_trakt(url, params=params, cache_limit=24 * 7)
 
@@ -210,8 +210,8 @@ class Trakt_API():
         params = {'extended': 'full,images'}
         return self.__call_trakt(url, params=params, cache_limit=8)
 
-    def get_people(self, section, slug, full=False):
-        url = '/%s/%s/people' % (TRAKT_SECTIONS[section], slug)
+    def get_people(self, section, show_id, full=False):
+        url = '/%s/%s/people' % (TRAKT_SECTIONS[section], show_id)
         params = {'extended': 'full,images'} if full else None
         return self.__call_trakt(url, params=params, cache_limit=24 * 30)
 
