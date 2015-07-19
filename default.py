@@ -537,22 +537,22 @@ def get_progress(cache_override=False):
     cached = kodi.get_setting('cache_watched') == 'true' and not cache_override
     timeout = max_timeout = int(kodi.get_setting('trakt_timeout'))
     watched_list = trakt_api.get_watched(SECTIONS.TV, full=True, cached=cached)
-    hidden = dict.fromkeys([item['show']['ids']['slug'] for item in trakt_api.get_hidden_progress(cached=cached)])
+    hidden = dict.fromkeys([item['show']['ids']['trakt'] for item in trakt_api.get_hidden_progress(cached=cached)])
     worker_count = 0
     workers = []
     shows = {}
     q = utils.Queue()
     begin = time.time()
     for watched in watched_list:
-        if watched['show']['ids']['slug'] in hidden:
+        if watched['show']['ids']['trakt'] in hidden:
             continue
         
-        worker = utils.start_worker(q, utils.parallel_get_progress, [watched['show']['ids']['slug'], cached])
+        worker = utils.start_worker(q, utils.parallel_get_progress, [watched['show']['ids']['trakt'], cached])
         worker_count += 1
         workers.append(worker)
         # create a shows dictionary to be used during progress building
-        shows[watched['show']['ids']['slug']] = watched['show']
-        shows[watched['show']['ids']['slug']]['last_watched_at'] = watched['last_watched_at']
+        shows[watched['show']['ids']['trakt']] = watched['show']
+        shows[watched['show']['ids']['trakt']]['last_watched_at'] = watched['last_watched_at']
 
     episodes = []
     while worker_count > 0:
@@ -563,8 +563,8 @@ def get_progress(cache_override=False):
             worker_count -= 1
 
             if 'next_episode' in progress and progress['next_episode']:
-                episode = {'show': shows[progress['slug']], 'episode': progress['next_episode']}
-                episode['last_watched_at'] = shows[progress['slug']]['last_watched_at']
+                episode = {'show': shows[progress['trakt']], 'episode': progress['next_episode']}
+                episode['last_watched_at'] = shows[progress['trakt']]['last_watched_at']
                 episode['percent_completed'] = (progress['completed'] * 100) / progress['aired'] if progress['aired'] > 0 else 0
                 episode['completed'] = progress['completed']
                 episodes.append(episode)

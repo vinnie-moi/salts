@@ -234,8 +234,8 @@ class Trakt_API():
         params = {'extended': 'full,images'} if full else None
         return self.__call_trakt(url, params=params, cached=cached)
 
-    def get_show_progress(self, slug, full=False, hidden=False, specials=False, cached=True):
-        url = '/shows/%s/progress/watched' % (slug)
+    def get_show_progress(self, show_id, full=False, hidden=False, specials=False, cached=True):
+        url = '/shows/%s/progress/watched' % (show_id)
         params = {}
         if full: params['extended'] = 'full,images'
         if hidden: params['hidden'] = 'true'

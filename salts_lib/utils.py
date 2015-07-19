@@ -458,16 +458,16 @@ def parallel_get_url(q, scraper, video):
     related = {'class': scraper, 'url': url, 'name': scraper.get_name(), 'label': '[%s] %s' % (scraper.get_name(), url)}
     q.put(related)
 
-def parallel_get_progress(q, slug, cached):
+def parallel_get_progress(q, trakt_id, cached):
     if P_MODE == P_MODES.PROCESSES:
         worker = multiprocessing.current_process()
     else:
         worker = threading.current_thread()
 
-    log_utils.log('Worker: %s (%s) for %s progress' % (worker.name, worker, slug), xbmc.LOGDEBUG)
-    progress = trakt_api.get_show_progress(slug, full=True, cached=cached)
-    progress['slug'] = slug  # add in a hacked slug to be used to match progress up to the show its for
-    log_utils.log('Got progress for %s from %s' % (slug, worker), xbmc.LOGDEBUG)
+    log_utils.log('Worker: %s (%s) for %s progress' % (worker.name, worker, trakt_id), xbmc.LOGDEBUG)
+    progress = trakt_api.get_show_progress(trakt_id, full=True, cached=cached)
+    progress['trakt'] = trakt_id  # add in a hacked show_id to be used to match progress up to the show its for
+    log_utils.log('Got progress for %s from %s' % (trakt_id, worker), xbmc.LOGDEBUG)
     q.put(progress)
 
 # Run a task on startup. Settings and mode values must match task name
