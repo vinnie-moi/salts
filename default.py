@@ -1619,6 +1619,7 @@ def make_dir_from_list(section, list_data, slug=None, query=None, page=None):
             show['watched'] = watched.get(show['ids']['slug'], False)
         else:
             try:
+                log_utils.log('%s - %s - %s' % (show['ids']['slug'], watched.get(show['ids']['slug'], 'NaN'), show['aired_episodes']), xbmc.LOGDEBUG)
                 show['watched'] = watched[show['ids']['slug']] >= show['aired_episodes']
                 show['watched_count'] = watched[show['ids']['slug']]
             except: show['watched'] = False
