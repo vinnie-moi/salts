@@ -18,7 +18,7 @@ from . import scraper  # just to avoid editor warning
 from . import *
 
 class ScraperVideo:
-    def __init__(self, video_type, title, year, trakt_id, season='', episode='', ep_title='', ep_airdate=''):
+    def __init__(self, video_type, title, year, slug, season='', episode='', ep_title='', ep_airdate=''):
         assert(video_type in (VIDEO_TYPES.__dict__[k] for k in VIDEO_TYPES.__dict__ if not k.startswith('__')))
         self.video_type = video_type
         self.title = title
@@ -26,7 +26,7 @@ class ScraperVideo:
         self.season = season
         self.episode = episode
         self.ep_title = ep_title
-        self.trakt_id = trakt_id
+        self.slug = slug
         self.ep_airdate = None
         if ep_airdate:
             try: self.ep_airdate = datetime.datetime.strptime(ep_airdate, "%Y-%m-%d").date()
