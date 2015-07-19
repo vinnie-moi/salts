@@ -780,12 +780,12 @@ def browse_seasons(slug, fanart):
     utils.set_view(CONTENT_TYPES.SEASONS, False)
     kodi.end_of_directory()
 
-@url_dispatcher.register(MODES.EPISODES, ['trakt_id', 'season'])
-def browse_episodes(trakt_id, season):
-    show = trakt_api.get_show_details(trakt_id)
-    episodes = trakt_api.get_episodes(trakt_id, season)
+@url_dispatcher.register(MODES.EPISODES, ['slug', 'season'])
+def browse_episodes(slug, season):
+    show = trakt_api.get_show_details(slug)
+    episodes = trakt_api.get_episodes(slug, season)
     if TOKEN:
-        progress = trakt_api.get_show_progress(trakt_id, hidden=True, specials=True, cached=kodi.get_setting('cache_watched') == 'true')
+        progress = trakt_api.get_show_progress(slug, hidden=True, specials=True, cached=kodi.get_setting('cache_watched') == 'true')
         episodes = utils.make_episodes_watched(episodes, progress)
 
     totalItems = len(episodes)
