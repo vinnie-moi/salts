@@ -100,10 +100,7 @@ def choose_list(username=None):
 def show_id(show):
     queries = {}
     ids = show['ids']
-    if 'slug' in ids and ids['slug']:
-        queries['id_type'] = 'slug'
-        queries['show_id'] = ids['slug']
-    elif 'trakt' in ids and ids['trakt']:
+    if 'trakt' in ids and ids['trakt']:
         queries['id_type'] = 'trakt'
         queries['show_id'] = ids['trakt']
     elif 'imdb' in ids and ids['imdb']:
@@ -118,6 +115,9 @@ def show_id(show):
     elif 'tvrage' in ids and ids['tvrage']:
         queries['id_type'] = 'tvrage'
         queries['show_id'] = ids['tvrage']
+    elif 'slug' in ids and ids['slug']:
+        queries['id_type'] = 'slug'
+        queries['show_id'] = ids['slug']
     return queries
 
 def update_url(video_type, title, year, source, old_url, new_url, season, episode):
@@ -753,10 +753,10 @@ def increment_setting(setting):
     cur_value = int(cur_value) if cur_value else 0
     kodi.set_setting(setting, cur_value + 1)
 
-def show_requires_source(slug):
+def show_requires_source(trakt_id):
     show_str = kodi.get_setting('exists_list')
     show_list = show_str.split('|')
-    if slug in show_list:
+    if trakt_id in show_list:
         return True
     else:
         return False
@@ -768,35 +768,35 @@ def keep_search(section, search_text):
     db_connection.set_setting('%s_search_%s' % (section, new_head), search_text)
     kodi.set_setting('%s_search_head' % (section), str(new_head))
 
-def bookmark_exists(slug, season, episode):
+def bookmark_exists(trakt_id, season, episode):
     if kodi.get_setting('trakt_bookmark') == 'true':
         if TOKEN:
-            bookmark = trakt_api.get_bookmark(slug, season, episode)
+            bookmark = trakt_api.get_bookmark(trakt_id, season, episode)
         else:
             bookmark = None
         return bookmark is not None
     else:
-        return db_connection.bookmark_exists(slug, season, episode)
+        return db_connection.bookmark_exists(trakt_id, season, episode)
 
 # returns true if user chooses to resume, else false
-def get_resume_choice(slug, season, episode):
+def get_resume_choice(trakt_id, season, episode):
     if kodi.get_setting('trakt_bookmark') == 'true':
-        resume_point = '%s%%' % (trakt_api.get_bookmark(slug, season, episode))
+        resume_point = '%s%%' % (trakt_api.get_bookmark(trakt_id, season, episode))
         header = i18n('trakt_bookmark_exists')
     else:
-        resume_point = format_time(db_connection.get_bookmark(slug, season, episode))
+        resume_point = format_time(db_connection.get_bookmark(trakt_id, season, episode))
         header = i18n('local_bookmark_exists')
     question = i18n('resume_from') % (resume_point)
     return xbmcgui.Dialog().yesno(header, question, '', '', i18n('start_from_beginning'), i18n('resume')) == 1
 
-def get_bookmark(slug, season, episode):
+def get_bookmark(trakt_id, season, episode):
     if kodi.get_setting('trakt_bookmark') == 'true':
         if TOKEN:
-            bookmark = trakt_api.get_bookmark(slug, season, episode)
+            bookmark = trakt_api.get_bookmark(trakt_id, season, episode)
         else:
             bookmark = None
     else:
-        bookmark = db_connection.get_bookmark(slug, season, episode)
+        bookmark = db_connection.get_bookmark(trakt_id, season, episode)
     return bookmark
 
 def format_time(seconds):

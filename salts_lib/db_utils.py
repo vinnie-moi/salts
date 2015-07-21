@@ -66,10 +66,10 @@ class DB_Connection():
         sql = 'DELETE FROM url_cache'
         self.__execute(sql)
 
-    def get_bookmark(self, slug, season='', episode=''):
-        if not slug: return None
+    def get_bookmark(self, trakt_id, season='', episode=''):
+        if not trakt_id: return None
         sql = 'SELECT resumepoint FROM bookmark where slug=? and season=? and episode=?'
-        bookmark = self.__execute(sql, (slug, season, episode))
+        bookmark = self.__execute(sql, (trakt_id, season, episode))
         if bookmark:
             return bookmark[0][0]
         else:
@@ -80,18 +80,18 @@ class DB_Connection():
         bookmarks = self.__execute(sql)
         return bookmarks
 
-    def bookmark_exists(self, slug, season='', episode=''):
-        return self.get_bookmark(slug, season, episode) != None
+    def bookmark_exists(self, trakt_id, season='', episode=''):
+        return self.get_bookmark(trakt_id, season, episode) != None
 
-    def set_bookmark(self, slug, offset, season='', episode=''):
-        if not slug: return
+    def set_bookmark(self, trakt_id, offset, season='', episode=''):
+        if not trakt_id: return
         sql = 'REPLACE INTO bookmark (slug, season, episode, resumepoint) VALUES(?, ?, ?,?)'
-        self.__execute(sql, (slug, season, episode, offset))
+        self.__execute(sql, (trakt_id, season, episode, offset))
 
-    def clear_bookmark(self, slug, season='', episode=''):
-        if not slug: return
+    def clear_bookmark(self, trakt_id, season='', episode=''):
+        if not trakt_id: return
         sql = 'DELETE FROM bookmark WHERE slug=? and season=? and episode=?'
-        self.__execute(sql, (slug, season, episode))
+        self.__execute(sql, (trakt_id, season, episode))
 
     def cache_url(self, url, body):
         now = time.time()

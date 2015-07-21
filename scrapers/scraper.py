@@ -376,7 +376,7 @@ class Scraper(object):
                         url = match.group(1)
                         return url.replace(self.base_url, '')
             else:
-                log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.slug), xbmc.LOGDEBUG)
+                log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), xbmc.LOGDEBUG)
 
             if (force_title or xbmcaddon.Addon().getSetting('title-fallback') == 'true') and video.ep_title and title_pattern:
                 norm_title = self._normalize_title(video.ep_title)
@@ -386,9 +386,9 @@ class Scraper(object):
                         return url.replace(self.base_url, '')
 
     def _force_title(self, video):
-            slug_str = xbmcaddon.Addon().getSetting('force_title_match')
-            slug_list = slug_str.split('|') if slug_str else []
-            return video.slug in slug_list
+            trakt_str = xbmcaddon.Addon().getSetting('force_title_match')
+            trakt_list = trakt_str.split('|') if trakt_str else []
+            return video.trakt_id in trakt_list
 
     def _normalize_title(self, title):
         new_title = title.upper()

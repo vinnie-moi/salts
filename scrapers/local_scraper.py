@@ -104,7 +104,7 @@ class Local_Scraper(scraper.Scraper):
             if 'result' in meta and 'episodes' in meta['result']:
                 episodes = meta['result']['episodes']
         else:
-            log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.slug), xbmc.LOGDEBUG)
+            log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), xbmc.LOGDEBUG)
 
         if (force_title or xbmcaddon.Addon().getSetting('title-fallback') == 'true') and video.ep_title:
             run = cmd % (params['id'][0], video.season, 'title', video.ep_title)

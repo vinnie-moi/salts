@@ -200,13 +200,13 @@ class Trakt_API():
         params = {'extended': 'full,images'}
         return self.__call_trakt(url, params=params, cache_limit=24 * 7)
 
-    def get_episode_details(self, slug, season, episode):
-        url = '/shows/%s/seasons/%s/episodes/%s' % (slug, season, episode)
+    def get_episode_details(self, show_id, season, episode):
+        url = '/shows/%s/seasons/%s/episodes/%s' % (show_id, season, episode)
         params = {'extended': 'full,images'}
         return self.__call_trakt(url, params=params, cache_limit=8)
 
-    def get_movie_details(self, slug):
-        url = '/movies/%s' % (slug)
+    def get_movie_details(self, show_id):
+        url = '/movies/%s' % (show_id)
         params = {'extended': 'full,images'}
         return self.__call_trakt(url, params=params, cache_limit=8)
 
@@ -259,15 +259,15 @@ class Trakt_API():
         url = '/sync/playback'
         return self.__call_trakt(url, cached=False)
 
-    def get_bookmark(self, slug, season, episode):
+    def get_bookmark(self, show_id, season, episode):
         response = self.get_bookmarks()
         for bookmark in response:
             if not season or not episode:
-                if bookmark['type'] == 'movie' and slug == bookmark['movie']['ids']['slug']:
+                if bookmark['type'] == 'movie' and show_id == bookmark['movie']['ids']['trakt']:
                     return bookmark['progress']
             else:
-                # log_utils.log('Resume: %s, %s, %s, %s' % (bookmark, slug, season, episode), xbmc.LOGDEBUG)
-                if bookmark['type'] == 'episode' and slug == bookmark['show']['ids']['slug'] and bookmark['episode']['season'] == int(season) and bookmark['episode']['number'] == int(episode):
+                # log_utils.log('Resume: %s, %s, %s, %s' % (bookmark, show_id, season, episode), xbmc.LOGDEBUG)
+                if bookmark['type'] == 'episode' and show_id == bookmark['show']['ids']['trakt'] and bookmark['episode']['season'] == int(season) and bookmark['episode']['number'] == int(episode):
                     return bookmark['progress']
 
     def rate(self, section, item, rating, season='', episode=''):
