@@ -117,7 +117,8 @@ class Playbox_Scraper(scraper.Scraper):
         except ValueError:
             log_utils.log('Invalid JSON returned for: %s' % (url), xbmc.LOGWARNING)
         else:
-            return js_data['data']['chapters'][0]['id']
+            if js_data['data']['chapters']:
+                return js_data['data']['chapters'][0]['id']
 
     def __decrypt(self, cipher_text):
         decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(PB_KEY, IV))
