@@ -495,7 +495,7 @@ msgid "Subscribe"
 msgstr ""
 
 msgctxt "#30120"
-msgid "Require Aired Only?'"
+msgid "Require Aired Only?"
 msgstr ""
 
 msgctxt "#30121"

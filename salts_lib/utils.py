@@ -756,7 +756,7 @@ def increment_setting(setting):
 def show_requires_source(trakt_id):
     show_str = kodi.get_setting('exists_list')
     show_list = show_str.split('|')
-    if trakt_id in show_list:
+    if str(trakt_id) in show_list:
         return True
     else:
         return False
