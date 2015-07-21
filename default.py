@@ -1346,13 +1346,14 @@ def toggle_watched(section, id_type, show_id, watched=True, season='', episode='
 
 @url_dispatcher.register(MODES.URL_EXISTS, ['trakt_id'])
 def toggle_url_exists(trakt_id):
+    trakt_id = str(trakt_id)
     show_str = kodi.get_setting('exists_list')
     if show_str:
         show_list = show_str.split('|')
     else:
         show_list = []
 
-    if str(trakt_id) in show_list:
+    if trakt_id in show_list:
         show_list.remove(trakt_id)
     else:
         show_list.append(trakt_id)
