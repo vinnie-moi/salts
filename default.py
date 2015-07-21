@@ -1686,7 +1686,7 @@ def make_dir_from_cal(mode, start_date, days):
             date_time = date
 
         menu_items = []
-        queries = {'mode': MODES.SEASONS, 'trakt_id': show['ids']['trakt_id'], 'fanart': fanart}
+        queries = {'mode': MODES.SEASONS, 'trakt_id': show['ids']['trakt'], 'fanart': fanart}
         menu_items.append((i18n('browse_seasons'), 'Container.Update(%s)' % (kodi.get_plugin_url(queries))),)
 
         liz, liz_url = make_episode_item(show, episode, show_subs=False, menu_items=menu_items)
