@@ -1325,6 +1325,7 @@ def copy_list(section, slug, username=None, target_slug=None):
 
 @url_dispatcher.register(MODES.TOGGLE_TITLE, ['trakt_id'])
 def toggle_title(trakt_id):
+    trakt_id = str(trakt_id)
     filter_list = utils.get_force_title_list()
     if trakt_id in filter_list:
         del filter_list[filter_list.index(trakt_id)]
@@ -1351,7 +1352,7 @@ def toggle_url_exists(trakt_id):
     else:
         show_list = []
 
-    if trakt_id in show_list:
+    if str(trakt_id) in show_list:
         show_list.remove(trakt_id)
     else:
         show_list.append(trakt_id)
@@ -1923,7 +1924,7 @@ def make_item(section_params, show, menu_items=None):
         menu_items.append((i18n('set_addicted_tvshowid'), runstring,))
 
     if section_params['section'] == SECTIONS.TV:
-        if trakt_id in utils.get_force_title_list():
+        if str(trakt_id) in utils.get_force_title_list():
             label = i18n('use_def_ep_matching')
         else:
             label = i18n('use_ep_title_match')

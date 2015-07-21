@@ -388,7 +388,7 @@ class Scraper(object):
     def _force_title(self, video):
             trakt_str = xbmcaddon.Addon().getSetting('force_title_match')
             trakt_list = trakt_str.split('|') if trakt_str else []
-            return video.trakt_id in trakt_list
+            return str(video.trakt_id) in trakt_list
 
     def _normalize_title(self, title):
         new_title = title.upper()
