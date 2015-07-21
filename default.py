@@ -976,7 +976,7 @@ def play_source(mode, hoster_url, direct, video_type, trakt_id, season='', episo
     try:
         win = xbmcgui.Window(10000)
         win.setProperty('salts.playing', 'True')
-        win.setProperty('salts.playing.trakt_id', trakt_id)
+        win.setProperty('salts.playing.trakt_id', str(trakt_id))
         win.setProperty('salts.playing.season', str(season))
         win.setProperty('salts.playing.episode', str(episode))
         if kodi.get_setting('trakt_bookmark') == 'true':
@@ -1840,7 +1840,7 @@ def make_item(section_params, show, menu_items=None):
     label = '%s (%s)' % (show['title'], show['year'])
     liz = utils.make_list_item(label, show)
     trakt_id = show['ids']['trakt']
-    liz.setProperty('trakt_id', trakt_id)
+    liz.setProperty('trakt_id', str(trakt_id))
     people = trakt_api.get_people(section_params['section'], trakt_id) if kodi.get_setting('include_people') == 'true' else None
     info = utils.make_info(show, people=people)
     if not section_params['folder']:
