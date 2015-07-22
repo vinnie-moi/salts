@@ -77,7 +77,6 @@ class GVCenter_Scraper(scraper.Scraper):
             params = urlparse.parse_qs(source_url)
             show_url = CONTENT_URL % (params['catalog_id'][0])
             url = urlparse.urljoin(self.base_url, show_url)
-            url += self.__get_extra()
             html = self._http_get(url, cache_limit=.5)
             try:
                 js_data = json.loads(html)
@@ -89,7 +88,6 @@ class GVCenter_Scraper(scraper.Scraper):
                 for film in js_data['listvideos']:
                     source_url = SOURCE_URL % (film['film_id'])
                     url = urlparse.urljoin(self.base_url, source_url)
-                    url += self.__get_extra()
                     html = self._http_get(url, cache_limit=.5)
                     try:
                         film_js = json.loads(html)
@@ -100,8 +98,8 @@ class GVCenter_Scraper(scraper.Scraper):
                             film_link = self.__decrypt(FILM_KEY, base64.b64decode(film['film_link']))
                             for match in re.finditer('(http.*?(?:#(\d+)#)?)(?=http|$)', film_link):
                                 link, height = match.groups()
-                                if height is None: height = 360  # Assumed medium quality if not found
-                                source = {'multi-part': False, 'url': link, 'host': self._get_direct_hostname(link), 'class': self, 'quality': self._gv_get_quality(link), 'views': None, 'rating': None, 'direct': True, 'resolution': '%sp' % (height)}
+                                source = {'multi-part': False, 'url': link, 'host': self._get_direct_hostname(link), 'class': self, 'quality': self._gv_get_quality(link), 'views': None, 'rating': None, 'direct': True}
+                                if height is not None: source['resolution'] = '%sp' % (height)
                                 sources.append(source)
 
         return sources
@@ -119,33 +117,30 @@ class GVCenter_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         results = []
         search_url = urlparse.urljoin(self.base_url, SEARCH_URL % (urllib.quote_plus(title)))
-        search_url += self.__get_extra()
         html = self._http_get(search_url, cache_limit=.25)
-        if html:
-            try:
-                js_data = json.loads(html)
-            except ValueError:
-                log_utils.log('Invalid JSON returned for: %s' % (search_url), xbmc.LOGWARNING)
-            else:
-                for item in js_data['categories']:
-                    match = re.search('(.*?)\s+\((\d{4}).?\d{0,4}\s*\)', item['catalog_name'])
-                    if match:
-                        match_title, match_year = match.groups()
-                    else:
-                        match_title = item['catalog_name']
-                        match_year = ''
-                    
-                    if not year or not match_year or year == match_year:
-                        result_url = RESULT_URL % (video_type, item['catalog_id'])
-                        result = {'title': match_title, 'url': result_url, 'year': match_year}
-                        results.append(result)
+        try:
+            js_data = json.loads(html)
+        except ValueError:
+            log_utils.log('Invalid JSON returned for: %s' % (search_url), xbmc.LOGWARNING)
+        else:
+            for item in js_data['categories']:
+                match = re.search('(.*?)\s+\((\d{4}).?\d{0,4}\s*\)', item['catalog_name'])
+                if match:
+                    match_title, match_year = match.groups()
+                else:
+                    match_title = item['catalog_name']
+                    match_year = ''
+                
+                if not year or not match_year or year == match_year:
+                    result_url = RESULT_URL % (video_type, item['catalog_id'])
+                    result = {'title': match_title, 'url': result_url, 'year': match_year}
+                    results.append(result)
         return results
 
     def _get_episode_url(self, show_url, video):
         params = urlparse.parse_qs(show_url)
         source_url = CONTENT_URL % (params['catalog_id'][0])
         url = urlparse.urljoin(self.base_url, source_url)
-        url += self.__get_extra()
         html = self._http_get(url, cache_limit=.5)
         try:
             js_data = json.loads(html)
@@ -168,15 +163,15 @@ class GVCenter_Scraper(scraper.Scraper):
                             return EPISODE_URL % (video.video_type, params['catalog_id'][0], int(season), int(episode))
 
     def _http_get(self, url, data=None, cache_limit=8):
+        url += self.__get_extra()
         result = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
-        if result:
-            try:
-                js_data = json.loads(result)
-            except ValueError:
-                log_utils.log('Invalid JSON returned for: %s' % (url), xbmc.LOGWARNING)
-            else:
-                if 'data' in js_data:
-                    return self.__decrypt(DATA_KEY, base64.b64decode(js_data['data']))
+        try:
+            js_data = json.loads(result)
+        except ValueError:
+            log_utils.log('Invalid JSON returned for: %s' % (url), xbmc.LOGWARNING)
+        else:
+            if 'data' in js_data:
+                return self.__decrypt(DATA_KEY, base64.b64decode(js_data['data']))
 
         return ''
                     
