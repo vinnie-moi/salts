@@ -227,7 +227,13 @@ class Trakt_API():
         url = '/users/me/collection/%s' % (TRAKT_SECTIONS[section])
         params = {'extended': 'full,images'} if full else None
         response = self.__call_trakt(url, params=params, cached=cached)
-        return [item[TRAKT_SECTIONS[section][:-1]] for item in response]
+        result = []
+        for item in response:
+            element = item[TRAKT_SECTIONS[section][:-1]]
+            if section == SECTIONS.TV:
+                element['seasons'] = item['seasons']
+            result.append(element)
+        return result
 
     def get_watched(self, section, full=False, cached=True):
         url = '/sync/watched/%s' % (TRAKT_SECTIONS[section])

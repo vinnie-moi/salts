@@ -531,6 +531,15 @@ def show_collection(section):
         items.reverse()
     elif sort_key > 0:
         items.sort(key=lambda x: x[['title', 'year'][sort_key - 2]])
+
+    # hack aired_episodes to override w/ collected_episodes to workaround trakt.tv cache issue
+    if section == SECTIONS.TV:
+        for item in items:
+            collected_episodes = len([e for s in item['seasons'] for e in s['episodes']])
+            log_utils.log('%s/%s: Collected: %s - Aired: %s' % (item['ids']['trakt'], item['ids']['slug'], collected_episodes, item['aired_episodes']), xbmc.LOGDEBUG)
+            if collected_episodes > item['aired_episodes']:
+                item['aired_episodes'] = collected_episodes
+
     make_dir_from_list(section, items, COLLECTION_SLUG)
 
 def get_progress(cache_override=False):
@@ -1622,7 +1631,7 @@ def make_dir_from_list(section, list_data, slug=None, query=None, page=None):
             show['watched'] = watched.get(show['ids']['trakt'], False)
         else:
             try:
-                log_utils.log('%s - %s - %s' % (show['ids']['trakt'], watched.get(show['ids']['trakt'], 'NaN'), show['aired_episodes']), xbmc.LOGDEBUG)
+                log_utils.log('%s/%s: Watched: %s - Aired: %s' % (show['ids']['trakt'], show['ids']['slug'], watched.get(show['ids']['trakt'], 'NaN'), show['aired_episodes']), xbmc.LOGDEBUG)
                 show['watched'] = watched[show['ids']['trakt']] >= show['aired_episodes']
                 show['watched_count'] = watched[show['ids']['trakt']]
             except: show['watched'] = False
