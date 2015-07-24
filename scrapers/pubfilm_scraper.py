@@ -88,8 +88,7 @@ class PubFilm_Scraper(scraper.Scraper):
             links[match.group(1)] = match.group(2)
         
         return links
-            
-        
+
     def get_url(self, video):
         return super(PubFilm_Scraper, self)._default_get_url(video)
 
