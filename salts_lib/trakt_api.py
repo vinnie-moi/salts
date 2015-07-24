@@ -80,12 +80,7 @@ class Trakt_API():
         url = '/users/%s/lists/%s/items' % (username, slug)
         params = {'extended': 'full,images'}
         list_data = self.__call_trakt(url, params=params, cache_limit=cache_limit, cached=cached)
-        items = []
-        for item in list_data:
-            if item['type'] == TRAKT_SECTIONS[section][:-1]:
-                show = item[item['type']]
-                items.append(show)
-        return items
+        return [item[item['type']] for item in list_data if item['type'] == TRAKT_SECTIONS[section][:-1]]
 
     def show_watchlist(self, section):
         url = '/users/me/watchlist/%s' % (TRAKT_SECTIONS[section])
@@ -213,7 +208,10 @@ class Trakt_API():
     def get_people(self, section, show_id, full=False):
         url = '/%s/%s/people' % (TRAKT_SECTIONS[section], show_id)
         params = {'extended': 'full,images'} if full else None
-        return self.__call_trakt(url, params=params, cache_limit=24 * 30)
+        try:
+            return self.__call_trakt(url, params=params, cache_limit=24 * 30)
+        except TraktNotFoundError:
+            return {}
 
     def search(self, section, query, page=None):
         url = '/search'
