@@ -418,6 +418,12 @@
          <setting id="streamallthis.is_try" type="number" default="0" visible="false"/>
          <setting id="streamallthis.is_fail" type="number" default="0" visible="false"/>
          <setting id="streamallthis.is_check" type="number" default="0" visible="false"/>
+         <setting id="tunemovie-enable" type="bool" label="tunemovie Enabled" default="true" visible="true"/>
+         <setting id="tunemovie-base_url" type="text" label="    Base Url" default="http://tunemovie.is" visible="eq(-1,true)"/>
+         <setting id="tunemovie-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="tunemovie_try" type="number" default="0" visible="false"/>
+         <setting id="tunemovie_fail" type="number" default="0" visible="false"/>
+         <setting id="tunemovie_check" type="number" default="0" visible="false"/>
          <setting id="TVRelease.Net-enable" type="bool" label="TVRelease.Net Enabled" default="true" visible="true"/>
          <setting id="TVRelease.Net-base_url" type="text" label="    Base Url" default="http://tv-release.net" visible="eq(-1,true)"/>
          <setting id="TVRelease.Net-sub_check" type="bool" label="    Include in Page Existence checks?" default="false" visible="eq(-2,true)"/>
@@ -493,12 +499,6 @@
          <setting id="yify-streaming_try" type="number" default="0" visible="false"/>
          <setting id="yify-streaming_fail" type="number" default="0" visible="false"/>
          <setting id="yify-streaming_check" type="number" default="0" visible="false"/>
-         <setting id="yify.tv-enable" type="bool" label="yify.tv Enabled" default="true" visible="true"/>
-         <setting id="yify.tv-base_url" type="text" label="    Base Url" default="http://yify.tv" visible="eq(-1,true)"/>
-         <setting id="yify.tv-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
-         <setting id="yify.tv_try" type="number" default="0" visible="false"/>
-         <setting id="yify.tv_fail" type="number" default="0" visible="false"/>
-         <setting id="yify.tv_check" type="number" default="0" visible="false"/>
     </category>
 
     <category label="30634">
