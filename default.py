@@ -162,7 +162,7 @@ def auto_conf():
                'afdah.org', 'xmovies8', 'Flixanity', 'hdmz', 'niter.tv', 'yify.tv', 'pubfilm', 'movietv.to', 'popcorntimefree', 'MintMovies', 'MovieNight', 'cmz', 'viooz.ac', 'view47', 'MoviesHD',
                'OnlineMovies', 'MoviesOnline7', 'wmo.ch', 'zumvo.com', 'mvsnap', 'alluc.com', 'MyVideoLinks.eu', 'OneClickWatch', 'RLSSource.net', 'TVRelease.Net', 'FilmStreaming.in',
                'PrimeWire', 'WatchFree.to', 'CouchTunerV2', 'CouchTunerV1', 'pftv', 'wso.ch', 'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131', 'moviestorm.eu', 'vidics.ch', 'Movie4K',
-               'LosMovies', 'MerDB', 'iWatchOnline', '2movies', 'iStreamHD', 'afdah', 'filmikz.ch', 'movie25']
+               'LosMovies', 'MerDB', 'iWatchOnline', '2movies', 'iStreamHD', 'afdah', 'filmikz.ch', 'movie25', 'tunemovie']
         db_connection.set_setting('source_sort_order', '|'.join(sso))
         kodi.notify(msg=i18n('auto_conf_complete'))
     
