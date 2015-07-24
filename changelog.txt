@@ -1,3 +1,14 @@
+[B]Version 1.0.23[/B]
+- Fix merdb scraper
+- Migrate from slugs to traktid's
+- Add popcorntime scraper
+- Add simply elegant theme
+- Improve playbox scraper
+- Fix gvcenter scraper
+- Hack watched indicators for collections (trakt API bug workaround)
+- Add couchtuner V1 and V2 scrapers
+- Add tunemovie scraper
+
 [B]Version 1.0.22[/B]
 - Subscription fix
 - Scraper Fixes
