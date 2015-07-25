@@ -181,7 +181,7 @@ def browse_menu(section):
         if utils.menu_on('subscriptions'): kodi.create_item({'mode': MODES.MANAGE_SUBS, 'section': section}, i18n('my_subscriptions'), thumb=utils.art('my_subscriptions.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('watchlist'): kodi.create_item({'mode': MODES.SHOW_WATCHLIST, 'section': section}, i18n('my_watchlist'), thumb=utils.art('my_watchlist.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('my_lists'): kodi.create_item({'mode': MODES.MY_LISTS, 'section': section}, i18n('my_lists'), thumb=utils.art('my_lists.png'), fanart=utils.art('fanart.jpg'))
-#     if utils.menu_on('other_lists'): kodi.add_directory({'mode': MODES.OTHER_LISTS, 'section': section}, {'title': i18n('other_lists')}, img=utils.art('other_lists.png'), fanart=utils.art('fanart.jpg'))
+    if utils.menu_on('other_lists'): kodi.create_item({'mode': MODES.OTHER_LISTS, 'section': section}, i18n('other_lists'), thumb=utils.art('other_lists.png'), fanart=utils.art('fanart.jpg'))
     if section == SECTIONS.TV:
         if TOKEN:
             if utils.menu_on('progress'): add_refresh_item({'mode': MODES.SHOW_PROGRESS}, i18n('my_next_episodes'), utils.art('my_progress.png'), utils.art('fanart.jpg'))
@@ -437,11 +437,8 @@ def browse_other_lists(section):
     for other_list in lists:
         try:
             header = trakt_api.get_list_header(other_list[1], other_list[0])
-        except urllib2.HTTPError as e:
-            if e.code == 404:
-                header = None
-            else:
-                raise
+        except TraktNotFoundError:
+            header = None
 
         if header:
             found = True
@@ -502,7 +499,7 @@ def add_other_list(section, username=None):
     slug = pick_list(None, section, username)
     if slug:
         db_connection.add_other_list(section, username, slug)
-    xbmc.executebuiltin("XBMC.Container.Refresh")
+        xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.SHOW_LIST, ['section', 'slug'], ['username'])
 def show_list(section, slug, username=None):
@@ -1327,10 +1324,11 @@ def copy_list(section, slug, username=None, target_slug=None):
         copy_item = {'type': TRAKT_SECTIONS[section][:-1], query['id_type']: query['show_id']}
         copy_items.append(copy_item)
     response = add_many_to_list(section, copy_items, target_slug)
-    added = sum(response['added'].values())
-    exists = sum(response['existing'].values())
-    not_found = sum([len(item) for item in response['not_found'].values()])
-    kodi.notify(msg=i18n('list_copied') % (added, exists, not_found), duration=5000)
+    if response:
+        added = sum(response['added'].values())
+        exists = sum(response['existing'].values())
+        not_found = sum([len(item) for item in response['not_found'].values()])
+        kodi.notify(msg=i18n('list_copied') % (added, exists, not_found), duration=5000)
 
 @url_dispatcher.register(MODES.TOGGLE_TITLE, ['trakt_id'])
 def toggle_title(trakt_id):
