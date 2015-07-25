@@ -20,14 +20,15 @@ import urllib
 import urlparse
 import re
 import xbmcaddon
-import xbmc
 import base64
 from salts_lib import dom_parser
-from salts_lib import log_utils
+from salts_lib import GKDecrypter
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import Q_ORDER
 
 BASE_URL = 'http://tunemovie.is'
+GK_KEY = base64.b64decode('Q05WTmhPSjlXM1BmeFd0UEtiOGg=')
 
 class TuneMovie_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -45,17 +46,11 @@ class TuneMovie_Scraper(scraper.Scraper):
         return 'tunemovie'
 
     def resolve_link(self, link):
-        html = self._http_get(link, cache_limit=.5)
-        match = re.search('<iframe[^>]*src="([^"]+)', html)
-        if match:
-            link = match.group(1)
-        else:
-            match = re.search('Base64\.decode\("([^"]+)', html)
+        if self.base_url in link:
+            html = self._http_get(link, cache_limit=.5)
+            match = re.search('<iframe[^>]*src="([^"]+)', html)
             if match:
-                link_text = base64.b64decode(match.group(1))
-                match = re.search('proxy\.link=tunemovie\*([^&]+)', link_text)
-                if match:
-                    link = match.group(1)
+                link = match.group(1)
 
         return link
 
@@ -83,22 +78,31 @@ class TuneMovie_Scraper(scraper.Scraper):
             for item in zip(hosts, links):
                 host, link_text = item
                 host = host.lower().replace('server', '').strip()
-                if 'google' in host:
-                    continue  # temporary until we get the gk key
-                    direct = True
-                    quality = QUALITIES.HD720
-                else:
-                    direct = False
-                    quality = self._get_quality(video, host, QUALITIES.HIGH)
-
                 match = re.search('href="([^"]+)', link_text)
                 if match:
                     link = match.group(1)
-                     
-                    hoster = {'multi-part': False, 'url': link, 'class': self, 'quality': quality, 'host': host, 'rating': None, 'views': views, 'direct': direct}
-                    hosters.append(hoster)
+                    if 'google' in host:
+                        sources = self.__get_google_links(link)
+                        for source in sources:
+                            hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': sources[source], 'host': self._get_direct_hostname(source), 'rating': None, 'views': views, 'direct': True}
+                            hosters.append(hoster)
+                    else:
+                            hoster = {'multi-part': False, 'url': link, 'class': self, 'quality': self._get_quality(video, host, QUALITIES.HIGH), 'host': host, 'rating': None, 'views': views, 'direct': False}
+                            hosters.append(hoster)
 
         return hosters
+
+    def __get_google_links(self, link):
+        sources = {}
+        html = self._http_get(link, cache_limit=.5)
+        match = re.search('base64\.decode\("([^"]+)', html, re.I)
+        if match:
+            match = re.search('proxy\.link=tunemovie\*([^&]+)', base64.b64decode(match.group(1)))
+            if match:
+                picasa_url = GKDecrypter.decrypter(198, 128).decrypt(match.group(1), GK_KEY, 'ECB').split('\0')[0]
+                html = self._http_get(picasa_url, cache_limit=.5)
+                sources = self._parse_google(html)
+        return sources
 
     def get_url(self, video):
         return super(TuneMovie_Scraper, self)._default_get_url(video)
