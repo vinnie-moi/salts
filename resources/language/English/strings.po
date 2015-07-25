@@ -798,6 +798,14 @@ msgctxt "#30195"
 msgid "'%s' added to library"
 msgstr ""
 
+msgctxt "#30196"
+msgid "Add to Section Menu"
+msgstr ""
+
+msgctxt "#30197"
+msgid "Remove from Section Menu"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""

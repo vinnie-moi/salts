@@ -14,6 +14,8 @@
 	    <setting id="TV_search_head" type="number" default="-1" visible="false"/>
 	    <setting id="Movies_search_head" type="number" default="-1" visible="false"/>
 	    <setting id="cookie_debug" type="bool" default="false" visible="false"/>
+        <settind id="TV_main" type="string" default="" visible="false"/>
+        <settind id="Movies_main" type="string" default="" visible="false"/>
 	</category>
 
 	<category label="30546">

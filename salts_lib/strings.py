@@ -204,5 +204,7 @@ STRINGS = {
            'reset_base_url': 30192,
            'reset_complete': 30193,
            'req_result': 30194,
-           'addded_to_lib': 30195
+           'addded_to_lib': 30195,
+           'add_to_main': 30196,
+           'remove_from_main': 30197
 }
