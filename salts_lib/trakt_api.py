@@ -98,6 +98,10 @@ class Trakt_API():
         url = '/users/%s/lists' % (username)
         return self.__call_trakt(url, cache_limit=0)
 
+    def get_liked_lists(self, cached=True):
+        url = '/users/likes/lists'
+        return self.__call_trakt(url, cache_limit=4, cached=cached)
+
     def add_to_list(self, section, slug, items):
         return self.__manage_list('add', section, slug, items)
 

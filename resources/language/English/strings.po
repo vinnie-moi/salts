@@ -806,6 +806,10 @@ msgctxt "#30197"
 msgid "Remove from Section Menu"
 msgstr ""
 
+msgctxt "#30198"
+msgid "Liked Lists"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
@@ -1379,4 +1383,8 @@ msgstr ""
 
 msgctxt "#30639"
 msgid "On"
+msgstr ""
+
+msgctxt "#30640"
+msgid "Show Liked Lists"
 msgstr ""

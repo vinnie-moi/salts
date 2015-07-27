@@ -206,5 +206,6 @@ STRINGS = {
            'req_result': 30194,
            'addded_to_lib': 30195,
            'add_to_main': 30196,
-           'remove_from_main': 30197
+           'remove_from_main': 30197,
+           'liked_lists': 30198
 }

@@ -28,6 +28,7 @@
 	    <setting id="show_subscriptions" type="bool" label="30530" default="true"/>
 	    <setting id="show_watchlist" type="bool" label="30531" default="true"/>
 	    <setting id="show_my_lists" type="bool" label="30532" default="true"/>
+        <setting id="show_liked_lists" type="bool" label="30640" default="true"/>
 	    <setting id="show_other_lists" type="bool" label="30533" default="true"/>
 	    <setting id="show_progress" type="bool" label="30534" default="true"/>
 	    <setting id="show_my_cal" type="bool" label="30535" default="true"/>
