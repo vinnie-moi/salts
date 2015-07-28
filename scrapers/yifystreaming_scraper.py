@@ -103,7 +103,8 @@ class YifyStreaming_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/?s=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
-        elements = dom_parser.parse_dom(html, 'h2', {'class': 'entry-title'})
+            
+        elements = dom_parser.parse_dom(html, 'li', {'class': '[^"]*%s[^"]*' % (CATEGORIES[video_type])})
         results = []
         for element in elements:
             match = re.search('href="([^"]+)[^>]+>\s*([^<]+)', element, re.DOTALL)
