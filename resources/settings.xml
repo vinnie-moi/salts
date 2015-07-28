@@ -14,8 +14,8 @@
 	    <setting id="TV_search_head" type="number" default="-1" visible="false"/>
 	    <setting id="Movies_search_head" type="number" default="-1" visible="false"/>
 	    <setting id="cookie_debug" type="bool" default="false" visible="false"/>
-        <settind id="TV_main" type="string" default="" visible="false"/>
-        <settind id="Movies_main" type="string" default="" visible="false"/>
+        <setting id="TV_main" type="string" default="imdb-highest-rated-tv-series@hulkhorgen" visible="false"/>
+        <setting id="Movies_main" type="string" default="imdb-best-250-movies@hulkhorgen" visible="false"/>
 	</category>
 
 	<category label="30546">
