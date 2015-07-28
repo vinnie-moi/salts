@@ -1,4 +1,4 @@
-[B]Version 1.0.25[/B]
+[B]Version 1.0.26[/B]
 - Handle TraktNotFound better
 - Add gvideo sources to tunemovie
 - Add Browse other lists back

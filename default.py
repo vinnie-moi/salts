@@ -204,9 +204,9 @@ def add_section_lists(section):
     main_str = kodi.get_setting('%s_main' % (section))
     if main_str:
         main_list = main_str.split('|')
-        other_dict = {'%s@%s' % (item[1], item[0]): item for item in db_connection.get_other_lists(section)}
+        other_dict = dict(('%s@%s' % (item[1], item[0]), item) for item in db_connection.get_other_lists(section))
         if TOKEN:
-            lists_dict = {user_list['ids']['slug']: user_list for user_list in trakt_api.get_lists()}
+            lists_dict = dict((user_list['ids']['slug'], user_list) for user_list in trakt_api.get_lists())
     
     for list_str in main_list:
         if '@' not in list_str:
