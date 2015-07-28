@@ -182,7 +182,7 @@ def browse_menu(section):
         if utils.menu_on('subscriptions'): kodi.create_item({'mode': MODES.MANAGE_SUBS, 'section': section}, i18n('my_subscriptions'), thumb=utils.art('my_subscriptions.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('watchlist'): kodi.create_item({'mode': MODES.SHOW_WATCHLIST, 'section': section}, i18n('my_watchlist'), thumb=utils.art('my_watchlist.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('my_lists'): kodi.create_item({'mode': MODES.MY_LISTS, 'section': section}, i18n('my_lists'), thumb=utils.art('my_lists.png'), fanart=utils.art('fanart.jpg'))
-    if utils.menu_on('liked_lists'): add_refresh_item({'mode': MODES.LIKED_LISTS, 'section': section}, i18n('liked_lists'), utils.art('liked_lists.png'), utils.art('fanart.jpg'))
+        if utils.menu_on('liked_lists'): add_refresh_item({'mode': MODES.LIKED_LISTS, 'section': section}, i18n('liked_lists'), utils.art('liked_lists.png'), utils.art('fanart.jpg'))
     if utils.menu_on('other_lists'): kodi.create_item({'mode': MODES.OTHER_LISTS, 'section': section}, i18n('other_lists'), thumb=utils.art('other_lists.png'), fanart=utils.art('fanart.jpg'))
     if section == SECTIONS.TV:
         if TOKEN:
@@ -483,7 +483,11 @@ def browse_other_lists(section):
 
 def add_other_list_item(mode, section, other_list, total_items=0):
     try:
-        header = trakt_api.get_list_header(other_list[1], other_list[0])
+        if TOKEN:
+            auth = True
+        else:
+            auth = False
+        header = trakt_api.get_list_header(other_list[1], other_list[0], auth)
     except TraktNotFoundError:
         header = None
 
@@ -592,7 +596,11 @@ def show_list(section, slug, username=None):
         items = trakt_api.show_watchlist(section)
     else:
         try:
-            items = trakt_api.show_list(slug, section, username)
+            if TOKEN:
+                auth = True
+            else:
+                auth = False
+            items = trakt_api.show_list(slug, section, username, auth=auth)
         except TraktNotFoundError:
             msg = i18n('list_not_exist') % (slug)
             kodi.notify(msg=msg, duration=5000)

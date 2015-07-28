@@ -69,7 +69,7 @@ class Trakt_API():
             
         return self.__call_trakt(url, data=data, auth=False, cached=False)
     
-    def show_list(self, slug, section, username=None, cached=True):
+    def show_list(self, slug, section, username=None, auth=True, cached=True):
         if not username:
             username = 'me'
             cache_limit = 0  # don't cache user's own lists at all
@@ -79,7 +79,7 @@ class Trakt_API():
 
         url = '/users/%s/lists/%s/items' % (username, slug)
         params = {'extended': 'full,images'}
-        list_data = self.__call_trakt(url, params=params, cache_limit=cache_limit, cached=cached)
+        list_data = self.__call_trakt(url, params=params, auth=auth, cache_limit=cache_limit, cached=cached)
         return [item[item['type']] for item in list_data if item['type'] == TRAKT_SECTIONS[section][:-1]]
 
     def show_watchlist(self, section):
@@ -88,10 +88,10 @@ class Trakt_API():
         response = self.__call_trakt(url, params=params, cache_limit=0)
         return [item[TRAKT_SECTIONS[section][:-1]] for item in response]
 
-    def get_list_header(self, slug, username=None):
+    def get_list_header(self, slug, username=None, auth=True):
         if not username: username = 'me'
         url = '/users/%s/lists/%s' % (username, slug)
-        return self.__call_trakt(url)
+        return self.__call_trakt(url, auth=auth)
 
     def get_lists(self, username=None):
         if not username: username = 'me'
