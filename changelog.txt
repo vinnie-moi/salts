@@ -1,3 +1,11 @@
+[B]Version 1.0.24[/B]
+- Handle TraktNotFound better
+- Add gvideo sources to tunemovie
+- Add Browse other lists back
+- Add ability to add lists and other lists to section menu
+- Add Browse Liked Lists function
+- Fix yify-streaming scraper
+
 [B]Version 1.0.23[/B]
 - Fix merdb scraper
 - Migrate from slugs to traktid's
