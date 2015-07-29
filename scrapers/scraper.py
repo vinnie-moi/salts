@@ -624,6 +624,7 @@ class Scraper(object):
             decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationECB(key))
             plain_text = decrypter.feed(cipher_link.decode('hex'))
             plain_text += decrypter.feed()
+            plain_text = plain_text.split('\0', 1)[0]
         except Exception as e:
             log_utils.log('Exception (%s) during %s gk decrypt: cipher_link: %s' % (e, self.get_name(), cipher_link), xbmc.LOGWARNING)
             plain_text = ''
