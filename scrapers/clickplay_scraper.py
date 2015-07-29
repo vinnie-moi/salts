@@ -22,7 +22,6 @@ import xbmcaddon
 import urllib
 import base64
 from salts_lib import dom_parser
-from salts_lib import GKDecrypter
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 

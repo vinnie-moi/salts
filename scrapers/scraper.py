@@ -33,6 +33,7 @@ import datetime
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
 from salts_lib import cloudflare
+from salts_lib import pyaes
 from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
@@ -617,6 +618,18 @@ class Scraper(object):
             sources[url] = self._width_get_quality(width)
         return sources
 
+    def _gk_decrypt(self, key, cipher_link):
+        try:
+            key += (24 - len(key)) * '\0'
+            decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationECB(key))
+            plain_text = decrypter.feed(cipher_link.decode('hex'))
+            plain_text += decrypter.feed()
+        except Exception as e:
+            log_utils.log('Exception (%s) during %s gk decrypt: cipher_link: %s' % (e, self.get_name(), cipher_link), xbmc.LOGWARNING)
+            plain_text = ''
+
+        return plain_text
+    
     def create_db_connection(self):
         if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
             worker_id = threading.current_thread().ident

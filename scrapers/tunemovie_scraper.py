@@ -22,7 +22,6 @@ import re
 import xbmcaddon
 import base64
 from salts_lib import dom_parser
-from salts_lib import GKDecrypter
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 from salts_lib.constants import Q_ORDER
@@ -99,7 +98,7 @@ class TuneMovie_Scraper(scraper.Scraper):
         if match:
             match = re.search('proxy\.link=tunemovie\*([^&]+)', base64.b64decode(match.group(1)))
             if match:
-                picasa_url = GKDecrypter.decrypter(198, 128).decrypt(match.group(1), GK_KEY, 'ECB').split('\0')[0]
+                picasa_url = self._gk_decrypt(GK_KEY, match.group(1))
                 html = self._http_get(picasa_url, cache_limit=.5)
                 sources = self._parse_google(html)
         return sources

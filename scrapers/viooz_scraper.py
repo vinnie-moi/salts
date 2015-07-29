@@ -21,7 +21,6 @@ import urlparse
 import re
 import xbmcaddon
 import base64
-from salts_lib import GKDecrypter
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
@@ -72,7 +71,7 @@ class VioozAc_Scraper(scraper.Scraper):
                     if match:
                         proxy_link = match.group(1)
                         proxy_link = proxy_link.split('*', 1)[-1]
-                        stream_url = GKDecrypter.decrypter(198, 128).decrypt(proxy_link, base64.urlsafe_b64decode('YVhWN09hU0M4MDRWYXlUQ0lPYmE='), 'ECB').split('\0')[0]
+                        stream_url = self._gk_decrypt(base64.urlsafe_b64decode('YVhWN09hU0M4MDRWYXlUQ0lPYmE='), proxy_link)
                         direct = True
                     else:
                         continue
