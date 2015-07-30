@@ -50,7 +50,8 @@ class Trakt_API():
     def __init__(self, token=None, use_https=False, list_size=RESULTS_LIMIT, timeout=5):
         self.token = token
         self.protocol = 'https://' if use_https else 'http://'
-        self.timeout = None if timeout == 0 else timeout
+#         self.timeout = None if timeout == 0 else timeout
+        self.timeout = timeout
         self.list_size = list_size
 
     def get_token(self, pin=None):

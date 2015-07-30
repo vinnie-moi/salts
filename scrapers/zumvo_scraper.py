@@ -22,7 +22,6 @@ import re
 import xbmcaddon
 import xbmc
 import base64
-from salts_lib import GKDecrypter
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
