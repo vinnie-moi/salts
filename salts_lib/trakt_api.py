@@ -364,7 +364,12 @@ class Trakt_API():
                     log_utils.log('Trakt Call: %s, header: %s, data: %s' % (url, headers, data), xbmc.LOGDEBUG)
                     request = urllib2.Request(url, data=json_data, headers=headers)
                     f = urllib2.urlopen(request, timeout=self.timeout)
-                    result = f.read()
+                    result = ''
+                    while True:
+                        data = f.read()
+                        if not data: break
+                        result += data
+
                     db_connection.cache_url(url, result)
                     break
                 except (ssl.SSLError, socket.timeout)  as e:
