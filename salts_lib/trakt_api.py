@@ -390,8 +390,8 @@ class Trakt_API():
                         elif e.code == 401 or e.code == 405:
                             if auth_retry or url.endswith('/token'):
                                 self.token = None
-                                kodi.get_setting('trakt_oauth_token', '')
-                                kodi.get_setting('trakt_refresh_token', '')
+                                kodi.get_setting('trakt_oauth_token')
+                                kodi.get_setting('trakt_refresh_token')
                                 raise TraktError('Trakt Call Authentication Failed (%s)' % (e.code))
                             else:
                                 result = self.get_token()
