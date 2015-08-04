@@ -282,7 +282,7 @@
          <setting id="MovieNight_fail" type="number" default="0" visible="false"/>
          <setting id="MovieNight_check" type="number" default="0" visible="false"/>
          <setting id="MoviesHD-enable" type="bool" label="MoviesHD Enabled" default="true" visible="true"/>
-         <setting id="MoviesHD-base_url" type="text" label="    Base Url" default="http://movieshd.co" visible="eq(-1,true)"/>
+         <setting id="MoviesHD-base_url" type="text" label="    Base Url" default="https://movieshd.eu" visible="eq(-1,true)"/>
          <setting id="MoviesHD-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="MoviesHD_try" type="number" default="0" visible="false"/>
          <setting id="MoviesHD_fail" type="number" default="0" visible="false"/>

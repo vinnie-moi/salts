@@ -23,7 +23,7 @@ import xbmcaddon
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://movieshd.co'
+BASE_URL = 'https://movieshd.eu'
 
 class MoviesHD_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -41,13 +41,16 @@ class MoviesHD_Scraper(scraper.Scraper):
         return 'MoviesHD'
 
     def resolve_link(self, link):
-        html = self._http_get(link, cache_limit=.5)
-        match = re.search('ref="([^"]+)', html)
-        if match:
-            return 'http://videomega.tv/iframe.php?ref=%s' % (match.group(1))
+        if 'videomega' in link:
+            html = self._http_get(link, cache_limit=.5)
+            match = re.search('ref="([^"]+)', html)
+            if match:
+                return 'http://videomega.tv/iframe.php?ref=%s' % (match.group(1))
+        else:
+            return link
 
     def format_source_label(self, item):
-        return '[%s] %s (%s Up, %s Down) (%s/100)' % (item['quality'], item['host'], item['up'], item['down'], item['rating'])
+        return '[%s] %s' % (item['quality'], item['host'])
 
     def get_sources(self, video):
         source_url = self.get_url(video)
@@ -57,20 +60,20 @@ class MoviesHD_Scraper(scraper.Scraper):
             html = self._http_get(url, cache_limit=.5)
 
             match = re.search("(?:'|\")([^'\"]+hashkey=[^'\"]+)", html)
+            stream_url = ''
             if match:
-                hash_url = match.group(1)
-                if hash_url.startswith('//'): hash_url = 'http:' + hash_url
-                hoster = {'multi-part': False, 'url': hash_url, 'host': 'videomega.tv', 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'up': None, 'down': None, 'direct': False}
-                match = re.search('class="rating">([^%<]*).*?class="nb-votes">(\d+)', html, re.DOTALL)
+                stream_url = match.group(1)
+                if stream_url.startswith('//'): stream_url = 'http:' + stream_url
+                host = 'videomega.tv'
+            else:
+                match = re.search('iframe[^>]*src="([^"]+)', html)
                 if match:
-                    rating, votes = match.groups()
-                    if rating:
-                        hoster['rating'] = int(rating)
-                    else:
-                        hoster['rating'] = 0
-                    hoster['up'] = int(round(hoster['rating'] * int(votes) / 100.0))
-                    hoster['down'] = int(int(votes) - hoster['up'])
-                hosters.append(hoster)
+                    stream_url = match.group(1)
+                    host = urlparse.urlparse(stream_url).hostname
+                    
+                if stream_url:
+                    hoster = {'multi-part': False, 'url': stream_url, 'host': host, 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'up': None, 'down': None, 'direct': False}
+                    hosters.append(hoster)
         return hosters
 
     def get_url(self, video):
@@ -81,7 +84,7 @@ class MoviesHD_Scraper(scraper.Scraper):
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
         results = []
-        if not re.search('Sorry, but nothing matched your search criteria', html, re.I):
+        if not re.search('nothing matched your search criteria', html, re.I):
             pattern = 'href="([^"]+)"\s+title="([^"]+)\s+\((\d{4})\)'
             for match in re.finditer(pattern, html):
                 url, title, match_year = match.groups('')
