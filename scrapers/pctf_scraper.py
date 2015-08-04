@@ -54,10 +54,11 @@ class PopcornTime_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            match = re.search("file\s*:\s*'([^']+)", html)
+            match = re.search('<iframe[^>]*src="([^"]+)', html)
             if match:
                 stream_url = match.group(1)
-                hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': QUALITIES.HD720, 'host': self._get_direct_hostname(stream_url), 'rating': None, 'views': None, 'direct': True}
+                host = urlparse.urlparse(stream_url).hostname
+                hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._get_quality(video, host, QUALITIES.HIGH), 'host': host, 'rating': None, 'views': None, 'direct': False}
                 hosters.append(hoster)
         return hosters
 
@@ -69,25 +70,35 @@ class PopcornTime_Scraper(scraper.Scraper):
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
         results = []
-        posters = dom_parser.parse_dom(html, 'div', {'class': 'movie-poster'})
         info = dom_parser.parse_dom(html, 'div', {'class': 'movie-info'})
-        for item in zip(posters, info):
-            href = dom_parser.parse_dom(item[0], 'a', ret='href')
-            match_title = dom_parser.parse_dom(item[1], 'span', {'class': 'movie-title'})
-            match_year = dom_parser.parse_dom(item[1], 'span', {'class': 'movie-year'})
-            if href and match_title:
-                url = href[0]
-                match_title = match_title[0]
+        for item in info:
+            match_title = dom_parser.parse_dom(item, 'span', {'class': 'movie-title'})
+            match_year = dom_parser.parse_dom(item, 'span', {'class': 'movie-year'})
+            if match_title:
+                match_title = self.__strip_link(match_title[0])
                 if match_year:
-                    match_year = match_year[0]
+                    match_year = self.__strip_link(match_year[0])
                 else:
                     match_year = ''
-
-            if not year or not match_year or year == match_year:
-                result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
-                results.append(result)
+                    
+                match = re.search('href="([^"]+)', item)
+                if match:
+                    url = match.group(1)
+                else:
+                    continue
+    
+                if not year or not match_year or year == match_year:
+                    result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
+                    results.append(result)
 
         return results
 
+    def __strip_link(self, html):
+        text = dom_parser.parse_dom(html, 'a')
+        if text:
+            return text[0]
+        else:
+            return html
+    
     def _http_get(self, url, data=None, cache_limit=8):
         return super(PopcornTime_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
