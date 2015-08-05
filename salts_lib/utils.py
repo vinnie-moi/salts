@@ -121,7 +121,7 @@ def show_id(show):
     return queries
 
 def update_url(video_type, title, year, source, old_url, new_url, season, episode):
-    log_utils.log('Setting Url: |%s|%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, source, old_url, new_url, season, episode), xbmc.LOGDEBUG)
+    log_utils.log('Setting Url: |%s|%s|%s|%s|%s|%s|%s|%s|' % (video_type, title, year, source, old_url, new_url, season, episode), log_utils.LOGDEBUG)
     if new_url:
         db_connection.set_related_url(video_type, title, year, source, new_url, season, episode)
     else:
@@ -327,7 +327,7 @@ def filter_exclusions(hosters):
     filtered_hosters = []
     for hoster in hosters:
         if hoster['host'].lower() in exclusions:
-            log_utils.log('Excluding %s (%s) from %s' % (hoster['url'], hoster['host'], hoster['class'].get_name()), xbmc.LOGDEBUG)
+            log_utils.log('Excluding %s (%s) from %s' % (hoster['url'], hoster['host'], hoster['class'].get_name()), log_utils.LOGDEBUG)
             continue
         filtered_hosters.append(hoster)
     return filtered_hosters
@@ -422,14 +422,14 @@ def reap_workers(workers, timeout=0):
     """
     Reap thread/process workers; don't block by default; return un-reaped workers
     """
-    log_utils.log('In Reap: %s' % (workers), xbmc.LOGDEBUG)
+    log_utils.log('In Reap: %s' % (workers), log_utils.LOGDEBUG)
     living_workers = []
     for worker in workers:
         if worker:
-            log_utils.log('Reaping: %s' % (worker.name), xbmc.LOGDEBUG)
+            log_utils.log('Reaping: %s' % (worker.name), log_utils.LOGDEBUG)
             worker.join(timeout)
             if worker.is_alive():
-                log_utils.log('Worker %s still running' % (worker.name), xbmc.LOGDEBUG)
+                log_utils.log('Worker %s still running' % (worker.name), log_utils.LOGDEBUG)
                 living_workers.append(worker)
     return living_workers
 
@@ -439,9 +439,9 @@ def parallel_get_sources(q, scraper, video):
     else:
         worker = threading.current_thread()
 
-    log_utils.log('Worker: %s (%s) for %s sources' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
+    log_utils.log('Worker: %s (%s) for %s sources' % (worker.name, worker, scraper.get_name()), log_utils.LOGDEBUG)
     hosters = scraper.get_sources(video)
-    log_utils.log('%s returned %s sources from %s' % (scraper.get_name(), len(hosters), worker), xbmc.LOGDEBUG)
+    log_utils.log('%s returned %s sources from %s' % (scraper.get_name(), len(hosters), worker), log_utils.LOGDEBUG)
     result = {'name': scraper.get_name(), 'hosters': hosters}
     q.put(result)
 
@@ -451,9 +451,9 @@ def parallel_get_url(q, scraper, video):
     else:
         worker = threading.current_thread()
 
-    log_utils.log('Worker: %s (%s) for %s url' % (worker.name, worker, scraper.get_name()), xbmc.LOGDEBUG)
+    log_utils.log('Worker: %s (%s) for %s url' % (worker.name, worker, scraper.get_name()), log_utils.LOGDEBUG)
     url = scraper.get_url(video)
-    log_utils.log('%s returned url %s from %s' % (scraper.get_name(), url, worker), xbmc.LOGDEBUG)
+    log_utils.log('%s returned url %s from %s' % (scraper.get_name(), url, worker), log_utils.LOGDEBUG)
     if not url: url = ''
     related = {'class': scraper, 'url': url, 'name': scraper.get_name(), 'label': '[%s] %s' % (scraper.get_name(), url)}
     q.put(related)
@@ -464,10 +464,10 @@ def parallel_get_progress(q, trakt_id, cached):
     else:
         worker = threading.current_thread()
 
-    log_utils.log('Worker: %s (%s) for %s progress' % (worker.name, worker, trakt_id), xbmc.LOGDEBUG)
+    log_utils.log('Worker: %s (%s) for %s progress' % (worker.name, worker, trakt_id), log_utils.LOGDEBUG)
     progress = trakt_api.get_show_progress(trakt_id, full=True, cached=cached)
     progress['trakt'] = trakt_id  # add in a hacked show_id to be used to match progress up to the show its for
-    log_utils.log('Got progress for %s from %s' % (trakt_id, worker), xbmc.LOGDEBUG)
+    log_utils.log('Got progress for %s from %s' % (trakt_id, worker), log_utils.LOGDEBUG)
     q.put(progress)
 
 # Run a task on startup. Settings and mode values must match task name
@@ -485,7 +485,7 @@ def do_scheduled_task(task, isPlaying):
     now = datetime.datetime.now()
     if kodi.get_setting('auto-%s' % task) == 'true':
         if last_check < now - datetime.timedelta(minutes=1):
-            #log_utils.log('Check Triggered: Last: %s Now: %s' % (last_check, now), xbmc.LOGDEBUG)
+            #log_utils.log('Check Triggered: Last: %s Now: %s' % (last_check, now), log_utils.LOGDEBUG)
             next_run = get_next_run(task)
             last_check = now
         else:
@@ -503,9 +503,9 @@ def do_scheduled_task(task, isPlaying):
                     xbmc.executebuiltin(builtin)
                     db_connection.set_setting('%s-last_run' % task, now.strftime("%Y-%m-%d %H:%M:%S.%f"))
                 else:
-                    log_utils.log('Service: Playing... Busy... Postponing [%s]' % (task), xbmc.LOGDEBUG)
+                    log_utils.log('Service: Playing... Busy... Postponing [%s]' % (task), log_utils.LOGDEBUG)
             else:
-                log_utils.log('Service: Scanning... Busy... Postponing [%s]' % (task), xbmc.LOGDEBUG)
+                log_utils.log('Service: Scanning... Busy... Postponing [%s]' % (task), log_utils.LOGDEBUG)
 
 def get_next_run(task):
     # strptime mysteriously fails sometimes with TypeError; this is a hacky workaround
@@ -524,13 +524,13 @@ def url_exists(video):
     check each source for a url for this video; return True as soon as one is found. If none are found, return False
     """
     max_timeout = int(kodi.get_setting('source_timeout'))
-    log_utils.log('Checking for Url Existence: |%s|' % (video), xbmc.LOGDEBUG)
+    log_utils.log('Checking for Url Existence: |%s|' % (video), log_utils.LOGDEBUG)
     for cls in relevant_scrapers(video.video_type):
         if kodi.get_setting('%s-sub_check' % (cls.get_name())) == 'true':
             scraper_instance = cls(max_timeout)
             url = scraper_instance.get_url(video)
             if url:
-                log_utils.log('Found url for |%s| @ %s: %s' % (video, cls.get_name(), url), xbmc.LOGDEBUG)
+                log_utils.log('Found url for |%s| @ %s: %s' % (video, cls.get_name(), url), log_utils.LOGDEBUG)
                 return True
 
     log_utils.log('No url found for: |%s|' % (video))
@@ -559,7 +559,7 @@ def set_view(content, set_sort):
 
     view = kodi.get_setting('%s_view' % (content))
     if view != '0':
-        log_utils.log('Setting View to %s (%s)' % (view, content), xbmc.LOGDEBUG)
+        log_utils.log('Setting View to %s (%s)' % (view, content), log_utils.LOGDEBUG)
         xbmc.executebuiltin('Container.SetViewMode(%s)' % (view))
 
     # set sort methods - probably we don't need all of them
@@ -716,7 +716,7 @@ def calculate_success(name):
 def record_timeouts(fails):
     for key in fails:
         if fails[key] == True:
-            log_utils.log('Recording Timeout of %s' % (key), xbmc.LOGWARNING)
+            log_utils.log('Recording Timeout of %s' % (key), log_utils.LOGWARNING)
             increment_setting('%s_fail' % key)
 
 def do_disable_check():
@@ -761,7 +761,7 @@ def show_requires_source(trakt_id):
 def keep_search(section, search_text):
     head = int(kodi.get_setting('%s_search_head' % (section)))
     new_head = (head + 1) % SEARCH_HISTORY
-    log_utils.log('Setting %s to %s' % (new_head, search_text), xbmc.LOGDEBUG)
+    log_utils.log('Setting %s to %s' % (new_head, search_text), log_utils.LOGDEBUG)
     db_connection.set_setting('%s_search_%s' % (section, new_head), search_text)
     kodi.set_setting('%s_search_head' % (section), str(new_head))
 
@@ -819,7 +819,7 @@ def download_media(url, path, file_name):
 
         file_name = file_name.replace('.strm', get_extension(url, response))
         full_path = os.path.join(path, file_name)
-        log_utils.log('Downloading: %s -> %s' % (url, full_path), xbmc.LOGDEBUG)
+        log_utils.log('Downloading: %s -> %s' % (url, full_path), log_utils.LOGDEBUG)
 
         path = xbmc.makeLegalFilename(path)
         if not xbmcvfs.exists(path):
@@ -852,21 +852,21 @@ def download_media(url, path, file_name):
                 raise Exception('failed_write_file')
 
             percent_progress = (total_len) * 100 / content_length if content_length > 0 else 0
-            log_utils.log('Position : %s / %s = %s%%' % (total_len, content_length, percent_progress), xbmc.LOGDEBUG)
+            log_utils.log('Position : %s / %s = %s%%' % (total_len, content_length, percent_progress), log_utils.LOGDEBUG)
             if progress == PROGRESS.WINDOW:
                 dialog.update(percent_progress)
             elif progress == PROGRESS.BACKGROUND:
                 dialog.update(percent_progress, 'Stream All The Sources')
         else:
             kodi.notify(msg=i18n('download_complete') % (file_name), duration=5000)
-            log_utils.log('Download Complete: %s -> %s' % (url, full_path), xbmc.LOGDEBUG)
+            log_utils.log('Download Complete: %s -> %s' % (url, full_path), log_utils.LOGDEBUG)
 
         file_desc.close()
         if progress:
             dialog.close()
 
     except Exception as e:
-        log_utils.log('Error (%s) during download: %s -> %s' % (str(e), url, file_name), xbmc.LOGERROR)
+        log_utils.log('Error (%s) during download: %s -> %s' % (str(e), url, file_name), log_utils.LOGERROR)
         kodi.notify(msg=i18n('download_error') % (str(e), file_name), duration=5000)
 
 def get_extension(url, response):

@@ -31,7 +31,7 @@ from salts_lib.constants import USER_AGENT
 
 class NoRedirection(urllib2.HTTPErrorProcessor):
     def http_response(self, request, response):
-        log_utils.log('Stopping Redirect', xbmc.LOGDEBUG)
+        log_utils.log('Stopping Redirect', log_utils.LOGDEBUG)
         return response
 
     https_response = http_response
@@ -67,7 +67,7 @@ def solve(url, cj, wait=True):
         pass_match = re.search(pass_pattern, html)
 
         if not init_match or not vc_match or not pass_match:
-            log_utils.log("Couldn't find attribute: init: |%s| vc: |%s| pass: |%s| No cloudflare check?" % (init_match, vc_match, pass_match), xbmc.LOGWARNING)
+            log_utils.log("Couldn't find attribute: init: |%s| vc: |%s| pass: |%s| No cloudflare check?" % (init_match, vc_match, pass_match), log_utils.LOGWARNING)
             return False
             
         init_dict, init_var, init_equation, equations = init_match.groups()
@@ -77,35 +77,35 @@ def solve(url, cj, wait=True):
         #log_utils.log("VC is: %s" % (vc), xbmc.LOGDEBUG)
         varname = (init_dict, init_var)
         result = int(solve_equation(init_equation.rstrip()))
-        log_utils.log('Initial value: |%s| Result: |%s|' % (init_equation, result), xbmc.LOGDEBUG)
+        log_utils.log('Initial value: |%s| Result: |%s|' % (init_equation, result), log_utils.LOGDEBUG)
         
         for equation in equations.split(';'):
                 equation = equation.rstrip()
                 if equation[:len('.'.join(varname))] != '.'.join(varname):
-                        log_utils.log('Equation does not start with varname |%s|' % (equation), xbmc.LOGDEBUG)
+                        log_utils.log('Equation does not start with varname |%s|' % (equation), log_utils.LOGDEBUG)
                 else:
                         equation = equation[len('.'.join(varname)):]
 
                 expression = equation[2:]
                 operator = equation[0]
                 if operator not in ['+', '-', '*', '/']:
-                    log_utils.log('Unknown operator: |%s|' % (equation), xbmc.LOGWARNING)
+                    log_utils.log('Unknown operator: |%s|' % (equation), log_utils.LOGWARNING)
                     continue
                     
                 result = int(str(eval(str(result) + operator + str(solve_equation(expression)))))
-                log_utils.log('intermediate: %s = %s' % (equation, result), xbmc.LOGDEBUG)
+                log_utils.log('intermediate: %s = %s' % (equation, result), log_utils.LOGDEBUG)
         
         scheme = urlparse.urlparse(url).scheme
         domain = urlparse.urlparse(url).hostname
         result += len(domain)
-        log_utils.log('Final Result: |%s|' % (result), xbmc.LOGDEBUG)
+        log_utils.log('Final Result: |%s|' % (result), log_utils.LOGDEBUG)
 
         if wait:
-                log_utils.log('Sleeping for 5 Seconds', xbmc.LOGDEBUG)
+                log_utils.log('Sleeping for 5 Seconds', log_utils.LOGDEBUG)
                 xbmc.sleep(5000)
                 
         url = '%s://%s/cdn-cgi/l/chk_jschl?jschl_vc=%s&jschl_answer=%s&pass=%s' % (scheme, domain, vc, result, password)
-        log_utils.log('url: %s' % (url), xbmc.LOGDEBUG)
+        log_utils.log('url: %s' % (url), log_utils.LOGDEBUG)
         request = urllib2.Request(url)
         for key in headers: request.add_header(key, headers[key])
         try:
@@ -123,7 +123,7 @@ def solve(url, cj, wait=True):
                 response = urllib2.urlopen(request)
             final = response.read()
         except urllib2.HTTPError as e:
-            log_utils.log('CloudFlare Error: %s on url: %s' % (e.code, url), xbmc.LOGWARNING)
+            log_utils.log('CloudFlare Error: %s on url: %s' % (e.code, url), log_utils.LOGWARNING)
             return False
 
         if cj:

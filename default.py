@@ -24,7 +24,6 @@ import xbmcplugin
 import xbmcgui
 import xbmc
 import xbmcvfs
-import urllib2
 import urlresolver
 import json
 import xml.etree.ElementTree as ET
@@ -41,13 +40,12 @@ from salts_lib.constants import *
 from scrapers import *  # import all scrapers into this namespace
 from scrapers import ScraperVideo
 
-ICON_PATH = os.path.join(kodi.get_path(), 'icon.png')
 TOKEN = kodi.get_setting('trakt_oauth_token')
 use_https = kodi.get_setting('use_https') == 'true'
 trakt_timeout = int(kodi.get_setting('trakt_timeout'))
 list_size = int(kodi.get_setting('list_size'))
-
 trakt_api = Trakt_API(TOKEN, use_https, list_size, trakt_timeout)
+
 url_dispatcher = URL_Dispatcher()
 db_connection = DB_Connection()
 

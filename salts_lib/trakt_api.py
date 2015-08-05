@@ -22,7 +22,6 @@ import urllib
 import socket
 import ssl
 import time
-import xbmc
 import kodi
 import log_utils
 from db_utils import DB_Connection
@@ -355,13 +354,13 @@ class Trakt_API():
         created, cached_result = db_connection.get_cached_url(url, db_cache_limit)
         if cached_result and (time.time() - created) < (60 * 60 * cache_limit):
             result = cached_result
-            log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
+            log_utils.log('Returning cached result for: %s' % (url), log_utils.LOGDEBUG)
         else:
             auth_retry = False
             while True:
                 try:
                     if auth: headers.update({'Authorization': 'Bearer %s' % (self.token)})
-                    log_utils.log('Trakt Call: %s, header: %s, data: %s' % (url, headers, data), xbmc.LOGDEBUG)
+                    log_utils.log('Trakt Call: %s, header: %s, data: %s' % (url, headers, data), log_utils.LOGDEBUG)
                     request = urllib2.Request(url, data=json_data, headers=headers)
                     f = urllib2.urlopen(request, timeout=self.timeout)
                     result = ''
@@ -375,7 +374,7 @@ class Trakt_API():
                 except (ssl.SSLError, socket.timeout)  as e:
                     if cached_result:
                         result = cached_result
-                        log_utils.log('Temporary Trakt Error (%s). Using Cached Page Instead.' % (str(e)), xbmc.LOGWARNING)
+                        log_utils.log('Temporary Trakt Error (%s). Using Cached Page Instead.' % (str(e)), log_utils.LOGWARNING)
                     else:
                         raise TransientTraktError('Temporary Trakt Error: ' + str(e))
                 except urllib2.URLError as e:
@@ -383,7 +382,7 @@ class Trakt_API():
                         if e.code in TEMP_ERRORS:
                             if cached_result:
                                 result = cached_result
-                                log_utils.log('Temporary Trakt Error (%s). Using Cached Page Instead.' % (str(e)), xbmc.LOGWARNING)
+                                log_utils.log('Temporary Trakt Error (%s). Using Cached Page Instead.' % (str(e)), log_utils.LOGWARNING)
                                 break
                             else:
                                 raise TransientTraktError('Temporary Trakt Error: ' + str(e))
@@ -406,7 +405,7 @@ class Trakt_API():
                     elif isinstance(e.reason, socket.timeout) or isinstance(e.reason, ssl.SSLError):
                         if cached_result:
                             result = cached_result
-                            log_utils.log('Temporary Trakt Error (%s). Using Cached Page Instead' % (str(e)), xbmc.LOGWARNING)
+                            log_utils.log('Temporary Trakt Error (%s). Using Cached Page Instead' % (str(e)), log_utils.LOGWARNING)
                             break
                         else:
                             raise TransientTraktError('Temporary Trakt Error: ' + str(e))

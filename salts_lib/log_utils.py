@@ -4,6 +4,15 @@ import xbmcaddon
 addon = xbmcaddon.Addon()
 name = addon.getAddonInfo('name')
 
+LOGDEBUG = xbmc.LOGDEBUG
+LOGERROR = xbmc.LOGERROR
+LOGFATAL = xbmc.LOGFATAL
+LOGINFO = xbmc.LOGINFO
+LOGNONE = xbmc.LOGNONE
+LOGNOTICE = xbmc.LOGNOTICE
+LOGSEVERE = xbmc.LOGSEVERE
+LOGWARNING = xbmc.LOGWARNING
+
 def log(msg, level=xbmc.LOGNOTICE):
     # override message level to force logging when addon logging turned on
     if addon.getSetting('addon_debug') == 'true' and level == xbmc.LOGDEBUG:

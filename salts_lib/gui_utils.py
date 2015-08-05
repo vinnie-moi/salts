@@ -15,12 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import sys
 import xbmcgui
 import time
-import xbmc
 import os
-import utils
 import kodi
 from trans_utils import i18n
 from trakt_api import Trakt_API

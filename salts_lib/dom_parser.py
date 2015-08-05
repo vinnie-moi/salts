@@ -17,7 +17,6 @@
 '''
 
 import re
-import xbmc
 import log_utils
 
 def _getDOMContent(html, name, match, ret):  # Cleanup
@@ -99,28 +98,28 @@ def _getDOMElements(item, name, attrs):
     return lst
 
 def parse_dom(html, name=u"", attrs={}, ret=False):
-    log_utils.log("parse_dom: " + repr(name) + " - Attrs:" + repr(attrs) + " - Ret: " + repr(ret) + " - HTML: " + str(type(html)), xbmc.LOGDEBUG)
+    log_utils.log("parse_dom: " + repr(name) + " - Attrs:" + repr(attrs) + " - Ret: " + repr(ret) + " - HTML: " + str(type(html)), log_utils.LOGDEBUG)
 
     if isinstance(name, str):  # Should be handled
         try:
             name = name   # .decode("utf-8")
         except:
-            log_utils.log("Couldn't decode name binary string: " + repr(name), xbmc.LOGWARNING)
+            log_utils.log("Couldn't decode name binary string: " + repr(name), log_utils.LOGWARNING)
 
     if isinstance(html, str):
         try:
             html = [html.decode("utf-8")]  # Replace with chardet thingy
         except:
-            log_utils.log("Couldn't decode html binary string. Data length: " + repr(len(html)), xbmc.LOGWARNING)
+            log_utils.log("Couldn't decode html binary string. Data length: " + repr(len(html)), log_utils.LOGWARNING)
             html = [html]
     elif isinstance(html, unicode):
         html = [html]
     elif not isinstance(html, list):
-        log_utils.log("Input isn't list or string/unicode.", xbmc.LOGWARNING)
+        log_utils.log("Input isn't list or string/unicode.", log_utils.LOGWARNING)
         return u""
 
     if not name.strip():
-        log_utils.log("Missing tag name", xbmc.LOGWARNING)
+        log_utils.log("Missing tag name", log_utils.LOGWARNING)
         return u""
 
     ret_lst = []

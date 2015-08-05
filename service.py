@@ -82,7 +82,7 @@ class Service(xbmc.Player):
 
         if resume_point:
             resume_time = float(resume_point) * self._totalTime / 100
-            log_utils.log("Resume Percent: %s, Resume Time: %s Total Time: %s" % (resume_point, resume_time, self._totalTime), xbmc.LOGDEBUG)
+            log_utils.log("Resume Percent: %s, Resume Time: %s Total Time: %s" % (resume_point, resume_time, self._totalTime), log_utils.LOGDEBUG)
             self.seekTime(resume_time)
 
     def onPlayBackStopped(self):
@@ -93,11 +93,11 @@ class Service(xbmc.Player):
             except: percent_played = 0  # guard div by zero
             pTime = utils.format_time(playedTime)
             tTime = utils.format_time(self._totalTime)
-            log_utils.log('Service: Played %s of %s total = %s%%' % (pTime, tTime, percent_played), xbmc.LOGDEBUG)
+            log_utils.log('Service: Played %s of %s total = %s%%' % (pTime, tTime, percent_played), log_utils.LOGDEBUG)
             if playedTime == 0 and self._totalTime == 999999:
-                log_utils.log('XBMC silently failed to start playback', xbmc.LOGWARNING)
+                log_utils.log('XBMC silently failed to start playback', log_utils.LOGWARNING)
             elif playedTime >= 5:
-                log_utils.log('Service: Setting bookmark on |%s|%s|%s| to %s seconds' % (self.trakt_id, self.season, self.episode, playedTime), xbmc.LOGDEBUG)
+                log_utils.log('Service: Setting bookmark on |%s|%s|%s| to %s seconds' % (self.trakt_id, self.season, self.episode, playedTime), log_utils.LOGDEBUG)
                 db_connection.set_bookmark(self.trakt_id, playedTime, self.season, self.episode)
                 if percent_played >= 75:
                     if xbmc.getCondVisibility('System.HasAddon(script.trakt)'):
@@ -122,10 +122,10 @@ while not xbmc.abortRequested:
     except Exception as e:
         errors += 1
         if errors >= MAX_ERRORS:
-            log_utils.log('Service: Error (%s) received..(%s/%s)...Ending Service...' % (e, errors, MAX_ERRORS), xbmc.LOGERROR)
+            log_utils.log('Service: Error (%s) received..(%s/%s)...Ending Service...' % (e, errors, MAX_ERRORS), log_utils.LOGERROR)
             break
         else:
-            log_utils.log('Service: Error (%s) received..(%s/%s)...Continuing Service...' % (e, errors, MAX_ERRORS), xbmc.LOGERROR)
+            log_utils.log('Service: Error (%s) received..(%s/%s)...Continuing Service...' % (e, errors, MAX_ERRORS), log_utils.LOGERROR)
     else:
         errors = 0
 
