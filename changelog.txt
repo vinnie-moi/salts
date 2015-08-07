@@ -1,3 +1,9 @@
+[B]Version 1.0.30[/B]
+- Fix pctf scraper
+- Fix movieshd scraper
+- Improve merdb scraper
+- Code improvements
+
 [B]Version 1.0.29[/B]
 - Fix trakt reauthorization
 - Improve trakt call reading
