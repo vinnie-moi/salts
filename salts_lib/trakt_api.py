@@ -145,6 +145,22 @@ class Trakt_API():
         response = self.__call_trakt(url, params=params)
         return [item[TRAKT_SECTIONS[section][:-1]] for item in response]
 
+    def get_most_played(self, section, period, page=None):
+        return self.__get_most('played', section, period, page)
+    
+    def get_most_watched(self, section, period, page=None):
+        return self.__get_most('watched', section, period, page)
+    
+    def get_most_collected(self, section, period, page=None):
+        return self.__get_most('collected', section, period, page)
+    
+    def __get_most(self, category, section, period, page):
+        url = '/%s/%s/%s' % (TRAKT_SECTIONS[section], category, period)
+        params = {'extended': 'full,images', 'limit': self.list_size}
+        if page: params['page'] = page
+        response = self.__call_trakt(url, params=params)
+        return [item[TRAKT_SECTIONS[section][:-1]] for item in response]
+    
     def get_genres(self, section):
         url = '/genres/%s' % (TRAKT_SECTIONS[section])
         return self.__call_trakt(url, cache_limit=7 * 24)

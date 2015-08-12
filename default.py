@@ -172,6 +172,7 @@ def browse_menu(section):
     if utils.menu_on('trending'): kodi.create_item({'mode': MODES.TRENDING, 'section': section}, i18n('trending') % (section_label), thumb=utils.art('trending.png'), fanart=utils.art('fanart.jpg'))
     if utils.menu_on('popular'): kodi.create_item({'mode': MODES.POPULAR, 'section': section}, i18n('popular') % (section_label), thumb=utils.art('popular.png'), fanart=utils.art('fanart.jpg'))
     if utils.menu_on('recent'): kodi.create_item({'mode': MODES.RECENT, 'section': section}, i18n('recently_updated') % (section_label), thumb=utils.art('recent.png'), fanart=utils.art('fanart.jpg'))
+    if utils.menu_on('mosts'): kodi.create_item({'mode': MODES.MOSTS, 'section': section}, i18n('mosts') % (section_label2), thumb=utils.art('mosts.png'), fanart=utils.art('fanart.jpg'))
     add_section_lists(section)
     if TOKEN:
         if utils.menu_on('recommended'): kodi.create_item({'mode': MODES.RECOMMEND, 'section': section}, i18n('recommended') % (section_label), thumb=utils.art('recommended.png'), fanart=utils.art('fanart.jpg'))
@@ -260,6 +261,26 @@ def force_refresh(refresh_mode, section=None, slug=None, username=None):
 
     log_utils.log('Force refresh complete: |%s|%s|%s|%s|' % (refresh_mode, section, slug, username))
     kodi.notify(msg=i18n('force_refresh_complete'))
+
+@url_dispatcher.register(MODES.MOSTS, ['section'])
+def mosts_menu(section):
+    modes = [(MODES.PLAYED, 'most_played_%s'), (MODES.WATCHED, 'most_watched_%s'), (MODES.COLLECTED, 'most_collected_%s')]
+    for mode in modes:
+        for period in ['weekly', 'monthly', 'all']:
+            kodi.create_item({'mode': mode[0], 'section': section, 'period': period}, i18n(mode[1] % (period)), thumb=utils.art('%s.png' % (mode[1] % (period))), fanart=utils.art('fanart.jpg'))
+    kodi.end_of_directory()
+
+@url_dispatcher.register(MODES.PLAYED, ['mode', 'section', 'period'], ['page'])
+@url_dispatcher.register(MODES.WATCHED, ['mode', 'section', 'period'], ['page'])
+@url_dispatcher.register(MODES.COLLECTED, ['mode', 'section', 'period'], ['page'])
+def browse_mosts(mode, section, period, page=1):
+    if mode == MODES.PLAYED:
+        items = trakt_api.get_most_played(section, period, page)
+    elif mode == MODES.WATCHED:
+        items = trakt_api.get_most_watched(section, period, page)
+    elif mode == MODES.COLLECTED:
+        items = trakt_api.get_most_collected(section, period, page)
+    make_dir_from_list(section, items, query={'mode': mode, 'section': section, 'period': period}, page=page)
 
 @url_dispatcher.register(MODES.SCRAPERS)
 def scraper_settings():

@@ -810,6 +810,46 @@ msgctxt "#30198"
 msgid "Liked Lists"
 msgstr ""
 
+msgctxt "#30199"
+msgid "%s Mosts"
+msgstr ""
+
+msgctxt "#30200"
+msgid "Most Played This Week"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Most Played This Month"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Most Played All Time"
+msgstr ""
+
+msgctxt "#30203"
+msgid "Most Watched This Week"
+msgstr ""
+
+msgctxt "#30204"
+msgid "Most Watched This Month"
+msgstr ""
+
+msgctxt "#30205"
+msgid "Most Watched All Time"
+msgstr ""
+
+msgctxt "#30206"
+msgid "Most Collected This Week"
+msgstr ""
+
+msgctxt "#30207"
+msgid "Most Collected This Month"
+msgstr ""
+
+msgctxt "#30208"
+msgid "Most Collected All Time"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
@@ -1387,4 +1427,8 @@ msgstr ""
 
 msgctxt "#30640"
 msgid "Show Liked Lists"
+msgstr ""
+
+msgctxt "#30641"
+msgid "Show Mosts"
 msgstr ""

@@ -207,5 +207,15 @@ STRINGS = {
            'addded_to_lib': 30195,
            'add_to_main': 30196,
            'remove_from_main': 30197,
-           'liked_lists': 30198
+           'liked_lists': 30198,
+           'mosts': 30199,
+           'most_played_weekly': 30200,
+           'most_played_monthly': 30201,
+           'most_played_all': 30202,
+           'most_watched_weekly': 30203,
+           'most_watched_monthly': 30204,
+           'most_watched_all': 30205,
+           'most_collected_weekly': 30206,
+           'most_collected_monthly': 30207,
+           'most_collected_all': 30208
 }
