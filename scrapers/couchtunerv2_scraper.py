@@ -26,7 +26,7 @@ from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://couchtuner.at'
 
-class CouchTunerV1_Scraper(scraper.Scraper):
+class CouchTunerV2_Scraper(scraper.Scraper):
     base_url = BASE_URL
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):

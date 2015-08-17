@@ -5,7 +5,7 @@ __all__ = ['scraper', 'local_scraper', 'pw_scraper', 'uflix_scraper', 'watchseri
            'streamtv_scraper', 'moviestorm_scraper', 'wmo_scraper', 'zumvo_scraper', 'wso_scraper', 'tvrelease_scraper', 'hdmz_scraper', 'ch131_scraper', 'watchfree_scraper',
            'pftv_scraper', 'flixanity_scraper', 'cmz_scraper', 'movienight_scraper', 'gvcenter_scraper', 'alluc_scraper', 'afdahorg_scraper', 'xmovies8_scraper',
            'yifystreaming_scraper', 'mintmovies_scraper', 'playbox_scraper', 'shush_proxy', 'mvsnap_scraper', 'pubfilm_scraper', 'pctf_scraper', 'rlssource_scraper',
-           'couchtunerv1_scraper', 'couchtunerv2_scraper', 'tunemovie_scraper']
+           'couchtunerv1_scraper', 'couchtunerv2_scraper', 'tunemovie_scraper', 'watch8now_scraper']
 
 import re
 import os
