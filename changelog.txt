@@ -1,4 +1,4 @@
-[B]Version 1.0.31[/B]
+[B]Version 1.0.32[/B]
 - Add Movie & TV Shows Mosts
 - Add watch8now scraper
 
