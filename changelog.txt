@@ -1,6 +1,7 @@
-[B]Version 1.0.32[/B]
+[B]Version 1.0.33[/B]
 - Add Movie & TV Shows Mosts
 - Add watch8now scraper
+- Fix ororo.tv scraper
 
 [B]Version 1.0.30[/B]
 - Fix pctf scraper
