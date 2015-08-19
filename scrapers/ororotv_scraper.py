@@ -24,6 +24,7 @@ from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import USER_AGENT
 
 BASE_URL = 'http://ororo.tv'
 CATEGORIES = {VIDEO_TYPES.TVSHOW: '2,3', VIDEO_TYPES.MOVIE: '1,3,4'}
@@ -70,6 +71,7 @@ class OroroTV_Scraper(scraper.Scraper):
 
             for match in re.finditer("source src='([^']+)'\s+type='video/([^']+)", html):
                 stream_url, format = match.groups()
+                stream_url = stream_url + '|User-Agent=%s' % (USER_AGENT)
                 hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'url': stream_url, 'quality': quality, 'views': None, 'rating': None, 'format': format, 'direct': True}
                 hosters.append(hoster)
         return hosters
