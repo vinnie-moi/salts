@@ -2,6 +2,10 @@
 - Add Movie & TV Shows Mosts
 - Add watch8now scraper
 - Fix ororo.tv scraper
+- Fix icefilms scraper
+- Fix ocw scraper
+- Fix gvcenter scraper
+- Fix solarmovie scraper
 
 [B]Version 1.0.30[/B]
 - Fix pctf scraper
