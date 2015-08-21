@@ -48,6 +48,7 @@ class IceFilms_Scraper(scraper.Scraper):
         url, query = link.split('?', 1)
         data = urlparse.parse_qs(query, True)
         url = urlparse.urljoin(self.base_url, url)
+        url += '?s=%s&t=%s' % (data['id'][0], data['t'][0])
         html = self._http_get(url, data=data, cache_limit=0)
         match = re.search('url=(.*)', html)
         if match:
