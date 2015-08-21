@@ -24,7 +24,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'HD': QUALITIES.HIGH, 'DVD': QUALITIES.HIGH, 'TV': QUALITIES.HIGH, 'LQ DVD': QUALITIES.MEDIUM, 'CAM': QUALITIES.LOW}
-BASE_URL = 'http://www.solarmovie.is'
+BASE_URL = 'https://www.solarmovie.is'
 
 class Solar_Scraper(scraper.Scraper):
     base_url = BASE_URL
