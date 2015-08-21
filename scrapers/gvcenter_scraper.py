@@ -45,6 +45,7 @@ ANDROID_LEVELS = {'22': '5.1', '21': '5.0', '19': '4.4.4', '18': '4.3.0', '17': 
 COUNTRIES = ['US', 'GB', 'CA', 'DK', 'MX', 'ES', 'JP', 'CN', 'DE', 'GR']
 DATA_KEY = base64.b64decode('M2FiYWFkMjE2NDYzYjc0MQ==')
 FILM_KEY = base64.b64decode('MmIyYTNkNTNkYzdiZjQyNw==')
+GV_USER_AGENT = "Apache-HttpClient/UNAVAILABLE (java 1.4)"
 
 class GVCenter_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -164,7 +165,10 @@ class GVCenter_Scraper(scraper.Scraper):
 
     def _http_get(self, url, data=None, cache_limit=8):
         url += self.__get_extra()
-        result = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
+        headers = {
+                   'User-Agent': GV_USER_AGENT
+        }
+        result = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
         try:
             js_data = json.loads(result)
         except ValueError:
