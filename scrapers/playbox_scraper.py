@@ -140,7 +140,7 @@ class Playbox_Scraper(scraper.Scraper):
             log_utils.log('Invalid JSON returned for: %s' % (url), xbmc.LOGWARNING)
         else:
             force_title = self._force_title(video)
-            if not force_title:
+            if not force_title and 'chapters' in js_data['data']:
                 for chapter in js_data['data']['chapters']:
                     if 'S%02dE%03d' % (int(video.season), int(video.episode)) == chapter['title']:
                         return RESULT_URL % (video.video_type, chapter['id'])
