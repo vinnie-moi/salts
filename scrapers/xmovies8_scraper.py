@@ -24,7 +24,6 @@ from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 
 BASE_URL = 'http://xmovies8.tv'
-SEARCH_URL = 'http://www.google.com/search?q=%s+site:xmovies8.tv'
 
 class XMovies8_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -63,31 +62,23 @@ class XMovies8_Scraper(scraper.Scraper):
         return super(XMovies8_Scraper, self)._default_get_url(video)
 
     def search(self, video_type, title, year):
-        search_url = SEARCH_URL % (urllib.quote_plus('%s %s' % (title, year)))
+        search_url = urlparse.urljoin(self.base_url, '/?s=%s' % urllib.quote_plus(title))
         html = self._http_get(search_url, cache_limit=.25)
         results = []
-        norm_title = self._normalize_title(title)
-        for result in dom_parser.parse_dom(html, 'h3', {'class': 'r'}):
+        for result in dom_parser.parse_dom(html, 'h2'):
             match = re.search('href="([^"]+)"[^>]*>([^<]+)', result)
             if match:
                 url, match_title_year = match.groups()
-                if '/movie/' in url:
-                    match_title_year = match_title_year.replace('Xmovies8: ', '')
-                    match_title_year = re.sub('^Watch ', '', match_title_year)
-                    match = re.search('(.*?)\s+\((\d{4})\)', match_title_year)
-                    if match:
-                        match_title, match_year = match.groups()
-                    else:
-                        match_title = match_title_year
-                        match = re.search('(\d{4})/?$', url)
-                        if match:
-                            match_year = match.group(1)
-                        else:
-                            match_year = ''
+                match = re.search('(.*?)\s+\((\d{4})\)', match_title_year)
+                if match:
+                    match_title, match_year = match.groups()
+                else:
+                    match_title = match_title_year
+                    match_year = ''
 
-                    if norm_title in self._normalize_title(match_title) and (not year or not match_year or year == match_year):
-                        result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
-                        results.append(result)
+                if not year or not match_year or year == match_year:
+                    result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
+                    results.append(result)
         return results
 
     def _http_get(self, url, cookies=None, data=None, cache_limit=8):
