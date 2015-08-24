@@ -50,9 +50,11 @@ class IceFilms_Scraper(scraper.Scraper):
         data = urlparse.parse_qs(query, True)
         url = urlparse.urljoin(self.base_url, url)
         url += '?s=%s&t=%s' % (data['id'][0], data['t'][0])
+        list_url = LIST_URL % (data['t'][0])
         headers = {
-                   'Referer': LIST_URL % (data['t'][0])
+                   'Referer': list_url
         }
+        _html = self._http_get(url, cache_limit=0)
         html = self._http_get(url, data=data, headers=headers, cache_limit=0)
         match = re.search('url=(.*)', html)
         if match:
@@ -75,7 +77,7 @@ class IceFilms_Scraper(scraper.Scraper):
                 match = re.search(pattern, html)
                 frame_url = match.group(1)
                 url = urlparse.urljoin(self.base_url, frame_url)
-                html = self._http_get(url, cache_limit=0)
+                html = self._http_get(url, cache_limit=.5)
 
                 match = re.search('lastChild\.value="([^"]+)"(?:\s*\+\s*"([^"]+))?', html)
                 secret = ''.join(match.groups(''))
