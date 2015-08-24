@@ -28,6 +28,7 @@ from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'HD 720P': QUALITIES.HD720, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH, 'DVD SCREENER': QUALITIES.HIGH}
 BASE_URL = 'http://www.icefilms.info'
+COOKIE_URL = BASE_URL + '/membersonly/components/com_iceplayer/video.php?h=374&w=631&vid=%s&img='
 
 class IceFilms_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -47,9 +48,14 @@ class IceFilms_Scraper(scraper.Scraper):
     def resolve_link(self, link):
         url, query = link.split('?', 1)
         data = urlparse.parse_qs(query, True)
+        cookie_url = COOKIE_URL % (data['t'][0])
+        _html = self._http_get(cookie_url, cache_limit=0)
         url = urlparse.urljoin(self.base_url, url)
         url += '?s=%s&t=%s' % (data['id'][0], data['t'][0])
-        html = self._http_get(url, data=data, cache_limit=0)
+        headers = {
+                   'Referer': cookie_url
+        }
+        html = self._http_get(url, data=data, headers=headers, cache_limit=0)
         match = re.search('url=(.*)', html)
         if match:
             url = urllib.unquote_plus(match.group(1))
@@ -73,8 +79,8 @@ class IceFilms_Scraper(scraper.Scraper):
                 url = urlparse.urljoin(self.base_url, frame_url)
                 html = self._http_get(url, cache_limit=.5)
 
-                match = re.search('lastChild\.value="([^"]+)"', html)
-                secret = match.group(1)
+                match = re.search('lastChild\.value="([^"]+)"\s*\+\s*"([^"]+)', html)
+                secret = match.group(1) + match.group(2)
 
                 match = re.search('"&t=([^"]+)', html)
                 t = match.group(1)
@@ -95,7 +101,7 @@ class IceFilms_Scraper(scraper.Scraper):
                         host = re.sub('(<[^>]+>|</span>)', '', host_fragment)
                         source['host'] = host.lower()
 
-                        url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=999&iqs=&url=&m=-999&cap=&sec=%s&t=%s' % (link_id, secret, t)
+                        url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=-999&iqs=&url=&m=999&cap= &sec=%s&t=%s' % (link_id, secret, t)
                         source['url'] = url
                         sources.append(source)
             except Exception as e:
@@ -140,5 +146,5 @@ class IceFilms_Scraper(scraper.Scraper):
         title_pattern = 'class=star>\s*<a href=([^>]+)>(?:\d+x\d+\s+)+([^<]+)'
         return super(IceFilms_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern)
 
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(IceFilms_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
+    def _http_get(self, url, data=None, headers=None, cache_limit=8):
+        return super(IceFilms_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
