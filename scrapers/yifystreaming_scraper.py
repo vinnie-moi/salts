@@ -57,15 +57,13 @@ class YifyStreaming_Scraper(scraper.Scraper):
             html = self._http_get(url, cache_limit=.5)
             match = re.search('href="([^"]+)">HTML Player<', html)
             if match:
-                match = re.search('i=([^&]+)', match.group(1))
-                if match:
-                    link = base64.decodestring(match.group(1))
-                    if 'picasa' in link:
-                        html = self._http_get(link, cache_limit=.5)
-                        sources = self._parse_google(html)
-                        for source in sources:
-                            hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': sources[source], 'host': self._get_direct_hostname(source), 'rating': None, 'views': None, 'direct': True}
-                            hosters.append(hoster)
+                link = match.group(1)
+                link = link.replace('#038;', '')
+                html = self._http_get(link, cache_limit=.5)
+                for match in re.finditer('<source\s+src="([^"]+)', html):
+                    stream_url = match.group(1)
+                    hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._gv_get_quality(stream_url), 'host': self._get_direct_hostname(stream_url), 'rating': None, 'views': None, 'direct': True}
+                    hosters.append(hoster)
         return hosters
 
     def get_url(self, video):
@@ -94,7 +92,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
         return url
 
     def _get_episode_url(self, show_url, video):
-        search_title = '%s+S%02dE%02d' % (urllib.quote_plus(video.title), int(video.season), int(video.episode))
+        search_title = '%s Season %d Episode %d' % (video.title, int(video.season), int(video.episode))
         results = self.search(video.video_type, search_title, '')
         if results:
             return results[0]['url']
