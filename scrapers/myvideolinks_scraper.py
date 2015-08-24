@@ -24,7 +24,7 @@ from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 
-BASE_URL = 'http://download.myvideolinks.xyz'
+BASE_URL = 'http://movies.myvideolinks.xyz'
 
 class MyVidLinks_Scraper(scraper.Scraper):
     base_url = BASE_URL
