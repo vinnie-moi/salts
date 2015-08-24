@@ -28,7 +28,7 @@ from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'HD 720P': QUALITIES.HD720, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH, 'DVD SCREENER': QUALITIES.HIGH}
 BASE_URL = 'http://www.icefilms.info'
-COOKIE_URL = BASE_URL + '/membersonly/components/com_iceplayer/video.php?h=374&w=631&vid=%s&img='
+LIST_URL = BASE_URL + '/membersonly/components/com_iceplayer/video.php?h=374&w=631&vid=%s&img='
 
 class IceFilms_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -48,12 +48,10 @@ class IceFilms_Scraper(scraper.Scraper):
     def resolve_link(self, link):
         url, query = link.split('?', 1)
         data = urlparse.parse_qs(query, True)
-        cookie_url = COOKIE_URL % (data['t'][0])
-        _html = self._http_get(cookie_url, cache_limit=0)
         url = urlparse.urljoin(self.base_url, url)
         url += '?s=%s&t=%s' % (data['id'][0], data['t'][0])
         headers = {
-                   'Referer': cookie_url
+                   'Referer': LIST_URL % (data['t'][0])
         }
         html = self._http_get(url, data=data, headers=headers, cache_limit=0)
         match = re.search('url=(.*)', html)
@@ -77,10 +75,10 @@ class IceFilms_Scraper(scraper.Scraper):
                 match = re.search(pattern, html)
                 frame_url = match.group(1)
                 url = urlparse.urljoin(self.base_url, frame_url)
-                html = self._http_get(url, cache_limit=.5)
+                html = self._http_get(url, cache_limit=0)
 
-                match = re.search('lastChild\.value="([^"]+)"\s*\+\s*"([^"]+)', html)
-                secret = match.group(1) + match.group(2)
+                match = re.search('lastChild\.value="([^"]+)"(?:\s*\+\s*"([^"]+))?', html)
+                secret = ''.join(match.groups(''))
 
                 match = re.search('"&t=([^"]+)', html)
                 t = match.group(1)
