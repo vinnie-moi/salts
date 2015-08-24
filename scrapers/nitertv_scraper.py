@@ -28,6 +28,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://niter.co'
+PHP_URL = BASE_URL + '/player/pk/pk/plugins/player_p2.php'
 MAX_TRIES = 3
 
 class Niter_Scraper(scraper.Scraper):
@@ -48,12 +49,6 @@ class Niter_Scraper(scraper.Scraper):
         return 'niter.tv'
 
     def resolve_link(self, link):
-        if 'vidbux' not in link:
-            html = self._http_get(link, cache_limit=.5)
-            match = re.search('file\s*:\s*"([^"]+)', html)
-            if match:
-                return match.group(1)
-        
         return link
 
     def format_source_label(self, item):
@@ -66,7 +61,7 @@ class Niter_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
 
-            match = re.search('emb=([^<]+)', html)
+            match = re.search('((?:pic|emb|vb)=[^<]+)', html)
             if match:
                 embeds = match.group(1)
                 for stream_url in embeds.split('&'):
@@ -74,11 +69,33 @@ class Niter_Scraper(scraper.Scraper):
                         stream_url = 'http://www.vidbux.com/%s' % (stream_url[3:])
                         host = 'vidbux.com'
                         direct = False
-                    else:
+                        quality = self._get_quality(video, host, QUALITIES.HD1080)
+                    elif stream_url.startswith('pic='):
+                        data = {'url': stream_url[4:]}
+                        html = self._http_get(PHP_URL, data=data, auth=False, cache_limit=0)
+                        try:
+                            js_data = json.loads(html)
+                        except ValueError:
+                            log_utils.log('Invalid JSON returned: %s (%s): %s' % (PHP_URL, stream_url, html), xbmc.LOGWARNING)
+                            continue
+                        else:
+                            host = self._get_direct_hostname(stream_url)
+                            direct = True
+                            for item in js_data:
+                                if 'medium' in item and item['medium'] == 'video':
+                                    stream_url = item['url']
+                                    quality = self._width_get_quality(item['width'])
+                                    break
+                            else:
+                                continue
+                    elif stream_url.startswith('emb='):
                         stream_url = stream_url.replace('emb=', '')
                         host = self._get_direct_hostname(stream_url)
                         direct = True
-                    quality = self._get_quality(video, host, QUALITIES.HD1080)
+                        quality = self._get_quality(video, host, QUALITIES.HD1080)
+                    else:
+                        continue
+
                     hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': direct}
                     hosters.append(hoster)
         return hosters
