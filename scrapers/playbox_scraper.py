@@ -29,9 +29,9 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://playboxhd.com/'
-SEARCH_URL = '/api/box?type=search&keyword=%s&os=Android&v=2.0.1&k=0'
-DETAIL_URL = '/api/box?type=detail&id=%s&os=Android&v=2.0.1&k=0'
-STREAM_URL = '/api/box?type=stream&id=%s&os=Android&v=2.0.1&k=0'
+SEARCH_URL = '/api/box?type=search&keyword=%s&os=Android&v=2.0.2&k=0'
+DETAIL_URL = '/api/box?type=detail&id=%s&os=Android&v=2.0.2&k=0'
+STREAM_URL = '/api/box?type=stream&id=%s&os=Android&v=2.0.2&k=0'
 PB_KEY = base64.decodestring('cXdlcnR5dWlvcGFzZGZnaGprbHp4YzEyMzQ1Njc4OTA=')
 IV = '\0' * 16
 
@@ -89,8 +89,9 @@ class Playbox_Scraper(scraper.Scraper):
                             direct = True
                             quality = self._gv_get_quality(stream_url)
                             host = self._get_direct_hostname(stream_url)
+                            if 'http' not in stream_url: continue
                         elif stream['server'] == 'amvideo':
-                            for match in re.finditer('<IFRAME\s+SRC="([^"]+)', stream_url):
+                            for match in re.finditer('<iframe\s+src="([^"]+)', stream_url, re.I):
                                 embed_url = match.group(1)
                                 host = urlparse.urlparse(embed_url).hostname.lower()
                                 quality = self._get_quality(video, host, QUALITIES.HIGH)
@@ -99,9 +100,12 @@ class Playbox_Scraper(scraper.Scraper):
                                 sources.append(source)
                             continue
                         else:
-                            direct = False
-                            host = urlparse.urlparse(stream_url).hostname.lower()
-                            quality = self._get_quality(video, host, QUALITIES.HIGH)
+                            try:
+                                direct = False
+                                host = urlparse.urlparse(stream_url).hostname.lower()
+                                quality = self._get_quality(video, host, QUALITIES.HIGH)
+                            except:
+                                continue
                         source = {'multi-part': False, 'url': stream_url, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'direct': direct}
                         if 'quality' in stream: source['resolution'] = stream['quality']
                         sources.append(source)
