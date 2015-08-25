@@ -1,4 +1,4 @@
-[B]Version 1.0.35[/B]
+[B]Version 1.0.36[/B]
 - Add Movie & TV Shows Mosts
 - Add watch8now scraper
 - Fix ororo.tv scraper
@@ -8,6 +8,16 @@
 - Fix solarmovie scraper
 - Fix playbox scraper
 - Fix yify-streaming scraper
+- Improve gvcenter scraper
+- Fix mvl scraper
+- Improve iwatchonline scraper
+- Improve moviestorm scraper
+- Improve niter scraper
+- Fix view47 scraper
+- Improve viooz scraper
+- Fix clickplay scraper
+- Fix pftv scraper
+-  Fix couchtunerV2 scraper
 
 [B]Version 1.0.30[/B]
 - Fix pctf scraper
