@@ -65,7 +65,6 @@ class CouchTunerV2_Scraper(scraper.Scraper):
             html = self._http_get(url, cache_limit=.5)
     
             for table_cell in dom_parser.parse_dom(html, 'td', {'class': 'domain'}):
-                print table_cell
                 match = re.search('href="([^"]+)(?:[^>]+>)+\s*(.*?)\s*</a>', table_cell)
                 if match:
                     link, host = match.groups()
