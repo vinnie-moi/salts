@@ -90,8 +90,8 @@ class Niter_Scraper(scraper.Scraper):
                                 continue
                     elif stream_url.startswith('emb='):
                         stream_url = stream_url.replace('emb=', '')
-                        host = self._get_direct_hostname(stream_url)
-                        direct = True
+                        host = urlparse.urlparse(stream_url).hostname
+                        direct = False
                         quality = self._get_quality(video, host, QUALITIES.HD1080)
                     else:
                         continue

@@ -46,20 +46,22 @@ class View47_Scraper(scraper.Scraper):
         return 'view47'
 
     def resolve_link(self, link):
-            url = urlparse.urljoin(self.base_url, link)
-            html = self._http_get(url, cache_limit=.5)
-            match = re.search('file\s*:\s*"([^"]+)', html)
+        url = urlparse.urljoin(self.base_url, link)
+        html = self._http_get(url, cache_limit=.5)
+        match = re.search('file\s*:\s*"([^"]+)', html)
+        if match:
+            return match.group(1)
+        else:
+            match = re.search('<iframe[^<]*src="([^"]+)', html)
             if match:
                 return match.group(1)
             else:
-                match = re.search('<iframe[^<]*src="([^"]+)', html)
+                match = re.search('proxy\.link=([^"]+)', html)
                 if match:
                     return match.group(1)
-                else:
-                    match = re.search('proxy\.link=([^"]+)', html)
-                    if match:
-                        return match.group(1)
-
+        
+        return link
+        
     def format_source_label(self, item):
         return '[%s] %s' % (item['quality'], item['host'])
 
@@ -71,16 +73,13 @@ class View47_Scraper(scraper.Scraper):
             html = self._http_get(url, cache_limit=.5)
             div = dom_parser.parse_dom(html, 'ul', {'class': 'css_server'})
             if div:
-                div = div[0]
-                for match in re.finditer('href="([^"]+)(?:.*?>){3}([^<]+)', div):
+                for match in re.finditer('href="([^"]+).*?/>(.*?)</p>', div[0]):
                     stream_url, host = match.groups()
-                    print stream_url, host
                     host = host.lower()
                     if host == 'picasa':
                         direct = True
+                        host = 'gvideo'
                         quality = QUALITIES.MEDIUM
-                    elif host == '1':
-                        continue
                     else:
                         quality = self._get_quality(video, host, QUALITIES.MEDIUM)
                         direct = False
