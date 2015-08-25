@@ -79,17 +79,16 @@ class ClickPlay_Scraper(scraper.Scraper):
 
     def _get_episode_url(self, show_url, video):
         season_url = show_url + 'season-%d/' % (int(video.season))
-        episode_pattern = 'href="([^"]+/season-%d/episode-%d[^"]+)' % (int(video.season), int(video.episode))
+        episode_pattern = 'href="([^"]+/season-%d/episode-%d-[^"]+)' % (int(video.season), int(video.episode))
         title_pattern = 'href="([^"]+)"\s+title="[^"]+/\s*([^"]+)'
         return super(ClickPlay_Scraper, self)._default_get_episode_url(season_url, video, episode_pattern, title_pattern)
 
     def search(self, video_type, title, year):
-        url = urlparse.urljoin(self.base_url, '/search/')
-        url += urllib.quote(title)
+        url = urlparse.urljoin(self.base_url, '/tv-series-a-z-list')
         html = self._http_get(url, cache_limit=8)
 
         results = []
-        pattern = 'href="([^"]+)"\s+class="article.*?class="article-title">([^<]+)'
+        pattern = '<li>\s*<a.*?href="([^"]+)[^>]*>([^<]+)'
         norm_title = self._normalize_title(title)
         for match in re.finditer(pattern, html, re.DOTALL):
             url, match_title_year = match.groups()
