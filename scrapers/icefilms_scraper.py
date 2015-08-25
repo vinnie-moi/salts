@@ -22,6 +22,7 @@ import urlparse
 import HTMLParser
 import string
 import xbmcaddon
+import random
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
@@ -54,7 +55,7 @@ class IceFilms_Scraper(scraper.Scraper):
         headers = {
                    'Referer': list_url
         }
-        _html = self._http_get(url, cache_limit=0)
+        #_html = self._http_get(list_url, cache_limit=0)
         html = self._http_get(url, data=data, headers=headers, cache_limit=0)
         match = re.search('url=(.*)', html)
         if match:
@@ -77,7 +78,7 @@ class IceFilms_Scraper(scraper.Scraper):
                 match = re.search(pattern, html)
                 frame_url = match.group(1)
                 url = urlparse.urljoin(self.base_url, frame_url)
-                html = self._http_get(url, cache_limit=.5)
+                html = self._http_get(url, cache_limit=.1)
 
                 match = re.search('lastChild\.value="([^"]+)"(?:\s*\+\s*"([^"]+))?', html)
                 secret = ''.join(match.groups(''))
@@ -100,8 +101,10 @@ class IceFilms_Scraper(scraper.Scraper):
                         source = {'multi-part': False, 'quality': quality, 'class': self, 'label': label, 'rating': None, 'views': None, 'direct': False}
                         host = re.sub('(<[^>]+>|</span>)', '', host_fragment)
                         source['host'] = host.lower()
+                        s = 1000 + random.randint(1, 100)
+                        m = s + random.randint(1, 100)
 
-                        url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=-999&iqs=&url=&m=999&cap= &sec=%s&t=%s' % (link_id, secret, t)
+                        url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=%s&iqs=&url=&m=%s&cap= &sec=%s&t=%s' % (link_id, s, m, secret, t)
                         source['url'] = url
                         sources.append(source)
             except Exception as e:
