@@ -27,6 +27,7 @@ import xbmcvfs
 import urlresolver
 import json
 import xml.etree.ElementTree as ET
+from Queue import Queue, Empty
 from salts_lib.db_utils import DB_Connection
 from salts_lib.url_dispatcher import URL_Dispatcher
 from salts_lib.srt_scraper import SRT_Scraper
@@ -659,7 +660,7 @@ def get_progress(cache_override=False):
     worker_count = 0
     workers = []
     shows = {}
-    q = utils.Queue()
+    q = Queue()
     begin = time.time()
     for watched in watched_list:
         if watched['show']['ids']['trakt'] in hidden:
@@ -690,7 +691,7 @@ def get_progress(cache_override=False):
             if max_timeout > 0:
                 timeout = max_timeout - (time.time() - begin)
                 if timeout < 0: timeout = 0
-        except utils.Empty:
+        except Empty:
             log_utils.log('Get Progress Process Timeout', xbmc.LOGWARNING)
             break
     else:
@@ -926,7 +927,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
     max_results = int(kodi.get_setting('source_results'))
     worker_count = 0
     workers = []
-    q = utils.Queue()
+    q = Queue()
     begin = time.time()
     fails = {}
     video = ScraperVideo(video_type, title, year, trakt_id, season, episode, ep_title, ep_airdate)
@@ -952,7 +953,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
             if max_timeout > 0:
                 timeout = max_timeout - (time.time() - begin)
                 if timeout < 0: timeout = 0
-        except utils.Empty:
+        except Empty:
             log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
             utils.record_timeouts(fails)
             got_timeouts = True
@@ -1234,7 +1235,7 @@ def set_related_url(mode, video_type, title, year, trakt_id, season='', episode=
     worker_count = 0
     workers = []
     related_list = []
-    q = utils.Queue()
+    q = Queue()
     begin = time.time()
     video = ScraperVideo(video_type, title, year, trakt_id, season, episode, ep_title, ep_airdate)
     with gui_utils.ProgressDialog(i18n('set_related_url'), utils.make_progress_msg(video_type, title, year, season, episode)) as pd:
@@ -1269,7 +1270,7 @@ def set_related_url(mode, video_type, title, year, trakt_id, season='', episode=
                 if max_timeout > 0:
                     timeout = max_timeout - (time.time() - begin)
                     if timeout < 0: timeout = 0
-            except utils.Empty:
+            except Empty:
                 log_utils.log('Get Url Timeout', xbmc.LOGWARNING)
                 utils.record_timeouts(fails)
                 break

@@ -35,6 +35,7 @@ from trans_utils import i18n
 from scrapers import *  # import all scrapers into this namespace
 from trakt_api import Trakt_API
 from db_utils import DB_Connection
+import threading
 
 ICON_PATH = os.path.join(kodi.get_path(), 'icon.png')
 SORT_FIELDS = [(SORT_LIST[int(kodi.get_setting('sort1_field'))], SORT_SIGNS[kodi.get_setting('sort1_order')]),
@@ -44,21 +45,6 @@ SORT_FIELDS = [(SORT_LIST[int(kodi.get_setting('sort1_field'))], SORT_SIGNS[kodi
                 (SORT_LIST[int(kodi.get_setting('sort5_field'))], SORT_SIGNS[kodi.get_setting('sort5_order')])]
 
 last_check = datetime.datetime.fromtimestamp(0)
-
-P_MODE = int(kodi.get_setting('parallel_mode'))
-if P_MODE in [P_MODES.THREADS, P_MODES.NONE]:
-    import threading
-    from Queue import Queue, Empty
-elif P_MODE == P_MODES.PROCESSES:
-    try:
-        import multiprocessing
-        from multiprocessing import Queue
-        from Queue import Empty
-    except ImportError:
-        import threading
-        from Queue import Queue, Empty
-        P_MODE = P_MODES.THREADS
-        kodi.notify(msg='Process Mode not supported on this platform falling back to Thread Mode', duration=7500)
 
 TOKEN = kodi.get_setting('trakt_oauth_token')
 use_https = kodi.get_setting('use_https') == 'true'
@@ -405,17 +391,9 @@ def make_source_sort_string(sort_key):
     return sort_string
 
 def start_worker(q, func, args):
-    if P_MODE == P_MODES.THREADS:
-        worker = threading.Thread(target=func, args=([q] + args))
-    elif P_MODE == P_MODES.PROCESSES:
-        worker = multiprocessing.Process(target=func, args=([q] + args))
-    else:
-        worker = None
-        func(*([q] + args))
-
-    if worker:
-        worker.daemon = True
-        worker.start()
+    worker = threading.Thread(target=func, args=([q] + args))
+    worker.daemon = True
+    worker.start()
     return worker
 
 def reap_workers(workers, timeout=0):
@@ -434,11 +412,7 @@ def reap_workers(workers, timeout=0):
     return living_workers
 
 def parallel_get_sources(q, scraper, video):
-    if P_MODE == P_MODES.PROCESSES:
-        worker = multiprocessing.current_process()
-    else:
-        worker = threading.current_thread()
-
+    worker = threading.current_thread()
     log_utils.log('Worker: %s (%s) for %s sources' % (worker.name, worker, scraper.get_name()), log_utils.LOGDEBUG)
     hosters = scraper.get_sources(video)
     log_utils.log('%s returned %s sources from %s' % (scraper.get_name(), len(hosters), worker), log_utils.LOGDEBUG)
@@ -446,11 +420,7 @@ def parallel_get_sources(q, scraper, video):
     q.put(result)
 
 def parallel_get_url(q, scraper, video):
-    if P_MODE == P_MODES.PROCESSES:
-        worker = multiprocessing.current_process()
-    else:
-        worker = threading.current_thread()
-
+    worker = threading.current_thread()
     log_utils.log('Worker: %s (%s) for %s url' % (worker.name, worker, scraper.get_name()), log_utils.LOGDEBUG)
     url = scraper.get_url(video)
     log_utils.log('%s returned url %s from %s' % (scraper.get_name(), url, worker), log_utils.LOGDEBUG)
@@ -459,11 +429,7 @@ def parallel_get_url(q, scraper, video):
     q.put(related)
 
 def parallel_get_progress(q, trakt_id, cached):
-    if P_MODE == P_MODES.PROCESSES:
-        worker = multiprocessing.current_process()
-    else:
-        worker = threading.current_thread()
-
+    worker = threading.current_thread()
     log_utils.log('Worker: %s (%s) for %s progress' % (worker.name, worker, trakt_id), log_utils.LOGDEBUG)
     progress = trakt_api.get_show_progress(trakt_id, full=True, cached=cached)
     progress['trakt'] = trakt_id  # add in a hacked show_id to be used to match progress up to the show its for

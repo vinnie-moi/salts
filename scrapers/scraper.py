@@ -41,17 +41,7 @@ from salts_lib.constants import QUALITIES
 from salts_lib.constants import HOST_Q
 from salts_lib.constants import Q_ORDER
 from salts_lib.constants import BLOG_Q_MAP
-from salts_lib.constants import P_MODES
-
-P_MODE = int(xbmcaddon.Addon().getSetting('parallel_mode'))
-if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
-    import threading
-elif P_MODE == P_MODES.PROCESSES:
-    try:
-        import multiprocessing
-    except ImportError:
-        import threading
-        P_MODE = P_MODES.THREADS
+import threading
 
 BASE_URL = ''
 CAPTCHA_BASE_URL = 'http://www.google.com/recaptcha/api'
@@ -632,11 +622,7 @@ class Scraper(object):
         return plain_text
     
     def create_db_connection(self):
-        if P_MODE in [P_MODES.NONE, P_MODES.THREADS]:
-            worker_id = threading.current_thread().ident
-        elif P_MODE == P_MODES.PROCESSES:
-            worker_id = multiprocessing.current_process().pid
-
+        worker_id = threading.current_thread().ident
         # create a connection if we don't have one or it was created in a different worker
         if self.db_connection is None or self.worker_id != worker_id:
             self.db_connection = DB_Connection()

@@ -854,10 +854,6 @@ msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
 
-msgctxt "#30501"
-msgid "Parallel Mode"
-msgstr ""
-
 msgctxt "#30502"
 msgid "Calendar Start Day (0=Today)"
 msgstr ""
