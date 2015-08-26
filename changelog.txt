@@ -1,3 +1,12 @@
+[B]Version 1.0.37[/B]
+- Improve icefilms scraper
+- Improve view47 and niter scrapers
+- Removed None and Process Parallel modes
+- Add setting to show authorized trakt user
+- Add option to test direct streams before including them in results
+- Fix streamallthis scraper
+- Improve GVCenter scraper
+
 [B]Version 1.0.36[/B]
 - Add Movie & TV Shows Mosts
 - Add watch8now scraper
