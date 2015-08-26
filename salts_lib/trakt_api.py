@@ -278,6 +278,11 @@ class Trakt_API():
             params['page'] += 1
         return result
     
+    def get_user_profile(self, username=None, cached=True):
+        if username is None: username = 'me'
+        url = '/users/%s' % (username)
+        return self.__call_trakt(url, cached=cached)
+        
     def get_bookmarks(self):
         url = '/sync/playback'
         return self.__call_trakt(url, cached=False)
@@ -309,15 +314,6 @@ class Trakt_API():
                 data[TRAKT_SECTIONS[section]][0].update({'rating': int(rating)})
 
         self.__call_trakt(url, data=data, cache_limit=0)
-
-    def __get_user_attributes(self, item):
-        show = {}
-        if 'watched' in item: show['watched'] = item['watched']
-        if 'in_collection' in item: show['in_collection'] = item['in_collection']
-        if 'in_watchlist' in item: show['in_watchlist'] = item['in_watchlist']
-        if 'rating' in item: show['rating'] = item['rating']
-        if 'rating_advanced' in item: show['rating_advanced'] = item['rating_advanced']
-        return show
 
     def __manage_list(self, action, section, slug, items):
         url = '/users/me/lists/%s/items' % (slug)

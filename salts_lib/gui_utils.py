@@ -92,6 +92,8 @@ def get_pin():
                     result = trakt_api.get_token(pin=pin)
                     kodi.set_setting('trakt_oauth_token', result['access_token'])
                     kodi.set_setting('trakt_refresh_token', result['refresh_token'])
+                    profile = trakt_api.get_user_profile(cached=False)
+                    kodi.set_setting('trakt_user', '%s (%s)' % (profile['username'], profile['name']))
                     return True
                 except:
                     return False

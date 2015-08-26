@@ -44,7 +44,8 @@
 	</category>
 
 	<category label="Trakt.tv">
-	    <setting id="get_pin" label="30547" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close"/>
+	    <setting id="get_pin" label="30547" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close" visible="eq(1,))"/>
+	    <setting id="trakt_user" label="30501" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close" visible="!eq(0,)"/>
 	    <setting id="use_https" type="bool" label="30548" default="false"/>
 		<setting id="trakt_timeout" type="slider" label="30549" default="30" range="0,120" option="int"/>
 		<setting id="list_size" type="slider" label="30550" default="30" range="1,100" option="int"/>

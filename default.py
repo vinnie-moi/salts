@@ -65,6 +65,9 @@ def main_menu():
         now = int(time.time())
         if last_reminder >= 0 and last_reminder < now - (24 * 60 * 60):
             gui_utils.get_pin()
+    else:
+        profile = trakt_api.get_user_profile()
+        kodi.set_setting('trakt_user', '%s (%s)' % (profile['username'], profile['name']))
             
     kodi.end_of_directory()
 

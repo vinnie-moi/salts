@@ -854,6 +854,10 @@ msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
 
+msgctxt "#30501"
+msgid "Authorized Trakt User"
+msgstr ""
+
 msgctxt "#30502"
 msgid "Calendar Start Day (0=Today)"
 msgstr ""
