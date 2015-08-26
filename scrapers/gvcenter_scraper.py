@@ -89,7 +89,7 @@ class GVCenter_Scraper(scraper.Scraper):
                 for film in js_data['listvideos']:
                     source_url = SOURCE_URL % (film['film_id'])
                     url = urlparse.urljoin(self.base_url, source_url)
-                    time.sleep(2)
+                    time.sleep(1.5)
                     html = self._http_get(url, cache_limit=.5)
                     try:
                         film_js = json.loads(html)

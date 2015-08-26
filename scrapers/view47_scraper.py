@@ -24,6 +24,7 @@ import time
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import USER_AGENT
 
 BASE_URL = 'http://view47.com'
 EPID_URL = '/ip.temp/swf/plugins/ipplugins.php'
@@ -60,8 +61,6 @@ class View47_Scraper(scraper.Scraper):
                 if match:
                     return match.group(1)
         
-        return link
-        
     def format_source_label(self, item):
         return '[%s] %s' % (item['quality'], item['host'])
 
@@ -77,6 +76,7 @@ class View47_Scraper(scraper.Scraper):
                     stream_url, host = match.groups()
                     host = host.lower()
                     if host == 'picasa':
+                        stream_url = stream_url + '|User-Agent=%s' % (USER_AGENT)
                         direct = True
                         host = 'gvideo'
                         quality = QUALITIES.MEDIUM

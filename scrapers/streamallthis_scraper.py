@@ -100,7 +100,7 @@ class Stream_Scraper(scraper.Scraper):
     def __set_quality(self, height):
         height = int(height)
         if height >= 720:
-            quality = QUALITIES.HD
+            quality = QUALITIES.HD720
         elif height >= 480:
             quality = QUALITIES.HIGH
         else:

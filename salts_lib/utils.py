@@ -29,6 +29,8 @@ import log_utils
 import sys
 import urlparse
 import urllib
+import urllib2
+import traceback
 import kodi
 from constants import *
 from trans_utils import i18n
@@ -327,11 +329,7 @@ def filter_quality(video_type, hosters):
     else:
         keep_qual = [QUALITIES.LOW, QUALITIES.MEDIUM, QUALITIES.HIGH]
 
-    filtered_hosters = []
-    for hoster in hosters:
-        if hoster['quality'] in keep_qual:
-            filtered_hosters.append(hoster)
-    return filtered_hosters
+    return [hoster for hoster in hosters if hoster['quality'] in keep_qual]
 
 def get_sort_key(item):
     item_sort_key = []
@@ -415,6 +413,7 @@ def parallel_get_sources(q, scraper, video):
     worker = threading.current_thread()
     log_utils.log('Worker: %s (%s) for %s sources' % (worker.name, worker, scraper.get_name()), log_utils.LOGDEBUG)
     hosters = scraper.get_sources(video)
+    hosters = [hoster for hoster in hosters if not hoster['direct'] or test_stream(hoster)]
     log_utils.log('%s returned %s sources from %s' % (scraper.get_name(), len(hosters), worker), log_utils.LOGDEBUG)
     result = {'name': scraper.get_name(), 'hosters': hosters}
     q.put(result)
@@ -435,6 +434,36 @@ def parallel_get_progress(q, trakt_id, cached):
     progress['trakt'] = trakt_id  # add in a hacked show_id to be used to match progress up to the show its for
     log_utils.log('Got progress for %s from %s' % (trakt_id, worker), log_utils.LOGDEBUG)
     q.put(progress)
+
+def test_stream(hoster):
+    # parse_qsl doesn't work because it splits elements by ';' which can be in a non-quoted UA
+    try: headers = dict([item.split('=') for item in (hoster['url'].split('|')[1]).split('&')])
+    except: headers = {}
+    log_utils.log('Testing Stream: %s from %s using Headers: %s' % (hoster['url'], hoster['class'].get_name(), headers), xbmc.LOGDEBUG)
+    request = urllib2.Request(hoster['url'].split('|')[0], headers=headers)
+
+    #  set urlopen timeout to 10 seconds
+    try: http_code = urllib2.urlopen(request, timeout=1).getcode()
+    except urllib2.URLError as e:
+        # treat an unhandled url type as success
+        if hasattr(e, 'reason') and 'unknown url type' in str(e.reason).lower():
+            return True
+        else:
+            if isinstance(e, urllib2.HTTPError):
+                http_code = e.code
+            else:
+                http_code = 600
+    except Exception as e:
+        if 'unknown url type' in str(e).lower():
+            return True
+        else:
+            log_utils.log('Exception during test_stream: (%s) %s' % (type(e).__name__, e), xbmc.LOGDEBUG)
+            http_code = 601
+
+    if int(http_code) >= 400:
+        log_utils.log('Test Stream Failed: Url: %s HTTP Code: %s' % (hoster['url'], http_code), xbmc.LOGDEBUG)
+
+    return int(http_code) < 400
 
 # Run a task on startup. Settings and mode values must match task name
 def do_startup_task(task):
