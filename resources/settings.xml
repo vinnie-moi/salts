@@ -94,6 +94,7 @@
 		<setting id="source_timeout" type="slider" label="30578" default="10" range="0,120" option="int"/>
 		<setting id="source_results" type="number" label="30579" default="0"/>
 		<setting id="filter_unusable" type="number" label="30580" default="50"/>
+        <setting id="filter_direct" type="bool" label="30551" default="false"/>
 		<setting id="excl_list" type="text" label="30581" default=""/>
 		<setting id="Episode_quality" type="enum" label="30582" values="HD &amp; SD|HD Only|SD Only" default="0" visible="true"/>
 		<setting id="Movie_quality" type="enum" label="30583" values="HD &amp; SD|HD Only|SD Only" default="0" visible="true"/>

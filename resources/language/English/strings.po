@@ -1056,7 +1056,9 @@ msgctxt "#30550"
 msgid "Trakt Page Size"
 msgstr ""
 
-# 30551 removed
+msgctxt "#30551"
+msgid "Pre-Test All Direct Sources"
+msgstr ""
 
 msgctxt "#30552"
 msgid "Use Trakt Bookmarks"
