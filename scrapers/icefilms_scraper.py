@@ -111,7 +111,6 @@ class IceFilms_Scraper(scraper.Scraper):
                         m = m_start + random.randint(1, 100)
 
                         url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=%s&iqs=&url=&m=%s&cap= &sec=%s&t=%s' % (link_id, s, m, secret, t)
-                        print url
                         source['url'] = url
                         sources.append(source)
             except Exception as e:
