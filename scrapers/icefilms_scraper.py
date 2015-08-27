@@ -85,6 +85,12 @@ class IceFilms_Scraper(scraper.Scraper):
 
                 match = re.search('"&t=([^"]+)', html)
                 t = match.group(1)
+                
+                match = re.search('(?:\s+|,)s\s*=(\d+)', html)
+                s_start = int(match.group(1))
+                
+                match = re.search('(?:\s+|,)m\s*=(\d+)', html)
+                m_start = int(match.group(1))
 
                 pattern = '<div class=ripdiv>(.*?)</div>'
                 for container in re.finditer(pattern, html):
@@ -101,10 +107,11 @@ class IceFilms_Scraper(scraper.Scraper):
                         source = {'multi-part': False, 'quality': quality, 'class': self, 'label': label, 'rating': None, 'views': None, 'direct': False}
                         host = re.sub('(<[^>]+>|</span>)', '', host_fragment)
                         source['host'] = host.lower()
-                        s = 1000 + random.randint(1, 100)
-                        m = s + random.randint(1, 100)
+                        s = s_start + random.randint(1, 100)
+                        m = m_start + random.randint(1, 100)
 
                         url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=%s&iqs=&url=&m=%s&cap= &sec=%s&t=%s' % (link_id, s, m, secret, t)
+                        print url
                         source['url'] = url
                         sources.append(source)
             except Exception as e:
