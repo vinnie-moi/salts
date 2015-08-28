@@ -30,6 +30,7 @@ import base64
 from StringIO import StringIO
 import gzip
 import datetime
+import json
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
 from salts_lib import cloudflare
@@ -599,13 +600,25 @@ class Scraper(object):
         else:
             return self.get_name()
     
-    def _parse_google(self, html):
-        pattern = '"url"\s*:\s*"([^"]+)"\s*,\s*"height"\s*:\s*\d+\s*,\s*"width"\s*:\s*(\d+)\s*,\s*"type"\s*:\s*"video/'
-        sources = {}
-        for match in re.finditer(pattern, html):
-            url, width = match.groups()
-            url = url.replace('%3D', '=')
-            sources[url] = self._width_get_quality(width)
+    def _parse_google(self, link):
+        sources = []
+        i = link.rfind('#')
+        if i > -1:
+            link_id = link[i + 1:]
+            html = self._http_get(link, cache_limit=.5)
+            match = re.search('feedPreload:\s*(.*}]}})},', html, re.DOTALL)
+            if match:
+                try:
+                    js = json.loads(match.group(1))
+                except ValueError:
+                    log_utils.log('Invalid JSON returned for: %s' % (link), xbmc.LOGWARNING)
+                else:
+                    for item in js['feed']['entry']:
+                        if item['gphoto$id'] == link_id:
+                            for media in item['media']['content']:
+                                if media['type'].startswith('video'):
+                                    sources.append(media['url'].replace('%3D', '='))
+
         return sources
 
     def _gk_decrypt(self, key, cipher_link):

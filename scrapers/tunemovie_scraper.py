@@ -83,7 +83,7 @@ class TuneMovie_Scraper(scraper.Scraper):
                     if 'google' in host:
                         sources = self.__get_google_links(link)
                         for source in sources:
-                            hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': sources[source], 'host': self._get_direct_hostname(source), 'rating': None, 'views': views, 'direct': True}
+                            hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': self._gv_get_quality(source), 'host': self._get_direct_hostname(source), 'rating': None, 'views': views, 'direct': True}
                             hosters.append(hoster)
                     else:
                             hoster = {'multi-part': False, 'url': link, 'class': self, 'quality': self._get_quality(video, host, QUALITIES.HIGH), 'host': host, 'rating': None, 'views': views, 'direct': False}
@@ -99,8 +99,7 @@ class TuneMovie_Scraper(scraper.Scraper):
             match = re.search('proxy\.link=tunemovie\*([^&]+)', base64.b64decode(match.group(1)))
             if match:
                 picasa_url = self._gk_decrypt(GK_KEY, match.group(1))
-                html = self._http_get(picasa_url, cache_limit=.5)
-                sources = self._parse_google(html)
+                sources = self._parse_google(picasa_url)
         return sources
 
     def get_url(self, video):
