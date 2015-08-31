@@ -23,6 +23,7 @@ import HTMLParser
 import string
 import xbmcaddon
 import random
+import xbmcgui
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
@@ -55,10 +56,12 @@ class IceFilms_Scraper(scraper.Scraper):
         headers = {
                    'Referer': list_url
         }
-        #_html = self._http_get(list_url, cache_limit=0)
+        ad_url = urllib.unquote(data['ad_url'][0])
+        del data['ad_url']
         html = self._http_get(url, data=data, headers=headers, cache_limit=0)
         match = re.search('url=(.*)', html)
         if match:
+            self.__show_ice_ad(ad_url)
             url = urllib.unquote_plus(match.group(1))
             return url
 
@@ -91,6 +94,9 @@ class IceFilms_Scraper(scraper.Scraper):
                 
                 match = re.search('(?:\s+|,)m\s*=(\d+)', html)
                 m_start = int(match.group(1))
+                
+                match = re.search('<iframe[^>]*src="([^"]+)', html)
+                ad_url = urllib.quote(match.group(1))
 
                 pattern = '<div class=ripdiv>(.*?)</div>'
                 for container in re.finditer(pattern, html):
@@ -108,9 +114,9 @@ class IceFilms_Scraper(scraper.Scraper):
                         host = re.sub('(<[^>]+>|</span>)', '', host_fragment)
                         source['host'] = host.lower()
                         s = s_start + random.randint(1, 100)
-                        m = m_start + random.randint(1, 100)
+                        m = m_start + (s - s_start) + random.randint(1, 100)
 
-                        url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=%s&iqs=&url=&m=%s&cap= &sec=%s&t=%s' % (link_id, s, m, secret, t)
+                        url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=%s&iqs=&url=&m=%s&cap= &sec=%s&t=%s&ad_url=%s' % (link_id, s, m, secret, t, ad_url)
                         source['url'] = url
                         sources.append(source)
             except Exception as e:
@@ -157,3 +163,28 @@ class IceFilms_Scraper(scraper.Scraper):
 
     def _http_get(self, url, data=None, headers=None, cache_limit=8):
         return super(IceFilms_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
+
+    def __show_ice_ad(self, ad_url):
+        try:
+            wdlg = xbmcgui.WindowDialog()
+            if not ad_url.startswith('http:'): ad_url = 'http:' + ad_url
+            html = self._http_get(ad_url, cache_limit=0)
+            for match in re.finditer("<img\s+src='([^']+)'\s+width='(\d+)'\s+height='(\d+)'", html):
+                img_url, width, height = match.groups()
+                width = int(width)
+                height = int(height)
+                if width > 0 and height > 0:
+                    left = (1280 - width) / 2
+                    img = xbmcgui.ControlImage(left, 0, width, height, img_url)
+                    wdlg.addControl(img)
+                else:
+                    _html = self._http_get(img_url, cache_limit=0)
+
+            wdlg.show()
+            dialog = xbmcgui.Dialog()
+            dialog.ok('Stream All The Sources', 'Continue to Video')
+            match = re.search("href='([^']+)", html)
+            if match:
+                _html = self._http_get(match.group(1), cache_limit=0)
+        finally:
+            wdlg.close()
