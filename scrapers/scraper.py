@@ -257,6 +257,9 @@ class Scraper(object):
             if not allow_redirect:
                 opener = urllib2.build_opener(NoRedirection)
                 urllib2.install_opener(opener)
+            else:
+                opener = urllib2.build_opener(urllib2.HTTPRedirectHandler)
+                urllib2.install_opener(opener)
 
             response = urllib2.urlopen(request, timeout=timeout)
             self.cj.extract_cookies(response, request)
