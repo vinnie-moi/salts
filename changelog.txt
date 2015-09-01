@@ -1,3 +1,7 @@
+[B]Version 1.0.38[/B]
+- Fix gvideo parsing
+- Show icefilms ads when playing icefilms sources
+
 [B]Version 1.0.37[/B]
 - Improve icefilms scraper
 - Improve view47 and niter scrapers
