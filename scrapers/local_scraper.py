@@ -73,19 +73,7 @@ class Local_Scraper(scraper.Scraper):
         return hosters
 
     def get_url(self, video):
-        temp_video_type = video.video_type
-        if video.video_type == VIDEO_TYPES.EPISODE: temp_video_type = VIDEO_TYPES.TVSHOW
-        url = None
-
-        results = self.search(temp_video_type, video.title, video.year)
-        if results:
-            url = results[0]['url']
-
-        if url and video.video_type == VIDEO_TYPES.EPISODE:
-            show_url = url
-            url = self._get_episode_url(show_url, video)
-
-        return url
+        return super(Local_Scraper, self)._default_get_url(video)
 
     def _get_episode_url(self, show_url, video):
         params = urlparse.parse_qs(show_url)
