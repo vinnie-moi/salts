@@ -32,6 +32,7 @@ from salts_lib.constants import QUALITIES
 QUALITY_MAP = {'HD 720P': QUALITIES.HD720, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH, 'DVD SCREENER': QUALITIES.HIGH}
 BASE_URL = 'http://www.icefilms.info'
 LIST_URL = BASE_URL + '/membersonly/components/com_iceplayer/video.php?h=374&w=631&vid=%s&img='
+AJAX_URL = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=%s&iqs=&url=&m=%s&cap= &sec=%s&t=%s&ad_url=%s'
 
 class IceFilms_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -97,7 +98,10 @@ class IceFilms_Scraper(scraper.Scraper):
                 m_start = int(match.group(1))
                 
                 match = re.search('<iframe[^>]*src="([^"]+)', html)
-                ad_url = urllib.quote(match.group(1))
+                if match:
+                    ad_url = urllib.quote(match.group(1))
+                else:
+                    ad_url = ''
 
                 pattern = '<div class=ripdiv>(.*?)</div>'
                 for container in re.finditer(pattern, html):
@@ -114,10 +118,9 @@ class IceFilms_Scraper(scraper.Scraper):
                         source = {'multi-part': False, 'quality': quality, 'class': self, 'label': label, 'rating': None, 'views': None, 'direct': False}
                         host = re.sub('(<[^>]+>|</span>)', '', host_fragment)
                         source['host'] = host.lower()
-                        s = s_start + random.randint(1, 100)
-                        m = m_start + (s - s_start) + random.randint(1, 100)
-
-                        url = '/membersonly/components/com_iceplayer/video.phpAjaxResp.php?id=%s&s=%s&iqs=&url=&m=%s&cap= &sec=%s&t=%s&ad_url=%s' % (link_id, s, m, secret, t, ad_url)
+                        s = s_start + random.randint(3, 1000)
+                        m = m_start + random.randint(21, 1000)
+                        url = AJAX_URL % (link_id, s, m, secret, t, ad_url)
                         source['url'] = url
                         sources.append(source)
             except Exception as e:
@@ -166,6 +169,7 @@ class IceFilms_Scraper(scraper.Scraper):
         return super(IceFilms_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
 
     def __show_ice_ad(self, ad_url):
+        if not ad_url: return
         try:
             wdlg = xbmcgui.WindowDialog()
             if not ad_url.startswith('http:'): ad_url = 'http:' + ad_url
