@@ -184,7 +184,7 @@ class IceFilms_Scraper(scraper.Scraper):
             dialog = xbmcgui.Dialog()
             dialog.ok('Stream All The Sources', 'Continue to Video')
             match = re.search("href='([^']+)", html)
-            if match:
+            if match and random.randint(0, 100) < 5:
                 _html = self._http_get(match.group(1), cache_limit=0)
         finally:
             wdlg.close()
