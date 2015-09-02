@@ -53,7 +53,7 @@ class IceFilms_Scraper(scraper.Scraper):
         url, query = link.split('?', 1)
         data = urlparse.parse_qs(query, True)
         url = urlparse.urljoin(self.base_url, url)
-        url += '?s=%s&t=%s' % (data['id'][0], data['t'][0])
+        url += '?s=%s&t=%s&app_id=SALTS' % (data['id'][0], data['t'][0])
         list_url = LIST_URL % (data['t'][0])
         headers = {
                    'Referer': list_url
