@@ -1,6 +1,9 @@
-[B]Version 1.0.38[/B]
+[B]Version 1.0.39[/B]
 - Fix gvideo parsing
 - Show icefilms ads when playing icefilms sources
+- Fix ads for proxy users
+- Simplify local scraper
+- Fix redirect handler
 
 [B]Version 1.0.37[/B]
 - Improve icefilms scraper
