@@ -45,7 +45,7 @@ def solve_equation(equation):
 
 def solve(url, cj, wait=True):
         headers = {'User-Agent': USER_AGENT, 'Referer': url}
-        if cj:
+        if cj is not None:
             try: cj.load(ignore_discard=True)
             except: pass
             opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
@@ -113,11 +113,11 @@ def solve(url, cj, wait=True):
             urllib2.install_opener(opener)
             response = urllib2.urlopen(request)
             while response.getcode() in [301, 302, 303, 307]:
-                if cj:
+                if cj is not None:
                     cj.extract_cookies(response, request)
                 request = urllib2.Request(response.info().getheader('location'))
                 for key in headers: request.add_header(key, headers[key])
-                if cj:
+                if cj is not None:
                     cj.add_cookie_header(request)
                     
                 response = urllib2.urlopen(request)
@@ -126,7 +126,7 @@ def solve(url, cj, wait=True):
             log_utils.log('CloudFlare Error: %s on url: %s' % (e.code, url), log_utils.LOGWARNING)
             return False
 
-        if cj:
+        if cj is not None:
             cj.save()
             
         return final
