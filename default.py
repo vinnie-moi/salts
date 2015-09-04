@@ -617,6 +617,14 @@ def add_other_list(section, username=None):
 def show_list(section, slug, username=None):
     if slug == utils.WATCHLIST_SLUG:
         items = trakt_api.show_watchlist(section)
+        sort_key = int(kodi.get_setting('sort_watchlist'))
+        if sort_key == 0:
+            items.reverse()
+        elif sort_key == 2:
+            items.sort(key=lambda x: re.sub('^(The |A |An )', '', x['title'], re.I))
+        elif sort_key == 3:
+            items.sort(key=lambda x: x['year'])
+            
     else:
         try:
             if TOKEN:
@@ -642,8 +650,10 @@ def show_collection(section):
     sort_key = int(kodi.get_setting('sort_collection'))
     if sort_key == 1:
         items.reverse()
-    elif sort_key > 0:
-        items.sort(key=lambda x: x[['title', 'year'][sort_key - 2]])
+    elif sort_key == 2:
+        items.sort(key=lambda x: re.sub('^(The |A |An )', '', x['title'], re.I))
+    elif sort_key == 3:
+        items.sort(key=lambda x: x['year'])
 
     # hack aired_episodes to override w/ collected_episodes to workaround trakt.tv cache issue
     if section == SECTIONS.TV:
