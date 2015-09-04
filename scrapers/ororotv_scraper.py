@@ -128,6 +128,6 @@ class OroroTV_Scraper(scraper.Scraper):
     def __login(self):
         url = urlparse.urljoin(self.base_url, '/en/users/sign_in')
         data = {'user[email]': self.username, 'user[password]': self.password, 'user[remember_me]': 1}
-        html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
-        if not re.search('href="/en/users/sign_out', html):
-            raise Exception('ororo.tv login failed')
+        html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, allow_redirect=False, cache_limit=0)
+        if html != 'http://ororo.tv/en':
+            raise Exception('ororo.tv login failed: %s' % (html))

@@ -28,6 +28,7 @@ from salts_lib import log_utils
 
 BASE_URL = 'http://www.hdmoviezone.net'
 PHP_URL = 'http://gl.hdmoviezone.net/hdmzgl.php'
+COOKIE_URL = 'http://gl.hdmoviezone.net/getimage.php'
 
 class hdmz_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -54,6 +55,7 @@ class hdmz_Scraper(scraper.Scraper):
         source_url = self.get_url(video)
         hosters = []
         if source_url:
+            _html = self._http_get(COOKIE_URL, cache_limit=.25)
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             match = re.search('file\s*=\s*"([^"]+)', html)
