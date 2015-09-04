@@ -80,7 +80,7 @@ class WSO_Scraper(scraper.Scraper):
         return settings
 
     def search(self, video_type, title, year):
-        url = urlparse.urljoin(self.base_url, 'http://watchseries-online.ch/2005/07/index.html')
+        url = urlparse.urljoin(self.base_url, '/index')
         html = self._http_get(url, cache_limit=24)
 
         results = []
