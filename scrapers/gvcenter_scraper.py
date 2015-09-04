@@ -57,6 +57,7 @@ class GVCenter_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
         self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
+        self.last_call = 0
 
     @classmethod
     def provides(cls):
@@ -85,7 +86,6 @@ class GVCenter_Scraper(scraper.Scraper):
             show_url = CONTENT_URL % (catalog_id, sid)
             url = urlparse.urljoin(self.base_url, show_url)
             html = self._http_get(url, cache_limit=.5)
-            time.sleep(3)
             try:
                 js_data = json.loads(html)
                 if video.video_type == VIDEO_TYPES.EPISODE:
@@ -99,7 +99,6 @@ class GVCenter_Scraper(scraper.Scraper):
                     source_url = SOURCE_URL % (film_id, catalog_id, sid)
                     url = urlparse.urljoin(self.base_url, source_url)
                     html = self._http_get(url, cache_limit=.5)
-                    time.sleep(1.5)
                     try:
                         film_js = json.loads(html)
                     except ValueError:
@@ -181,7 +180,10 @@ class GVCenter_Scraper(scraper.Scraper):
         headers = {
                    'User-Agent': GV_USER_AGENT
         }
+        # throttle http requests
+        while time.time() - self.last_call < 2: time.sleep(.25)
         result = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
+        self.last_call = time.time()
         try:
             #print 'result: %s' % (result)
             js_data = json.loads(result)
