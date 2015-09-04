@@ -1,8 +1,9 @@
-[B]Version 1.0.40[/B]
+[B]Version 1.0.41[/B]
 - Add megabox scraper
 - Fix gvcenter scraper
 - Fix hdmz scraper
 - Fix ororo.tv scraper
+- Fix niter.tv scraper
 - Icefilms Ad fixes
 
 [B]Version 1.0.39[/B]
