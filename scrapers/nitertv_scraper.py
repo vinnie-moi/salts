@@ -139,6 +139,6 @@ class Niter_Scraper(scraper.Scraper):
     def __login(self):
         url = urlparse.urljoin(self.base_url, '/sessions')
         data = {'username': self.username, 'password': self.password, 'remember': 1}
-        html = super(Niter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
-        if not re.search('href="[^"]+/logout"', html):
+        html = super(Niter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, allow_redirect=False, cache_limit=0)
+        if html != self.base_url:
             raise Exception('niter.tv login failed')
