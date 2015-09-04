@@ -36,7 +36,7 @@ SEARCH_URL = '/megaboxhd/android_api_100/index.php?select=search&q=%s&page=1&tot
 CONTENT_URL = '/megaboxhd/android_api_100/index.php?select=detail&id=%s'
 SOURCE_URL = '/megaboxhd/android_api_100/index.php?select=stream&id=%s&cataid=%s'
 EXTRA_URL = ('&os=android&version=1.0.0&versioncode=100&extra_1=26EB5D5D9DC010629E21A8A6076D86CF&'
-             'deviceid=%s&extra_3=7326c76a03066b39e2a0b1dc235c351c&extra_4=%s'
+             'deviceid=%s&extra_3=6de97ad519993642d91de9b577f75b36&extra_4=%s'
              '&extra_5=%s&token=%s&time=%s&devicename=Google-Nexus-%s-%s')
 
 RESULT_URL = '/video_type=%s&catalog_id=%s'
@@ -170,7 +170,11 @@ class Megabox_Scraper(scraper.Scraper):
                    'User-Agent': MB_USER_AGENT
         }
         result = super(Megabox_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
-        return self.__decrypt(DATA_KEY, base64.b64decode(result))
+        result = result.strip()
+        if result:
+            return self.__decrypt(DATA_KEY, base64.b64decode(result))
+        else:
+            return ''
                     
     def __get_extra(self):
         now = str(int(time.time()))
