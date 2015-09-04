@@ -63,7 +63,7 @@ class IceFilms_Scraper(scraper.Scraper):
         html = self._http_get(url, data=data, headers=headers, cache_limit=0)
         match = re.search('url=(.*)', html)
         if match:
-            self.__show_ice_ad(ad_url)
+            self.__show_ice_ad(ad_url, list_url)
             url = urllib.unquote_plus(match.group(1))
             return url
 
@@ -168,15 +168,18 @@ class IceFilms_Scraper(scraper.Scraper):
     def _http_get(self, url, data=None, headers=None, cache_limit=8):
         return super(IceFilms_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
 
-    def __show_ice_ad(self, ad_url):
+    def __show_ice_ad(self, ad_url, ice_referer):
         if not ad_url: return
         try:
             wdlg = xbmcgui.WindowDialog()
             if not ad_url.startswith('http:'): ad_url = 'http:' + ad_url
             log_utils.log('Getting ad page: %s' % (ad_url), xbmc.LOGDEBUG)
-            html = self._http_get(ad_url, cache_limit=0)
+            headers = {'Referer': ice_referer}
+            html = self._http_get(ad_url, headers=headers, cache_limit=0)
+            headers = {'Referer': ad_url}
             for match in re.finditer("<img\s+src='([^']+)'\s+width='(\d+)'\s+height='(\d+)'", html):
                 img_url, width, height = match.groups()
+                img_url = img_url.replace('&amp;', '&')
                 width = int(width)
                 height = int(height)
                 log_utils.log('Image in page: |%s| - (%dx%d)' % (img_url, width, height), xbmc.LOGDEBUG)
@@ -185,7 +188,7 @@ class IceFilms_Scraper(scraper.Scraper):
                     img = xbmcgui.ControlImage(left, 0, width, height, img_url)
                     wdlg.addControl(img)
                 else:
-                    _html = self._http_get(img_url, cache_limit=0)
+                    _html = self._http_get(img_url, headers=headers, cache_limit=0)
 
             wdlg.show()
             dialog = xbmcgui.Dialog()
