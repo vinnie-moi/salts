@@ -77,8 +77,8 @@ class VioozAc_Scraper(scraper.Scraper):
                         if match:
                             proxy_link = match.group(1)
                             proxy_link = proxy_link.split('*', 1)[-1]
-                            stream_url = self._gk_decrypt(base64.urlsafe_b64decode('YVhWN09hU0M4MDRWYXlUQ0lPYmE='), proxy_link)
-                            direct = True
+                            stream_url = self._gk_decrypt(base64.urlsafe_b64decode('Y0t3RERKc1ZpQ3NtWndET2p6UlU='), proxy_link)
+                            direct = False
 
                 # skip these for now till I work out how to extract them
                 if not stream_url or 'hqq.tv' in stream_url:
