@@ -76,6 +76,7 @@
 		<setting id="require_source" type="bool" label="30564" default="true" visible="true"/>
 		<setting id="include_specials" type="bool" label="30565" default="false" visible="true"/>
 		<setting id="include_unknown" type="bool" label="30566" default="true" visible="true"/>
+        <setting id="exclude_local" type="bool" label="30645" default="false" visible="true"/> 
 		<setting id="library-update" type="bool" label="30567" default="false" visible="true"/>
 		<setting id="update_subs-notify" type="bool" label="30568" default="false" visible="true"/>
 		<setting id="include_movies" type="bool" label="30569" default="false" visible="true"/>

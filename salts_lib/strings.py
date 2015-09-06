@@ -204,7 +204,7 @@ STRINGS = {
            'reset_base_url': 30192,
            'reset_complete': 30193,
            'req_result': 30194,
-           'addded_to_lib': 30195,
+           'added_to_lib': 30195,
            'add_to_main': 30196,
            'remove_from_main': 30197,
            'liked_lists': 30198,
@@ -217,5 +217,7 @@ STRINGS = {
            'most_watched_all': 30205,
            'most_collected_weekly': 30206,
            'most_collected_monthly': 30207,
-           'most_collected_all': 30208
+           'most_collected_all': 30208,
+           'not_added_to_lib': 30209,
+           'local_exists': 30210
 }
