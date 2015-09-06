@@ -35,6 +35,7 @@ BASE_URL = 'http://www.megaboxhd.com'
 SEARCH_URL = '/megaboxhd/android_api_100/index.php?select=search&q=%s&page=1&total=0&total=0'
 CONTENT_URL = '/megaboxhd/android_api_100/index.php?select=detail&id=%s'
 SOURCE_URL = '/megaboxhd/android_api_100/index.php?select=stream&id=%s&cataid=%s'
+CONFIG_URL = '/megaboxhd/android_api_100/index.php?select=config'
 EXTRA_URL = ('&os=android&version=1.0.0&versioncode=100&extra_1=26EB5D5D9DC010629E21A8A6076D86CF&'
              'deviceid=%s&extra_3=6de97ad519993642d91de9b577f75b36&extra_4=%s'
              '&extra_5=%s&token=%s&time=%s&devicename=Google-Nexus-%s-%s')
@@ -46,6 +47,11 @@ COUNTRIES = ['US', 'GB', 'CA', 'DK', 'MX', 'ES', 'JP', 'CN', 'DE', 'GR']
 DATA_KEY = base64.b64decode('MzkzNmI5MGU5N2RjNTIxYw==')
 FILM_KEY = base64.b64decode('OTBlOTdkYzUyMWNmMDIwZQ==')
 MB_USER_AGENT = "Apache-HttpClient/UNAVAILABLE (java 1.4)"
+HEADERS = {
+           'User-Agent': MB_USER_AGENT
+        }
+
+
 
 class Megabox_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -164,18 +170,30 @@ class Megabox_Scraper(scraper.Scraper):
                         if title and norm_title == self._normalize_title(title):
                             return EPISODE_URL % (video.video_type, params['catalog_id'][0], int(season), int(episode))
 
+    @classmethod
+    def get_settings(cls):
+        settings = super(Megabox_Scraper, cls).get_settings()
+        name = cls.get_name()
+        settings.append('         <setting id="%s-last-config" type="number" default="0" visible="false"/>' % (name))
+        return settings
+
     def _http_get(self, url, data=None, cache_limit=8):
+        self.__check_config()
         url += self.__get_extra()
-        headers = {
-                   'User-Agent': MB_USER_AGENT
-        }
-        result = super(Megabox_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
+        result = super(Megabox_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=HEADERS, cache_limit=cache_limit)
         result = result.strip()
         if result:
             return self.__decrypt(DATA_KEY, base64.b64decode(result))
         else:
             return ''
                     
+    def __check_config(self):
+        last_config_call = time.time() - int(xbmcaddon.Addon().getSetting('%s-last-config' % (self.get_name())))
+        if last_config_call > 8 * 60 * 60:
+            url = urlparse.urljoin(self.base_url, CONFIG_URL)
+            url += self.__get_extra()
+            _html = super(Megabox_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, headers=HEADERS, cache_limit=8)
+    
     def __get_extra(self):
         now = str(int(time.time()))
         build = random.choice(ANDROID_LEVELS.keys())
