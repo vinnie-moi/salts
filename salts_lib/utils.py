@@ -355,12 +355,12 @@ def get_sort_key(item):
     return tuple(item_sort_key)
 
 def make_source_sort_key():
-    sso = db_connection.get_setting('source_sort_order')
+    sso = kodi.get_setting('source_sort_order')
     # migrate sso to db setting
     if sso is None:
-        sso = kodi.get_setting('source_sort_order')
-        sso = db_connection.set_setting('source_sort_order', sso)
-        kodi.set_setting('source_sort_order', '')
+        sso = db_connection.get_setting('source_sort_order')
+        sso = kodi.set_setting('source_sort_order', sso)
+        db_connection.set_setting('source_sort_order', '')
         
     sort_key = {}
     i = 0

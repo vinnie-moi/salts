@@ -165,7 +165,7 @@ def auto_conf():
                'view47', 'MoviesHD', 'OnlineMovies', 'MoviesOnline7', 'wmo.ch', 'zumvo.com', 'mvsnap', 'alluc.com', 'MyVideoLinks.eu', 'OneClickWatch', 'RLSSource.net', 'TVRelease.Net',
                'FilmStreaming.in', 'PrimeWire', 'WatchFree.to', 'CouchTunerV2', 'CouchTunerV1', 'Watch8Now', 'pftv', 'wso.ch', 'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131',
                'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies', 'iStreamHD', 'afdah', 'filmikz.ch', 'movie25', 'tunemovie']
-        db_connection.set_setting('source_sort_order', '|'.join(sso))
+        kodi.set_setting('source_sort_order', '|'.join(sso))
         kodi.notify(msg=i18n('auto_conf_complete'))
     
 @url_dispatcher.register(MODES.BROWSE, ['section'])
@@ -347,7 +347,7 @@ def move_to(name):
                     sort_key[key] += 1
 
         sort_key[name] = new_key
-    db_connection.set_setting('source_sort_order', utils.make_source_sort_string(sort_key))
+    kodi.set_setting('source_sort_order', utils.make_source_sort_string(sort_key))
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.MOVE_SCRAPER, ['name', 'direction', 'other'])
@@ -359,7 +359,7 @@ def move_scraper(name, direction, other):
     elif direction == DIRS.DOWN:
         sort_key[name] -= 1
         sort_key[other] += 1
-    db_connection.set_setting('source_sort_order', utils.make_source_sort_string(sort_key))
+    kodi.set_setting('source_sort_order', utils.make_source_sort_string(sort_key))
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.TOGGLE_ALL)
