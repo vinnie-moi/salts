@@ -51,8 +51,6 @@ HEADERS = {
            'User-Agent': MB_USER_AGENT
         }
 
-
-
 class Megabox_Scraper(scraper.Scraper):
     base_url = BASE_URL
 

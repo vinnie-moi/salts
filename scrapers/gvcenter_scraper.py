@@ -35,6 +35,7 @@ BASE_URL = 'http://www.gearscenter.com'
 SEARCH_URL = '/gold-server/gapiandroid206/?option=search&q=%s&page=1&total=0&block=0'
 CONTENT_URL = '/gold-server/gapiandroid206/?option=content&id=%s&sid=%s'
 SOURCE_URL = '/gold-server/gapiandroid206/?option=filmcontent&id=%s&cataid=%s&sid=%s'
+CONFIG_URL = '/gold-server/gapiandroid206/?option=config'
 EXTRA_URL = ('&os=android&version=2.0.6&versioncode=206&param_1=EA2C2D2240456D78B2CCE8148B10A674'
              '&deviceid=%s&param_3=0685257cd8bc8108d550c4e948aebf2f&param_4=%s'
              '&param_5=%s&token=%s&time=%s&devicename=Google-Nexus-%s-%s'
@@ -50,6 +51,10 @@ pn = hashlib.md5('com.gamena.funboxhd').hexdigest().upper()
 FILM_KEY = hashlib.md5(vc + vn + pn).hexdigest()[0:16]
 URL_KEY = base64.b64decode('RzRtM2wwZnRfczNjcjN0MA==')
 GV_USER_AGENT = "Apache-HttpClient/UNAVAILABLE (java 1.4)"
+HEADERS = {
+           'User-Agent': GV_USER_AGENT
+        }
+
 
 class GVCenter_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -174,15 +179,20 @@ class GVCenter_Scraper(scraper.Scraper):
                         if title and norm_title == self._normalize_title(title):
                             return EPISODE_URL % (video.video_type, params['catalog_id'][0], int(season), int(episode))
 
+    @classmethod
+    def get_settings(cls):
+        settings = super(GVCenter_Scraper, cls).get_settings()
+        name = cls.get_name()
+        settings.append('         <setting id="%s-last-config" type="number" default="0" visible="false"/>' % (name))
+        return settings
+
     def _http_get(self, url, data=None, cache_limit=8):
-        now = str(int(time.time()))
+        now = int(time.time())
+        self.__check_config(now)
         url += self.__get_extra(now)
-        headers = {
-                   'User-Agent': GV_USER_AGENT
-        }
         # throttle http requests
         while time.time() - self.last_call < 2: time.sleep(.25)
-        result = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
+        result = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=HEADERS, cache_limit=cache_limit)
         self.last_call = time.time()
         try:
             #print 'result: %s' % (result)
@@ -191,11 +201,19 @@ class GVCenter_Scraper(scraper.Scraper):
             log_utils.log('Invalid JSON returned for: %s' % (url), xbmc.LOGWARNING)
         else:
             if 'data' in js_data:
-                key = hashlib.md5(now).hexdigest()[0:16]
+                key = hashlib.md5(str(now)).hexdigest()[0:16]
                 return self.__decrypt(key, base64.b64decode(js_data['data']))
         return ''
                     
+    def __check_config(self, now):
+        last_config_call = now - int(xbmcaddon.Addon().getSetting('%s-last-config' % (self.get_name())))
+        if last_config_call > 8 * 60 * 60:
+            url = urlparse.urljoin(self.base_url, CONFIG_URL)
+            url += self.__get_extra(now)
+            _html = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, headers=HEADERS, cache_limit=8)
+    
     def __get_extra(self, now):
+        now = str(now)
         token = hashlib.md5(now).hexdigest()
         build = random.choice(ANDROID_LEVELS.keys())
         country = random.choice(COUNTRIES)

@@ -219,6 +219,7 @@
          <setting id="GVCenter_try" type="number" default="0" visible="false"/>
          <setting id="GVCenter_fail" type="number" default="0" visible="false"/>
          <setting id="GVCenter_check" type="number" default="0" visible="false"/>
+         <setting id="GVCenter-last-config" type="number" default="0" visible="false"/>
     </category>
 
 	<category label="Scrapers 2">
@@ -267,6 +268,7 @@
          <setting id="MegaboxHD_try" type="number" default="0" visible="false"/>
          <setting id="MegaboxHD_fail" type="number" default="0" visible="false"/>
          <setting id="MegaboxHD_check" type="number" default="0" visible="false"/>
+         <setting id="MegaboxHD-last-config" type="number" default="0" visible="false"/>
          <setting id="MerDB-enable" type="bool" label="MerDB Enabled" default="true" visible="true"/>
          <setting id="MerDB-base_url" type="text" label="    Base Url" default="http://www.merdb.mx" visible="eq(-1,true)"/>
          <setting id="MerDB-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
