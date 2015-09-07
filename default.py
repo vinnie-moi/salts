@@ -1536,7 +1536,10 @@ def update_strms(section, dialog=None):
         if dialog:
             percent_progress = i * 100 / length
             dialog.update(percent_progress, 'Stream All The Sources', '%s %s: %s (%s)' % (i18n('updating'), section, re.sub(' \(\d{4}\)$', '', item['title']), item['year']))
-        add_to_library(section_params['video_type'], item['title'], item['year'], item['ids']['trakt'])
+        try:
+            add_to_library(section_params['video_type'], item['title'], item['year'], item['ids']['trakt'])
+        except Exception as e:
+            log_utils.log('Subscription Update Exception: |%s|%s|%s|%s| - %s' % (section_params['video_type'], item['title'], item['year'], item['ids']['trakt'], e), xbmc.LOGDEBUG)
 
 @url_dispatcher.register(MODES.CLEAN_SUBS)
 def clean_subs():
