@@ -1,3 +1,11 @@
+[B]Version 1.0.42[/B]
+- Fix gvcenter scraper
+- Update wso scraper
+- update viooz scraper
+ - Add de-dup "add to library" option
+ - Move source sort order back to settings.xml
+ - Fix megabox scraper
+ 
 [B]Version 1.0.41[/B]
 - Add megabox scraper
 - Fix gvcenter scraper
