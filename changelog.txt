@@ -1,4 +1,4 @@
-[B]Version 1.0.42[/B]
+[B]Version 1.0.43[/B]
 - Fix gvcenter scraper
 - Update wso scraper
 - update viooz scraper
