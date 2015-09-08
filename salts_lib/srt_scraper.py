@@ -93,7 +93,7 @@ class SRT_Scraper():
         req_hi = kodi.get_setting('subtitle-hi') == 'true'
         req_hd = kodi.get_setting('subtitle-hd') == 'true'
         items = []
-        regex = re.compile('<td>(\d+)</td><td>(\d+)</td><td>.*?</td><td>(.*?)</td><td.*?>(.+?)</td>.*?<td.*?>(.+?)</td><td.*?>(.*?)</td><td.*?>(.*?)</td><td.*?>(.*?)</td><td.*?><a\s+href="(.*?)">.+?</td>',
+        regex = re.compile('<td>(\d+)</td><td>(\d+)</td><td>.*?</td><td>(.*?)</td><td.*?>(.*?)</td>.*?<td.*?>(.+?)</td><td.*?>(.*?)</td><td.*?>(.*?)</td><td.*?>(.*?)</td><td.*?><a\s+href="(.*?)">.+?</td>',
                          re.DOTALL)
         for match in regex.finditer(html):
             season, episode, srt_lang, version, completed, hi, corrected, hd, srt_url = match.groups()
@@ -134,7 +134,7 @@ class SRT_Scraper():
     def download_subtitle(self, url):
         url = BASE_URL + url
         (response, srt) = self.__get_url(url)
-        if 'Content-Disposition' not in response.info():
+        if not hasattr(response, 'info') or 'Content-Disposition' not in response.info():
             return
 
         cd = response.info()['Content-Disposition']
