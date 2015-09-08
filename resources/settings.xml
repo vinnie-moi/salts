@@ -151,6 +151,12 @@
          <setting id="alluc.com_try" type="number" default="0" visible="false"/>
          <setting id="alluc.com_fail" type="number" default="0" visible="false"/>
          <setting id="alluc.com_check" type="number" default="0" visible="false"/>
+         <setting id="beinmovie-enable" type="bool" label="beinmovie Enabled" default="true" visible="true"/>
+         <setting id="beinmovie-base_url" type="text" label="    Base Url" default="https://beinmovie.com" visible="eq(-1,true)"/>
+         <setting id="beinmovie-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="beinmovie_try" type="number" default="0" visible="false"/>
+         <setting id="beinmovie_fail" type="number" default="0" visible="false"/>
+         <setting id="beinmovie_check" type="number" default="0" visible="false"/>
          <setting id="ch131-enable" type="bool" label="ch131 Enabled" default="true" visible="true"/>
          <setting id="ch131-base_url" type="text" label="    Base Url" default="http://www.ch131.me" visible="eq(-1,true)"/>
          <setting id="ch131-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -213,6 +219,9 @@
          <setting id="Flixanity_check" type="number" default="0" visible="false"/>
          <setting id="Flixanity-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>
          <setting id="Flixanity-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>
+    </category>
+
+	<category label="Scrapers 2">
          <setting id="GVCenter-enable" type="bool" label="GVCenter Enabled" default="true" visible="true"/>
          <setting id="GVCenter-base_url" type="text" label="    Base Url" default="http://www.gearscenter.com" visible="eq(-1,true)"/>
          <setting id="GVCenter-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -220,9 +229,6 @@
          <setting id="GVCenter_fail" type="number" default="0" visible="false"/>
          <setting id="GVCenter_check" type="number" default="0" visible="false"/>
          <setting id="GVCenter-last-config" type="number" default="0" visible="false"/>
-    </category>
-
-	<category label="Scrapers 2">
          <setting id="hdmz-enable" type="bool" label="hdmz Enabled" default="true" visible="true"/>
          <setting id="hdmz-base_url" type="text" label="    Base Url" default="http://www.hdmoviezone.net" visible="eq(-1,true)"/>
          <setting id="hdmz-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -311,15 +317,15 @@
          <setting id="MoviesOnline7_try" type="number" default="0" visible="false"/>
          <setting id="MoviesOnline7_fail" type="number" default="0" visible="false"/>
          <setting id="MoviesOnline7_check" type="number" default="0" visible="false"/>
+    </category>
+
+	<category label="Scrapers 3">
          <setting id="moviestorm.eu-enable" type="bool" label="moviestorm.eu Enabled" default="true" visible="true"/>
          <setting id="moviestorm.eu-base_url" type="text" label="    Base Url" default="http://moviestorm.eu" visible="eq(-1,true)"/>
          <setting id="moviestorm.eu-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="moviestorm.eu_try" type="number" default="0" visible="false"/>
          <setting id="moviestorm.eu_fail" type="number" default="0" visible="false"/>
          <setting id="moviestorm.eu_check" type="number" default="0" visible="false"/>
-    </category>
-
-	<category label="Scrapers 3">
          <setting id="movietv.to-enable" type="bool" label="movietv.to Enabled" default="true" visible="true"/>
          <setting id="movietv.to-base_url" type="text" label="    Base Url" default="http://movietv.to" visible="eq(-1,true)"/>
          <setting id="movietv.to-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
