@@ -76,7 +76,6 @@ class Dizilab_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/arsiv?limit=&tur=&orderby=&ulke=&order=&yil=&dizi_adi=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=8)
-        print html
         results = []
         for item in dom_parser.parse_dom(html, 'div', {'class': 'tv-series-single'}):
             try:
