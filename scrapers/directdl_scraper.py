@@ -68,6 +68,10 @@ class DirectDownload_Scraper(scraper.Scraper):
                 except ValueError:
                     log_utils.log('Invalid JSON returned: %s: %s' % (url, html), xbmc.LOGWARNING)
                 else:
+                    if 'error' in js_result:
+                        log_utils.log('DD.tv API error: "%s" @ %s' % (js_result['error'], url), xbmc.LOGWARNING)
+                        return hosters
+
                     query = urlparse.parse_qs(urlparse.urlparse(url).query)
                     match_quality = Q_ORDER
                     if 'quality' in query:
@@ -137,6 +141,10 @@ class DirectDownload_Scraper(scraper.Scraper):
             except ValueError:
                 log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
             else:
+                if 'error' in js_result:
+                    log_utils.log('DD.tv API error: "%s" @ %s' % (js_result['error'], search_url), xbmc.LOGWARNING)
+                    return results
+                
                 for match in js_result:
                     url = search_url + '&quality=%s' % match['quality']
                     result = {'url': url.replace(self.base_url, ''), 'title': match['release'], 'quality': match['quality'], 'year': ''}
