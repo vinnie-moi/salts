@@ -20,15 +20,14 @@ import xbmc
 import urllib
 import urlparse
 import re
-import xbmcaddon
 import json
 import base64
 import time
 import hashlib
 import random
-import sys
 from salts_lib import pyaes
 from salts_lib import log_utils
+from salts_lib import kodi
 from salts_lib.constants import VIDEO_TYPES
 
 BASE_URL = 'http://www.gearscenter.com'
@@ -61,7 +60,7 @@ class GVCenter_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
+        self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
         self.last_call = 0
 
     @classmethod
@@ -170,7 +169,7 @@ class GVCenter_Scraper(scraper.Scraper):
                     if ' S%02dE%02d ' % (int(video.season), int(video.episode)) in episode['film_name']:
                         return EPISODE_URL % (video.video_type, params['catalog_id'][0], video.season, video.episode)
             
-            if (force_title or xbmcaddon.Addon().getSetting('title-fallback') == 'true') and video.ep_title:
+            if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title:
                 norm_title = self._normalize_title(video.ep_title)
                 for episode in js_data['listvideos']:
                     match = re.search('-\s*S(\d+)E(\d+)\s*-\s*(.*)', episode['film_name'])
@@ -206,11 +205,12 @@ class GVCenter_Scraper(scraper.Scraper):
         return ''
                     
     def __check_config(self, now):
-        last_config_call = now - int(xbmcaddon.Addon().getSetting('%s-last-config' % (self.get_name())))
+        last_config_call = now - int(kodi.get_setting('%s-last-config' % (self.get_name())))
         if last_config_call > 8 * 60 * 60:
             url = urlparse.urljoin(self.base_url, CONFIG_URL)
             url += self.__get_extra(now)
             _html = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, headers=HEADERS, cache_limit=8)
+            kodi.set_setting('%s-last-config' % (self.get_name()), str(int(now)))
     
     def __get_extra(self, now):
         now = str(now)
