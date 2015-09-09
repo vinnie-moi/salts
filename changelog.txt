@@ -1,8 +1,9 @@
-[B]Version 1.0.44[/B]
+[B]Version 1.0.45[/B]
 - Add beinmovie scraper
 - Fix srt scraper
 - Update dizilab scraper
 - Handle dd.tv api errors more gracefully
+- Fix gvcenter and megabox scrapers
 
 [B]Version 1.0.43[/B]
 - Fix gvcenter scraper
