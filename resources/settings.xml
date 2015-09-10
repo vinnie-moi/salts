@@ -199,6 +199,12 @@
          <setting id="Dizilab_try" type="number" default="0" visible="false"/>
          <setting id="Dizilab_fail" type="number" default="0" visible="false"/>
          <setting id="Dizilab_check" type="number" default="0" visible="false"/>
+         <setting id="Dizimag-enable" type="bool" label="Dizimag Enabled" default="true" visible="true"/>
+         <setting id="Dizimag-base_url" type="text" label="    Base Url" default="http://dizimag.co" visible="eq(-1,true)"/>
+         <setting id="Dizimag-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="Dizimag_try" type="number" default="0" visible="false"/>
+         <setting id="Dizimag_fail" type="number" default="0" visible="false"/>
+         <setting id="Dizimag_check" type="number" default="0" visible="false"/>
          <setting id="filmikz.ch-enable" type="bool" label="filmikz.ch Enabled" default="true" visible="true"/>
          <setting id="filmikz.ch-base_url" type="text" label="    Base Url" default="http://filmikz.ch" visible="eq(-1,true)"/>
          <setting id="filmikz.ch-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>

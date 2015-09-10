@@ -31,6 +31,7 @@ from StringIO import StringIO
 import gzip
 import datetime
 import json
+import sys
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
 from salts_lib import cloudflare
@@ -265,6 +266,7 @@ class Scraper(object):
             self.cj.extract_cookies(response, request)
             if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
                 log_utils.log('Response Cookies: %s - %s' % (url, self.cookies_as_str(self.cj)), xbmc.LOGDEBUG)
+            self.__fix_bad_cookies()
             self.cj.save(ignore_discard=True)
             if not allow_redirect and response.getcode() in [301, 302, 303, 307]:
                 return response.info().getheader('Location')
@@ -321,6 +323,16 @@ class Scraper(object):
             s += '} '
         return s
                     
+    def __fix_bad_cookies(self):
+        c = self.cj._cookies
+        for domain in c:
+            for path in c[domain]:
+                for key in c[domain][path]:
+                    cookie = c[domain][path][key]
+                    if cookie.expires > sys.maxint:
+                        log_utils.log('Fixing cookie expiration for %s: was: %s now: %s' % (key, cookie.expires, sys.maxint))
+                        cookie.expires = sys.maxint
+        
     def _do_recaptcha(self, key, tries=None, max_tries=None):
         challenge_url = CAPTCHA_BASE_URL + '/challenge?k=%s' % (key)
         html = self._cached_http_get(challenge_url, CAPTCHA_BASE_URL, timeout=DEFAULT_TIMEOUT, cache_limit=0)
