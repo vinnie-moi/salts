@@ -24,6 +24,7 @@ import time
 from salts_lib import log_utils
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import USER_AGENT
 from salts_lib import kodi
 
 BASE_URL = 'http://dizimag.co'
@@ -58,8 +59,8 @@ class Dizimag_Scraper(scraper.Scraper):
         source_url = self.get_url(video)
         hosters = []
         if source_url:
-            url = urlparse.urljoin(self.base_url, source_url)
-            html = self._http_get(url, cache_limit=.5)
+            page_url = urlparse.urljoin(self.base_url, source_url)
+            html = self._http_get(page_url, cache_limit=.5)
             
             for match in re.finditer('onclick\s*=\s*"Change_Source\(\s*(\d+)\s*,\s*\'([^\']+)\'\s*\)', html):
                 vid_id, host = match.groups()
@@ -99,6 +100,7 @@ class Dizimag_Scraper(scraper.Scraper):
                                 quality = self._gv_get_quality(stream_url)
                             else:
                                 quality = self._height_get_quality(height)
+                                stream_url += '|User-Agent=%s&Referer=%s' % (USER_AGENT, page_url)
 
                             hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                             hosters.append(hoster)
