@@ -194,7 +194,7 @@ class IceFilms_Scraper(scraper.Scraper):
             dialog = xbmcgui.Dialog()
             dialog.ok('Stream All The Sources', 'Continue to Video')
             match = re.search("href='([^']+)", html)
-            if match and random.randint(0, 100) < 101:
+            if match and random.randint(0, 100) < 5:
                 log_utils.log('Link Clicked: %s' % (match.group(1)), xbmc.LOGDEBUG)
                 html = self._http_get(match.group(1), cache_limit=0)
                 match = re.search("location=decode\('([^']+)", html)
