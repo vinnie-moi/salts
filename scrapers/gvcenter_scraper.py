@@ -25,6 +25,7 @@ import base64
 import time
 import hashlib
 import random
+import string
 from salts_lib import pyaes
 from salts_lib import log_utils
 from salts_lib import kodi
@@ -217,7 +218,7 @@ class GVCenter_Scraper(scraper.Scraper):
         token = hashlib.md5(now).hexdigest()
         build = random.choice(ANDROID_LEVELS.keys())
         country = random.choice(COUNTRIES)
-        device_id = '000000000000000'
+        device_id = ''.join(random.choice(string.digits) for _ in xrange(14))
         sm = hashlib.md5(str(random.randint(0, 1000))).hexdigest()
         si = hashlib.md5('catoon_206').hexdigest()
         ex_1 = hashlib.md5(str(now) + sm).hexdigest()
