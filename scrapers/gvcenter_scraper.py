@@ -63,6 +63,11 @@ class GVCenter_Scraper(scraper.Scraper):
         self.timeout = timeout
         self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
         self.last_call = 0
+        device_id = kodi.get_setting('%s-device_id' % (self.get_name()))
+        if device_id not in ['', '0']:
+            self.device_id = device_id
+        else:
+            self.device_id = None
 
     @classmethod
     def provides(cls):
@@ -184,6 +189,7 @@ class GVCenter_Scraper(scraper.Scraper):
         settings = super(GVCenter_Scraper, cls).get_settings()
         name = cls.get_name()
         settings.append('         <setting id="%s-last-config" type="number" default="0" visible="false"/>' % (name))
+        settings.append('         <setting id="%s-device_id" type="number" default="0" visible="false"/>' % (name))
         return settings
 
     def _http_get(self, url, data=None, cache_limit=8):
@@ -207,7 +213,9 @@ class GVCenter_Scraper(scraper.Scraper):
                     
     def __check_config(self, now):
         last_config_call = now - int(kodi.get_setting('%s-last-config' % (self.get_name())))
-        if last_config_call > 8 * 60 * 60:
+        if self.device_id is None or last_config_call > 8 * 60 * 60:
+            self.device_id = ''.join(random.choice(string.digits) for _ in xrange(15))
+            kodi.set_setting('%s-device_id' % (self.get_name()), self.device_id)
             url = urlparse.urljoin(self.base_url, CONFIG_URL)
             url += self.__get_extra(now)
             _html = super(GVCenter_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, headers=HEADERS, cache_limit=8)
@@ -218,14 +226,13 @@ class GVCenter_Scraper(scraper.Scraper):
         token = hashlib.md5(now).hexdigest()
         build = random.choice(ANDROID_LEVELS.keys())
         country = random.choice(COUNTRIES)
-        device_id = ''.join(random.choice(string.digits) for _ in xrange(14))
         sm = hashlib.md5(str(random.randint(0, 1000))).hexdigest()
         si = hashlib.md5('catoon_206').hexdigest()
         ex_1 = hashlib.md5(str(now) + sm).hexdigest()
         ex_2 = urllib.quote_plus(hashlib.md5(str(now) + si).hexdigest())
-        ex_3 = sm[0:5] + hashlib.md5(device_id).hexdigest()[2:7]
+        ex_3 = sm[0:5] + hashlib.md5(self.device_id).hexdigest()[2:7]
         ex_3 = urllib.quote_plus(base64.encodestring(self.__encrypt(URL_KEY, ex_3)))
-        return EXTRA_URL % (device_id, country, country.lower(), token, now, build, ANDROID_LEVELS[build], sm, si, ex_1, ex_2, ex_3)
+        return EXTRA_URL % (self.device_id, country, country.lower(), token, now, build, ANDROID_LEVELS[build], sm, si, ex_1, ex_2, ex_3)
     
     def __decrypt(self, key, cipher_text):
         decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationECB(key))
