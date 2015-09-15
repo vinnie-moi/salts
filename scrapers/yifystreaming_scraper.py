@@ -94,8 +94,9 @@ class YifyStreaming_Scraper(scraper.Scraper):
     def _get_episode_url(self, show_url, video):
         search_title = '%s Season %d Episode %d' % (video.title, int(video.season), int(video.episode))
         results = self.search(video.video_type, search_title, '')
-        if results:
-            return results[0]['url']
+        for result in results:
+            if re.search('Season\s+%s[^\d]+Episode\s+%s$' % (video.season, video.episode), result['title'], re.I):
+                return result['url']
     
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/?s=')
