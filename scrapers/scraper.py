@@ -649,6 +649,25 @@ class Scraper(object):
 
         return plain_text
     
+    def _parse_episode_link(self, link):
+        match = re.match('(.*?)(?:\.|_)S(\d+)E(\d+)(?:E\d+)*.*?(?:(?:_|\.)(\d+)p(?:_|\.))(.*)', link)
+        if match:
+            return match.groups()
+        else:
+            match = re.match('(.*?)(?:\.|_)S(\d+)E(\d+)(?:E\d+)*(.*)', link)
+            if match:
+                return match.groups()[:-1] + ('480', ) + (match.groups()[-1],)  # assume no height = 480
+            else:
+                return ('', '-1', '-1', '-1', '')
+    
+    def _parse_movie_link(self, link):
+        file_name = link.split('/')[-1]
+        match = re.match('(.*?)(?:(?:\.|_)(\d{4})(?:(?:\.|_).*?)*)?(?:\.|_)(\d+)p(?:\.|_)(.*)', file_name)
+        if match:
+            return match.groups()
+        else:
+            return ('', '', '480', '')  # make 480p when unknown
+    
     def create_db_connection(self):
         worker_id = threading.current_thread().ident
         # create a connection if we don't have one or it was created in a different worker

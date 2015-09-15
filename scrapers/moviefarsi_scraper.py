@@ -57,7 +57,7 @@ class MovieFarsi_Scraper(scraper.Scraper):
             if video.video_type == VIDEO_TYPES.EPISODE:
                     sources = self.__get_files(source_url)
                     for source in sources:
-                        _, season, episode, height, _ = self.__parse_episode_link(source['link'])
+                        _title, season, episode, height, _extra = self._parse_episode_link(source['link'])
                         if int(video.season) == int(season) and int(video.episode) == int(episode):
                             hoster = {'multi-part': False, 'host': self._get_direct_hostname(source['url']), 'class': self, 'quality': self._height_get_quality(height), 'views': None, 'rating': None, 'url': source['url'], 'direct': True}
                             hosters.append(hoster)
@@ -66,27 +66,12 @@ class MovieFarsi_Scraper(scraper.Scraper):
                 html = self._http_get(source_url, cache_limit=1)
                 for match in re.finditer('downloadicon.png.*?href="([^"]+)', html):
                     stream_url = match.group(1)
-                    _title, _year, height, _extra = self.__parse_movie_link(stream_url)
+                    _title, _year, height, _extra = self._parse_movie_link(stream_url)
                     hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': self._height_get_quality(height), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                     hosters.append(hoster)
                     
         return hosters
 
-    def __parse_episode_link(self, link):
-        match = re.match('(.*?)\.S(\d+)E(\d+)\.(\d+)p(?:_|\.)(.*)', link)
-        if match:
-            return match.groups()
-        else:
-            return ('', '-1', '-1', '-1', '')
-    
-    def __parse_movie_link(self, link):
-        file_name = link.split('/')[-1]
-        match = re.match('(.*?)(?:\.(\d{4}))?\.(\d+)p(?:\.|_)(.*)', file_name)
-        if match:
-            return match.groups()
-        else:
-            return ('', '', '480', '')  # make 480p when unknown
-    
     def get_url(self, video):
         return super(MovieFarsi_Scraper, self)._default_get_url(video)
 

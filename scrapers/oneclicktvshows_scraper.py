@@ -20,11 +20,10 @@ import re
 import urlparse
 import urllib
 import xbmcaddon
-from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://oneclicktvshows.com'
+FORMATS = ['x265', 'x264', 'webrip', 'webdl']
 
 class OCTV_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -45,7 +44,10 @@ class OCTV_Scraper(scraper.Scraper):
         return link
 
     def format_source_label(self, item):
-        label = '[%s] %s ' % (item['quality'], item['host'])
+        if 'format' in item:
+            label = '[%s] (%s) %s ' % (item['quality'], item['format'], item['host'])
+        else:
+            label = '[%s] %s ' % (item['quality'], item['host'])
         return label
 
     def get_sources(self, video):
@@ -54,21 +56,29 @@ class OCTV_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
+            
+            for match in re.finditer('<a[^>]+href="([^"]+)[^>]+>(.*?)</a>', html):
+                stream_url, title = match.groups()
+                title = re.sub('<span[^>]*>|</span>', '', title)
+                title = title.strip()
+                if title[-2:].upper() in ('MB', 'GB'):
+                    _title, season, episode, height, extra = self._parse_episode_link(title)
+                    if int(season) == int(video.season) and int(episode) == int(video.episode):
+                        host = urlparse.urlparse(stream_url).hostname
+                        hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': self._height_get_quality(height), 'views': None, 'rating': None, 'url': stream_url, 'direct': False}
+                        for vid_format in FORMATS:
+                            if vid_format in extra.lower():
+                                hoster['format'] = vid_format
+                                break
+                        hosters.append(hoster)
     
-            for table_cell in dom_parser.parse_dom(html, 'td', {'class': 'domain'}):
-                match = re.search('href="([^"]+)(?:[^>]+>)+\s*(.*?)\s*</a>', table_cell)
-                if match:
-                    link, host = match.groups()
-                    hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': self._get_quality(video, host, QUALITIES.HIGH), 'views': None, 'rating': None, 'url': link, 'direct': False}
-                    hosters.append(hoster)
-
         return hosters
 
     def get_url(self, video):
         return super(OCTV_Scraper, self)._default_get_url(video)
 
     def _get_episode_url(self, show_url, video):
-        return None
+        return show_url
 
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/?s=')
