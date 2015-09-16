@@ -53,20 +53,20 @@ def get_pin():
             never.controlRight(self.pin_edit_control)
             
         def onAction(self, action):
-            #print 'Action: %s' % (action.getId())
+            # print 'Action: %s' % (action.getId())
             if action == ACTION_PREVIOUS_MENU or action == ACTION_BACK:
                 self.close()
 
         def onControl(self, control):
-            #print 'onControl: %s' % (control)
+            # print 'onControl: %s' % (control)
             pass
 
         def onFocus(self, control):
-            #print 'onFocus: %s' % (control)
+            # print 'onFocus: %s' % (control)
             pass
 
         def onClick(self, control):
-            #print 'onClick: %s' % (control)
+            # print 'onClick: %s' % (control)
             if control == AUTH_BUTTON:
                 if not self.__get_token():
                     kodi.notify(msg=i18n('pin_auth_failed'), duration=5000)

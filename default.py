@@ -87,13 +87,13 @@ def settings_menu():
 def show_views():
     for content_type in ['movies', 'tvshows', 'seasons', 'episodes']:
         kodi.create_item({'mode': MODES.BROWSE_VIEW, 'content_type': content_type}, i18n('set_default_x_view') % (content_type.capitalize()),
-                      thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+                         thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     kodi.end_of_directory()
 
 @url_dispatcher.register(MODES.BROWSE_VIEW, ['content_type'])
 def browse_view(content_type):
     kodi.create_item({'mode': MODES.SET_VIEW, 'content_type': content_type}, i18n('set_view_instr') % (content_type.capitalize()), thumb=utils.art('settings.png'),
-                  fanart=utils.art('fanart.jpg'), is_folder=False, is_playable=False)
+                     fanart=utils.art('fanart.jpg'), is_folder=False, is_playable=False)
     utils.set_view(content_type, False)
     kodi.end_of_directory()
 
@@ -497,7 +497,7 @@ def browse_liked_lists(section):
 @url_dispatcher.register(MODES.OTHER_LISTS, ['section'])
 def browse_other_lists(section):
     kodi.create_item({'mode': MODES.ADD_OTHER_LIST, 'section': section}, i18n('add_other_list'), thumb=utils.art('add_other.png'),
-                  fanart=utils.art('fanart.jpg'), is_folder=False, is_playable=False)
+                     fanart=utils.art('fanart.jpg'), is_folder=False, is_playable=False)
 
     lists = db_connection.get_other_lists(section)
     total_items = len(lists)
@@ -692,7 +692,7 @@ def get_progress(cache_override=False):
         try:
             log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
             progress = q.get(True, timeout)
-            #log_utils.log('Got Progress: %s' % (progress), xbmc.LOGDEBUG)
+            # log_utils.log('Got Progress: %s' % (progress), xbmc.LOGDEBUG)
             worker_count -= 1
 
             if 'next_episode' in progress and progress['next_episode']:
@@ -760,10 +760,10 @@ def manage_subscriptions(section):
             color = 'red'
             run_str = i18n('disabled')
         kodi.create_item({'mode': MODES.UPDATE_SUBS, 'section': section}, label % (color, run_str), thumb=utils.art('update_subscriptions.png'),
-                      fanart=utils.art('fanart.jpg'), is_folder=False, is_playable=False)
+                         fanart=utils.art('fanart.jpg'), is_folder=False, is_playable=False)
         if section == SECTIONS.TV:
             kodi.create_item({'mode': MODES.CLEAN_SUBS}, i18n('cleanup_subs'), thumb=utils.art('clean_up.png'), fanart=utils.art('fanart.jpg'),
-                          is_folder=False, is_playable=False)
+                             is_folder=False, is_playable=False)
     show_pickable_list(slug, i18n('pick_sub_list'), MODES.PICK_SUB_LIST, section)
 
 @url_dispatcher.register(MODES.SHOW_FAVORITES, ['section'])
@@ -1427,7 +1427,6 @@ def add_to_list(section, id_type, show_id, slug=None):
     response = add_many_to_list(section, {id_type: show_id}, slug)
     if response is not None:
         kodi.notify(msg=i18n('item_to_list'))
-    #xbmc.executebuiltin("XBMC.Container.Refresh")
 
 def add_many_to_list(section, items, slug=None):
     if not slug: slug = utils.choose_list()
@@ -1667,7 +1666,7 @@ def add_to_library(video_type, title, year, trakt_id):
                     filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
                     final_path = os.path.join(make_path(save_path, video_type, show['title'], season=season_num), filename)
                     strm_string = kodi.get_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': year, 'season': season_num,
-                                                           'episode': ep_num, 'trakt_id': trakt_id, 'ep_title': episode['title'], 'ep_airdate': air_date, 'dialog': True})
+                                                       'episode': ep_num, 'trakt_id': trakt_id, 'ep_title': episode['title'], 'ep_airdate': air_date, 'dialog': True})
                     write_strm(strm_string, final_path, VIDEO_TYPES.EPISODE, show['title'], show['year'], trakt_id, season_num, ep_num, require_source=require_source)
 
     elif video_type == VIDEO_TYPES.MOVIE:
@@ -1883,8 +1882,8 @@ def make_season_item(season, info, trakt_id, fanart):
     return liz
 
 def make_episode_item(show, episode, show_subs=True, menu_items=None):
-    #log_utils.log('Make Episode: Show: %s, Episode: %s, Show Subs: %s' % (show, episode, show_subs), xbmc.LOGDEBUG)
-    #log_utils.log('Make Episode: Episode: %s' % (episode), xbmc.LOGDEBUG)
+    # log_utils.log('Make Episode: Show: %s, Episode: %s, Show Subs: %s' % (show, episode, show_subs), xbmc.LOGDEBUG)
+    # log_utils.log('Make Episode: Episode: %s' % (episode), xbmc.LOGDEBUG)
     if menu_items is None: menu_items = []
     folder = kodi.get_setting('source-win') == 'Directory' and kodi.get_setting('auto-play') == 'false'
     show['title'] = re.sub(' \(\d{4}\)$', '', show['title'])

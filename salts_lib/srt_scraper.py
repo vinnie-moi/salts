@@ -94,7 +94,7 @@ class SRT_Scraper():
         req_hd = kodi.get_setting('subtitle-hd') == 'true'
         items = []
         regex = re.compile('<td>(\d+)</td><td>(\d+)</td><td>.*?</td><td>(.*?)</td><td.*?>(.*?)</td>.*?<td.*?>(.+?)</td><td.*?>(.*?)</td><td.*?>(.*?)</td><td.*?>(.*?)</td><td.*?><a\s+href="(.*?)">.+?</td>',
-                         re.DOTALL)
+                           re.DOTALL)
         for match in regex.finditer(html):
             season, episode, srt_lang, version, completed, hi, corrected, hd, srt_url = match.groups()
             if not language or language == srt_lang and (not req_hi or hi) and (not req_hd or hd):

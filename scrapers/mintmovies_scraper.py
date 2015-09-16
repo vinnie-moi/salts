@@ -20,10 +20,8 @@ import urllib
 import urlparse
 import re
 from salts_lib import kodi
-import urllib2
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://www.mintmovies.net'
 

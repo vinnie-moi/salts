@@ -344,7 +344,7 @@ class Trakt_API():
             if season:
                 data['shows'][0]['seasons'] = [{'number': int(season)}]
                 if episode:
-                    data['shows'][0]['seasons'][0]['episodes'] = [{'number':int(episode)}]
+                    data['shows'][0]['seasons'][0]['episodes'] = [{'number': int(episode)}]
         return data
 
     def __make_media_list_from_list(self, section, items):
@@ -383,7 +383,7 @@ class Trakt_API():
 
                     db_connection.cache_url(url, result)
                     break
-                except (ssl.SSLError, socket.timeout)  as e:
+                except (ssl.SSLError, socket.timeout) as e:
                     if cached_result:
                         result = cached_result
                         log_utils.log('Temporary Trakt Error (%s). Using Cached Page Instead.' % (str(e)), log_utils.LOGWARNING)

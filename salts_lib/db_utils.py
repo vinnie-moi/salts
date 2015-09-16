@@ -365,7 +365,7 @@ class DB_Connection():
         while True:
             try:
                 cur = self.db.cursor()
-                #log_utils.log('Running: %s with %s' % (sql, params), log_utils.LOGDEBUG)
+                # log_utils.log('Running: %s with %s' % (sql, params), log_utils.LOGDEBUG)
                 cur.execute(sql, params)
                 if sql[:6].upper() == 'SELECT' or sql[:4].upper() == 'SHOW':
                     rows = cur.fetchall()

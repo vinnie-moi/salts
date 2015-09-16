@@ -40,11 +40,12 @@ from db_utils import DB_Connection
 import threading
 
 ICON_PATH = os.path.join(kodi.get_path(), 'icon.png')
-SORT_FIELDS = [(SORT_LIST[int(kodi.get_setting('sort1_field'))], SORT_SIGNS[kodi.get_setting('sort1_order')]),
-                (SORT_LIST[int(kodi.get_setting('sort2_field'))], SORT_SIGNS[kodi.get_setting('sort2_order')]),
-                (SORT_LIST[int(kodi.get_setting('sort3_field'))], SORT_SIGNS[kodi.get_setting('sort3_order')]),
-                (SORT_LIST[int(kodi.get_setting('sort4_field'))], SORT_SIGNS[kodi.get_setting('sort4_order')]),
-                (SORT_LIST[int(kodi.get_setting('sort5_field'))], SORT_SIGNS[kodi.get_setting('sort5_order')])]
+SORT_FIELDS = [
+    (SORT_LIST[int(kodi.get_setting('sort1_field'))], SORT_SIGNS[kodi.get_setting('sort1_order')]),
+    (SORT_LIST[int(kodi.get_setting('sort2_field'))], SORT_SIGNS[kodi.get_setting('sort2_order')]),
+    (SORT_LIST[int(kodi.get_setting('sort3_field'))], SORT_SIGNS[kodi.get_setting('sort3_order')]),
+    (SORT_LIST[int(kodi.get_setting('sort4_field'))], SORT_SIGNS[kodi.get_setting('sort4_order')]),
+    (SORT_LIST[int(kodi.get_setting('sort5_field'))], SORT_SIGNS[kodi.get_setting('sort5_order')])]
 
 last_check = datetime.datetime.fromtimestamp(0)
 
@@ -481,14 +482,14 @@ def do_scheduled_task(task, isPlaying):
     now = datetime.datetime.now()
     if kodi.get_setting('auto-%s' % task) == 'true':
         if last_check < now - datetime.timedelta(minutes=1):
-            #log_utils.log('Check Triggered: Last: %s Now: %s' % (last_check, now), log_utils.LOGDEBUG)
+            # log_utils.log('Check Triggered: Last: %s Now: %s' % (last_check, now), log_utils.LOGDEBUG)
             next_run = get_next_run(task)
             last_check = now
         else:
             # hack next_run to be in the future
             next_run = now + datetime.timedelta(seconds=1)
 
-        #log_utils.log("Update Status on [%s]: Currently: %s Will Run: %s Last Check: %s" % (task, now, next_run, last_check), xbmc.LOGDEBUG)
+        # log_utils.log("Update Status on [%s]: Currently: %s Will Run: %s Last Check: %s" % (task, now, next_run, last_check), xbmc.LOGDEBUG)
         if now >= next_run:
             is_scanning = xbmc.getCondVisibility('Library.IsScanningVideo')
             if not is_scanning:
