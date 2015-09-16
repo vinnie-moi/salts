@@ -16,11 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
-from salts_lib import kodi
 import xbmc
 import os
 import base64
 import time
+from salts_lib import kodi
 from salts_lib import pyaes
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -82,8 +82,7 @@ class Shush_Proxy(scraper.Scraper):
     
     def __update_scraper_py(self):
         try:
-            path = xbmcaddon.Addon().getAddonInfo('path')
-            py_path = os.path.join(path, 'scrapers', 'shush_scraper.py')
+            py_path = os.path.join(kodi.get_path(), 'scrapers', 'shush_scraper.py')
             exists = os.path.exists(py_path)
             if  not exists or (exists and os.path.getmtime(py_path) < time.time() - (4 * 60 * 60)):
                 cipher_text = self._http_get(PY_URL, cache_limit=4)
