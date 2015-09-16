@@ -68,6 +68,13 @@ class XMovies8_Scraper(scraper.Scraper):
                     hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                     hosters.append(hoster)
             
+            match = re.search('<source\s+src="([^"]+)', html)
+            if match:
+                stream_url = match.group(1) + '|User-Agent=%s' % (USER_AGENT)
+                hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                hosters.append(hoster)
+                
+            
         return hosters
 
     def get_url(self, video):
