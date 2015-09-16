@@ -26,7 +26,7 @@ from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://zumvo.me'
+BASE_URL = 'http://zumvo.tv'
 QUALITY_MAP = {'HD': QUALITIES.HIGH, 'CAM': QUALITIES.LOW, 'BR-RIP': QUALITIES.HD720, 'UNKNOWN': QUALITIES.MEDIUM, 'SD': QUALITIES.HIGH}
 
 class Zumvo_Scraper(scraper.Scraper):
@@ -91,7 +91,6 @@ class Zumvo_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/search/')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=0)
-        print html
         results = []
         match = re.search('ul class="list-film"(.*?)</ul>', html, re.DOTALL)
         if match:
