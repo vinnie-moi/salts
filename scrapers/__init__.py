@@ -65,9 +65,6 @@ def update_settings():
     classes = scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     for cls in sorted(classes, key=lambda x: x.get_name().upper()):
         new_settings += cls.get_settings()
-        if cls.get_name() == 'xmovies8':
-            print new_settings
-
         if len(new_settings) > 90:
             xml = update_xml(xml, new_settings, cat_count)
             new_settings = []
