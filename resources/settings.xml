@@ -199,6 +199,12 @@
          <setting id="DirectDownload.tv_try" type="number" default="0" visible="false"/>
          <setting id="DirectDownload.tv_fail" type="number" default="0" visible="false"/>
          <setting id="DirectDownload.tv_check" type="number" default="0" visible="false"/>
+         <setting id="Dizigold-enable" type="bool" label="Dizigold Enabled" default="true" visible="true"/>
+         <setting id="Dizigold-base_url" type="text" label="    Base Url" default="http://www.dizigold.net" visible="eq(-1,true)"/>
+         <setting id="Dizigold-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="Dizigold_try" type="number" default="0" visible="false"/>
+         <setting id="Dizigold_fail" type="number" default="0" visible="false"/>
+         <setting id="Dizigold_check" type="number" default="0" visible="false"/>
          <setting id="Dizilab-enable" type="bool" label="Dizilab Enabled" default="true" visible="true"/>
          <setting id="Dizilab-base_url" type="text" label="    Base Url" default="http://dizilab.com" visible="eq(-1,true)"/>
          <setting id="Dizilab-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -217,15 +223,15 @@
          <setting id="filmikz.ch_try" type="number" default="0" visible="false"/>
          <setting id="filmikz.ch_fail" type="number" default="0" visible="false"/>
          <setting id="filmikz.ch_check" type="number" default="0" visible="false"/>
+    </category>
+
+	<category label="Scrapers 2">
          <setting id="FilmStreaming.in-enable" type="bool" label="FilmStreaming.in Enabled" default="true" visible="true"/>
          <setting id="FilmStreaming.in-base_url" type="text" label="    Base Url" default="http://film-streaming.in" visible="eq(-1,true)"/>
          <setting id="FilmStreaming.in-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="FilmStreaming.in_try" type="number" default="0" visible="false"/>
          <setting id="FilmStreaming.in_fail" type="number" default="0" visible="false"/>
          <setting id="FilmStreaming.in_check" type="number" default="0" visible="false"/>
-    </category>
-
-	<category label="Scrapers 2">
          <setting id="Flixanity-enable" type="bool" label="Flixanity Enabled" default="true" visible="true"/>
          <setting id="Flixanity-base_url" type="text" label="    Base Url" default="http://www.flixanity.tv" visible="eq(-1,true)"/>
          <setting id="Flixanity-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -313,15 +319,15 @@
          <setting id="Movie4K_try" type="number" default="0" visible="false"/>
          <setting id="Movie4K_fail" type="number" default="0" visible="false"/>
          <setting id="Movie4K_check" type="number" default="0" visible="false"/>
+    </category>
+
+	<category label="Scrapers 3">
          <setting id="MovieFarsi-enable" type="bool" label="MovieFarsi Enabled" default="true" visible="true"/>
          <setting id="MovieFarsi-base_url" type="text" label="    Base Url" default="http://moviefarsi2.com" visible="eq(-1,true)"/>
          <setting id="MovieFarsi-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="MovieFarsi_try" type="number" default="0" visible="false"/>
          <setting id="MovieFarsi_fail" type="number" default="0" visible="false"/>
          <setting id="MovieFarsi_check" type="number" default="0" visible="false"/>
-    </category>
-
-	<category label="Scrapers 3">
          <setting id="MovieNight-enable" type="bool" label="MovieNight Enabled" default="true" visible="true"/>
          <setting id="MovieNight-base_url" type="text" label="    Base Url" default="http://movienight.ws" visible="eq(-1,true)"/>
          <setting id="MovieNight-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -412,15 +418,15 @@
          <setting id="pftv_try" type="number" default="0" visible="false"/>
          <setting id="pftv_fail" type="number" default="0" visible="false"/>
          <setting id="pftv_check" type="number" default="0" visible="false"/>
+    </category>
+	
+    <category label="Scrapers 4">
          <setting id="popcorntimefree-enable" type="bool" label="popcorntimefree Enabled" default="true" visible="true"/>
          <setting id="popcorntimefree-base_url" type="text" label="    Base Url" default="http://popcorntimefree.info" visible="eq(-1,true)"/>
          <setting id="popcorntimefree-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="popcorntimefree_try" type="number" default="0" visible="false"/>
          <setting id="popcorntimefree_fail" type="number" default="0" visible="false"/>
          <setting id="popcorntimefree_check" type="number" default="0" visible="false"/>
-    </category>
-	
-    <category label="Scrapers 4">
          <setting id="PrimeWire-enable" type="bool" label="PrimeWire Enabled" default="true" visible="true"/>
          <setting id="PrimeWire-base_url" type="text" label="    Base Url" default="http://www.primewire.ag" visible="eq(-1,true)"/>
          <setting id="PrimeWire-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -509,15 +515,15 @@
          <setting id="VKBox_try" type="number" default="0" visible="false"/>
          <setting id="VKBox_fail" type="number" default="0" visible="false"/>
          <setting id="VKBox_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 5">
          <setting id="Watch8Now-enable" type="bool" label="Watch8Now Enabled" default="true" visible="true"/>
          <setting id="Watch8Now-base_url" type="text" label="    Base Url" default="http://watch8now.so" visible="eq(-1,true)"/>
          <setting id="Watch8Now-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="Watch8Now_try" type="number" default="0" visible="false"/>
          <setting id="Watch8Now_fail" type="number" default="0" visible="false"/>
          <setting id="Watch8Now_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 5">
          <setting id="WatchFree.to-enable" type="bool" label="WatchFree.to Enabled" default="true" visible="true"/>
          <setting id="WatchFree.to-base_url" type="text" label="    Base Url" default="http://www.watchfree.to" visible="eq(-1,true)"/>
          <setting id="WatchFree.to-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>

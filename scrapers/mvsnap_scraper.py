@@ -22,11 +22,11 @@ import re
 import json
 import xbmcaddon
 import xbmc
+import urllib2
 from salts_lib import log_utils
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.constants import QUALITIES
-from salts_lib.constants import Q_ORDER
+from salts_lib.constants import USER_AGENT
 
 BASE_URL = 'https://mvsnap.com'
 
@@ -63,9 +63,15 @@ class Mvsnap_Scraper(scraper.Scraper):
                 for match in re.finditer('<option\s+value="([^"]+)', fragment):
                     stream_url = match.group(1)
                     stream_url = urlparse.urljoin(self.base_url, stream_url)
-                    stream_url = self._http_get(stream_url, allow_redirect=False, cache_limit=.5)
-                    hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': self._gv_get_quality(stream_url), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
-                    hosters.append(hoster)
+                    request = urllib2.Request(stream_url)
+                    request.add_header('User-Agent', USER_AGENT)
+                    try:
+                        response = urllib2.urlopen(request)
+                        stream_url = response.geturl() + '|User-Agent=%s' % (USER_AGENT)
+                        hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': self._gv_get_quality(stream_url), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                        hosters.append(hoster)
+                    except Exception as e:
+                        log_utils.log('Exception during mvsnap get_sources: %s' % (e), xbmc.LOGDEBUG)
         return hosters
 
     def get_url(self, video):
@@ -84,18 +90,22 @@ class Mvsnap_Scraper(scraper.Scraper):
             else:
                 if 'movies' in js_data:
                     for item in js_data['movies']:
-                        if item['type'] != 'movies':
-                            continue
-                        
-                        match = re.search('(.*)(?:\s+\((\d{4})\))', item['title'])
-                        if match:
-                            match_title, match_year = match.groups()
-                        else:
-                            match_title = item['title']
-                            match_year = ''
-                        
-                        result = {'title': match_title, 'url': '/movies/%s' % (item['slug']), 'year': match_year}
-                        results.append(result)
+                        try:
+                            if item['type'] != 'movies':
+                                continue
+                            
+                            match = re.search('(.*)(?:\s+\((\d{4})\))', item['long_title'])
+                            if match:
+                                match_title, match_year = match.groups()
+                            else:
+                                match_title = item['long_title']
+                                match_year = ''
+                            
+                            if not year or not match_year or year == match_year:
+                                result = {'title': match_title, 'url': '/movies/%s' % (item['slug']), 'year': match_year}
+                                results.append(result)
+                        except KeyError:
+                            pass
         return results
 
     def _http_get(self, url, data=None, allow_redirect=True, cache_limit=8):
