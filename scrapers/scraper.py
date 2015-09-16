@@ -244,7 +244,12 @@ class Scraper(object):
 
         try:
             self.cj = self._set_cookies(base_url, cookies)
-            if data is not None: data = urllib.urlencode(data, True)
+            if data is not None:
+                if isinstance(data, basestring):
+                    data = data
+                else:
+                    data = urllib.urlencode(data, True)
+
             if multipart_data is not None:
                 headers['Content-Type'] = 'multipart/form-data; boundary=X-X-X'
                 data = multipart_data

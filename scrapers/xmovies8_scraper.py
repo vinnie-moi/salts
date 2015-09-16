@@ -22,8 +22,11 @@ import re
 import xbmcaddon
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import USER_AGENT
+from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://xmovies8.tv'
+XHR = {'X-Requested-With': 'XMLHttpRequest'}
 
 class XMovies8_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -56,6 +59,17 @@ class XMovies8_Scraper(scraper.Scraper):
                 stream_url, width, _ = match.groups()
                 hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': self._width_get_quality(width), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                 hosters.append(hoster)
+            
+            match = re.search('url\s*:\s*"([^"]+picasa\.php).*?data\s*:\s*\'([^\']+)', html, re.DOTALL)
+            if match:
+                php_url, data = match.groups()
+                html = self._http_get(php_url, data=data, headers=XHR, cache_limit=0)
+                match = re.search('<source\s+src="([^"]+)', html)
+                if match:
+                    stream_url = match.group(1) + '|User-Agent=%s' % (USER_AGENT)
+                    hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                    hosters.append(hoster)
+            
         return hosters
 
     def get_url(self, video):
@@ -63,23 +77,27 @@ class XMovies8_Scraper(scraper.Scraper):
 
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/?s=%s' % urllib.quote_plus(title))
-        html = self._http_get(search_url, cache_limit=.25)
+        html = self._http_get(search_url, allow_redirect=False, cache_limit=.25)
         results = []
-        for result in dom_parser.parse_dom(html, 'h2'):
-            match = re.search('href="([^"]+)"[^>]*>([^<]+)', result)
-            if match:
-                url, match_title_year = match.groups()
-                match = re.search('(.*?)\s+\((\d{4})\)', match_title_year)
+        if html.startswith('http://') and '/movie/' in html:
+            result = {'url': html.replace(self.base_url, ''), 'title': title, 'year': year}
+            results.append(result)
+        else:
+            for result in dom_parser.parse_dom(html, 'div', {'class': 'info'}):
+                match = re.search('href="([^"]+)"[^>]*>\s*([^<]+)', result)
                 if match:
-                    match_title, match_year = match.groups()
-                else:
-                    match_title = match_title_year
-                    match_year = ''
-
-                if not year or not match_year or year == match_year:
-                    result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
-                    results.append(result)
+                    url, match_title_year = match.groups()
+                    match = re.search('(.*?)\s+\((\d{4})\)', match_title_year)
+                    if match:
+                        match_title, match_year = match.groups()
+                    else:
+                        match_title = match_title_year
+                        match_year = ''
+    
+                    if not year or not match_year or year == match_year:
+                        result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
+                        results.append(result)
         return results
 
-    def _http_get(self, url, cookies=None, data=None, cache_limit=8):
-        return super(XMovies8_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, cache_limit=cache_limit)
+    def _http_get(self, url, cookies=None, data=None, headers=None, allow_redirect=True, cache_limit=8):
+        return super(XMovies8_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, headers=headers, allow_redirect=allow_redirect, cache_limit=cache_limit)
