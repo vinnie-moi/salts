@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import xbmc
-import xbmcaddon
 import xbmcgui
+from salts_lib import kodi
 from salts_lib import log_utils
 from salts_lib import utils
 from salts_lib.constants import MODES
@@ -25,11 +25,9 @@ from salts_lib.db_utils import DB_Connection
 
 MAX_ERRORS = 10
 
-kodi = xbmcaddon.Addon(id='plugin.video.salts')
-log_utils.log('Service: Installed Version: %s' % (kodi.getAddonInfo('version')))
-
+log_utils.log('Service: Installed Version: %s' % (kodi.get_version()))
 db_connection = DB_Connection()
-if kodi.getSetting('use_remote_db') == 'false' or kodi.getSetting('enable_upgrade') == 'true':
+if kodi.get_setting('use_remote_db') == 'false' or kodi.get_setting('enable_upgrade') == 'true':
     db_connection.init_database()
 
 class Service(xbmc.Player):
