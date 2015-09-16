@@ -20,7 +20,7 @@ import urllib
 import urlparse
 import re
 import json
-import xbmcaddon
+from salts_lib import kodi
 import xbmc
 import urllib2
 from salts_lib import log_utils
@@ -35,7 +35,7 @@ class Mvsnap_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
+        self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
 
     @classmethod
     def provides(cls):

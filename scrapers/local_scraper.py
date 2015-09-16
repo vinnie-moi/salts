@@ -17,7 +17,7 @@
 """
 import scraper
 import json
-import xbmcaddon
+from salts_lib import kodi
 import xbmc
 import urlparse
 from salts_lib import log_utils
@@ -29,8 +29,8 @@ BASE_URL = ''
 
 class Local_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
-        self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
-        self.def_quality = int(xbmcaddon.Addon().getSetting('%s-def-quality' % (self.get_name())))
+        self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
+        self.def_quality = int(kodi.get_setting('%s-def-quality' % (self.get_name())))
 
     @classmethod
     def provides(cls):
@@ -94,7 +94,7 @@ class Local_Scraper(scraper.Scraper):
         else:
             log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), xbmc.LOGDEBUG)
 
-        if (force_title or xbmcaddon.Addon().getSetting('title-fallback') == 'true') and video.ep_title:
+        if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title:
             run = cmd % (params['id'][0], video.season, 'title', video.ep_title)
             meta = xbmc.executeJSONRPC(run)
             meta = json.loads(meta)

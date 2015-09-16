@@ -20,7 +20,7 @@ import urllib
 import urlparse
 import re
 import json
-import xbmcaddon
+from salts_lib import kodi
 import xbmc
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
@@ -36,9 +36,9 @@ class Niter_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
-        self.username = xbmcaddon.Addon().getSetting('%s-username' % (self.get_name()))
-        self.password = xbmcaddon.Addon().getSetting('%s-password' % (self.get_name()))
+        self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
+        self.username = kodi.get_setting('%s-username' % (self.get_name()))
+        self.password = kodi.get_setting('%s-password' % (self.get_name()))
 
     @classmethod
     def provides(cls):

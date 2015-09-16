@@ -21,7 +21,7 @@ import urllib
 import urlparse
 import cookielib
 import xbmc
-import xbmcaddon
+from salts_lib import kodi
 import xbmcgui
 import os
 import re
@@ -47,7 +47,7 @@ import threading
 
 BASE_URL = ''
 CAPTCHA_BASE_URL = 'http://www.google.com/recaptcha/api'
-COOKIEPATH = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
+COOKIEPATH = xbmc.translatePath(kodi.get_profile())
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 SHORT_MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 Q_LIST = [item[0] for item in sorted(Q_ORDER.items(), key=lambda x:x[1])]
@@ -269,7 +269,7 @@ class Scraper(object):
 
             response = urllib2.urlopen(request, timeout=timeout)
             self.cj.extract_cookies(response, request)
-            if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
+            if kodi.get_setting('cookie_debug') == 'true':
                 log_utils.log('Response Cookies: %s - %s' % (url, self.cookies_as_str(self.cj)), xbmc.LOGDEBUG)
             self.__fix_bad_cookies()
             self.cj.save(ignore_discard=True)
@@ -302,7 +302,7 @@ class Scraper(object):
         cj = cookielib.LWPCookieJar(cookie_file)
         try: cj.load(ignore_discard=True)
         except: pass
-        if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
+        if kodi.get_setting('cookie_debug') == 'true':
             log_utils.log('Before Cookies: %s - %s' % (self, self.cookies_as_str(cj)), xbmc.LOGDEBUG)
         domain = urlparse.urlsplit(base_url).hostname
         for key in cookies:
@@ -311,7 +311,7 @@ class Scraper(object):
                                 comment_url=None, rest={})
             cj.set_cookie(c)
         cj.save(ignore_discard=True)
-        if xbmcaddon.Addon().getSetting('cookie_debug') == 'true':
+        if kodi.get_setting('cookie_debug') == 'true':
             log_utils.log('After Cookies: %s - %s' % (self, self.cookies_as_str(cj)), xbmc.LOGDEBUG)
         return cj
 
@@ -373,7 +373,7 @@ class Scraper(object):
                     url = match.group(1)
                     return url.replace(self.base_url, '')
 
-                if xbmcaddon.Addon().getSetting('airdate-fallback') == 'true' and airdate_pattern and video.ep_airdate:
+                if kodi.get_setting('airdate-fallback') == 'true' and airdate_pattern and video.ep_airdate:
                     airdate_pattern = airdate_pattern.replace('{year}', str(video.ep_airdate.year))
                     airdate_pattern = airdate_pattern.replace('{month}', str(video.ep_airdate.month))
                     airdate_pattern = airdate_pattern.replace('{p_month}', '%02d' % (video.ep_airdate.month))
@@ -390,7 +390,7 @@ class Scraper(object):
             else:
                 log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), xbmc.LOGDEBUG)
 
-            if (force_title or xbmcaddon.Addon().getSetting('title-fallback') == 'true') and video.ep_title and title_pattern:
+            if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title and title_pattern:
                 norm_title = self._normalize_title(video.ep_title)
                 for match in re.finditer(title_pattern, html, re.DOTALL | re.I):
                     url, title = match.groups()
@@ -398,7 +398,7 @@ class Scraper(object):
                         return url.replace(self.base_url, '')
 
     def _force_title(self, video):
-            trakt_str = xbmcaddon.Addon().getSetting('force_title_match')
+            trakt_str = kodi.get_setting('force_title_match')
             trakt_list = trakt_str.split('|') if trakt_str else []
             return str(video.trakt_id) in trakt_list
 
@@ -421,7 +421,7 @@ class Scraper(object):
                 show_title = title
         norm_title = self._normalize_title(show_title)
 
-        filter_days = datetime.timedelta(days=int(xbmcaddon.Addon().getSetting('%s-filter' % (self.get_name()))))
+        filter_days = datetime.timedelta(days=int(kodi.get_setting('%s-filter' % (self.get_name()))))
         today = datetime.date.today()
         for match in re.finditer(post_pattern, html, re.DOTALL):
             post_data = match.groupdict()
@@ -470,7 +470,7 @@ class Scraper(object):
             url = result[0][0]
             log_utils.log('Got local related url: |%s|%s|%s|%s|%s|' % (video.video_type, video.title, video.year, self.get_name(), url))
         else:
-            select = int(xbmcaddon.Addon().getSetting('%s-select' % (self.get_name())))
+            select = int(kodi.get_setting('%s-select' % (self.get_name())))
             if video.video_type == VIDEO_TYPES.EPISODE:
                 temp_title = re.sub('[^A-Za-z0-9 ]', '', video.title)
                 if not self._force_title(video):

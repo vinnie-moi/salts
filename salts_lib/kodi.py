@@ -35,6 +35,9 @@ show_settings = addon.openSettings
 def get_path():
     return addon.getAddonInfo('path')
 
+def get_profile():
+    return addon.getAddonInfo('profile')
+
 def set_setting(id, value):
     addon.setSetting(id, str(value))
 

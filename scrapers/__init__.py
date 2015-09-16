@@ -10,10 +10,10 @@ __all__ = ['scraper', 'local_scraper', 'pw_scraper', 'uflix_scraper', 'watchseri
 
 import re
 import os
-import xbmcaddon
 import xbmc
 import datetime
 import time
+from salts_lib import kodi
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from . import scraper  # just to avoid editor warning
@@ -51,8 +51,7 @@ def update_xml(xml, new_settings, cat_count):
     return xml
 
 def update_settings():
-    path = xbmcaddon.Addon().getAddonInfo('path')
-    full_path = os.path.join(path, 'resources', 'settings.xml')
+    full_path = os.path.join(kodi.get_path(), 'resources', 'settings.xml')
     try:
         with open(full_path, 'r') as f:
             xml = f.read()

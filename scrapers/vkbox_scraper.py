@@ -17,7 +17,7 @@
 """
 import scraper
 import urlparse
-import xbmcaddon
+from salts_lib import kodi
 import xbmc
 import zipfile
 import StringIO
@@ -38,7 +38,7 @@ class VKBox_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
+        self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
 
     @classmethod
     def provides(cls):

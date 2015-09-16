@@ -16,11 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
-import urllib
 import urlparse
 import re
-import xbmcaddon
 import string
+from salts_lib import kodi
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 BASE_URL = 'http://afdah.tv'
@@ -30,7 +29,7 @@ class Afdah_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
+        self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
 
     @classmethod
     def provides(cls):

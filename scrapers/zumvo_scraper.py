@@ -19,7 +19,7 @@ import scraper
 import urllib
 import urlparse
 import re
-import xbmcaddon
+from salts_lib import kodi
 import xbmc
 import base64
 from salts_lib import log_utils
@@ -34,7 +34,7 @@ class Zumvo_Scraper(scraper.Scraper):
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
+        self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
 
     @classmethod
     def provides(cls):
@@ -91,6 +91,7 @@ class Zumvo_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/search/')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=0)
+        print html
         results = []
         match = re.search('ul class="list-film"(.*?)</ul>', html, re.DOTALL)
         if match:
