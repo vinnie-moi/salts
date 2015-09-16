@@ -40,12 +40,12 @@ class ScraperVideo:
 def update_xml(xml, new_settings, cat_count):
     new_settings.insert(0, '<category label="Scrapers %s">' % (cat_count))
     new_settings.append('    </category>')
-    new_str = '\n'.join(new_settings)
+    new_settings = '\n'.join(new_settings)
     match = re.search('(<category label="Scrapers %s">.*?</category>)' % (cat_count), xml, re.DOTALL | re.I)
     if match:
         old_settings = match.group(1)
         if old_settings != new_settings:
-            xml = xml.replace(old_settings, new_str)
+            xml = xml.replace(old_settings, new_settings)
     else:
         log_utils.log('Unable to match category: %s' % (cat_count), xbmc.LOGWARNING)
     return xml
@@ -65,6 +65,8 @@ def update_settings():
     classes = scraper.Scraper.__class__.__subclasses__(scraper.Scraper)
     for cls in sorted(classes, key=lambda x: x.get_name().upper()):
         new_settings += cls.get_settings()
+        if cls.get_name() == 'xmovies8':
+            print new_settings
 
         if len(new_settings) > 90:
             xml = update_xml(xml, new_settings, cat_count)

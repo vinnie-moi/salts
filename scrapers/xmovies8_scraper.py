@@ -19,21 +19,19 @@ import scraper
 import urllib
 import urlparse
 import re
-import xbmcaddon
+import random
+from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://xmovies8.tv'
 XHR = {'X-Requested-With': 'XMLHttpRequest'}
 
 class XMovies8_Scraper(scraper.Scraper):
-    base_url = BASE_URL
-
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
-        self.base_url = xbmcaddon.Addon().getSetting('%s-base_url' % (self.get_name()))
+        self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
 
     @classmethod
     def provides(cls):
@@ -75,6 +73,12 @@ class XMovies8_Scraper(scraper.Scraper):
     def get_url(self, video):
         return super(XMovies8_Scraper, self)._default_get_url(video)
 
+    @classmethod
+    def get_settings(cls):
+        settings = super(XMovies8_Scraper, cls).get_settings()
+        settings.append('         <setting id="%s-default_url" type="string" visible="false"/>' % (cls.get_name()))
+        return settings
+
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/?s=%s' % urllib.quote_plus(title))
         html = self._http_get(search_url, allow_redirect=False, cache_limit=.25)
@@ -101,3 +105,12 @@ class XMovies8_Scraper(scraper.Scraper):
 
     def _http_get(self, url, cookies=None, data=None, headers=None, allow_redirect=True, cache_limit=8):
         return super(XMovies8_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, headers=headers, allow_redirect=allow_redirect, cache_limit=cache_limit)
+
+# if no default url has been set, then pick one and set it. If one has been set, use it
+default_url = kodi.get_setting('%s-default_url' % (XMovies8_Scraper.get_name()))
+if not default_url:
+    BASE_URL = random.choice(['http://xmovies8.tv', 'http://megashare9.tv'])
+    XMovies8_Scraper.base_url = BASE_URL
+    kodi.set_setting('%s-default_url' % (XMovies8_Scraper.get_name()), BASE_URL)
+else:
+    XMovies8_Scraper.base_url = default_url
