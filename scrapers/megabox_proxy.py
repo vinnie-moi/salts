@@ -19,13 +19,14 @@ import scraper
 import xbmc
 import os
 import time
+import urllib2
 from salts_lib.trans_utils import i18n
 from salts_lib import kodi
 from salts_lib import pyaes
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 
-BASE_URL = 'http://www.megaboxhd.com'
+BASE_URL = 'http://megaboxhd.com'
 IV = '\0' * 16
 
 class Megabox_Proxy(scraper.Scraper):
@@ -92,8 +93,14 @@ class Megabox_Proxy(scraper.Scraper):
             exists = os.path.exists(py_path)
             scraper_url = kodi.get_setting('%s-scraper_url' % (self.get_name()))
             scraper_key = kodi.get_setting('%s-scraper_key' % (self.get_name()))
-            if scraper_url and scraper_key and (not exists or (exists and os.path.getmtime(py_path) < time.time() - (4 * 60 * 60))):
-                cipher_text = self._http_get(scraper_url, cache_limit=4)
+            if scraper_url and scraper_key and (not exists or os.path.getmtime(py_path) < time.time() - (4 * 60 * 60)):
+                try:
+                    req = urllib2.urlopen(scraper_url)
+                    cipher_text = req.read()
+                except Exception as e:
+                    log_utils.log('Failure during %s scraper get: %s' % (self.get_name(), e), xbmc.LOGWARNING)
+                    return
+                 
                 if cipher_text:
                     decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(scraper_key, IV))
                     new_py = decrypter.feed(cipher_text)
