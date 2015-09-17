@@ -219,5 +219,7 @@ STRINGS = {
     'most_collected_monthly': 30207,
     'most_collected_all': 30208,
     'not_added_to_lib': 30209,
-    'local_exists': 30210
+    'local_exists': 30210,
+    'scraper_location': 30211,
+    'scraper_key': 30212
 }

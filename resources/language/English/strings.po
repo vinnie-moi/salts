@@ -858,6 +858,14 @@ msgctxt "#30210"
 msgid "Local Exists"
 msgstr ""
 
+msgctxt "#30211"
+msgid "Scraper Download Url"
+msgstr ""
+
+msgctxt "#30212"
+msgid "Scraper Decryption Key"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
