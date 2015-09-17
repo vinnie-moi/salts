@@ -248,8 +248,8 @@
          <setting id="GVCenter_try" type="number" default="0" visible="false"/>
          <setting id="GVCenter_fail" type="number" default="0" visible="false"/>
          <setting id="GVCenter_check" type="number" default="0" visible="false"/>
-         <setting id="GVCenter-scraper_url" type="text" label="     Scraper Download Url" default="" visible="eq(-6,true)"/>
-         <setting id="GVCenter-scraper_key" type="text" label="     Scraper Decryption Key" option="hidden" default="" visible="eq(-7,true)"/>
+         <setting id="GVCenter-scraper_url" type="text" label="    Scraper Download Url" default="" visible="eq(-6,true)"/>
+         <setting id="GVCenter-scraper_key" type="text" label="    Scraper Decryption Key" option="hidden" default="" visible="eq(-7,true)"/>
          <setting id="hdmz-enable" type="bool" label="hdmz Enabled" default="true" visible="true"/>
          <setting id="hdmz-base_url" type="text" label="    Base Url" default="http://www.hdmoviezone.net" visible="eq(-1,true)"/>
          <setting id="hdmz-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -295,8 +295,8 @@
          <setting id="MegaboxHD_try" type="number" default="0" visible="false"/>
          <setting id="MegaboxHD_fail" type="number" default="0" visible="false"/>
          <setting id="MegaboxHD_check" type="number" default="0" visible="false"/>
-         <setting id="MegaboxHD-scraper_url" type="text" label="     Scraper Download Url" default="" visible="eq(-6,true)"/>
-         <setting id="MegaboxHD-scraper_key" type="text" label="     Scraper Decryption Key" option="hidden" default="" visible="eq(-7,true)"/>
+         <setting id="MegaboxHD-scraper_url" type="text" label="    Scraper Download Url" default="" visible="eq(-6,true)"/>
+         <setting id="MegaboxHD-scraper_key" type="text" label="    Scraper Decryption Key" option="hidden" default="" visible="eq(-7,true)"/>
          <setting id="MerDB-enable" type="bool" label="MerDB Enabled" default="true" visible="true"/>
          <setting id="MerDB-base_url" type="text" label="    Base Url" default="http://www.merdb.mx" visible="eq(-1,true)"/>
          <setting id="MerDB-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>

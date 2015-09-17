@@ -79,8 +79,8 @@ class Megabox_Proxy(scraper.Scraper):
     def get_settings(cls):
         settings = super(Megabox_Proxy, cls).get_settings()
         name = cls.get_name()
-        settings.append('         <setting id="%s-scraper_url" type="text" label="     %s" default="" visible="eq(-6,true)"/>' % (name, i18n('scraper_location')))
-        settings.append('         <setting id="%s-scraper_key" type="text" label="     %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('scraper_key')))
+        settings.append('         <setting id="%s-scraper_url" type="text" label="    %s" default="" visible="eq(-6,true)"/>' % (name, i18n('scraper_location')))
+        settings.append('         <setting id="%s-scraper_key" type="text" label="    %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('scraper_key')))
         return settings
 
     def _http_get(self, url, cache_limit=8):
