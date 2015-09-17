@@ -1,3 +1,16 @@
+[B]Version 1.0.48[/B]
+- Add moviefarsi scraper
+- Remove playbox scraper
+- Fix yify-streaming
+- Add oneclicktvshows scraper
+- Add dizigold scraper
+- Fix mvsnap scraper
+- Fix xmovies8 scraper
+- Fix losmovies scraper
+- Fix zumvo scraper
+- Add uid/pw option to alluc
+- Start on megabox and gvc proxies
+
 [B]Version 1.0.47[/B]
 - More icefilms ad testing
 - Add dizimag scraper
