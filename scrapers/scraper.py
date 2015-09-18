@@ -562,6 +562,9 @@ class Scraper(object):
         return quality
 
     def _height_get_quality(self, height):
+        if str(height)[-1] in ['p', 'P']:
+            height = str(height)[:-1]
+            
         height = int(height)
         if height > 800:
             quality = QUALITIES.HD1080
