@@ -82,7 +82,7 @@ class Afdah_Scraper(scraper.Scraper):
         hosters = []
         for match in re.finditer('file\s*:\s*"([^"]+).*?label\s*:\s*"([^"]+)', html):
             url, resolution = match.groups()
-            hoster = {'multi-part': False, 'url': url, 'host': self._get_direct_hostname(url), 'class': self, 'quality': self._height_get_quality(resolution[:-1]), 'rating': None, 'views': None, 'direct': True}
+            hoster = {'multi-part': False, 'url': url, 'host': self._get_direct_hostname(url), 'class': self, 'quality': self._height_get_quality(resolution), 'rating': None, 'views': None, 'direct': True}
             hosters.append(hoster)
         return hosters
 

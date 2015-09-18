@@ -76,7 +76,7 @@ class Dizigold_Scraper(scraper.Scraper):
                             if self._get_direct_hostname(stream_url) == 'gvideo':
                                 quality = self._gv_get_quality(stream_url)
                             else:
-                                quality = self._height_get_quality(source['label'][:-1])
+                                quality = self._height_get_quality(source['label'])
                         
                             hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
                             hosters.append(hoster)
