@@ -23,9 +23,9 @@ from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 
-BASE_URL = 'http://onlinemovies.pro'
+BASE_URL = 'http://onlinemovies.is'
 
-class OnlineMoviesPro_Scraper(scraper.Scraper):
+class OnlineMoviesIs_Scraper(scraper.Scraper):
     base_url = BASE_URL
 
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
@@ -38,7 +38,7 @@ class OnlineMoviesPro_Scraper(scraper.Scraper):
 
     @classmethod
     def get_name(cls):
-        return 'OnlineMoviesPro'
+        return 'OnlineMoviesIs'
 
     def resolve_link(self, link):
         return link
@@ -57,29 +57,29 @@ class OnlineMoviesPro_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            match = re.search('class="video-embed".*?src="([^"]+)', html, re.DOTALL)
+            q_str = ''
+            match = re.search('>quality(.*?)<br\s*/>', html, re.I)
             if match:
-                stream_url = match.group(1)
-                host = urlparse.urlparse(stream_url).hostname
-                q_str = ''
-                match = re.search('>Quality(.*?)<br\s*/>', html, re.I)
-                if match:
-                    q_str = match.group(1)
-                    q_str = q_str.decode('utf-8').encode('ascii', 'ignore')
-                    q_str = re.sub('(</?strong[^>]*>|:|\s)', '', q_str, re.I | re.U)
-                    
-                hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': self._blog_get_quality(video, q_str, host), 'views': None, 'rating': None, 'url': stream_url, 'direct': False}
-                
-                match = re.search('class="views-infos">(\d+).*?class="rating">(\d+)%', html, re.DOTALL)
-                if match:
-                    hoster['views'] = int(match.group(1))
-                    hoster['rating'] = match.group(2)
+                q_str = match.group(1)
+                q_str = q_str.decode('utf-8').encode('ascii', 'ignore')
+                q_str = re.sub('(</?strong[^>]*>|:|\s)', '', q_str, re.I | re.U)
 
-                hosters.append(hoster)
+            fragment = dom_parser.parse_dom(html, 'div', {'class': 'video-embed'})
+            if fragment:
+                for match in re.finditer('<iframe[^>]+src="([^"]+)', fragment[0], re.I):
+                    stream_url = match.group(1)
+                    host = urlparse.urlparse(stream_url).hostname
+                    hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': self._blog_get_quality(video, q_str, host), 'views': None, 'rating': None, 'url': stream_url, 'direct': False}
+                    match = re.search('class="views-infos">(\d+).*?class="rating">(\d+)%', html, re.DOTALL)
+                    if match:
+                        hoster['views'] = int(match.group(1))
+                        hoster['rating'] = match.group(2)
+    
+                    hosters.append(hoster)
         return hosters
 
     def get_url(self, video):
-        return super(OnlineMoviesPro_Scraper, self)._default_get_url(video)
+        return super(OnlineMoviesIs_Scraper, self)._default_get_url(video)
 
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/?s=')
@@ -108,4 +108,4 @@ class OnlineMoviesPro_Scraper(scraper.Scraper):
         return results
 
     def _http_get(self, url, data=None, cache_limit=8):
-        return super(OnlineMoviesPro_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
+        return super(OnlineMoviesIs_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
