@@ -82,10 +82,8 @@ class MovieFarsi_Scraper(scraper.Scraper):
             match = re.search('href="(S%02d/?)"' % (int(video.season)), html)
             if match:
                 season_url = urlparse.urljoin(show_url, match.group(1))
-                for row in self.__parse_directory(self._http_get(season_url, cache_limit=24)):  # Quality directory
-                    url = urlparse.urljoin(season_url, row['link'])
-                    html = self._http_get(url, cache_limit=.5)
-                    match = re.search('href="[^"]*\.S%02dE%02d\.[^"]*' % (int(video.season), int(video.episode)), html)
+                for item in self.__get_files(season_url, cache_limit=1):
+                    match = re.search('(\.|_)S%02dE%02d(\.|_)' % (int(video.season), int(video.episode)), item['title'])
                     if match:
                         return season_url
             
@@ -123,9 +121,9 @@ class MovieFarsi_Scraper(scraper.Scraper):
         
         return results
 
-    def __get_files(self, url):
+    def __get_files(self, url, cache_limit=.5):
         sources = []
-        for row in self.__parse_directory(self._http_get(url, cache_limit=.5)):
+        for row in self.__parse_directory(self._http_get(url, cache_limit=cache_limit)):
             source_url = urlparse.urljoin(url, row['link'])
             if row['directory']:
                 sources += self.__get_files(source_url)
