@@ -1,4 +1,9 @@
 [B]Version 1.0.48[/B]
+- Add onlinemoviespro scraper
+- Add onlinemoviesis scraper
+- Add 123Movies scraper
+
+[B]Version 1.0.48[/B]
 - Add moviefarsi scraper
 - Remove playbox scraper
 - Fix yify-streaming
