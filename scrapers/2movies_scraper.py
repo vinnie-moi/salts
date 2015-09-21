@@ -45,7 +45,7 @@ class TwoMovies_Scraper(scraper.Scraper):
 
     @classmethod
     def provides(cls):
-        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
+        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
 
     @classmethod
     def get_name(cls):
@@ -85,7 +85,7 @@ class TwoMovies_Scraper(scraper.Scraper):
         results = []
 
         # filter the html down to only tvshow or movie results
-        if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE]:
+        if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE]:
             pattern = '<h1>Tv Shows</h1>.*'
         else:
             pattern = '<div class="filmDiv".*(<h1>Tv Shows</h1>)*'

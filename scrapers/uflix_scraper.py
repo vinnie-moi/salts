@@ -37,7 +37,7 @@ class UFlix_Scraper(scraper.Scraper):
 
     @classmethod
     def provides(cls):
-        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
+        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
 
     @classmethod
     def get_name(cls):
@@ -91,7 +91,7 @@ class UFlix_Scraper(scraper.Scraper):
         results = []
 
         # filter the html down to only tvshow or movie results
-        if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE]:
+        if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE]:
             pattern = 'id="series".*'
             pattern2 = '<a title="Watch (.*?) Online For FREE".*?href="([^"]+)".*\((\d{1,4})\)</a>'
         else:

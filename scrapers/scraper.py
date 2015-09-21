@@ -392,9 +392,12 @@ class Scraper(object):
 
             if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title and title_pattern:
                 norm_title = self._normalize_title(video.ep_title)
+                print norm_title
                 for match in re.finditer(title_pattern, html, re.DOTALL | re.I):
+                    print match.groups()
                     url, title = match.groups()
                     if norm_title == self._normalize_title(title):
+                        print url
                         return url.replace(self.base_url, '')
 
     def _force_title(self, video):

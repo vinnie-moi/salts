@@ -16,7 +16,7 @@ __all__ = ['scraper', 'local_scraper', 'pw_scraper', 'uflix_scraper', 'watchseri
            'pftv_scraper', 'flixanity_scraper', 'cmz_scraper', 'movienight_scraper', 'alluc_scraper', 'afdahorg_scraper', 'xmovies8_scraper', 'yifystreaming_scraper',
            'mintmovies_scraper', 'shush_proxy', 'mvsnap_scraper', 'pubfilm_scraper', 'pctf_scraper', 'rlssource_scraper', 'couchtunerv1_scraper', 'couchtunerv2_scraper',
            'tunemovie_scraper', 'watch8now_scraper', 'megabox_proxy', 'dizilab_scraper', 'beinmovie_scraper', 'dizimag_scraper', 'ayyex_scraper', 'moviefarsi_scraper',
-           'oneclicktvshows_scraper', 'dizigold_scraper', 'gvcenter_proxy', 'onlinemoviespro_scraper', 'onlinemoviesis_scraper', '123movies_scraper']
+           'oneclicktvshows_scraper', 'dizigold_scraper', 'gvcenter_proxy', 'onlinemoviespro_scraper', 'onlinemoviesis_scraper', '123movies_scraper', 'rainierland_scraper']
 
 from . import *
 
