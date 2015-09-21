@@ -1664,7 +1664,7 @@ def add_to_library(video_type, title, year, trakt_id):
 
                     filename = utils.filename_from_title(show['title'], video_type)
                     filename = filename % ('%02d' % int(season_num), '%02d' % int(ep_num))
-                    final_path = os.path.join(make_path(save_path, video_type, show['title'], season=season_num), filename)
+                    final_path = os.path.join(make_path(save_path, video_type, show['title'], show['year'], season=season_num), filename)
                     strm_string = kodi.get_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': year, 'season': season_num,
                                                        'episode': ep_num, 'trakt_id': trakt_id, 'ep_title': episode['title'], 'ep_airdate': air_date, 'dialog': True})
                     write_strm(strm_string, final_path, VIDEO_TYPES.EPISODE, show['title'], show['year'], trakt_id, season_num, ep_num, require_source=require_source)
@@ -1682,7 +1682,8 @@ def add_to_library(video_type, title, year, trakt_id):
 
 def make_path(base_path, video_type, title, year='', season=''):
     path = base_path
-    show_folder = re.sub(r'([^\w\-_\. ]|\.$)', '_', title)
+    show_folder = re.sub(r'[^\w\-_\. ]', '_', title)
+    show_folder = '%s (%s)' % (show_folder, year)
     if video_type == VIDEO_TYPES.TVSHOW:
         path = os.path.join(base_path, show_folder, 'Season %s' % (season))
     else:
