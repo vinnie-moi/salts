@@ -207,21 +207,27 @@
          <setting id="DirectDownload.tv_try" type="number" default="0" visible="false"/>
          <setting id="DirectDownload.tv_fail" type="number" default="0" visible="false"/>
          <setting id="DirectDownload.tv_check" type="number" default="0" visible="false"/>
+         <setting id="Dizibox-enable" type="bool" label="Dizibox Enabled" default="true" visible="true"/>
+         <setting id="Dizibox-base_url" type="text" label="    Base Url" default="http://www.dizibox.com" visible="eq(-1,true)"/>
+         <setting id="Dizibox-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="Dizibox_try" type="number" default="0" visible="false"/>
+         <setting id="Dizibox_fail" type="number" default="0" visible="false"/>
+         <setting id="Dizibox_check" type="number" default="0" visible="false"/>
          <setting id="Dizigold-enable" type="bool" label="Dizigold Enabled" default="true" visible="true"/>
          <setting id="Dizigold-base_url" type="text" label="    Base Url" default="http://www.dizigold.net" visible="eq(-1,true)"/>
          <setting id="Dizigold-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="Dizigold_try" type="number" default="0" visible="false"/>
          <setting id="Dizigold_fail" type="number" default="0" visible="false"/>
          <setting id="Dizigold_check" type="number" default="0" visible="false"/>
+    </category>
+
+	<category label="Scrapers 2">
          <setting id="Dizilab-enable" type="bool" label="Dizilab Enabled" default="true" visible="true"/>
          <setting id="Dizilab-base_url" type="text" label="    Base Url" default="http://dizilab.com" visible="eq(-1,true)"/>
          <setting id="Dizilab-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="Dizilab_try" type="number" default="0" visible="false"/>
          <setting id="Dizilab_fail" type="number" default="0" visible="false"/>
          <setting id="Dizilab_check" type="number" default="0" visible="false"/>
-    </category>
-
-	<category label="Scrapers 2">
          <setting id="Dizimag-enable" type="bool" label="Dizimag Enabled" default="true" visible="true"/>
          <setting id="Dizimag-base_url" type="text" label="    Base Url" default="http://dizimag.co" visible="eq(-1,true)"/>
          <setting id="Dizimag-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -309,15 +315,15 @@
          <setting id="MerDB_try" type="number" default="0" visible="false"/>
          <setting id="MerDB_fail" type="number" default="0" visible="false"/>
          <setting id="MerDB_check" type="number" default="0" visible="false"/>
+    </category>
+
+	<category label="Scrapers 3">
          <setting id="MintMovies-enable" type="bool" label="MintMovies Enabled" default="true" visible="true"/>
          <setting id="MintMovies-base_url" type="text" label="    Base Url" default="http://www.mintmovies.net" visible="eq(-1,true)"/>
          <setting id="MintMovies-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="MintMovies_try" type="number" default="0" visible="false"/>
          <setting id="MintMovies_fail" type="number" default="0" visible="false"/>
          <setting id="MintMovies_check" type="number" default="0" visible="false"/>
-    </category>
-
-	<category label="Scrapers 3">
          <setting id="movie25-enable" type="bool" label="movie25 Enabled" default="true" visible="true"/>
          <setting id="movie25-base_url" type="text" label="    Base Url" default="http://movie25.ag" visible="eq(-1,true)"/>
          <setting id="movie25-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -403,6 +409,9 @@
          <setting id="OneClickTVShows_try" type="number" default="0" visible="false"/>
          <setting id="OneClickTVShows_fail" type="number" default="0" visible="false"/>
          <setting id="OneClickTVShows_check" type="number" default="0" visible="false"/>
+    </category>
+	
+    <category label="Scrapers 4">
          <setting id="OneClickWatch-enable" type="bool" label="OneClickWatch Enabled" default="true" visible="true"/>
          <setting id="OneClickWatch-base_url" type="text" label="    Base Url" default="http://oneclickwatch.ws" visible="eq(-1,true)"/>
          <setting id="OneClickWatch-sub_check" type="bool" label="    Include in Page Existence checks?" default="false" visible="eq(-2,true)"/>
@@ -411,9 +420,6 @@
          <setting id="OneClickWatch_check" type="number" default="0" visible="false"/>
          <setting id="OneClickWatch-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>
          <setting id="OneClickWatch-select" type="enum" label="     Automatically Select" lvalues="30636|30637" default="0" visible="eq(-7,true)"/>
-    </category>
-	
-    <category label="Scrapers 4">
          <setting id="OnlineMoviesIs-enable" type="bool" label="OnlineMoviesIs Enabled" default="true" visible="true"/>
          <setting id="OnlineMoviesIs-base_url" type="text" label="    Base Url" default="http://onlinemovies.is" visible="eq(-1,true)"/>
          <setting id="OnlineMoviesIs-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -497,6 +503,9 @@
          <setting id="streamallthis.is_try" type="number" default="0" visible="false"/>
          <setting id="streamallthis.is_fail" type="number" default="0" visible="false"/>
          <setting id="streamallthis.is_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 5">
          <setting id="tunemovie-enable" type="bool" label="tunemovie Enabled" default="true" visible="true"/>
          <setting id="tunemovie-base_url" type="text" label="    Base Url" default="http://tunemovie.is" visible="eq(-1,true)"/>
          <setting id="tunemovie-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -511,9 +520,6 @@
          <setting id="TVRelease.Net_check" type="number" default="0" visible="false"/>
          <setting id="TVRelease.Net-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>
          <setting id="TVRelease.Net-select" type="enum" label="     Automatically Select" lvalues="30636|30637" default="0" visible="eq(-7,true)"/>
-    </category>
-
-    <category label="Scrapers 5">
          <setting id="UFlix.org-enable" type="bool" label="UFlix.org Enabled" default="true" visible="true"/>
          <setting id="UFlix.org-base_url" type="text" label="    Base Url" default="http://uflix.me" visible="eq(-1,true)"/>
          <setting id="UFlix.org-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -594,12 +600,6 @@
          <setting id="yify.tv_try" type="number" default="0" visible="false"/>
          <setting id="yify.tv_fail" type="number" default="0" visible="false"/>
          <setting id="yify.tv_check" type="number" default="0" visible="false"/>
-         <setting id="zumvo.com-enable" type="bool" label="zumvo.com Enabled" default="true" visible="true"/>
-         <setting id="zumvo.com-base_url" type="text" label="    Base Url" default="http://zumvo.tv" visible="eq(-1,true)"/>
-         <setting id="zumvo.com-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
-         <setting id="zumvo.com_try" type="number" default="0" visible="false"/>
-         <setting id="zumvo.com_fail" type="number" default="0" visible="false"/>
-         <setting id="zumvo.com_check" type="number" default="0" visible="false"/>
     </category>
 
     <category label="30634">
