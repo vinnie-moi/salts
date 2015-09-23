@@ -170,17 +170,6 @@ class Trakt_API():
         params = {'extended': 'full,images', 'limit': self.list_size}
         return self.__call_trakt(url, params=params)
 
-#     def get_friends_activity(self, section, include_episodes=False):
-#         if section == SECTIONS.TV:
-#             types='show'
-#             if include_episodes:
-#                 types += ',episode'
-#         elif section == SECTIONS.MOVIES:
-#             types='movie'
-#
-#         url='/activity/friends.json/%s/%s' % (API_KEY, types)
-#         return self.__call_trakt(url)
-#
     def get_premieres(self, start_date=None, days=8, cached=True):
         url = '/calendars/all/shows/premieres'
         if start_date: url += '/%s' % (start_date)
