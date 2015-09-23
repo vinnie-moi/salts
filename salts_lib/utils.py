@@ -440,8 +440,11 @@ def parallel_get_progress(q, trakt_id, cached):
 
 def test_stream(hoster):
     # parse_qsl doesn't work because it splits elements by ';' which can be in a non-quoted UA
-    try: headers = dict([item.split('=') for item in (hoster['url'].split('|')[1]).split('&')])
-    except: headers = {}
+    try:
+        headers = dict([item.split('=') for item in (hoster['url'].split('|')[1]).split('&')])
+        for key in headers: headers[key] = urllib.unquote(headers[key])
+    except:
+        headers = {}
     log_utils.log('Testing Stream: %s from %s using Headers: %s' % (hoster['url'], hoster['class'].get_name(), headers), xbmc.LOGDEBUG)
     request = urllib2.Request(hoster['url'].split('|')[0], headers=headers)
 

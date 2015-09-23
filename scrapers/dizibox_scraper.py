@@ -19,6 +19,7 @@
 import scraper
 import re
 import urlparse
+import urllib
 from salts_lib import log_utils
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
@@ -83,7 +84,7 @@ class Dizibox_Scraper(scraper.Scraper):
                 quality = self._gv_get_quality(stream_url)
             else:
                 quality = self._height_get_quality(height)
-                stream_url += '|User-Agent=%s&Referer=%s' % (USER_AGENT, page_url)
+                stream_url += '|User-Agent=%s&Referer=%s' % (USER_AGENT, urllib.quote(page_url))
             hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
             if 'altyazi.png' in html: hoster['subs'] = True
             sources.append(hoster)
@@ -106,7 +107,6 @@ class Dizibox_Scraper(scraper.Scraper):
         results = []
         norm_title = self._normalize_title(title)
         for fragment in dom_parser.parse_dom(html, 'div', {'class': 'category-list-wrapper'}):
-            print fragment.encode('utf-8', 'ignore')
             for match in re.finditer('href=["\']([^"\']+)["\']>([^<]+)', fragment):
                 url, match_title = match.groups()
                 if norm_title in self._normalize_title(match_title):
