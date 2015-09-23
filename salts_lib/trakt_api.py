@@ -181,21 +181,24 @@ class Trakt_API():
 #         url='/activity/friends.json/%s/%s' % (API_KEY, types)
 #         return self.__call_trakt(url)
 #
-    def get_premieres(self, start_date=None, cached=True):
+    def get_premieres(self, start_date=None, days=8, cached=True):
         url = '/calendars/all/shows/premieres'
         if start_date: url += '/%s' % (start_date)
+        url += '/%s' % (days)
         params = {'extended': 'full,images', 'auth': False}
         return self.__call_trakt(url, params=params, auth=False, cache_limit=24, cached=cached)
 
-    def get_calendar(self, start_date=None, cached=True):
+    def get_calendar(self, start_date=None, days=8, cached=True):
         url = '/calendars/all/shows'
         if start_date: url += '/%s' % (start_date)
+        url += '/%s' % (days)
         params = {'extended': 'full,images', 'auth': False}
         return self.__call_trakt(url, params=params, auth=False, cache_limit=24, cached=cached)
 
-    def get_my_calendar(self, start_date=None, cached=True):
+    def get_my_calendar(self, start_date=None, days=8, cached=True):
         url = '/calendars/my/shows'
         if start_date: url += '/%s' % (start_date)
+        url += '/%s' % (days)
         params = {'extended': 'full,images', 'auth': True}
         return self.__call_trakt(url, params=params, auth=True, cache_limit=24, cached=cached)
 
