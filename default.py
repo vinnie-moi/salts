@@ -488,7 +488,6 @@ def add_list_item(section, user_list, total_items=0):
 @url_dispatcher.register(MODES.LIKED_LISTS, ['section'])
 def browse_liked_lists(section):
     liked_lists = trakt_api.get_liked_lists()
-    print liked_lists
     total_items = len(liked_lists)
     for liked_list in liked_lists:
         list_item = (liked_list['list']['user']['username'], liked_list['list']['ids']['slug'])
@@ -582,7 +581,6 @@ def toggle_to_menu(action, section, slug, username=None):
                 break
 
     main_str = '|'.join(main_list)
-    print main_str
     kodi.set_setting(setting, main_str)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
