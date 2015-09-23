@@ -248,11 +248,11 @@ def force_refresh(refresh_mode, section=None, slug=None, username=None):
         finally:
             utils.reap_workers(workers, None)
     elif refresh_mode == MODES.MY_CAL:
-        trakt_api.get_my_calendar(start_date, cached=False)
+        trakt_api.get_my_calendar(start_date, 8, cached=False)
     elif refresh_mode == MODES.CAL:
-        trakt_api.get_calendar(start_date, cached=False)
+        trakt_api.get_calendar(start_date, 8, cached=False)
     elif refresh_mode == MODES.PREMIERES:
-        trakt_api.get_premieres(start_date, cached=False)
+        trakt_api.get_premieres(start_date, 8, cached=False)
     elif refresh_mode == MODES.FRIENDS_EPISODE:
         trakt_api.get_friends_activity(section, True)
     elif refresh_mode == MODES.FRIENDS:
@@ -446,11 +446,11 @@ def browse_calendar(mode, start_date=None):
         start_date = now + datetime.timedelta(days=offset)
         start_date = datetime.datetime.strftime(start_date, '%Y-%m-%d')
     if mode == MODES.MY_CAL:
-        days = trakt_api.get_my_calendar(start_date)
+        days = trakt_api.get_my_calendar(start_date, 8)
     elif mode == MODES.CAL:
-        days = trakt_api.get_calendar(start_date)
+        days = trakt_api.get_calendar(start_date, 8)
     elif mode == MODES.PREMIERES:
-        days = trakt_api.get_premieres(start_date)
+        days = trakt_api.get_premieres(start_date, 8)
     make_dir_from_cal(mode, start_date, days)
 
 @url_dispatcher.register(MODES.MY_LISTS, ['section'])

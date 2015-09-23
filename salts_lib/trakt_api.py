@@ -170,24 +170,24 @@ class Trakt_API():
         params = {'extended': 'full,images', 'limit': self.list_size}
         return self.__call_trakt(url, params=params)
 
-    def get_premieres(self, start_date=None, days=8, cached=True):
+    def get_premieres(self, start_date=None, days=None, cached=True):
         url = '/calendars/all/shows/premieres'
         if start_date: url += '/%s' % (start_date)
-        url += '/%s' % (days)
+        if days is not None: url += '/%s' % (days)
         params = {'extended': 'full,images', 'auth': False}
         return self.__call_trakt(url, params=params, auth=False, cache_limit=24, cached=cached)
 
-    def get_calendar(self, start_date=None, days=8, cached=True):
+    def get_calendar(self, start_date=None, days=None, cached=True):
         url = '/calendars/all/shows'
         if start_date: url += '/%s' % (start_date)
-        url += '/%s' % (days)
+        if days is not None: url += '/%s' % (days)
         params = {'extended': 'full,images', 'auth': False}
         return self.__call_trakt(url, params=params, auth=False, cache_limit=24, cached=cached)
 
-    def get_my_calendar(self, start_date=None, days=8, cached=True):
+    def get_my_calendar(self, start_date=None, days=None, cached=True):
         url = '/calendars/my/shows'
         if start_date: url += '/%s' % (start_date)
-        url += '/%s' % (days)
+        if days is not None: url += '/%s' % (days)
         params = {'extended': 'full,images', 'auth': True}
         return self.__call_trakt(url, params=params, auth=True, cache_limit=24, cached=cached)
 
