@@ -82,28 +82,18 @@ class OnlineMoviesIs_Scraper(scraper.Scraper):
         return super(OnlineMoviesIs_Scraper, self)._default_get_url(video)
 
     def search(self, video_type, title, year):
-        search_url = urlparse.urljoin(self.base_url, '/?s=')
-        search_url += urllib.quote_plus('%s %s' % (title, year))
-        html = self._http_get(search_url, cache_limit=.25)
         results = []
-        if not re.search('Sorry, but nothing matched', html):
-            norm_title = self._normalize_title(title)
-            for item in dom_parser.parse_dom(html, 'li', {'class': '[^"]*box-shadow[^"]*'}):
-                match = re.search('href="([^"]+)"\s+title="([^"]+)', item)
-                if match:
-                    url, match_title_year = match.groups()
-                    if re.search('S\d{2}E\d{2}', match_title_year): continue  # skip episodes
-                    if re.search('TV\s*SERIES', match_title_year, re.I): continue  # skip shows
-                    match = re.search('(.*?)\s+\(?(\d{4})\)?', match_title_year)
-                    if match:
-                        match_title, match_year = match.groups()
-                    else:
-                        match_title = match_title_year
-                        match_year = ''
-
-                    if (not year or not match_year or year == match_year) and norm_title in self._normalize_title(match_title):
-                        result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
-                        results.append(result)
+        test_url = title.replace("'", '')
+        test_url = re.sub(r'[^a-zA-Z0-9\s]+', ' ', test_url).lower().strip()
+        test_url = re.sub('\s+', ' ', test_url)
+        test_url = test_url.replace(' ', '-')
+        if year:
+            test_url += '-%s' % (year)
+        
+        test_url = urlparse.urljoin(self.base_url, test_url)
+        if self._http_get(test_url, cache_limit=1):
+            result = {'title': title, 'year': year, 'url': test_url.replace(self.base_url, '')}
+            results.append(result)
 
         return results
 
