@@ -1,3 +1,15 @@
+[B]Version 1.0.51[/B]
+- Add year to TV Show folders
+- Add rainierland scraper
+- Add dizibox scraper
+- Add Sezonlukdizi scraper
+- Add IzlemeyeDeger scraper
+- Add movietube scraper
+- Fix calendar views misisng last day
+- Fix trakt bookmarks
+- Fix oneclickwatch scraper
+- Fix dizimag scraper
+
 [B]Version 1.0.50[/B]
 - Add onlinemoviespro scraper
 - Add onlinemoviesis scraper
