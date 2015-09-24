@@ -61,17 +61,13 @@ class Mvsnap_Scraper(scraper.Scraper):
             if fragment:
                 fragment = fragment[0]
                 for match in re.finditer('<option\s+value="([^"]+)', fragment):
-                    stream_url = match.group(1)
-                    stream_url = urlparse.urljoin(self.base_url, stream_url)
-                    request = urllib2.Request(stream_url)
-                    request.add_header('User-Agent', USER_AGENT)
-                    try:
-                        response = urllib2.urlopen(request)
-                        stream_url = response.geturl() + '|User-Agent=%s' % (USER_AGENT)
-                        hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': self._gv_get_quality(stream_url), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
-                        hosters.append(hoster)
-                    except Exception as e:
-                        log_utils.log('Exception during mvsnap get_sources: %s' % (e), xbmc.LOGDEBUG)
+                    for item in match.group(1).split(','):
+                        if '|' in item:
+                            q_str, stream_url = item.split('|')
+                            stream_url += '|User-Agent=%s' % (USER_AGENT)
+                            host = self._get_direct_hostname(stream_url)
+                            hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': self._blog_get_quality(video, q_str, host), 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                            hosters.append(hoster)
         return hosters
 
     def get_url(self, video):
