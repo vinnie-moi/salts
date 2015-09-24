@@ -1,3 +1,8 @@
+[B]Version 1.0.52[/B]
+- Fix movietv
+- Fix mvsnap
+- Fix onlinemovies.is
+
 [B]Version 1.0.51[/B]
 - Add year to TV Show folders
 - Add rainierland scraper
