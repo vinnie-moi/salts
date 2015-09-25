@@ -142,7 +142,8 @@ class SezonLukDizi_Scraper(scraper.Scraper):
         except ValueError:
             log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), log_utils.LOGWARNING)
         else:
-            for item in js_result:
+            if js_result:
+                for item in js_result:
                     result = {'url': item['url'].replace('\/', '/').replace(self.base_url, ''), 'title': item['name'], 'year': ''}
                     results.append(result)
 
