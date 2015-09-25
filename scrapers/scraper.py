@@ -51,11 +51,11 @@ COOKIEPATH = xbmc.translatePath(kodi.get_profile())
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 SHORT_MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 Q_LIST = [item[0] for item in sorted(Q_ORDER.items(), key=lambda x:x[1])]
-MAX_CHUNK = 1024*1024
+MAX_RESPONSE = 1024*1024
 
 class NoRedirection(urllib2.HTTPErrorProcessor):
     def http_response(self, request, response):
-        log_utils.log('Stopping Redirect', xbmc.LOGDEBUG)
+        log_utils.log('Stopping Redirect', log_utils.LOGDEBUG)
         return response
 
     https_response = http_response
@@ -240,7 +240,7 @@ class Scraper(object):
         self.create_db_connection()
         _, html = self.db_connection.get_cached_url(url, cache_limit)
         if html:
-            log_utils.log('Returning cached result for: %s' % (url), xbmc.LOGDEBUG)
+            log_utils.log('Returning cached result for: %s' % (url), log_utils.LOGDEBUG)
             return html
 
         try:
@@ -271,28 +271,32 @@ class Scraper(object):
             response = urllib2.urlopen(request, timeout=timeout)
             self.cj.extract_cookies(response, request)
             if kodi.get_setting('cookie_debug') == 'true':
-                log_utils.log('Response Cookies: %s - %s' % (url, self.cookies_as_str(self.cj)), xbmc.LOGDEBUG)
+                log_utils.log('Response Cookies: %s - %s' % (url, self.cookies_as_str(self.cj)), log_utils.LOGDEBUG)
             self.__fix_bad_cookies()
             self.cj.save(ignore_discard=True)
             if not allow_redirect and response.getcode() in [301, 302, 303, 307]:
                 return response.info().getheader('Location')
             
+            content_length = response.info().getheader('Content-Length', 0)
+            if int(content_length) > MAX_RESPONSE:
+                log_utils.log('Response exceeded allowed size. %s => %s / %s' % (url, content_length, MAX_RESPONSE), log_utils.LOGWARNING)
+            
             if response.info().get('Content-Encoding') == 'gzip':
-                buf = StringIO(response.read(MAX_CHUNK))
+                buf = StringIO(response.read(MAX_RESPONSE))
                 f = gzip.GzipFile(fileobj=buf)
                 html = f.read()
             else:
-                html = response.read(MAX_CHUNK)
+                html = response.read(MAX_RESPONSE)
         except urllib2.HTTPError as e:
             if e.code == 503 and 'cf-browser-verification' in e.read():
                 html = cloudflare.solve(url, self.cj)
                 if not html:
                     return ''
             else:
-                log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), xbmc.LOGWARNING)
+                log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), log_utils.LOGWARNING)
                 return ''
         except Exception as e:
-            log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), xbmc.LOGWARNING)
+            log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), log_utils.LOGWARNING)
             return ''
 
         self.db_connection.cache_url(url, html)
@@ -304,16 +308,16 @@ class Scraper(object):
         try: cj.load(ignore_discard=True)
         except: pass
         if kodi.get_setting('cookie_debug') == 'true':
-            log_utils.log('Before Cookies: %s - %s' % (self, self.cookies_as_str(cj)), xbmc.LOGDEBUG)
+            log_utils.log('Before Cookies: %s - %s' % (self, self.cookies_as_str(cj)), log_utils.LOGDEBUG)
         domain = urlparse.urlsplit(base_url).hostname
         for key in cookies:
             c = cookielib.Cookie(0, key, str(cookies[key]), port=None, port_specified=False, domain=domain, domain_specified=True,
-                                domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=False, comment=None,
-                                comment_url=None, rest={})
+                                 domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=False, comment=None,
+                                 comment_url=None, rest={})
             cj.set_cookie(c)
         cj.save(ignore_discard=True)
         if kodi.get_setting('cookie_debug') == 'true':
-            log_utils.log('After Cookies: %s - %s' % (self, self.cookies_as_str(cj)), xbmc.LOGDEBUG)
+            log_utils.log('After Cookies: %s - %s' % (self, self.cookies_as_str(cj)), log_utils.LOGDEBUG)
         return cj
 
     def cookies_as_str(self, cj):
@@ -362,7 +366,7 @@ class Scraper(object):
         return {'recaptcha_challenge_field': match.group(1), 'recaptcha_response_field': solution}
 
     def _default_get_episode_url(self, show_url, video, episode_pattern, title_pattern='', airdate_pattern=''):
-        log_utils.log('Default Episode Url: |%s|%s|%s|' % (self.base_url, show_url, str(video).decode('utf-8', 'replace')), xbmc.LOGDEBUG)
+        log_utils.log('Default Episode Url: |%s|%s|%s|' % (self.base_url, show_url, str(video).decode('utf-8', 'replace')), log_utils.LOGDEBUG)
         url = urlparse.urljoin(self.base_url, show_url)
         html = self._http_get(url, cache_limit=2)
         if html:
@@ -382,14 +386,14 @@ class Scraper(object):
                     airdate_pattern = airdate_pattern.replace('{short_month}', SHORT_MONS[video.ep_airdate.month - 1])
                     airdate_pattern = airdate_pattern.replace('{day}', str(video.ep_airdate.day))
                     airdate_pattern = airdate_pattern.replace('{p_day}', '%02d' % (video.ep_airdate.day))
-                    log_utils.log('Air Date Pattern: %s' % (airdate_pattern), xbmc.LOGDEBUG)
+                    log_utils.log('Air Date Pattern: %s' % (airdate_pattern), log_utils.LOGDEBUG)
 
                     match = re.search(airdate_pattern, html, re.DOTALL | re.I)
                     if match:
                         url = match.group(1)
                         return url.replace(self.base_url, '')
             else:
-                log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), xbmc.LOGDEBUG)
+                log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), log_utils.LOGDEBUG)
 
             if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title and title_pattern:
                 norm_title = self._normalize_title(video.ep_title)
@@ -406,7 +410,7 @@ class Scraper(object):
     def _normalize_title(self, title):
         new_title = title.upper()
         new_title = re.sub('[^A-Za-z0-9]', '', new_title)
-        # log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), xbmc.LOGDEBUG)
+        # log_utils.log('In title: |%s| Out title: |%s|' % (title,new_title), log_utils.LOGDEBUG)
         return new_title
 
     def _blog_proc_results(self, html, post_pattern, date_format, video_type, title, year):
@@ -542,7 +546,7 @@ class Scraper(object):
                     host_quality = key
                     break
 
-        # log_utils.log('q_str: %s, host: %s, post q: %s, host q: %s' % (q_str, host, post_quality, host_quality), xbmc.LOGDEBUG)
+        # log_utils.log('q_str: %s, host: %s, post q: %s, host q: %s' % (q_str, host, post_quality, host_quality), log_utils.LOGDEBUG)
         if host_quality is not None and Q_ORDER[host_quality] < Q_ORDER[quality]:
             quality = host_quality
 
@@ -613,7 +617,7 @@ class Scraper(object):
                     if match:
                         return {match.group(1): match.group(2)}
                 except Exception as e:
-                    log_utils.log('Exception during sucuri js: %s' % (e), xbmc.LOGWARNING)
+                    log_utils.log('Exception during sucuri js: %s' % (e), log_utils.LOGWARNING)
         
         return {}
         
@@ -635,7 +639,7 @@ class Scraper(object):
                 try:
                     js = json.loads(match.group(1))
                 except ValueError:
-                    log_utils.log('Invalid JSON returned for: %s' % (link), xbmc.LOGWARNING)
+                    log_utils.log('Invalid JSON returned for: %s' % (link), log_utils.LOGWARNING)
                 else:
                     for item in js['feed']['entry']:
                         if item['gphoto$id'] == link_id:
@@ -653,7 +657,7 @@ class Scraper(object):
             plain_text += decrypter.feed()
             plain_text = plain_text.split('\0', 1)[0]
         except Exception as e:
-            log_utils.log('Exception (%s) during %s gk decrypt: cipher_link: %s' % (e, self.get_name(), cipher_link), xbmc.LOGWARNING)
+            log_utils.log('Exception (%s) during %s gk decrypt: cipher_link: %s' % (e, self.get_name(), cipher_link), log_utils.LOGWARNING)
             plain_text = ''
 
         return plain_text
