@@ -274,8 +274,12 @@ class Trakt_API():
         url = '/users/%s' % (username)
         return self.__call_trakt(url, cached=cached)
         
-    def get_bookmarks(self, full=False):
+    def get_bookmarks(self, section=None, full=False):
         url = '/sync/playback'
+        if section == SECTIONS.MOVIES:
+            url += '/movies'
+        elif section == SECTIONS.TV:
+            url += '/episodes'
         params = {'extended': 'full,images'} if full else None
         return self.__call_trakt(url, params=params, cached=False)
 

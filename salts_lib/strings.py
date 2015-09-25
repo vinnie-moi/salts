@@ -222,5 +222,6 @@ STRINGS = {
     'local_exists': 30210,
     'scraper_location': 30211,
     'scraper_key': 30212,
-    'show_trakt_bookmarks': 30213
+    'trakt_on_deck': 30213,
+    'on': 30214
 }

@@ -867,7 +867,11 @@ msgid "Scraper Decryption Key"
 msgstr ""
 
 msgctxt "#30213"
-msgid "Show Trakt Bookmarks"
+msgid "Trakt On Deck"
+msgstr ""
+
+msgctxt "#30214"
+msgid "on"
 msgstr ""
 
 msgctxt "#30500"
@@ -1473,4 +1477,8 @@ msgstr ""
 
 msgctxt "#30646"
 msgid "Include Watchlist in My Next Episodes"
+msgstr ""
+
+msgctxt "#30647"
+msgid "Show Trakt On Deck"
 msgstr ""

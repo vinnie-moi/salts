@@ -81,32 +81,28 @@ def settings_menu():
     kodi.create_item({'mode': MODES.GET_PIN}, i18n('auth_salts'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     kodi.create_item({'mode': MODES.SHOW_VIEWS}, i18n('set_default_views'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     kodi.create_item({'mode': MODES.BROWSE_URLS}, i18n('remove_cached_urls'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    if TOKEN:
-        kodi.create_item({'mode': MODES.SHOW_BOOKMARKS}, i18n('show_trakt_bookmarks'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
-    
     kodi.end_of_directory()
 
-@url_dispatcher.register(MODES.SHOW_BOOKMARKS)
-def view_bookmarks():
-    bookmarks = trakt_api.get_bookmarks(full=True)
-    movie_bookmarks = [bookmark for bookmark in bookmarks if bookmark['type'] == 'movie']
-    episode_bookmarks = [bookmark for bookmark in bookmarks if bookmark['type'] == 'episode']
-    movie_bookmarks.sort(key=lambda x: (x['movie']['title'], x['movie']['year']))
-    episode_bookmarks.sort(key=lambda x: (x['show']['title'], x['show']['year'], x['episode']['season'], x['episode']['number']))
-
-    for bookmark in movie_bookmarks + episode_bookmarks:
+@url_dispatcher.register(MODES.SHOW_BOOKMARKS, ['section'])
+def view_bookmarks(section):
+    bookmarks = trakt_api.get_bookmarks(section, full=True)
+    section_params = utils.get_section_params(section)
+    for bookmark in bookmarks:
         if bookmark['type'] == 'movie':
-            section_params = utils.get_section_params(SECTIONS.MOVIES)
             liz, liz_url = make_item(section_params, bookmark['movie'])
         else:
-            section_params = utils.get_section_params(SECTIONS.TV)
             liz, liz_url = make_episode_item(bookmark['show'], bookmark['episode'])
             label = liz.getLabel()
             label = '%s - %s' % (bookmark['show']['title'], label.decode('utf-8', 'replace'))
             liz.setLabel(label)
             
         label = liz.getLabel()
-        label = '[%5.2f%%] %s' % (bookmark['progress'], label.decode('utf-8', 'replace'))
+        paused_at = time.strftime('%Y-%m-%d', time.localtime(utils.iso_2_utc(bookmark['paused_at'])))
+        pause_label = ''
+        if kodi.get_setting('trakt_bookmark') == 'true':
+            pause_label = '[COLOR blue]%.2f%%[/COLOR] %s ' % (bookmark['progress'], i18n('on'))
+        pause_label += '[COLOR deeppink]%s[/COLOR]' % (paused_at)
+        label = '[%s] %s ' % (pause_label, label.decode('utf-8', 'replace'))
         liz.setLabel(label)
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=0)
 
@@ -210,6 +206,7 @@ def browse_menu(section):
     if utils.menu_on('mosts'): kodi.create_item({'mode': MODES.MOSTS, 'section': section}, i18n('mosts') % (section_label2), thumb=utils.art('mosts.png'), fanart=utils.art('fanart.jpg'))
     add_section_lists(section)
     if TOKEN:
+        if utils.menu_on('on_deck'): kodi.create_item({'mode': MODES.SHOW_BOOKMARKS, 'section': section}, i18n('trakt_on_deck'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('recommended'): kodi.create_item({'mode': MODES.RECOMMEND, 'section': section}, i18n('recommended') % (section_label), thumb=utils.art('recommended.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('collection'): add_refresh_item({'mode': MODES.SHOW_COLLECTION, 'section': section}, i18n('my_collection') % (section_label2), utils.art('collection.png'), utils.art('fanart.jpg'))
         if utils.menu_on('favorites'): kodi.create_item({'mode': MODES.SHOW_FAVORITES, 'section': section}, i18n('my_favorites'), thumb=utils.art('my_favorites.png'), fanart=utils.art('fanart.jpg'))
