@@ -255,7 +255,6 @@ class Trakt_API():
         if full: params['extended'] = 'full,images'
         if hidden: params['hidden'] = 'true'
         if specials: params['specials'] = 'true'
-            
         return self.__call_trakt(url, params=params, cached=cached)
 
     def get_hidden_progress(self, cached=True):
