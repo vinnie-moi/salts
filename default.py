@@ -97,10 +97,10 @@ def view_bookmarks(section):
             liz.setLabel(label)
             
         label = liz.getLabel()
-        paused_at = time.strftime('%Y-%m-%d', time.localtime(utils.iso_2_utc(bookmark['paused_at'])))
         pause_label = ''
         if kodi.get_setting('trakt_bookmark') == 'true':
             pause_label = '[COLOR blue]%.2f%%[/COLOR] %s ' % (bookmark['progress'], i18n('on'))
+        paused_at = time.strftime('%Y-%m-%d', time.localtime(utils.iso_2_utc(bookmark['paused_at'])))
         pause_label += '[COLOR deeppink]%s[/COLOR]' % (paused_at)
         label = '[%s] %s ' % (pause_label, label.decode('utf-8', 'replace'))
         liz.setLabel(label)
