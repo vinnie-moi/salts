@@ -1466,3 +1466,7 @@ msgstr ""
 msgctxt "#30645"
 msgid "Skip movies/episodes that exist locally"
 msgstr ""
+
+msgctxt "#30646"
+msgid "Include Watchlist in My Next Episodes"
+msgstr ""

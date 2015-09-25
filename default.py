@@ -668,23 +668,28 @@ def show_collection(section):
 def get_progress(cache_override=False):
     cached = kodi.get_setting('cache_watched') == 'true' and not cache_override
     timeout = max_timeout = int(kodi.get_setting('trakt_timeout'))
-    watched_list = trakt_api.get_watched(SECTIONS.TV, full=True, cached=cached)
+    progress_list = trakt_api.get_watched(SECTIONS.TV, full=True, cached=cached)
+    if kodi.get_setting('include_watchlist_next') == 'true':
+        watchlist = trakt_api.show_watchlist(SECTIONS.TV)
+        watchlist = [{'show': item, 'last_watched_at': None} for item in watchlist]
+        progress_list += watchlist
+
     hidden = dict.fromkeys([item['show']['ids']['trakt'] for item in trakt_api.get_hidden_progress(cached=cached)])
     worker_count = 0
     workers = []
     shows = {}
     q = Queue()
     begin = time.time()
-    for watched in watched_list:
-        if watched['show']['ids']['trakt'] in hidden:
+    for show in progress_list:
+        if show['show']['ids']['trakt'] in hidden:
             continue
         
-        worker = utils.start_worker(q, utils.parallel_get_progress, [watched['show']['ids']['trakt'], cached])
+        worker = utils.start_worker(q, utils.parallel_get_progress, [show['show']['ids']['trakt'], cached])
         worker_count += 1
         workers.append(worker)
         # create a shows dictionary to be used during progress building
-        shows[watched['show']['ids']['trakt']] = watched['show']
-        shows[watched['show']['ids']['trakt']]['last_watched_at'] = watched['last_watched_at']
+        shows[show['show']['ids']['trakt']] = show['show']
+        shows[show['show']['ids']['trakt']]['last_watched_at'] = show['last_watched_at']
 
     episodes = []
     while worker_count > 0:
