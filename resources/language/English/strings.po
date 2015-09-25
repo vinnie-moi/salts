@@ -866,6 +866,10 @@ msgctxt "#30212"
 msgid "Scraper Decryption Key"
 msgstr ""
 
+msgctxt "#30213"
+msgid "Show Trakt Bookmarks"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""

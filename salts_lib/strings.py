@@ -221,5 +221,6 @@ STRINGS = {
     'not_added_to_lib': 30209,
     'local_exists': 30210,
     'scraper_location': 30211,
-    'scraper_key': 30212
+    'scraper_key': 30212,
+    'show_trakt_bookmarks': 30213
 }

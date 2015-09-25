@@ -40,6 +40,7 @@ from salts_lib import kodi
 from salts_lib.constants import *
 from scrapers import *  # import all scrapers into this namespace
 from scrapers import ScraperVideo
+from salts_lib.utils import get_section_params
 
 TOKEN = kodi.get_setting('trakt_oauth_token')
 use_https = kodi.get_setting('use_https') == 'true'
@@ -81,6 +82,35 @@ def settings_menu():
     kodi.create_item({'mode': MODES.GET_PIN}, i18n('auth_salts'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     kodi.create_item({'mode': MODES.SHOW_VIEWS}, i18n('set_default_views'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     kodi.create_item({'mode': MODES.BROWSE_URLS}, i18n('remove_cached_urls'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    if TOKEN:
+        kodi.create_item({'mode': MODES.SHOW_BOOKMARKS}, i18n('show_trakt_bookmarks'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+    
+    kodi.end_of_directory()
+
+@url_dispatcher.register(MODES.SHOW_BOOKMARKS)
+def view_bookmarks():
+    bookmarks = trakt_api.get_bookmarks(full=True)
+    movie_bookmarks = [bookmark for bookmark in bookmarks if bookmark['type'] == 'movie']
+    episode_bookmarks = [bookmark for bookmark in bookmarks if bookmark['type'] == 'episode']
+    movie_bookmarks.sort(key=lambda x: (x['movie']['title'], x['movie']['year']))
+    episode_bookmarks.sort(key=lambda x: (x['show']['title'], x['show']['year'], x['episode']['season'], x['episode']['number']))
+
+    for bookmark in movie_bookmarks + episode_bookmarks:
+        if bookmark['type'] == 'movie':
+            section_params = utils.get_section_params(SECTIONS.MOVIES)
+            liz, liz_url = make_item(section_params, bookmark['movie'])
+        else:
+            section_params = utils.get_section_params(SECTIONS.TV)
+            liz, liz_url = make_episode_item(bookmark['show'], bookmark['episode'])
+            label = liz.getLabel()
+            label = '%s - %s' % (bookmark['show']['title'], label.decode('utf-8', 'replace'))
+            liz.setLabel(label)
+            
+        label = liz.getLabel()
+        label = '[%5.2f%%] %s' % (bookmark['progress'], label.decode('utf-8', 'replace'))
+        liz.setLabel(label)
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=0)
+
     kodi.end_of_directory()
 
 @url_dispatcher.register(MODES.SHOW_VIEWS)
