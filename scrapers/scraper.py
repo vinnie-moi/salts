@@ -51,6 +51,7 @@ COOKIEPATH = xbmc.translatePath(kodi.get_profile())
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 SHORT_MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 Q_LIST = [item[0] for item in sorted(Q_ORDER.items(), key=lambda x:x[1])]
+MAX_CHUNK = 1024*1024
 
 class NoRedirection(urllib2.HTTPErrorProcessor):
     def http_response(self, request, response):
@@ -277,11 +278,11 @@ class Scraper(object):
                 return response.info().getheader('Location')
             
             if response.info().get('Content-Encoding') == 'gzip':
-                buf = StringIO(response.read())
+                buf = StringIO(response.read(MAX_CHUNK))
                 f = gzip.GzipFile(fileobj=buf)
                 html = f.read()
             else:
-                html = response.read()
+                html = response.read(MAX_CHUNK)
         except urllib2.HTTPError as e:
             if e.code == 503 and 'cf-browser-verification' in e.read():
                 html = cloudflare.solve(url, self.cj)
