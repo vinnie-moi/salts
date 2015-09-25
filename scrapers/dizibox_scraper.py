@@ -27,7 +27,7 @@ from salts_lib.constants import USER_AGENT
 from salts_lib import kodi
 
 BASE_URL = 'http://www.dizibox.com'
-ALTERNATIVES = ['1080P', 'İNGILIZCE', 'ALTYAZıSıZ']
+ALTERNATIVES = ['1080P', 'İngilizce', 'Altyazısız']
 
 class Dizibox_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -62,7 +62,8 @@ class Dizibox_Scraper(scraper.Scraper):
             hosters += self.__get_links(html, page_url)
 
             for match in re.finditer("<option\s+value='([^']+)[^>]+>([^<]+)", html):
-                if match.group(2).upper() in ALTERNATIVES:
+                print match.group(2), ALTERNATIVES
+                if match.group(2) in ALTERNATIVES:
                     html = self._http_get(match.group(1), cache_limit=.5)
                     hosters += self.__get_links(html, page_url)
         
@@ -99,7 +100,7 @@ class Dizibox_Scraper(scraper.Scraper):
         season_pattern = 'href=["\']([^"\']+)[^>]*>%s\.?\s+Sezon<' % (video.season)
         match = re.search(season_pattern, html)
         if match:
-            episode_pattern = 'href=["\']([^"\']+-%s-sezon-%s-bolum[^"\']+)' % (video.season, video.episode)
+            episode_pattern = 'href=["\']([^"\']+-%s-sezon-%s-[^"\']+)' % (video.season, video.episode)
             return super(Dizibox_Scraper, self)._default_get_episode_url(match.group(1), video, episode_pattern)
 
     def search(self, video_type, title, year):
