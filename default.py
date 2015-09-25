@@ -40,7 +40,6 @@ from salts_lib import kodi
 from salts_lib.constants import *
 from scrapers import *  # import all scrapers into this namespace
 from scrapers import ScraperVideo
-from salts_lib.utils import get_section_params
 
 TOKEN = kodi.get_setting('trakt_oauth_token')
 use_https = kodi.get_setting('use_https') == 'true'
