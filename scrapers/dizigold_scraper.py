@@ -58,7 +58,7 @@ class Dizigold_Scraper(scraper.Scraper):
         hosters = []
         if source_url:
             page_url = urlparse.urljoin(self.base_url, source_url)
-            html = self._http_get(page_url, cache_limit=.5)
+            html = self._http_get(page_url, cache_limit=.25)
             match = re.search('var\s+view_id\s*=\s*"([^"]+)', html)
             if match:
                 view_data = {'id': match.group(1), 'tip': 'view'}

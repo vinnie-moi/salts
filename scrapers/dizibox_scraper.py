@@ -100,7 +100,7 @@ class Dizibox_Scraper(scraper.Scraper):
         season_pattern = 'href=["\']([^"\']+)[^>]*>%s\.?\s+Sezon<' % (video.season)
         match = re.search(season_pattern, html)
         if match:
-            episode_pattern = 'href=["\']([^"\']+-%s-sezon-%s-[^"\']+)' % (video.season, video.episode)
+            episode_pattern = 'href=["\']([^"\']+-%s-sezon-%s-[^"\']*bolum[^"\']*)' % (video.season, video.episode)
             return super(Dizibox_Scraper, self)._default_get_episode_url(match.group(1), video, episode_pattern)
 
     def search(self, video_type, title, year):
