@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
-import xbmc
 import os
 import time
 import urllib2
@@ -39,7 +38,7 @@ class GVCenter_Proxy(scraper.Scraper):
             import gvcenter_scraper
             self.__scraper = gvcenter_scraper.GVCenter_Scraper(timeout)
         except Exception as e:
-            log_utils.log('Failure during %s scraper creation: %s' % (self.get_name(), e), xbmc.LOGWARNING)
+            log_utils.log('Failure during %s scraper creation: %s' % (self.get_name(), e), log_utils.LOGWARNING)
             self.__scraper = None
    
     @classmethod
@@ -98,7 +97,7 @@ class GVCenter_Proxy(scraper.Scraper):
                     req = urllib2.urlopen(scraper_url)
                     cipher_text = req.read()
                 except Exception as e:
-                    log_utils.log('Failure during %s scraper get: %s' % (self.get_name(), e), xbmc.LOGWARNING)
+                    log_utils.log('Failure during %s scraper get: %s' % (self.get_name(), e), log_utils.LOGWARNING)
                     return
                  
                 if cipher_text:
@@ -111,9 +110,9 @@ class GVCenter_Proxy(scraper.Scraper):
                         with open(py_path, 'r') as f:
                             old_py = f.read()
                     
-                    log_utils.log('%s path: %s, new_py: %s, match: %s' % (self.get_name(), py_path, bool(new_py), new_py == old_py), xbmc.LOGDEBUG)
+                    log_utils.log('%s path: %s, new_py: %s, match: %s' % (self.get_name(), py_path, bool(new_py), new_py == old_py), log_utils.LOGDEBUG)
                     if old_py != new_py:
                         with open(py_path, 'w') as f:
                             f.write(new_py)
         except Exception as e:
-            log_utils.log('Failure during %s scraper update: %s' % (self.get_name(), e), xbmc.LOGWARNING)
+            log_utils.log('Failure during %s scraper update: %s' % (self.get_name(), e), log_utils.LOGWARNING)

@@ -20,7 +20,6 @@ import urllib
 import urlparse
 import re
 from salts_lib import kodi
-import xbmc
 import base64
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -107,6 +106,6 @@ class Zumvo_Scraper(scraper.Scraper):
         html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
         cookie = self._get_sucuri_cookie(html)
         if cookie:
-            log_utils.log('Setting Zumvo cookie: %s' % (cookie), xbmc.LOGDEBUG)
+            log_utils.log('Setting Zumvo cookie: %s' % (cookie), log_utils.LOGDEBUG)
             html = super(Zumvo_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookie, cache_limit=0)
         return html

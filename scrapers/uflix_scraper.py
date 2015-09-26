@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
-import xbmc
 import urllib
 import urlparse
 import re
@@ -107,7 +106,7 @@ class UFlix_Scraper(scraper.Scraper):
                         result = {'title': res_title, 'url': url.replace(self.base_url, ''), 'year': res_year}
                         results.append(result)
             except Exception as e:
-                log_utils.log('Failure during %s search: |%s|%s|%s| (%s)' % (self.get_name(), video_type, title, year, str(e)), xbmc.LOGWARNING)
+                log_utils.log('Failure during %s search: |%s|%s|%s| (%s)' % (self.get_name(), video_type, title, year, str(e)), log_utils.LOGWARNING)
         return results
 
     def _get_episode_url(self, show_url, video):

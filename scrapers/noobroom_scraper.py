@@ -21,7 +21,6 @@ import urllib
 import urllib2
 import urlparse
 from salts_lib import kodi
-import xbmc
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
@@ -151,8 +150,8 @@ class NoobRoom_Scraper(scraper.Scraper):
             return ''
 
         html = super(NoobRoom_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
-        if not 'href="logout.php"' in html:
-            log_utils.log('Logging in for url (%s)' % (url), xbmc.LOGDEBUG)
+        if 'href="logout.php"' not in html:
+            log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login(html)
             html = super(NoobRoom_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
 

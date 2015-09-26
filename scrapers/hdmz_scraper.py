@@ -19,10 +19,9 @@ import scraper
 import urllib
 import urlparse
 import re
-from salts_lib import kodi
-import xbmc
 import json
 import xml.dom.minidom
+from salts_lib import kodi
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib import log_utils
 
@@ -66,7 +65,7 @@ class hdmz_Scraper(scraper.Scraper):
                     try:
                         js_data = json.loads(data)
                     except ValueError:
-                        log_utils.log('No JSON returned: %s: %s' % (url, data), xbmc.LOGWARNING)
+                        log_utils.log('No JSON returned: %s: %s' % (url, data), log_utils.LOGWARNING)
                     else:
                         if js_data and 'content' in js_data:
                             for item in js_data['content']:

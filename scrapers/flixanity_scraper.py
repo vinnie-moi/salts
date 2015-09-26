@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
-import xbmc
 import urllib
 import urlparse
 import re
@@ -98,7 +97,7 @@ class Flixanity_Scraper(scraper.Scraper):
             try:
                 js_data = json.loads(html)
             except ValueError:
-                log_utils.log('No JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
+                log_utils.log('No JSON returned: %s: %s' % (search_url, html), log_utils.LOGWARNING)
             else:
                 for item in js_data:
                     if item['meta'].upper().startswith(media_type):
@@ -128,7 +127,7 @@ class Flixanity_Scraper(scraper.Scraper):
 
         html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
         if '<span>Log In</span>' in html:
-            log_utils.log('Logging in for url (%s)' % (url), xbmc.LOGDEBUG)
+            log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login()
             html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
 
@@ -141,13 +140,13 @@ class Flixanity_Scraper(scraper.Scraper):
             if match:
                 self.__token = match.group(1)
             else:
-                log_utils.log('Unable to locate Flixanity token', xbmc.LOGWARNING)
+                log_utils.log('Unable to locate Flixanity token', log_utils.LOGWARNING)
     
             match = re.search('<input type="hidden" name="t" value="([^"]+)', html)
             if match:
                 self.__t = match.group(1)
             else:
-                log_utils.log('Unable to locate Flixanity t value', xbmc.LOGWARNING)
+                log_utils.log('Unable to locate Flixanity t value', log_utils.LOGWARNING)
 
     def __login(self):
         url = urlparse.urljoin(self.base_url, '/ajax/login.php')

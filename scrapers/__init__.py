@@ -1,6 +1,5 @@
 import re
 import os
-import xbmc
 import datetime
 import time
 from salts_lib import kodi
@@ -49,7 +48,7 @@ def update_xml(xml, new_settings, cat_count):
         if old_settings != new_settings:
             xml = xml.replace(old_settings, new_settings)
     else:
-        log_utils.log('Unable to match category: %s' % (cat_count), xbmc.LOGWARNING)
+        log_utils.log('Unable to match category: %s' % (cat_count), log_utils.LOGWARNING)
     return xml
 
 def update_settings():
@@ -81,6 +80,6 @@ def update_settings():
         except:
             raise
     else:
-        log_utils.log('No Settings Update Needed', xbmc.LOGDEBUG)
+        log_utils.log('No Settings Update Needed', log_utils.LOGDEBUG)
 
 update_settings()

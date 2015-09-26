@@ -22,7 +22,6 @@ import xbmc
 import urlparse
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.constants import QUALITIES
 from salts_lib.constants import SORT_KEYS
 
 BASE_URL = ''
@@ -61,7 +60,7 @@ class Local_Scraper(scraper.Scraper):
             run = cmd % (params['id'][0])
             meta = xbmc.executeJSONRPC(run)
             meta = json.loads(meta)
-            log_utils.log('Source Meta: %s' % (meta), xbmc.LOGDEBUG)
+            log_utils.log('Source Meta: %s' % (meta), log_utils.LOGDEBUG)
             if 'result' in meta and result_key in meta['result']:
                 details = meta['result'][result_key]
                 def_quality = [item[0] for item in sorted(SORT_KEYS['quality'].items(), key=lambda x:x[1])][self.def_quality]
@@ -88,17 +87,17 @@ class Local_Scraper(scraper.Scraper):
             run = cmd % (params['id'][0], video.season, 'episode', video.episode)
             meta = xbmc.executeJSONRPC(run)
             meta = json.loads(meta)
-            log_utils.log('Episode Meta: %s' % (meta), xbmc.LOGDEBUG)
+            log_utils.log('Episode Meta: %s' % (meta), log_utils.LOGDEBUG)
             if 'result' in meta and 'episodes' in meta['result']:
                 episodes = meta['result']['episodes']
         else:
-            log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), xbmc.LOGDEBUG)
+            log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), log_utils.LOGDEBUG)
 
         if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title:
             run = cmd % (params['id'][0], video.season, 'title', video.ep_title)
             meta = xbmc.executeJSONRPC(run)
             meta = json.loads(meta)
-            log_utils.log('Episode Title Meta: %s' % (meta), xbmc.LOGDEBUG)
+            log_utils.log('Episode Title Meta: %s' % (meta), log_utils.LOGDEBUG)
             if 'result' in meta and 'episodes' in meta['result']:
                 episodes = meta['result']['episodes']
 
@@ -133,7 +132,7 @@ class Local_Scraper(scraper.Scraper):
         cmd = cmd % (filter_str)
         meta = xbmc.executeJSONRPC(cmd)
         meta = json.loads(meta)
-        log_utils.log('Search Meta: %s' % (meta), xbmc.LOGDEBUG)
+        log_utils.log('Search Meta: %s' % (meta), log_utils.LOGDEBUG)
         if 'result' in meta and result_key in meta['result']:
             for item in meta['result'][result_key]:
                 if video_type == VIDEO_TYPES.MOVIE and item['file'].endswith('.strm'):

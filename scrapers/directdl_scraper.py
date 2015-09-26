@@ -19,7 +19,6 @@ import scraper
 import urllib
 import urlparse
 import re
-import xbmc
 import json
 from salts_lib import kodi
 from salts_lib import log_utils
@@ -66,10 +65,10 @@ class DirectDownload_Scraper(scraper.Scraper):
                 try:
                     js_result = json.loads(html)
                 except ValueError:
-                    log_utils.log('Invalid JSON returned: %s: %s' % (url, html), xbmc.LOGWARNING)
+                    log_utils.log('Invalid JSON returned: %s: %s' % (url, html), log_utils.LOGWARNING)
                 else:
                     if 'error' in js_result:
-                        log_utils.log('DD.tv API error: "%s" @ %s' % (js_result['error'], url), xbmc.LOGWARNING)
+                        log_utils.log('DD.tv API error: "%s" @ %s' % (js_result['error'], url), log_utils.LOGWARNING)
                         return hosters
 
                     query = urlparse.parse_qs(urlparse.urlparse(url).query)
@@ -139,10 +138,10 @@ class DirectDownload_Scraper(scraper.Scraper):
             try:
                 js_result = json.loads(html)
             except ValueError:
-                log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
+                log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), log_utils.LOGWARNING)
             else:
                 if 'error' in js_result:
-                    log_utils.log('DD.tv API error: "%s" @ %s' % (js_result['error'], search_url), xbmc.LOGWARNING)
+                    log_utils.log('DD.tv API error: "%s" @ %s' % (js_result['error'], search_url), log_utils.LOGWARNING)
                     return results
                 
                 for match in js_result:
@@ -153,7 +152,7 @@ class DirectDownload_Scraper(scraper.Scraper):
 
     def _http_get(self, url, data=None, cache_limit=8):
         if 'search?query' in url:
-            log_utils.log('Translating Search Url: %s' % (url), xbmc.LOGDEBUG)
+            log_utils.log('Translating Search Url: %s' % (url), log_utils.LOGDEBUG)
             url = self.__translate_search(url)
 
         return super(DirectDownload_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

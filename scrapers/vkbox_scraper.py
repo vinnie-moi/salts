@@ -18,7 +18,6 @@
 import scraper
 import urlparse
 from salts_lib import kodi
-import xbmc
 import zipfile
 import StringIO
 import json
@@ -72,7 +71,7 @@ class VKBox_Scraper(scraper.Scraper):
                 try:
                     json_data = json.loads(html)
                 except ValueError:
-                    log_utils.log('No JSON returned: %s' % (url), xbmc.LOGWARNING)
+                    log_utils.log('No JSON returned: %s' % (url), log_utils.LOGWARNING)
                 else:
                     try: langs = json_data['langs']
                     except: langs = json_data
@@ -83,9 +82,9 @@ class VKBox_Scraper(scraper.Scraper):
                             hosters.append(hoster)
                             break
                     else:
-                        log_utils.log('No english language found from vkbox: %s' % (langs), xbmc.LOGWARNING)
+                        log_utils.log('No english language found from vkbox: %s' % (langs), log_utils.LOGWARNING)
             else:
-                log_utils.log('No data returned from vkbox: %s' % (url), xbmc.LOGWARNING)
+                log_utils.log('No data returned from vkbox: %s' % (url), log_utils.LOGWARNING)
 
         return hosters
 

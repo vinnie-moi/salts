@@ -19,7 +19,6 @@ import scraper
 import re
 import urlparse
 import json
-import xbmc
 from salts_lib import dom_parser
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -69,7 +68,7 @@ class Dizigold_Scraper(scraper.Scraper):
                     try:
                         js_data = json.loads(match.group(1))
                     except ValueError:
-                        log_utils.log('Invalid JSON returned: %s: %s' % (view_data, html), xbmc.LOGWARNING)
+                        log_utils.log('Invalid JSON returned: %s: %s' % (view_data, html), log_utils.LOGWARNING)
                     else:
                         for source in js_data:
                             stream_url = source['file'] + '|User-Agent=%s' % (USER_AGENT)

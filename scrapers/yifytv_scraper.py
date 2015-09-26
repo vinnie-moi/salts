@@ -21,7 +21,6 @@ import urlparse
 import re
 import json
 from salts_lib import kodi
-import xbmc
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
@@ -53,7 +52,7 @@ class YIFY_Scraper(scraper.Scraper):
         tries = 1
         while tries <= MAX_TRIES:
             html = self._http_get(url, data=data, cache_limit=0)
-            log_utils.log('Initial Data (%s): |%s|' % (tries, html), xbmc.LOGDEBUG)
+            log_utils.log('Initial Data (%s): |%s|' % (tries, html), log_utils.LOGDEBUG)
             if html.strip():
                 break
             tries += 1
@@ -70,7 +69,7 @@ class YIFY_Scraper(scraper.Scraper):
                     data['chall'] = captcha_result['recaptcha_challenge_field']
                     data['res'] = captcha_result['recaptcha_response_field']
                     html = self._http_get(url, data=data, cache_limit=0)
-                    log_utils.log('2nd Data (%s): %s' % (tries, html), xbmc.LOGDEBUG)
+                    log_utils.log('2nd Data (%s): %s' % (tries, html), log_utils.LOGDEBUG)
                     if html:
                         js_data = json.loads(html)
                         if 'captcha' not in js_data[0]:
@@ -163,7 +162,7 @@ class YIFY_Scraper(scraper.Scraper):
                         result = {'title': post['title'], 'year': post['year'], 'url': post['link'].replace(self.base_url, '')}
                         results.append(result)
                 except ValueError:
-                    log_utils.log('Invalid JSON in yify.tv: %s' % (fragment), xbmc.LOGWARNING)
+                    log_utils.log('Invalid JSON in yify.tv: %s' % (fragment), log_utils.LOGWARNING)
         return results
 
     def _http_get(self, url, data=None, cache_limit=8):

@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
-import xbmc
 import os
 import base64
 import time
@@ -40,7 +39,7 @@ class Shush_Proxy(scraper.Scraper):
             import shush_scraper
             self.__scraper = shush_scraper.Shush_Scraper(timeout)
         except Exception as e:
-            log_utils.log('Failure during shush scraper creation: %s' % (e), xbmc.LOGWARNING)
+            log_utils.log('Failure during shush scraper creation: %s' % (e), log_utils.LOGWARNING)
             self.__scraper = None
    
     @classmethod
@@ -96,9 +95,9 @@ class Shush_Proxy(scraper.Scraper):
                         with open(py_path, 'r') as f:
                             old_py = f.read()
                     
-                    log_utils.log('shush path: %s, new_py: %s, match: %s' % (py_path, bool(new_py), new_py == old_py), xbmc.LOGDEBUG)
+                    log_utils.log('shush path: %s, new_py: %s, match: %s' % (py_path, bool(new_py), new_py == old_py), log_utils.LOGDEBUG)
                     if old_py != new_py:
                         with open(py_path, 'w') as f:
                             f.write(new_py)
         except Exception as e:
-            log_utils.log('Failure during shush scraper update: %s' % (e), xbmc.LOGWARNING)
+            log_utils.log('Failure during shush scraper update: %s' % (e), log_utils.LOGWARNING)

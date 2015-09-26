@@ -20,7 +20,6 @@ import re
 import urllib
 import urlparse
 from salts_lib import kodi
-import xbmc
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
@@ -127,7 +126,7 @@ class PW_Scraper(scraper.Scraper):
                 result['year'] = year
                 results.append(result)
         else:
-            log_utils.log('Unable to locate PW search key', xbmc.LOGWARNING)
+            log_utils.log('Unable to locate PW search key', log_utils.LOGWARNING)
         return results
 
     def _get_episode_url(self, show_url, video):

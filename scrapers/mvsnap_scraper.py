@@ -21,8 +21,6 @@ import urlparse
 import re
 import json
 from salts_lib import kodi
-import xbmc
-import urllib2
 from salts_lib import log_utils
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
@@ -82,7 +80,7 @@ class Mvsnap_Scraper(scraper.Scraper):
             try:
                 js_data = json.loads(html)
             except ValueError:
-                log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
+                log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), log_utils.LOGWARNING)
             else:
                 if 'movies' in js_data:
                     for item in js_data['movies']:

@@ -20,7 +20,6 @@ import re
 import urllib
 import urlparse
 from salts_lib import kodi
-import xbmc
 from salts_lib.trans_utils import i18n
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -130,7 +129,7 @@ class IStreamHD_Scraper(scraper.Scraper):
         html = super(IStreamHD_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
         # if returned page is still the login page, then login and reissue http get
         if re.search('data-target="#login-overlay"', html) or re.search('<h1>Please logon</h1>', html):
-            log_utils.log('Logging in for url (%s)' % (url), xbmc.LOGDEBUG)
+            log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login()
             html = super(IStreamHD_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
 

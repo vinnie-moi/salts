@@ -19,7 +19,6 @@ import scraper
 import urllib
 import urlparse
 import json
-import xbmc
 from salts_lib import kodi
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
@@ -91,7 +90,7 @@ class Alluc_Scraper(scraper.Scraper):
                 try:
                     js_result = json.loads(html)
                 except ValueError:
-                    log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
+                    log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), log_utils.LOGWARNING)
                 else:
                     if js_result['status'] == 'success':
                         for result in js_result['result']:
@@ -107,7 +106,7 @@ class Alluc_Scraper(scraper.Scraper):
                                     hosters.append(hoster)
                                     seen_urls.add(stream_url)
                     else:
-                        log_utils.log('Alluc API Error: %s: %s' % (search_url, js_result['message']), xbmc.LOGWARNING)
+                        log_utils.log('Alluc API Error: %s: %s' % (search_url, js_result['message']), log_utils.LOGWARNING)
 
         return hosters
         
@@ -127,7 +126,7 @@ class Alluc_Scraper(scraper.Scraper):
                 show_title = title.split(se)[0]
             else:
                 show_title = title
-            # log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), xbmc.LOGDEBUG)
+            # log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), log_utils.LOGDEBUG)
             return self._normalize_title(video.title) in show_title and (sxe in title or se in title or air_date in title)
     
     def _get_title_quality(self, title):
@@ -137,7 +136,7 @@ class Alluc_Scraper(scraper.Scraper):
             if any(q in title for q in QUALITY_MAP[key]):
                 post_quality = key
 
-        # log_utils.log('Setting |%s| to |%s|' % (title, post_quality), xbmc.LOGDEBUG)
+        # log_utils.log('Setting |%s| to |%s|' % (title, post_quality), log_utils.LOGDEBUG)
         return post_quality
     
     def get_url(self, video):

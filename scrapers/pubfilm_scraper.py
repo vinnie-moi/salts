@@ -19,9 +19,8 @@ import scraper
 import urllib
 import urlparse
 import re
-from salts_lib import kodi
-import xbmc
 import json
+from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -104,7 +103,7 @@ class PubFilm_Scraper(scraper.Scraper):
                 try:
                     js_data = json.loads(js_data)
                 except ValueError:
-                    log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), xbmc.LOGWARNING)
+                    log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), log_utils.LOGWARNING)
                 else:
                     if 'feed' in js_data and 'entry' in js_data['feed']:
                         for entry in js_data['feed']['entry']:
@@ -133,6 +132,6 @@ class PubFilm_Scraper(scraper.Scraper):
         html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
         cookie = self._get_sucuri_cookie(html)
         if cookie:
-            log_utils.log('Setting Pubfilm cookie: %s' % (cookie), xbmc.LOGDEBUG)
+            log_utils.log('Setting Pubfilm cookie: %s' % (cookie), log_utils.LOGDEBUG)
             html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookie, cache_limit=0)
         return html
