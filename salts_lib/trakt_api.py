@@ -290,7 +290,7 @@ class Trakt_API():
                 if bookmark['type'] == 'movie' and int(show_id) == bookmark['movie']['ids']['trakt']:
                     return bookmark['progress']
             else:
-                #log_utils.log('Resume: %s, %s, %s, %s' % (bookmark, show_id, season, episode), log_utils.LOGDEBUG)
+                # log_utils.log('Resume: %s, %s, %s, %s' % (bookmark, show_id, season, episode), log_utils.LOGDEBUG)
                 if bookmark['type'] == 'episode' and int(show_id) == bookmark['show']['ids']['trakt'] and bookmark['episode']['season'] == int(season) and bookmark['episode']['number'] == int(episode):
                     return bookmark['progress']
 

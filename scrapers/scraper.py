@@ -51,7 +51,7 @@ COOKIEPATH = xbmc.translatePath(kodi.get_profile())
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 SHORT_MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 Q_LIST = [item[0] for item in sorted(Q_ORDER.items(), key=lambda x:x[1])]
-MAX_RESPONSE = 1024*1024
+MAX_RESPONSE = 1024 * 1024
 
 class NoRedirection(urllib2.HTTPErrorProcessor):
     def http_response(self, request, response):

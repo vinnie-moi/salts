@@ -808,7 +808,6 @@ def format_time(seconds):
 def download_media(url, path, file_name):
     try:
         progress = int(kodi.get_setting('down_progress'))
-        import urllib2
         request = urllib2.Request(url)
         request.add_header('User-Agent', USER_AGENT)
         request.add_unredirected_header('Host', request.get_host())

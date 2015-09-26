@@ -44,8 +44,7 @@ class DB_Connection():
         self.progress = None
 
         if kodi.get_setting('use_remote_db') == 'true':
-            if self.address is not None and self.username is not None \
-            and self.password is not None and self.dbname is not None:
+            if self.address is not None and self.username is not None and self.password is not None and self.dbname is not None:
                 import mysql.connector as db_lib
                 from mysql.connector import OperationalError as OperationalError
                 log_utils.log('Loading MySQL as DB engine', log_utils.LOGDEBUG)
