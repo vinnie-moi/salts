@@ -1,134 +1,134 @@
 <settings>
-	<category label="30545">
-	    <setting id="theme" type="enum" label="30500" values="Shine|Luna Blue|Iconic|Simple|SALTy|SALTy (Blended)|SALTy (Blue)|SALTy (Frog)|SALTy (Green)|SALTy (Macaw)|SALTier (Green)|SALTier (Orange)|SALTier (Red)|IGDB|Simply Elegant|IGDB Redux" default="0"/>
-		<setting id="calendar-day" type="slider" label="30502" default="0" range="-7,7" option="int"/>
-		<setting id="calendar_time" type="enum" label="30503" default="0" lvalues="30511|30512|30513"/>
-	    <setting id="sort_collection" type="enum" label="30504" lvalues="30514|30515|30516|30517" default="0"/>
-	    <setting id="sort_progress" type="enum" label="30505" lvalues="30518|30519|30520|30521|30522|30523" default="0"/>
+    <category label="30545">
+        <setting id="theme" type="enum" label="30500" values="Shine|Luna Blue|Iconic|Simple|SALTy|SALTy (Blended)|SALTy (Blue)|SALTy (Frog)|SALTy (Green)|SALTy (Macaw)|SALTier (Green)|SALTier (Orange)|SALTier (Red)|IGDB|Simply Elegant|IGDB Redux" default="0"/>
+        <setting id="calendar-day" type="slider" label="30502" default="0" range="-7,7" option="int"/>
+        <setting id="calendar_time" type="enum" label="30503" default="0" lvalues="30511|30512|30513"/>
+        <setting id="sort_collection" type="enum" label="30504" lvalues="30514|30515|30516|30517" default="0"/>
+        <setting id="sort_progress" type="enum" label="30505" lvalues="30518|30519|30520|30521|30522|30523" default="0"/>
         <setting id="sort_watchlist" type="enum" label="30642" lvalues="30643|30644|30516|30517" default="0"/>
         <setting id="include_watchlist_next" type="bool" label="30646" default="false"/>
-	    <setting id="show_unaired_next" type="bool" label="30506" default="false"/>
-		<setting id="show_season0" type="bool" label="30507" default="true"/>
-	    <setting id="show_unaired" type="bool" label="30508" default="true"/>
-	    <setting id="unaired_indicator" type="bool" label="30509" default="true" enable="eq(-1,true)"/>
-	    <setting id="show_unknown" type="bool" label="30510" default="true" enable="eq(-2,false)"/>
-	    <setting id="TV_search_head" type="number" default="-1" visible="false"/>
-	    <setting id="Movies_search_head" type="number" default="-1" visible="false"/>
-	    <setting id="cookie_debug" type="bool" default="false" visible="false"/>
+        <setting id="show_unaired_next" type="bool" label="30506" default="false"/>
+        <setting id="show_season0" type="bool" label="30507" default="true"/>
+        <setting id="show_unaired" type="bool" label="30508" default="true"/>
+        <setting id="unaired_indicator" type="bool" label="30509" default="true" enable="eq(-1,true)"/>
+        <setting id="show_unknown" type="bool" label="30510" default="true" enable="eq(-2,false)"/>
+        <setting id="TV_search_head" type="number" default="-1" visible="false"/>
+        <setting id="Movies_search_head" type="number" default="-1" visible="false"/>
+        <setting id="cookie_debug" type="bool" default="false" visible="false"/>
         <setting id="TV_main" type="string" default="imdb-highest-rated-tv-series@hulkhorgen" visible="false"/>
         <setting id="Movies_main" type="string" default="imdb-best-250-movies@hulkhorgen" visible="false"/>
         <setting id="source_sort_order" type="text" label="Source Sort Order" enable="false" visible="false"/>
-	</category>
+    </category>
 
-	<category label="30546">
-	    <setting id="show_trending" type="bool" label="30524" default="true"/>
-	    <setting id="show_popular" type="bool" label="30525" default="true"/>
-	    <setting id="show_recent" type="bool" label="30526" default="true"/>
+    <category label="30546">
+        <setting id="show_trending" type="bool" label="30524" default="true"/>
+        <setting id="show_popular" type="bool" label="30525" default="true"/>
+        <setting id="show_recent" type="bool" label="30526" default="true"/>
         <setting id="show_mosts" type="bool" label="30641" default="true"/>
         <setting id="show_on_deck" type="bool" label="30647" default="true"/>
-	    <setting id="show_recommended" type="bool" label="30527" default="true"/>
-	    <setting id="show_collection" type="bool" label="30528" default="true"/>
-	    <setting id="show_favorites" type="bool" label="30529" default="true"/>
-	    <setting id="show_subscriptions" type="bool" label="30530" default="true"/>
-	    <setting id="show_watchlist" type="bool" label="30531" default="true"/>
-	    <setting id="show_my_lists" type="bool" label="30532" default="true"/>
+        <setting id="show_recommended" type="bool" label="30527" default="true"/>
+        <setting id="show_collection" type="bool" label="30528" default="true"/>
+        <setting id="show_favorites" type="bool" label="30529" default="true"/>
+        <setting id="show_subscriptions" type="bool" label="30530" default="true"/>
+        <setting id="show_watchlist" type="bool" label="30531" default="true"/>
+        <setting id="show_my_lists" type="bool" label="30532" default="true"/>
         <setting id="show_liked_lists" type="bool" label="30640" default="true"/>
-	    <setting id="show_other_lists" type="bool" label="30533" default="true"/>
-	    <setting id="show_progress" type="bool" label="30534" default="true"/>
-	    <setting id="show_my_cal" type="bool" label="30535" default="true"/>
-	    <setting id="show_general_cal" type="bool" label="30536" default="true"/>
-	    <setting id="show_premiere_cal" type="bool" label="30537" default="true"/>
-	    <setting id="show_friends" type="bool" label="30538" default="true"/>
-	    <setting id="show_search" type="bool" label="30539" default="true"/>
-		<setting label="30540" type="lsep"/>
-		<setting id="movies_view" label="30541" type="number" default="0" visible="true"/>
-		<setting id="tvshows_view" label="30542" type="number" default="0" visible="true"/>
-		<setting id="seasons_view" label="30543" type="number" default="0" visible="true"/>
-		<setting id="episodes_view" label="30544" type="number" default="0" visible="true"/>
-	</category>
+        <setting id="show_other_lists" type="bool" label="30533" default="true"/>
+        <setting id="show_progress" type="bool" label="30534" default="true"/>
+        <setting id="show_my_cal" type="bool" label="30535" default="true"/>
+        <setting id="show_general_cal" type="bool" label="30536" default="true"/>
+        <setting id="show_premiere_cal" type="bool" label="30537" default="true"/>
+        <setting id="show_friends" type="bool" label="30538" default="true"/>
+        <setting id="show_search" type="bool" label="30539" default="true"/>
+        <setting label="30540" type="lsep"/>
+        <setting id="movies_view" label="30541" type="number" default="0" visible="true"/>
+        <setting id="tvshows_view" label="30542" type="number" default="0" visible="true"/>
+        <setting id="seasons_view" label="30543" type="number" default="0" visible="true"/>
+        <setting id="episodes_view" label="30544" type="number" default="0" visible="true"/>
+    </category>
 
-	<category label="Trakt.tv">
-	    <setting id="get_pin" label="30547" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close" visible="eq(1,))"/>
-	    <setting id="trakt_user" label="30501" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close" visible="!eq(0,)"/>
-	    <setting id="use_https" type="bool" label="30548" default="false"/>
-		<setting id="trakt_timeout" type="slider" label="30549" default="30" range="0,120" option="int"/>
-		<setting id="list_size" type="slider" label="30550" default="30" range="1,100" option="int"/>
-		<setting id="trakt_bookmark" type="bool" label="30552" default="false"/>
-		<setting id="cache_watched" type="bool" label="30553" default="true"/>
-		<setting id="cache_collection" type="bool" label="30554" default="true"/>
-		<setting id="include_people" type="bool" label="30555" default="false"/>
-		<setting id="image_size" type="enum" label="30556" values="Full (HD)|Medium (SD)|Thumb (Mobile)" default="1"/>
-	    <setting id="TV_sub_slug" type="text" visible="false"/>
-	    <setting id="Movies_sub_slug" type="text" visible="false"/>
-	    <setting id="TV_fav_slug" type="text" visible="false"/>
-	    <setting id="Movies_fav_slug" type="text" visible="false"/>
+    <category label="Trakt.tv">
+        <setting id="get_pin" label="30547" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close" visible="eq(1,))"/>
+        <setting id="trakt_user" label="30501" type="action" action="RunPlugin(plugin://plugin.video.salts/?mode=get_pin)" option="close" visible="!eq(0,)"/>
+        <setting id="use_https" type="bool" label="30548" default="false"/>
+        <setting id="trakt_timeout" type="slider" label="30549" default="30" range="0,120" option="int"/>
+        <setting id="list_size" type="slider" label="30550" default="30" range="1,100" option="int"/>
+        <setting id="trakt_bookmark" type="bool" label="30552" default="false"/>
+        <setting id="cache_watched" type="bool" label="30553" default="true"/>
+        <setting id="cache_collection" type="bool" label="30554" default="true"/>
+        <setting id="include_people" type="bool" label="30555" default="false"/>
+        <setting id="image_size" type="enum" label="30556" values="Full (HD)|Medium (SD)|Thumb (Mobile)" default="1"/>
+        <setting id="TV_sub_slug" type="text" visible="false"/>
+        <setting id="Movies_sub_slug" type="text" visible="false"/>
+        <setting id="TV_fav_slug" type="text" visible="false"/>
+        <setting id="Movies_fav_slug" type="text" visible="false"/>
         <setting id="trakt_oauth_token" type="text" default="" visible="false"/>
         <setting id="trakt_refresh_token" type="text" default="" visible="false"/>
         <setting id="last_reminder" type="number" default="0" visible="false"/>
     </category>
 
     <category label="30557">
-	    <setting id="tvshow-folder" type="folder" label="30558"
-	             default="special://userdata/addon_data/plugin.video.salts/TVShows"/>
-	    <setting id="movie-folder" type="folder" label="30559"
-	             default="special://userdata/addon_data/plugin.video.salts/Movies"/>
-		<setting id="auto-update_subs" type="bool" label="30560" default="false"/>
-		<setting id="update_subs-interval" type="slider" range=".5,.5,24" option="float" label="30561" default="2" visible="eq(-1,true)"/>
-		<setting id="update_subs-during-startup" type="bool" label="30562" default="false" visible="eq(-2,true)"/>
-		<setting id="update_subs-during-playback" type="bool" label="30563" default="false" visible="eq(-3,true)"/>
-		<setting id="require_source" type="bool" label="30564" default="true" visible="true"/>
-		<setting id="include_specials" type="bool" label="30565" default="false" visible="true"/>
-		<setting id="include_unknown" type="bool" label="30566" default="true" visible="true"/>
+        <setting id="tvshow-folder" type="folder" label="30558"
+                 default="special://userdata/addon_data/plugin.video.salts/TVShows"/>
+        <setting id="movie-folder" type="folder" label="30559"
+                 default="special://userdata/addon_data/plugin.video.salts/Movies"/>
+        <setting id="auto-update_subs" type="bool" label="30560" default="false"/>
+        <setting id="update_subs-interval" type="slider" range=".5,.5,24" option="float" label="30561" default="2" visible="eq(-1,true)"/>
+        <setting id="update_subs-during-startup" type="bool" label="30562" default="false" visible="eq(-2,true)"/>
+        <setting id="update_subs-during-playback" type="bool" label="30563" default="false" visible="eq(-3,true)"/>
+        <setting id="require_source" type="bool" label="30564" default="true" visible="true"/>
+        <setting id="include_specials" type="bool" label="30565" default="false" visible="true"/>
+        <setting id="include_unknown" type="bool" label="30566" default="true" visible="true"/>
         <setting id="exclude_local" type="bool" label="30645" default="false" visible="true"/> 
-		<setting id="library-update" type="bool" label="30567" default="false" visible="true"/>
-		<setting id="update_subs-notify" type="bool" label="30568" default="false" visible="true"/>
-		<setting id="include_movies" type="bool" label="30569" default="false" visible="true"/>
-		<setting id="cleanup-subscriptions" type="bool" label="30570" default="false" visible="true"/>
-		<setting id="exists_list" type="text" visible="false"/>
-	</category>
+        <setting id="library-update" type="bool" label="30567" default="false" visible="true"/>
+        <setting id="update_subs-notify" type="bool" label="30568" default="false" visible="true"/>
+        <setting id="include_movies" type="bool" label="30569" default="false" visible="true"/>
+        <setting id="cleanup-subscriptions" type="bool" label="30570" default="false" visible="true"/>
+        <setting id="exists_list" type="text" visible="false"/>
+    </category>
 
-	<category label="30571">
+    <category label="30571">
         <setting id="auto-play" type="bool" label="30572" default="false"/>
-		<setting id="source-win" type="labelenum" label="30573" values="Directory|Dialog" default="Dialog"/>		
-		<setting id="show_download" type="bool" label="30574" default="false"/>
-		<setting id="down_progress" type="enum" label="30575" lvalues="30511|30589|30590" default="1" enable="eq(-1,true)"/>
-	    <setting id="tv-download-folder" type="folder" label="30576"
-	             default="special://userdata/addon_data/plugin.video.salts/Download/TVShows" enable="eq(-2,true)"/>
-	    <setting id="movie-download-folder" type="folder" label="30577"
-	             default="special://userdata/addon_data/plugin.video.salts/Download/Movies" enable="eq(-3,true)"/>
-		<setting id="source_timeout" type="slider" label="30578" default="10" range="0,120" option="int"/>
-		<setting id="source_results" type="number" label="30579" default="0"/>
-		<setting id="filter_unusable" type="number" label="30580" default="50"/>
+        <setting id="source-win" type="labelenum" label="30573" values="Directory|Dialog" default="Dialog"/>        
+        <setting id="show_download" type="bool" label="30574" default="false"/>
+        <setting id="down_progress" type="enum" label="30575" lvalues="30511|30589|30590" default="1" enable="eq(-1,true)"/>
+        <setting id="tv-download-folder" type="folder" label="30576"
+                 default="special://userdata/addon_data/plugin.video.salts/Download/TVShows" enable="eq(-2,true)"/>
+        <setting id="movie-download-folder" type="folder" label="30577"
+                 default="special://userdata/addon_data/plugin.video.salts/Download/Movies" enable="eq(-3,true)"/>
+        <setting id="source_timeout" type="slider" label="30578" default="10" range="0,120" option="int"/>
+        <setting id="source_results" type="number" label="30579" default="0"/>
+        <setting id="filter_unusable" type="number" label="30580" default="50"/>
         <setting id="filter_direct" type="bool" label="30551" default="false"/>
-		<setting id="excl_list" type="text" label="30581" default=""/>
-		<setting id="Episode_quality" type="enum" label="30582" values="HD &amp; SD|HD Only|SD Only" default="0" visible="true"/>
-		<setting id="Movie_quality" type="enum" label="30583" values="HD &amp; SD|HD Only|SD Only" default="0" visible="true"/>
+        <setting id="excl_list" type="text" label="30581" default=""/>
+        <setting id="Episode_quality" type="enum" label="30582" values="HD &amp; SD|HD Only|SD Only" default="0" visible="true"/>
+        <setting id="Movie_quality" type="enum" label="30583" values="HD &amp; SD|HD Only|SD Only" default="0" visible="true"/>
         <setting id="airdate-fallback" type="bool" label="30584" default="true"/>
-		<setting id="title-fallback" type="bool" label="30585" default="true"/>
-	    <setting id="last_check" type="number" default="0" visible="false"/>
-		<setting id="auto-disable" type="enum" label="30586" lvalues="30511|30638|30639" default="1"/>
-		<setting id="disable-freq" type="slider" label="30587" default="100" range="100,50,1000" option="int" enable="!eq(-1,0)"/>
-		<setting id="disable-thresh" type="slider" label="30588" default="50" range="0,100" option="int" enable="!eq(-2,0)"/>
-	</category>
-	
-	<category label="30591">
-		<setting id="enable_sort" type="bool" label="30592" default="false"/>
-		<setting id="filter-unknown" type="bool" label="30593" default="false" visible="eq(-1,true)"/>
-		<setting id="sort1_field" type="enum" label="30594" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-2,true)"/>
-		<setting id="sort1_order" type="enum" label="30595" lvalues="30610|30611" default="0" visible="eq(-3,true) + !eq(-1,0)"/>
-		<setting id="sort2_field" type="enum" label="30596" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-4,true) + !eq(-2,0)"/>
-		<setting id="sort2_order" type="enum" label="30597" lvalues="30610|30611" default="0" visible="eq(-5,true) + !eq(-1,0)+!eq(-3,0)"/>
-		<setting id="sort3_field" type="enum" label="30598" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-6,true) + !eq(-2,0) + !eq(-4,0)"/>
-		<setting id="sort3_order" type="enum" label="30599" lvalues="30610|30611" default="0" visible="eq(-7,true) + !eq(-1,0) + !eq(-3,0) + !eq(-5,0) "/>
-		<setting id="sort4_field" type="enum" label="30600" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-8,true) + !eq(-2,0) + !eq(-4,0) + !eq(-6,0)"/>
-		<setting id="sort4_order" type="enum" label="30601" lvalues="30610|30611" default="0" visible="eq(-9,true) + !eq(-1,0) + !eq(-3,0) + !eq(-5,0) + !eq(-7,0)"/>
-		<setting id="sort5_field" type="enum" label="30602" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-10,true) + !eq(-2,0) + !eq(-4,0) + !eq(-6,0) + !eq(8,0)"/>
-		<setting id="sort5_order" type="enum" label="30603" lvalues="30610|30611" default="0" visible="eq(-11,true) + !eq(-1,0) + !eq(-3,0) + !eq(-5,0) + !eq(-7,0) + !eq(-9,0)"/>
-		<setting id="force_title_match" type="text" label="Shows forced to match only on title" enable="false" visible="false"/>
-		<setting id="toggle_enable" type="bool" label="Enable/Disable Check" default="false" enable="false" visible="false"/>
-	</category>
-	
-	<category label="Scrapers 1">
+        <setting id="title-fallback" type="bool" label="30585" default="true"/>
+        <setting id="last_check" type="number" default="0" visible="false"/>
+        <setting id="auto-disable" type="enum" label="30586" lvalues="30511|30638|30639" default="1"/>
+        <setting id="disable-freq" type="slider" label="30587" default="100" range="100,50,1000" option="int" enable="!eq(-1,0)"/>
+        <setting id="disable-thresh" type="slider" label="30588" default="50" range="0,100" option="int" enable="!eq(-2,0)"/>
+    </category>
+    
+    <category label="30591">
+        <setting id="enable_sort" type="bool" label="30592" default="false"/>
+        <setting id="filter-unknown" type="bool" label="30593" default="false" visible="eq(-1,true)"/>
+        <setting id="sort1_field" type="enum" label="30594" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-2,true)"/>
+        <setting id="sort1_order" type="enum" label="30595" lvalues="30610|30611" default="0" visible="eq(-3,true) + !eq(-1,0)"/>
+        <setting id="sort2_field" type="enum" label="30596" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-4,true) + !eq(-2,0)"/>
+        <setting id="sort2_order" type="enum" label="30597" lvalues="30610|30611" default="0" visible="eq(-5,true) + !eq(-1,0)+!eq(-3,0)"/>
+        <setting id="sort3_field" type="enum" label="30598" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-6,true) + !eq(-2,0) + !eq(-4,0)"/>
+        <setting id="sort3_order" type="enum" label="30599" lvalues="30610|30611" default="0" visible="eq(-7,true) + !eq(-1,0) + !eq(-3,0) + !eq(-5,0) "/>
+        <setting id="sort4_field" type="enum" label="30600" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-8,true) + !eq(-2,0) + !eq(-4,0) + !eq(-6,0)"/>
+        <setting id="sort4_order" type="enum" label="30601" lvalues="30610|30611" default="0" visible="eq(-9,true) + !eq(-1,0) + !eq(-3,0) + !eq(-5,0) + !eq(-7,0)"/>
+        <setting id="sort5_field" type="enum" label="30602" lvalues="30604|30605|30606|30607|30608|30609" default="0" visible="eq(-10,true) + !eq(-2,0) + !eq(-4,0) + !eq(-6,0) + !eq(8,0)"/>
+        <setting id="sort5_order" type="enum" label="30603" lvalues="30610|30611" default="0" visible="eq(-11,true) + !eq(-1,0) + !eq(-3,0) + !eq(-5,0) + !eq(-7,0) + !eq(-9,0)"/>
+        <setting id="force_title_match" type="text" label="Shows forced to match only on title" enable="false" visible="false"/>
+        <setting id="toggle_enable" type="bool" label="Enable/Disable Check" default="false" enable="false" visible="false"/>
+    </category>
+    
+    <category label="Scrapers 1">
          <setting id="123Movies-enable" type="bool" label="123Movies Enabled" default="true" visible="true"/>
          <setting id="123Movies-base_url" type="text" label="    Base Url" default="http://123movies.to" visible="eq(-1,true)"/>
          <setting id="123Movies-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -223,7 +223,7 @@
          <setting id="Dizigold_check" type="number" default="0" visible="false"/>
     </category>
 
-	<category label="Scrapers 2">
+    <category label="Scrapers 2">
          <setting id="Dizilab-enable" type="bool" label="Dizilab Enabled" default="true" visible="true"/>
          <setting id="Dizilab-base_url" type="text" label="    Base Url" default="http://dizilab.com" visible="eq(-1,true)"/>
          <setting id="Dizilab-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -319,7 +319,7 @@
          <setting id="MegaboxHD-scraper_key" type="text" label="    Scraper Decryption Key" option="hidden" default="" visible="eq(-7,true)"/>
     </category>
 
-	<category label="Scrapers 3">
+    <category label="Scrapers 3">
          <setting id="MerDB-enable" type="bool" label="MerDB Enabled" default="true" visible="true"/>
          <setting id="MerDB-base_url" type="text" label="    Base Url" default="http://www.merdb.mx" visible="eq(-1,true)"/>
          <setting id="MerDB-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -418,7 +418,7 @@
          <setting id="NoobRoom-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>
          <setting id="NoobRoom-include_premium" type="bool" label="     Include Premium" default="false" visible="eq(-8,true)"/>
     </category>
-	
+    
     <category label="Scrapers 4">
          <setting id="OneClickTVShows-enable" type="bool" label="OneClickTVShows Enabled" default="true" visible="true"/>
          <setting id="OneClickTVShows-base_url" type="text" label="    Base Url" default="http://oneclicktvshows.com" visible="eq(-1,true)"/>
@@ -632,32 +632,32 @@
     </category>
 
     <category label="30634">
-    	<setting type="lsep" label="30614"/>
-    	<setting id="enable-subtitles" type="bool" label="30615" default="false"/>
-		<setting id="subtitle-indicator" type="bool" label="30616" default="true" enable="eq(-1,true)"/>
-    	<setting id="subtitle-lang" type="text" label="30617" default="English" enable="eq(-2,true)"/>
-    	<setting id="subtitle-hi" type="bool" label="30618" default="false" enable="eq(-3,true)"/>
-    	<setting id="subtitle-hd" type="bool" label="30619" default="false" enable="eq(-4,true)"/>
-    	<setting id="subtitle-download" type="bool" label="30620" default="true" enable="eq(-5,true)"/>
+        <setting type="lsep" label="30614"/>
+        <setting id="enable-subtitles" type="bool" label="30615" default="false"/>
+        <setting id="subtitle-indicator" type="bool" label="30616" default="true" enable="eq(-1,true)"/>
+        <setting id="subtitle-lang" type="text" label="30617" default="English" enable="eq(-2,true)"/>
+        <setting id="subtitle-hi" type="bool" label="30618" default="false" enable="eq(-3,true)"/>
+        <setting id="subtitle-hd" type="bool" label="30619" default="false" enable="eq(-4,true)"/>
+        <setting id="subtitle-download" type="bool" label="30620" default="true" enable="eq(-5,true)"/>
         <setting id="subtitle-folder" type="folder" label="30621" default="special://userdata/addon_data/plugin.video.salts/Subtitles" enable="eq(-1,true)+eq(-6,true)"/>
         <setting id="subtitle-show" type="bool" label="30622" default="false" enable="eq(-2,true)+eq(-7,true)"/>
     </category>
     
     <category label="30635">
-		<setting id="use_remote_db" type="bool" label="30623" default="false"/>
+        <setting id="use_remote_db" type="bool" label="30623" default="false"/>
         <setting id="db_address" type="text" label="30624" enable="eq(-1,true)" visible="eq(-1,true)" default=""/>
         <setting id="db_port" type="integer" label="30625" enable="eq(-2,true)" visible="eq(-2,true)" default=""/>
         <setting id="db_user" type="text" label="30626" enable="eq(-3,true)" visible="eq(-3,true)" default=""/>
         <setting id="db_pass" type="text" label="30627" enable="eq(-4,true)" visible="eq(-4,true)" default="" option="hidden"/>
         <setting id="db_name" type="text" label="30628" enable="eq(-5,true)" visible="eq(-5,true)" default="salts_db"/>
-		<setting id="enable_upgrade" type="bool" label="30629" default="true" enable="eq(-6,true)" visible="eq(-6,true)"/>
+        <setting id="enable_upgrade" type="bool" label="30629" default="true" enable="eq(-6,true)" visible="eq(-6,true)"/>
         <setting id="flush_cache" type="action" label="30630" enable="true"
-        	action="RunPlugin(plugin://plugin.video.salts/?mode=flush_cache)"/>
+            action="RunPlugin(plugin://plugin.video.salts/?mode=flush_cache)"/>
         <setting id="reset_db" type="action" label="30631" enable="true"
-        	action="RunPlugin(plugin://plugin.video.salts/?mode=reset_db)"/>
+            action="RunPlugin(plugin://plugin.video.salts/?mode=reset_db)"/>
          <setting id="db_export" type="action" label="30632" enable="true" 
-         	action="RunPlugin(plugin://plugin.video.salts/?mode=export_db)"/>
+             action="RunPlugin(plugin://plugin.video.salts/?mode=export_db)"/>
          <setting id="db_import" type="action" label="30633" enable="true"
-         	action="RunPlugin(plugin://plugin.video.salts/?mode=import_db)"/>
-	</category>	
+             action="RunPlugin(plugin://plugin.video.salts/?mode=import_db)"/>
+    </category>
 </settings>
