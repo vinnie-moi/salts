@@ -22,7 +22,6 @@ import urllib
 from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://dizilab.com'
 

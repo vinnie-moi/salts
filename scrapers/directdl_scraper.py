@@ -91,7 +91,7 @@ class DirectDownload_Scraper(scraper.Scraper):
                                 
                                 hostname = urlparse.urlparse(url).hostname
                                 hoster = {'multi-part': False, 'class': self, 'views': None, 'url': url, 'rating': None, 'host': hostname,
-                                        'quality': QUALITY_MAP[result['quality']], 'dd_qual': result['quality'], 'direct': False}
+                                          'quality': QUALITY_MAP[result['quality']], 'dd_qual': result['quality'], 'direct': False}
                                 hosters.append(hoster)
 
         return hosters

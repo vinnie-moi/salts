@@ -19,7 +19,6 @@ import scraper
 import urllib
 import urlparse
 import re
-import base64
 from salts_lib import kodi
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES

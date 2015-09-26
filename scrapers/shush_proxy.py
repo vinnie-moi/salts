@@ -83,7 +83,7 @@ class Shush_Proxy(scraper.Scraper):
         try:
             py_path = os.path.join(kodi.get_path(), 'scrapers', 'shush_scraper.py')
             exists = os.path.exists(py_path)
-            if  not exists or (exists and os.path.getmtime(py_path) < time.time() - (4 * 60 * 60)):
+            if not exists or (exists and os.path.getmtime(py_path) < time.time() - (4 * 60 * 60)):
                 cipher_text = self._http_get(PY_URL, cache_limit=4)
                 if cipher_text:
                     decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(KEY, IV))

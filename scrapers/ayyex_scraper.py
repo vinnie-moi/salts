@@ -84,7 +84,6 @@ class Ayyex_Scraper(scraper.Scraper):
                     result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
                     results.append(result)
                 
-        
         return results
 
     def _http_get(self, url, cache_limit=8):

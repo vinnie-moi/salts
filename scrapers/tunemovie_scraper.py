@@ -24,7 +24,6 @@ import base64
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
-from salts_lib.constants import Q_ORDER
 
 BASE_URL = 'http://tunemovie.is'
 GK_KEY = base64.b64decode('Q05WTmhPSjlXM1BmeFd0UEtiOGg=')

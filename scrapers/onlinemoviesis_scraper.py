@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scraper
-import urllib
 import urlparse
 import re
 from salts_lib import kodi

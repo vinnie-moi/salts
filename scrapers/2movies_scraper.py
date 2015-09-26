@@ -29,11 +29,10 @@ from salts_lib.constants import USER_AGENT
 QUALITY_MAP = {'HD': QUALITIES.HIGH, 'LOW': QUALITIES.LOW}
 BASE_URL = 'http://twomovies.us'
 UA_RAND = {
-           'Mozilla/5.0': ['Mozilla/5.0', 'Mozilla/4.0'],
-           'MSIE 11': ['MSIE 11', 'MSIE 11.0', 'MSIE 10.0', 'MSIE 9.0', 'MSIE 8.0', 'MSIE 7.0b', 'MSIE 7.0'],
-           'Windows NT 6.3': ['Windows NT 6.3', 'Windows NT 6.1', 'Windows NT 6.0', 'Windows NT 5.0', 'Windows 3.1'],
-           'Trident/7.0': ['Trident/7.0', 'Trident/6.0', 'Trident/5.0', 'Trident/4.0']
-           }
+    'Mozilla/5.0': ['Mozilla/5.0', 'Mozilla/4.0'],
+    'MSIE 11': ['MSIE 11', 'MSIE 11.0', 'MSIE 10.0', 'MSIE 9.0', 'MSIE 8.0', 'MSIE 7.0b', 'MSIE 7.0'],
+    'Windows NT 6.3': ['Windows NT 6.3', 'Windows NT 6.1', 'Windows NT 6.0', 'Windows NT 5.0', 'Windows 3.1'],
+    'Trident/7.0': ['Trident/7.0', 'Trident/6.0', 'Trident/5.0', 'Trident/4.0']}
 
 class TwoMovies_Scraper(scraper.Scraper):
     base_url = BASE_URL

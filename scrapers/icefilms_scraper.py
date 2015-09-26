@@ -55,8 +55,7 @@ class IceFilms_Scraper(scraper.Scraper):
         url += '?s=%s&t=%s&app_id=SALTS' % (data['id'][0], data['t'][0])
         list_url = LIST_URL % (data['t'][0])
         headers = {
-                   'Referer': list_url
-        }
+            'Referer': list_url}
         ad_url = urllib.unquote(data['ad_url'][0])
         del data['ad_url']
         html = self._http_get(url, data=data, headers=headers, cache_limit=0)

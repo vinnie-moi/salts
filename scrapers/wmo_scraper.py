@@ -18,9 +18,8 @@
 import scraper
 import re
 import urlparse
-from salts_lib import kodi
 import urllib
-import time
+from salts_lib import kodi
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 

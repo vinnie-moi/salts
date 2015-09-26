@@ -26,8 +26,8 @@ from salts_lib.constants import QUALITIES
 BASE_URL = 'http://moviesonline7.co'
 BUY_VIDS_URL = '/includes/buyVidS.php?vid=%s&num=%s'
 QUALITY_MAP = {'BRRIP1': QUALITIES.HIGH, 'BRRIP2': QUALITIES.HD720, 'BRRIP3': QUALITIES.MEDIUM, 'BRRIP4': QUALITIES.HD720,
-             'DVDRIP1': QUALITIES.HIGH, 'DVDRIP2': QUALITIES.HIGH, 'DVDRIP3': QUALITIES.HIGH,
-             'CAM1': QUALITIES.LOW, 'CAM2': QUALITIES.LOW}
+               'DVDRIP1': QUALITIES.HIGH, 'DVDRIP2': QUALITIES.HIGH, 'DVDRIP3': QUALITIES.HIGH,
+               'CAM1': QUALITIES.LOW, 'CAM2': QUALITIES.LOW}
 
 class MO7_Scraper(scraper.Scraper):
     base_url = BASE_URL
