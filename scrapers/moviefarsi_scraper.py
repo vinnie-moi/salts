@@ -98,9 +98,10 @@ class MovieFarsi_Scraper(scraper.Scraper):
                         result = {'url': urlparse.urljoin(server_url, row['link']), 'title': row['title'], 'year': match_year}
                         results.append(result)
         else:
+            cookies = self.__get_cookie()
             search_url = urlparse.urljoin(self.base_url, '/?s=')
             search_url += urllib.quote_plus(title)
-            html = self._http_get(search_url, cache_limit=.5)
+            html = self._http_get(search_url, cookies=cookies, cache_limit=.5)
             for article in dom_parser.parse_dom(html, 'article', {'class': 'entry-body'}):
                 link = dom_parser.parse_dom(article, 'a', {'class': 'more-link'}, 'href')
                 item = dom_parser.parse_dom(article, 'div', {'class': 'post-content'})
@@ -150,5 +151,11 @@ class MovieFarsi_Scraper(scraper.Scraper):
             rows.append(row)
         return rows
     
-    def _http_get(self, url, cache_limit=8):
-        return super(MovieFarsi_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
+    def __get_cookie(self):
+        html = self._http_get(self.base_url, cache_limit=.2)
+        match = re.search('setCookie\(\s*"([^"]+)"\s*,\s*"([^"]+)', html)
+        if match:
+            return {match.group(1): match.group(2)}
+    
+    def _http_get(self, url, cookies=None, cache_limit=8):
+        return super(MovieFarsi_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, cache_limit=cache_limit)
