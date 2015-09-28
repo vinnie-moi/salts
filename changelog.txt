@@ -1,14 +1,14 @@
 [B]Version 1.0.53[/B]
-- Fix sezonlukdizi
-- Limit all fetches to 1MB
 - Add option to include watchlist in My Next Episodes
-- Fix ororo.tv (sorta?)
-- Add "On Deck" menu item basedon trakt bookmarks
-- Improve dizibox scraper
+- Add "On Deck" menu item based on trakt bookmarks
+- Limit all fetches to 1MB
 - Improve episode matching for all dizi scrapers
-- pep8 code cleanup
+- Improve dizibox scraper
+- Fix ororo.tv (sorta?)
+- Fix sezonlukdizi
 - Fix moviefarsi search
 - Fix dizimag
+- pep8 code cleanup
 
 [B]Version 1.0.52[/B]
 - Fix movietv
