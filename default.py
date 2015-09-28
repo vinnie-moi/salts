@@ -104,7 +104,7 @@ def view_bookmarks(section):
         pause_label += '[COLOR deeppink]%s[/COLOR]' % (paused_at)
         label = '[%s] %s ' % (pause_label, label.decode('utf-8', 'replace'))
         liz.setLabel(label)
-        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=section_params['folder'], totalItems=0)
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=(liz.getProperty('isPlayable') != 'true'), totalItems=0)
 
     kodi.end_of_directory()
 
