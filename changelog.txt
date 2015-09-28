@@ -1,4 +1,4 @@
-[B]Version 1.0.53[/B]
+[B]Version 1.0.54[/B]
 - Add option to include watchlist in My Next Episodes
 - Add "On Deck" menu item based on trakt bookmarks
 - Limit all fetches to 1MB
