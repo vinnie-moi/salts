@@ -206,7 +206,7 @@ def browse_menu(section):
     if utils.menu_on('mosts'): kodi.create_item({'mode': MODES.MOSTS, 'section': section}, i18n('mosts') % (section_label2), thumb=utils.art('mosts.png'), fanart=utils.art('fanart.jpg'))
     add_section_lists(section)
     if TOKEN:
-        if utils.menu_on('on_deck'): kodi.create_item({'mode': MODES.SHOW_BOOKMARKS, 'section': section}, i18n('trakt_on_deck'), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+        if utils.menu_on('on_deck'): kodi.create_item({'mode': MODES.SHOW_BOOKMARKS, 'section': section}, i18n('trakt_on_deck'), thumb=utils.art('on_deck.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('recommended'): kodi.create_item({'mode': MODES.RECOMMEND, 'section': section}, i18n('recommended') % (section_label), thumb=utils.art('recommended.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('collection'): add_refresh_item({'mode': MODES.SHOW_COLLECTION, 'section': section}, i18n('my_collection') % (section_label2), utils.art('collection.png'), utils.art('fanart.jpg'))
         if utils.menu_on('favorites'): kodi.create_item({'mode': MODES.SHOW_FAVORITES, 'section': section}, i18n('my_favorites'), thumb=utils.art('my_favorites.png'), fanart=utils.art('fanart.jpg'))
