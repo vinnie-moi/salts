@@ -22,6 +22,7 @@ import urllib
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
+from salts_lib.constants import XHR
 from salts_lib import kodi
 
 BASE_URL = 'http://dizimag.co'
@@ -54,27 +55,24 @@ class Dizimag_Scraper(scraper.Scraper):
         if source_url:
             page_url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(page_url, cache_limit=.5)
-            
-            for alter_link in dom_parser.parse_dom(html, 'a', {'class': 'alterlink'}, 'href'):
-                if not alter_link.endswith('=0'):
-                    alter_url = page_url + alter_link
-                    html = self._http_get(alter_url, cache_limit=.5)
-                
-                for script in re.finditer('<script[^>]*>(.*?)</script>', html, re.DOTALL):
-                    match = re.search('var\s+kaynaklar\s*=\s*\[([^]]+)', script.group(1))
-                    if match:
-                        for match in re.finditer('file\s*:\s*"([^"]+)"\s*,\s*label\s*:\s*"(\d+)p?"', match.group(1)):
-                            stream_url, height = match.groups()
-                            stream_url = stream_url.decode('unicode_escape')
-                            host = self._get_direct_hostname(stream_url)
-                            if host == 'gvideo':
-                                quality = self._gv_get_quality(stream_url)
-                            else:
-                                quality = self._height_get_quality(height)
-                                stream_url += '|User-Agent=%s&Referer=%s' % (USER_AGENT, urllib.quote(page_url))
-    
-                            hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
-                            hosters.append(hoster)
+            for script in re.finditer('<script[^>]*>(.*?)</script>', html, re.DOTALL):
+                match = re.search("var\s+kaynaklar.*?url\s*:\s*\"([^\"]+)\"\s*,\s*data\s*:\s*'([^']+)", script.group(1), re.DOTALL)
+                if match:
+                    url = urlparse.urljoin(self.base_url, match.group(1))
+                    data = urlparse.parse_qs(match.group(2))
+                    result = self._http_get(url, data=data, headers=XHR, cache_limit=0)
+                    for match in re.finditer('"videolink\d*"\s*:\s*"([^"]+)","videokalite\d*"\s*:\s*"?(\d+)p?', result):
+                        stream_url, height = match.groups()
+                        stream_url = stream_url.replace('\\/', '/')
+                        host = self._get_direct_hostname(stream_url)
+                        if host == 'gvideo':
+                            quality = self._gv_get_quality(stream_url)
+                        else:
+                            quality = self._height_get_quality(height)
+                            stream_url += '|User-Agent=%s&Referer=%s' % (USER_AGENT, urllib.quote(page_url))
+
+                        hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                        hosters.append(hoster)
     
         return hosters
 
