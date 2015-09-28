@@ -115,10 +115,11 @@ class SezonLukDizi_Scraper(scraper.Scraper):
                 if self._get_direct_hostname(stream_url) == 'gvideo':
                     quality = self._gv_get_quality(stream_url)
                 else:
-                    stream_redirect = self._http_get(stream_url, allow_redirect=False, cache_limit=0)
-                    if self._get_direct_hostname(stream_redirect) == 'gvideo':
-                        stream_url = stream_redirect
-                        quality = self._gv_get_quality(stream_url)
+                    if 'v.asp' in stream_url:
+                        stream_redirect = self._http_get(stream_url, allow_redirect=False, cache_limit=0)
+                        if self._get_direct_hostname(stream_redirect) == 'gvideo':
+                            stream_url = stream_redirect
+                            quality = self._gv_get_quality(stream_url)
                     else:
                         quality = self._height_get_quality(height)
                         
