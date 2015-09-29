@@ -20,6 +20,7 @@ import urllib
 import urlparse
 import re
 from salts_lib import kodi
+from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
@@ -89,11 +90,13 @@ class MO7_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/search.php?stext=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
-        pattern = "class='bekas'.*?href='([^']+).*?color:orange.*?[^>]+>([^<]+).*?Premiere:.*?(\d{4})</a>"
-        for match in re.finditer(pattern, html, re.DOTALL):
-            url, match_title, match_year = match.groups('')
-            if not year or not match_year or year == match_year:
-                result = {'url': '/' + url, 'title': match_title, 'year': match_year}
+        for cell in dom_parser.parse_dom(html, 'table', {'class': 'boxed'}):
+            url = dom_parser.parse_dom(cell, 'a', ret='href')
+            match_title = dom_parser.parse_dom(cell, 'h3', {'class': 'title_grid'})
+            if url and match_title:
+                url = url[0].replace(self.base_url, '')
+                if not url.startswith('/'): url = '/' + url
+                result = {'url': url, 'title': match_title[0], 'year': ''}
                 results.append(result)
 
         return results
