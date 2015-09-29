@@ -26,6 +26,7 @@ from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import XHR
 
 BASE_URL = 'http://www.flixanity.tv'
 
@@ -83,11 +84,10 @@ class Flixanity_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         self.__get_tokens()
         results = []
-        search_url = urlparse.urljoin(self.base_url, '/ajax/search.php?q=')
-        search_url += urllib.quote_plus(title)
+        search_url = urlparse.urljoin(self.base_url, 'cautare')
         timestamp = int(time.time() * 1000)
         query = {'q': title, 'limit': '100', 'timestamp': timestamp, 'verifiedCheck': self.__token}
-        html = self._http_get(search_url, data=query, cache_limit=.25)
+        html = self._http_get(search_url, data=query, headers=XHR, cache_limit=0)
         if video_type in [VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE]:
             media_type = 'TV SHOW'
         else:
@@ -120,16 +120,16 @@ class Flixanity_Scraper(scraper.Scraper):
         settings.append('         <setting id="%s-password" type="text" label="     %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('password')))
         return settings
 
-    def _http_get(self, url, data=None, cache_limit=8):
+    def _http_get(self, url, data=None, headers=None, cache_limit=8):
         # return all uncached blank pages if no user or pass
         if not self.username or not self.password:
             return ''
 
-        html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
+        html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
         if '<span>Log In</span>' in html:
             log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login()
-            html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
+            html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=0)
 
         return html
 
