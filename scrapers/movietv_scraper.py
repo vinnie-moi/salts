@@ -98,7 +98,6 @@ class MovieTV_Scraper(scraper.Scraper):
             url_frag = '/movies/'
         else:
             url_frag = '/series/'
-        print html
 
         for item in dom_parser.parse_dom(html, 'div', {'class': '[^"]*movie-grid[^"]*'}):
             match = re.search('href="([^"]+).*?class="movie-grid-title">\s*([^<]+).*?movie-grid-year">(\d+)', item, re.DOTALL)
