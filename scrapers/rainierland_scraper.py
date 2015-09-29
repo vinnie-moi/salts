@@ -101,9 +101,9 @@ class Rainierland_Scraper(scraper.Scraper):
             matches = zip(links, titles)
         else:
             html = self._http_get(self.base_url, cache_limit=8)
-            norm_title = self._normalize_title(title)
             matches = re.findall('<li\s+class="cat-item[^>]+>\s*<a\s+href="([^"]+)[^>]+>([^<]+)', html)
                 
+        norm_title = self._normalize_title(title)
         for item in matches:
             url, match_title_year = item
             match = re.search('(.*?)\s+\(?(\d{4})\)?', match_title_year)
