@@ -25,7 +25,7 @@ class ScraperVideo:
         assert(video_type in (VIDEO_TYPES.__dict__[k] for k in VIDEO_TYPES.__dict__ if not k.startswith('__')))
         self.video_type = video_type
         self.title = title
-        self.year = year
+        self.year = str(year)
         self.season = season
         self.episode = episode
         self.ep_title = ep_title
