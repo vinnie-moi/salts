@@ -89,10 +89,12 @@ class Dizilab_Scraper(scraper.Scraper):
             
             try:
                 match_title = dom_parser.parse_dom(item, 'a', {'class': 'title'})
-                re.search('([^>]+)$', match_title[0]).group(1)
+                match_title = re.search('([^>]+)$', match_title[0]).group(1)
+                match_title = match_title.strip()
             except:
                 match_title = ''
-                
+            
+            print url, match_year, match_title
             if url and match_title and (not year or not match_year or year == match_year):
                 result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': ''}
                 results.append(result)
