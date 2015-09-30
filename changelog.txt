@@ -1,3 +1,13 @@
+[B]Version 1.0.56[/B]
+- Add funtastic-vids scraper
+- Fix movietv.to scraper
+- Fix moviesonline7 scraper
+- Fix flixanity scraper
+- Fix rainierland scraper
+- Fix dizlab scraper
+- Fix duration infolabel for Isengard
+- Exclude episode titles from listitem labels when null
+
 [B]Version 1.0.55[/B]
 - Add option to include watchlist in My Next Episodes
 - Add "On Deck" menu item based on trakt bookmarks
