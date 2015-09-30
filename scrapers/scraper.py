@@ -481,7 +481,7 @@ class Scraper(object):
                 temp_title = re.sub('[^A-Za-z0-9 ]', '', video.title)
                 if not self._force_title(video):
                     search_title = '%s S%02dE%02d' % (temp_title, int(video.season), int(video.episode))
-                    if video.ep_airdate:
+                    if isinstance(video.ep_airdate, datetime.date):
                         fallback_search = '%s %s' % (temp_title, video.ep_airdate.strftime('%Y{0}%m{0}%d'.format(delim)))
                     else:
                         fallback_search = ''
