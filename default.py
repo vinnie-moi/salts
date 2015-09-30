@@ -1918,7 +1918,10 @@ def make_episode_item(show, episode, show_subs=True, menu_items=None):
     if menu_items is None: menu_items = []
     folder = kodi.get_setting('source-win') == 'Directory' and kodi.get_setting('auto-play') == 'false'
     show['title'] = re.sub(' \(\d{4}\)$', '', show['title'])
-    label = '%sx%s %s' % (episode['season'], episode['number'], episode['title'])
+    if episode['title'] is None:
+        label = '%sx%s' % (episode['season'], episode['number'])
+    else:
+        label = '%sx%s %s' % (episode['season'], episode['number'], episode['title'])
 
     if 'first_aired' in episode: utc_air_time = utils.iso_2_utc(episode['first_aired'])
     try: time_str = time.asctime(time.localtime(utc_air_time))
