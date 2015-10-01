@@ -77,8 +77,7 @@ class Funtastic_Scraper(scraper.Scraper):
             fragment = dom_parser.parse_dom(html, 'div', {'id': 'dlnmt'})
             hosters += self.__get_links(video, fragment[0])
             
-            seen_urls = dict((stream['url'], stream) for stream in hosters)
-            hosters = [seen_urls[stream] for stream in seen_urls]
+            hosters = dict((stream['url'], stream) for stream in hosters).values()
         return hosters
 
     def __get_links(self, video, fragment):
