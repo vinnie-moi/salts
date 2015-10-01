@@ -26,7 +26,9 @@ from salts_lib.constants import QUALITIES
 from salts_lib.constants import USER_AGENT
 
 BASE_URL = 'http://ororo.tv'
-LANDING_URL = 'http://ororo.tv/en/nl'
+LANDING_URL = '/nl'
+LOGIN_URL = '/en/users/sign_in'
+MAX_REDIRECT = 10
 CATEGORIES = {VIDEO_TYPES.TVSHOW: '2,3', VIDEO_TYPES.MOVIE: '1,3,4'}
 
 class OroroTV_Scraper(scraper.Scraper):
@@ -112,13 +114,13 @@ class OroroTV_Scraper(scraper.Scraper):
         settings.append('         <setting id="%s-include_premium" type="bool" label="     %s" default="false" visible="eq(-8,true)"/>' % (name, i18n('include_premium')))
         return settings
 
-    def _http_get(self, url, data=None, cache_limit=8):
+    def _http_get(self, url, auth=True, cookies=None, data=None, allow_redirect=True, cache_limit=8):
         # return all uncached blank pages if no user or pass
         if not self.username or not self.password:
             return ''
 
-        html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
-        if not html or 'csrf-token' in html:
+        html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, allow_redirect=allow_redirect, cache_limit=cache_limit)
+        if auth and (not html or LOGIN_URL in html):
             log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login()
             html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
@@ -126,9 +128,18 @@ class OroroTV_Scraper(scraper.Scraper):
         return html
 
     def __login(self):
-        url = urlparse.urljoin(self.base_url, '/en/users/sign_in')
+        url = urlparse.urljoin(self.base_url, LANDING_URL)
+        tries = 0
+        while True:
+            html = self._http_get(url, auth=False, allow_redirect=False, cache_limit=0)
+            if html.startswith('http://') and tries < MAX_REDIRECT:
+                tries += 1
+                url = html
+            else:
+                break
+        
         data = {'user[email]': self.username, 'user[password]': self.password, 'user[remember_me]': 1}
-        cookies = {'nl': 'true', 'locale': 'en'}
-        html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, allow_redirect=False, cache_limit=0)
+        url = urlparse.urljoin(self.base_url, LOGIN_URL)
+        html = self._http_get(url, auth=False, data=data, allow_redirect=False, cache_limit=0)
         if html != 'http://ororo.tv/en':
             raise Exception('ororo.tv login failed: %s' % (html))
