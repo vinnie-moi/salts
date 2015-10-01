@@ -46,7 +46,7 @@ class Putlocker_Scraper(scraper.Scraper):
         return link
 
     def format_source_label(self, item):
-        label = '[%s] (%s) %s' % (item['quality'], item['verson'], item['host'])
+        label = '[%s] (%s) %s' % (item['quality'], item['version'], item['host'])
         return label
 
     def get_sources(self, video):

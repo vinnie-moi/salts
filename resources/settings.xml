@@ -485,6 +485,12 @@
          <setting id="pubfilm_try" type="number" default="0" visible="false"/>
          <setting id="pubfilm_fail" type="number" default="0" visible="false"/>
          <setting id="pubfilm_check" type="number" default="0" visible="false"/>
+         <setting id="Putlocker-enable" type="bool" label="Putlocker Enabled" default="true" visible="true"/>
+         <setting id="Putlocker-base_url" type="text" label="    Base Url" default="http://putlocker.is" visible="eq(-1,true)"/>
+         <setting id="Putlocker-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
+         <setting id="Putlocker_try" type="number" default="0" visible="false"/>
+         <setting id="Putlocker_fail" type="number" default="0" visible="false"/>
+         <setting id="Putlocker_check" type="number" default="0" visible="false"/>
          <setting id="Rainierland-enable" type="bool" label="Rainierland Enabled" default="true" visible="true"/>
          <setting id="Rainierland-base_url" type="text" label="    Base Url" default="http://rainierland.com" visible="eq(-1,true)"/>
          <setting id="Rainierland-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -505,15 +511,15 @@
          <setting id="SezonLukDizi_try" type="number" default="0" visible="false"/>
          <setting id="SezonLukDizi_fail" type="number" default="0" visible="false"/>
          <setting id="SezonLukDizi_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 5">
          <setting id="Shush.se-enable" type="bool" label="Shush.se Enabled" default="true" visible="true"/>
          <setting id="Shush.se-base_url" type="text" label="    Base Url" default="http://shush.se" visible="eq(-1,true)"/>
          <setting id="Shush.se-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="Shush.se_try" type="number" default="0" visible="false"/>
          <setting id="Shush.se_fail" type="number" default="0" visible="false"/>
          <setting id="Shush.se_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 5">
          <setting id="SolarMovie-enable" type="bool" label="SolarMovie Enabled" default="true" visible="true"/>
          <setting id="SolarMovie-base_url" type="text" label="    Base Url" default="https://www.solarmovie.is" visible="eq(-1,true)"/>
          <setting id="SolarMovie-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -600,6 +606,9 @@
          <setting id="wmo.ch_try" type="number" default="0" visible="false"/>
          <setting id="wmo.ch_fail" type="number" default="0" visible="false"/>
          <setting id="wmo.ch_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 6">
          <setting id="wso.ch-enable" type="bool" label="wso.ch Enabled" default="true" visible="true"/>
          <setting id="wso.ch-base_url" type="text" label="    Base Url" default="http://watchseries-online.ch" visible="eq(-1,true)"/>
          <setting id="wso.ch-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -607,9 +616,6 @@
          <setting id="wso.ch_fail" type="number" default="0" visible="false"/>
          <setting id="wso.ch_check" type="number" default="0" visible="false"/>
          <setting id="wso.ch-max_pages" type="slider" range="1,50" option="int" label="     Maximum Pages" default="1" visible="eq(-6,true)"/>
-    </category>
-
-    <category label="Scrapers 6">
          <setting id="xmovies8-enable" type="bool" label="xmovies8 Enabled" default="true" visible="true"/>
          <setting id="xmovies8-base_url" type="text" label="    Base Url" default="http://megashare9.tv" visible="eq(-1,true)"/>
          <setting id="xmovies8-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
