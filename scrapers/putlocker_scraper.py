@@ -24,7 +24,6 @@ from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-QUALITY_MAP = {'DVD': QUALITIES.HIGH, 'TS': QUALITIES.MEDIUM, 'CAM': QUALITIES.LOW}
 BASE_URL = 'http://putlocker.is'
 
 class Putlocker_Scraper(scraper.Scraper):
@@ -37,7 +36,7 @@ class Putlocker_Scraper(scraper.Scraper):
 
     @classmethod
     def provides(cls):
-        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.SEASON, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
+        return frozenset([VIDEO_TYPES.TVSHOW, VIDEO_TYPES.EPISODE, VIDEO_TYPES.MOVIE])
 
     @classmethod
     def get_name(cls):
@@ -47,7 +46,7 @@ class Putlocker_Scraper(scraper.Scraper):
         return link
 
     def format_source_label(self, item):
-        label = '[%s] %s' % (item['quality'], item['host'])
+        label = '[%s] (%s) %s' % (item['quality'], item['verson'], item['host'])
         return label
 
     def get_sources(self, video):
@@ -57,10 +56,11 @@ class Putlocker_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             
-            for match in re.finditer('<a[^>]+href="([^"]+)[^>]+>Version \d+</a>', html):
-                url = match.group(1)
+            for match in re.finditer('<a[^>]+href="([^"]+)[^>]+>(Version \d+)<', html):
+                url, version = match.groups()
                 host = urlparse.urlsplit(url).hostname.replace('embed.', '')
                 hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': self._get_quality(video, host, QUALITIES.HIGH), 'views': None, 'rating': None, 'url': url, 'direct': False}
+                hoster['version'] = version
                 hosters.append(hoster)
 
         return hosters
