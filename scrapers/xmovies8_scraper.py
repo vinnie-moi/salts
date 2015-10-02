@@ -24,9 +24,8 @@ from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
+from salts_lib.constants import XHR
 from salts_lib.constants import QUALITIES
-
-XHR = {'X-Requested-With': 'XMLHttpRequest'}
 
 class XMovies8_Scraper(scraper.Scraper):
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):

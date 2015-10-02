@@ -27,12 +27,12 @@ import random
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
+from salts_lib.constants import XHR
 from salts_lib import kodi
 
 BASE_URL = 'http://sezonlukdizi.com'
 SEARCH_URL = '/service/search?q=%s&_=%s'
 GET_VIDEO_URL = '/service/get_video_part'
-XHR = {'X-Requested-With': 'XMLHttpRequest'}
 
 class SezonLukDizi_Scraper(scraper.Scraper):
     base_url = BASE_URL
