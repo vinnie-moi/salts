@@ -47,7 +47,6 @@ class YShows_Scraper(scraper.Scraper):
         link_url = urlparse.urljoin(self.base_url, LINK_URL)
         data = {'id_link': link}
         html = self._http_get(link_url, data=data, headers=XHR, cache_limit=0)
-        print html
         match = re.search('<iframe[^>]+src="([^"]+)', html, re.I)
         if match:
             return match.group(1)
@@ -87,7 +86,6 @@ class YShows_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/search_ajax')
         data = {'query': title}
         html = self._http_get(search_url, data=data, headers=XHR, cache_limit=0)
-        print html
         results = []
         for match in re.finditer('class="list-group-item"\s+href="([^"]+)">([^<]+)', html):
             url, match_title = match.groups()
