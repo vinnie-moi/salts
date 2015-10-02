@@ -75,6 +75,7 @@ class SezonLukDizi_Scraper(scraper.Scraper):
                     _, links = self.__get_video(video_id, part_name, page)
                     hosters += links
         
+            hosters = dict((stream['url'], stream) for stream in hosters).values()
         return hosters
 
     def __get_video(self, video_id, part_name, page):
@@ -98,7 +99,6 @@ class SezonLukDizi_Scraper(scraper.Scraper):
         
     def __get_links(self, url):
         sources = []
-        seen_urls = {}
         match = re.search('src="([^"]+)', url)
         if match:
             url = match.group(1).replace('\\/', '/')
@@ -112,19 +112,15 @@ class SezonLukDizi_Scraper(scraper.Scraper):
             for match in re.finditer('"?file"?\s*:\s*"([^"]+)"\s*,\s*"?label"?\s*:\s*"(\d+)p?"', html):
                 stream_url, height = match.groups()
                 stream_url = stream_url.replace('\\&', '&').replace('\\/', '/')
+                if 'v.asp' in stream_url:
+                    stream_redirect = self._http_get(stream_url, allow_redirect=False, cache_limit=0)
+                    if stream_redirect: stream_url = stream_redirect
+
                 if self._get_direct_hostname(stream_url) == 'gvideo':
                     quality = self._gv_get_quality(stream_url)
                 else:
-                    if 'v.asp' in stream_url:
-                        stream_redirect = self._http_get(stream_url, allow_redirect=False, cache_limit=0)
-                        if self._get_direct_hostname(stream_redirect) == 'gvideo':
-                            stream_url = stream_redirect
-                            quality = self._gv_get_quality(stream_url)
-                    else:
-                        quality = self._height_get_quality(height)
+                    quality = self._height_get_quality(height)
                         
-                if stream_url in seen_urls: continue
-                seen_urls[stream_url] = True
                 host = self._get_direct_hostname(stream_url)
                 stream_url += '|User-Agent=%s&Referer=%s' % (USER_AGENT, urllib.quote(url))
                 hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
