@@ -61,7 +61,6 @@ class Dizibox_Scraper(scraper.Scraper):
             hosters += self.__get_links(html, page_url)
 
             for match in re.finditer("<option\s+value='([^']+)[^>]+>([^<]+)", html):
-                print match.group(2), ALTERNATIVES
                 if match.group(2) in ALTERNATIVES:
                     html = self._http_get(match.group(1), cache_limit=.5)
                     hosters += self.__get_links(html, page_url)
