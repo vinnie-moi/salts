@@ -78,7 +78,11 @@ class DirectDownload_Scraper(scraper.Scraper):
                         match_quality = temp_quality.split(',')
     
                     sxe_str = '.S%02dE%02d.' % (int(video.season), int(video.episode))
-                    airdate_str = video.ep_airdate.strftime('.%Y.%m.%d.')
+                    try:
+                        airdate_str = video.ep_airdate.strftime('.%Y.%m.%d.')
+                    except:
+                        airdate_str = ''
+                        
                     for result in js_result:
                         if sxe_str not in result['release'] and airdate_str not in result['release']:
                             continue
