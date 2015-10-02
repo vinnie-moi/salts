@@ -138,7 +138,7 @@ class SezonLukDizi_Scraper(scraper.Scraper):
     def search(self, video_type, title, year):
         results = []
         search_url = urlparse.urljoin(self.base_url, SEARCH_URL)
-        search_url = search_url % (urllib.quote_plus(title), str(time.time() * 1000))
+        search_url = search_url % (urllib.quote_plus(title), str(int(time.time() * 1000)))
         html = self._http_get(search_url, headers=XHR, cache_limit=1)
         try:
             js_result = json.loads(html)
