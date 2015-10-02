@@ -1,3 +1,10 @@
+[B]Version 1.0.57[/B]
+- Add putlocker scraper
+- Add yshows scraper
+- Fix funtastic-vids scraper
+- Improve/Fix ororo.tv scraper
+- Minor code fixes
+
 [B]Version 1.0.56[/B]
 - Add funtastic-vids scraper
 - Fix movietv.to scraper
