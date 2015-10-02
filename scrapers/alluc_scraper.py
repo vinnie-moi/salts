@@ -117,10 +117,14 @@ class Alluc_Scraper(scraper.Scraper):
         else:
             sxe = 'S%02dE%02d' % (int(video.season), int(video.episode))
             se = '%d%02d' % (int(video.season), int(video.episode))
-            air_date = video.ep_airdate.strftime('%Y%m%d')
+            try:
+                air_date = video.ep_airdate.strftime('%Y%m%d')
+            except:
+                air_date = ''
+                
             if sxe in title:
                 show_title = title.split(sxe)[0]
-            elif air_date in title:
+            elif air_date and air_date in title:
                 show_title = title.split(air_date)[0]
             elif se in title:
                 show_title = title.split(se)[0]
