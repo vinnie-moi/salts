@@ -64,21 +64,12 @@ class MO7_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-
-            quality = QUALITIES.HIGH
-            match = re.search("kokybe;([^']+)", html)
-            if match:
-                quality = QUALITY_MAP.get(match.group(1).upper(), QUALITIES.HIGH)
-
-            match = re.search("buyVid\('(\d+)", html)
-            if match:
-                vid_num = match.group(1)
-                match = re.search('n(\d+)\.html', source_url)
-                if match:
-                    stream_url = urlparse.urljoin(self.base_url, BUY_VIDS_URL % (match.group(1), vid_num))
-                    if stream_url:
-                        hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'url': stream_url, 'class': self, 'rating': None, 'views': None, 'quality': quality, 'direct': True}
-                        hosters.append(hoster)
+            fragment = dom_parser.parse_dom(html, 'div', {'class': 'list-wrap'})
+            if fragment:
+                for stream_url in dom_parser.parse_dom(fragment[0], 'iframe', ret='src'):
+                    host = urlparse.urlparse(stream_url).hostname
+                    hoster = {'multi-part': False, 'host': host, 'url': stream_url, 'class': self, 'rating': None, 'views': None, 'quality': QUALITIES.HIGH, 'direct': False}
+                    hosters.append(hoster)
 
         return hosters
 
