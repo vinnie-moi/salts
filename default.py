@@ -1142,7 +1142,7 @@ def play_source(mode, hoster_url, direct, video_type, trakt_id, season='', episo
         win.setProperty('salts.playing.trakt_id', str(trakt_id))
         win.setProperty('salts.playing.season', str(season))
         win.setProperty('salts.playing.episode', str(episode))
-        if kodi.get_setting('trakt_bookmark') == 'true':
+        if kodi.get_setting('trakt_bookmark') == 'true' and resume_point > 0:
             win.setProperty('salts.playing.trakt_resume', str(resume_point))
 
         art = {'thumb': '', 'fanart': ''}
