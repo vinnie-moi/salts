@@ -72,6 +72,17 @@ class MintMovies_Scraper(scraper.Scraper):
         streams = []
         fragment = dom_parser.parse_dom(html, 'div', {'class': 'video-embed'})
         if fragment:
+            match = re.search("id='(engima[^']+)", fragment[0])
+            if match:
+                enigma_id = match.group(1)
+                match = re.search('<script[^>]+src="(http[^"]+mintmovies[^"]+)', html)
+                if match:
+                    js_html = self._http_get(match.group(1), cache_limit=.5)
+                    pattern = "\('#%s'\)\.replaceWith\('([^']+)" % (enigma_id)
+                    match = re.search(pattern, js_html)
+                    if match:
+                        fragment = [match.group(1).decode('unicode_escape')]
+            
             match = re.search('src="([^"]+)', fragment[0])
             if match:
                 streams.append(match.group(1))
@@ -80,8 +91,16 @@ class MintMovies_Scraper(scraper.Scraper):
                 streams.append(match.group(1))
 
         for stream_url in streams:
-            host = urlparse.urlparse(stream_url).hostname
-            hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': QUALITIES.HIGH, 'views': None, 'rating': None, 'url': stream_url, 'direct': False}
+            if self._get_direct_hostname(stream_url) == 'gvideo':
+                quality = self._gv_get_quality(stream_url)
+                host = self._get_direct_hostname(stream_url)
+                direct = True
+            else:
+                host = urlparse.urlparse(stream_url).hostname
+                quality = QUALITIES.HIGH
+                direct = False
+
+            hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': direct}
             
             match = re.search('class="views-infos">(\d+)', html, re.DOTALL)
             if match:

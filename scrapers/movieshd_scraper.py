@@ -23,7 +23,7 @@ from salts_lib import kodi
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'https://movieshd.eu'
+BASE_URL = 'http://movieshd.eu'
 
 class MoviesHD_Scraper(scraper.Scraper):
     base_url = BASE_URL
