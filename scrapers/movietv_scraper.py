@@ -55,7 +55,9 @@ class MovieTV_Scraper(scraper.Scraper):
         hosters = []
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
-            html = self._http_get(url, cache_limit=1)
+            headers = {'Referer': self.base_url + '/'}
+            html = self._http_get(url, headers=headers, cache_limit=1)
+            print html
             if video.video_type == VIDEO_TYPES.MOVIE:
                 pattern = '<source\s+src="([^"]+)'
                 match = re.search(pattern, html)
