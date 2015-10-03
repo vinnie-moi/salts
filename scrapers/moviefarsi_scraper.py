@@ -23,7 +23,7 @@ from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 
-BASE_URL = 'http://moviefarsi2.com'
+BASE_URL = 'http://moviefarsi3.com'
 TVSHOW_URLS = ['http://dl1.moviefarsi.org/serial/', 'http://dl1.moviefarsi.org/serial/best/', 'http://dl2.moviefarsi.org/serial/', 'http://dl3.moviefarsi.org/serial/', 'http://dl5.moviefarsi.org/serial/']
 
 class MovieFarsi_Scraper(scraper.Scraper):
