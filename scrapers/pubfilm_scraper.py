@@ -24,8 +24,10 @@ from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import USER_AGENT
 
 BASE_URL = 'http://movie.pubfilmno1.com'
+GK_URL = 'http://player.pubfilm.com/smplayer/plugins/gkplugins_picasaweb/plugins/plugins_player.php'
 
 class PubFilm_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -77,12 +79,20 @@ class PubFilm_Scraper(scraper.Scraper):
         return hosters
 
     def __get_links(self, url):
+        links = {}
         url = url.replace('&#038;', '&')
         html = self._http_get(url, cache_limit=.5)
-        links = {}
+        match = re.search('proxy\.link=([^&]+)', html)
+        if match:
+            data = {'url': match.group(1), 'isslverify': 'true', 'ihttpheader': 'true', 'iheader': 'true', 'iagent': USER_AGENT}
+            html = self._http_get(GK_URL, data=data, cache_limit=0)
+
         for match in re.finditer('file\s*:\s*"([^"]+)"\s*,\s*label\s*:\s*"([^"]+)p', html):
             links[match.group(1)] = match.group(2)
         
+        for match in re.finditer('"url":"([^"]+)","height":(\d+),"width":\d+,"type":"video', html):
+            links[match.group(1)] = match.group(2)
+
         for match in re.finditer('<source\s+src=\'([^\']+)[^>]*data-res="([^"]+)P', html):
             links[match.group(1)] = match.group(2)
         
@@ -128,10 +138,10 @@ class PubFilm_Scraper(scraper.Scraper):
                                         results.append(result)
         return results
 
-    def _http_get(self, url, cache_limit=8):
-        html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
+    def _http_get(self, url, data=None, cache_limit=8):
+        html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
         cookie = self._get_sucuri_cookie(html)
         if cookie:
             log_utils.log('Setting Pubfilm cookie: %s' % (cookie), log_utils.LOGDEBUG)
-            html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookie, cache_limit=0)
+            html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookie, data=data, cache_limit=0)
         return html
