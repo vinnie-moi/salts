@@ -29,6 +29,7 @@ from salts_lib.constants import QUALITIES
 from salts_lib.constants import XHR
 
 BASE_URL = 'http://www.flixanity.tv'
+EMBED_URL = '/ajax/embeds.php'
 
 class Flixanity_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -61,20 +62,31 @@ class Flixanity_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            pattern = '<IFRAME\s+SRC="([^"]+)'
-            for match in re.finditer(pattern, html, re.DOTALL | re.I):
-                url = match.group(1)
-                host = self._get_direct_hostname(url)
-                if host == 'gvideo':
-                    direct = True
-                    quality = self._gv_get_quality(url)
-                else:
-                    direct = False
-                    host = urlparse.urlparse(url).hostname
-                    quality = self._get_quality(video, host, QUALITIES.HD720)
-
-                source = {'multi-part': False, 'url': url, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'direct': direct}
-                sources.append(source)
+            if video.video_type == VIDEO_TYPES.MOVIE:
+                action = 'getMovieEmb'
+            else:
+                action = 'getEpisodeEmb'
+            match = re.search('elid="([^"]+)', html)
+            if match and self.__token is not None:
+                data = {'action': action, 'idEl': match.group(1), 'token': self.__token}
+                ajax_url = urlparse.urljoin(self.base_url, EMBED_URL)
+                html = self._http_get(ajax_url, data=data, headers=XHR, cache_limit=0)
+                html = html.replace('\\"', '"').replace('\\/', '/')
+                 
+                pattern = '<IFRAME\s+SRC="([^"]+)'
+                for match in re.finditer(pattern, html, re.DOTALL | re.I):
+                    url = match.group(1)
+                    host = self._get_direct_hostname(url)
+                    if host == 'gvideo':
+                        direct = True
+                        quality = self._gv_get_quality(url)
+                    else:
+                        direct = False
+                        host = urlparse.urlparse(url).hostname
+                        quality = self._get_quality(video, host, QUALITIES.HD720)
+    
+                    source = {'multi-part': False, 'url': url, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'direct': direct}
+                    sources.append(source)
 
         return sources
 
@@ -82,7 +94,7 @@ class Flixanity_Scraper(scraper.Scraper):
         return super(Flixanity_Scraper, self)._default_get_url(video)
 
     def search(self, video_type, title, year):
-        self.__get_tokens()
+        self.__get_token()
         results = []
         search_url = urlparse.urljoin(self.base_url, 'cautare')
         timestamp = int(time.time() * 1000)
@@ -130,18 +142,26 @@ class Flixanity_Scraper(scraper.Scraper):
             log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login()
             html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=0)
+            self.__get_token(html)
 
         return html
 
-    def __get_tokens(self):
-        if self.__token is None or self.__t is None:
-            html = super(Flixanity_Scraper, self)._cached_http_get(self.base_url, self.base_url, self.timeout, cache_limit=0)
+    def __get_token(self, html=''):
+        if self.__token is None:
+            if not html:
+                html = super(Flixanity_Scraper, self)._cached_http_get(self.base_url, self.base_url, self.timeout, cache_limit=0)
+                
             match = re.search("var\s+tok\s*=\s*'([^']+)", html)
             if match:
                 self.__token = match.group(1)
             else:
                 log_utils.log('Unable to locate Flixanity token', log_utils.LOGWARNING)
     
+    def __get_t(self, html=''):
+        if self.__t is None:
+            if not html:
+                html = super(Flixanity_Scraper, self)._cached_http_get(self.base_url, self.base_url, self.timeout, cache_limit=0)
+                
             match = re.search('<input type="hidden" name="t" value="([^"]+)', html)
             if match:
                 self.__t = match.group(1)
@@ -150,7 +170,8 @@ class Flixanity_Scraper(scraper.Scraper):
 
     def __login(self):
         url = urlparse.urljoin(self.base_url, '/ajax/login.php')
-        self.__get_tokens()
+        self.__get_token()
+        self.__get_t()
         data = {'username': self.username, 'password': self.password, 'action': 'login', 'token': self.__token, 't': self.__t}
         html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
         if html != '0':
