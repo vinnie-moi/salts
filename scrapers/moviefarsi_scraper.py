@@ -83,7 +83,6 @@ class MovieFarsi_Scraper(scraper.Scraper):
             if match:
                 season_url = urlparse.urljoin(show_url, match.group(1))
                 for item in self.__get_files(season_url, cache_limit=1):
-                    print item
                     match = re.search('(\.|_| )S%02d(\.|_| )?E%02d(\.|_| )' % (int(video.season), int(video.episode)), item['title'], re.I)
                     if match:
                         return season_url
