@@ -67,6 +67,9 @@ class Flixanity_Scraper(scraper.Scraper):
             else:
                 action = 'getEpisodeEmb'
             match = re.search('elid="([^"]+)', html)
+            if self.__token is None:
+                self.__get_token()
+                
             if match and self.__token is not None:
                 data = {'action': action, 'idEl': match.group(1), 'token': self.__token}
                 ajax_url = urlparse.urljoin(self.base_url, EMBED_URL)
@@ -142,8 +145,8 @@ class Flixanity_Scraper(scraper.Scraper):
             log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login()
             html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=0)
-            self.__get_token(html)
 
+        self.__get_token(html)
         return html
 
     def __get_token(self, html=''):
