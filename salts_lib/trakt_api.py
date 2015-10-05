@@ -294,6 +294,10 @@ class Trakt_API():
                 if bookmark['type'] == 'episode' and int(show_id) == bookmark['show']['ids']['trakt'] and bookmark['episode']['season'] == int(season) and bookmark['episode']['number'] == int(episode):
                     return bookmark['progress']
 
+    def delete_bookmark(self, bookmark_id):
+        url = '/sync/playback/%s' % (bookmark_id)
+        return self.__call_trakt(url, method='DELETE', cached=False)
+        
     def rate(self, section, item, rating, season='', episode=''):
         url = '/sync/ratings'
         data = self.__make_media_list(section, item, season, episode)
@@ -350,7 +354,7 @@ class Trakt_API():
             data[TRAKT_SECTIONS[section]].append(ids)
         return data
 
-    def __call_trakt(self, url, data=None, params=None, auth=True, cache_limit=.25, cached=True):
+    def __call_trakt(self, url, method=None, data=None, params=None, auth=True, cache_limit=.25, cached=True):
         if not cached: cache_limit = 0
         db_cache_limit = cache_limit if cache_limit > 8 else 8
         json_data = json.dumps(data) if data else None
@@ -368,8 +372,9 @@ class Trakt_API():
             while True:
                 try:
                     if auth: headers.update({'Authorization': 'Bearer %s' % (self.token)})
-                    log_utils.log('Trakt Call: %s, header: %s, data: %s' % (url, headers, data), log_utils.LOGDEBUG)
+                    log_utils.log('Trakt Call: %s, header: %s, data: %s cache_limit: %s cached: %s' % (url, headers, data, cache_limit, cached), log_utils.LOGDEBUG)
                     request = urllib2.Request(url, data=json_data, headers=headers)
+                    if method is not None: request.get_method = lambda: method.upper()
                     f = urllib2.urlopen(request, timeout=self.timeout)
                     result = ''
                     while True:
@@ -422,12 +427,12 @@ class Trakt_API():
                 except:
                     raise
 
-        response = json.loads(result)
+        try:
+            response = json.loads(result)
+        except ValueError:
+            response = ''
+            if result:
+                log_utils.log('Invalid JSON Trakt API Response: %s - |%s|' % (url, result), log_utils.LOGERROR)
 
-        if 'status' in response and response['status'] == 'failure':
-            if 'message' in response: raise TraktError(response['message'])
-            if 'error' in response: raise TraktError(response['error'])
-            else: raise TraktError()
-        else:
-            # log_utils.log('Trakt Response: %s' % (response), xbmc.LOGDEBUG)
-            return response
+        # log_utils.log('Trakt Response: %s' % (response), xbmc.LOGDEBUG)
+        return response

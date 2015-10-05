@@ -223,5 +223,7 @@ STRINGS = {
     'scraper_location': 30211,
     'scraper_key': 30212,
     'trakt_on_deck': 30213,
-    'on': 30214
+    'on': 30214,
+    'delete_bookmark': 30215,
+    'bookmark_deleted': 30216
 }

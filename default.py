@@ -85,13 +85,16 @@ def settings_menu():
 
 @url_dispatcher.register(MODES.SHOW_BOOKMARKS, ['section'])
 def view_bookmarks(section):
-    bookmarks = trakt_api.get_bookmarks(section, full=True)
     section_params = utils.get_section_params(section)
-    for bookmark in bookmarks:
+    for bookmark in trakt_api.get_bookmarks(section, full=True):
+        queries = {'mode': MODES.DELETE_BOOKMARK, 'bookmark_id': bookmark['id']}
+        runstring = 'RunPlugin(%s)' % kodi.get_plugin_url(queries)
+        menu_items = [(i18n('delete_bookmark'), runstring,)]
+        
         if bookmark['type'] == 'movie':
-            liz, liz_url = make_item(section_params, bookmark['movie'])
+            liz, liz_url = make_item(section_params, bookmark['movie'], menu_items=menu_items)
         else:
-            liz, liz_url = make_episode_item(bookmark['show'], bookmark['episode'])
+            liz, liz_url = make_episode_item(bookmark['show'], bookmark['episode'], menu_items=menu_items)
             label = liz.getLabel()
             label = '%s - %s' % (bookmark['show']['title'], label.decode('utf-8', 'replace'))
             liz.setLabel(label)
@@ -107,6 +110,12 @@ def view_bookmarks(section):
         xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=(liz.getProperty('isPlayable') != 'true'), totalItems=0)
 
     kodi.end_of_directory()
+
+@url_dispatcher.register(MODES.DELETE_BOOKMARK, ['bookmark_id'])
+def delete_bookmark(bookmark_id):
+    trakt_api.delete_bookmark(bookmark_id)
+    kodi.notify(msg=i18n('bookmark_deleted'))
+    xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.SHOW_VIEWS)
 def show_views():

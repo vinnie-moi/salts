@@ -874,6 +874,14 @@ msgctxt "#30214"
 msgid "on"
 msgstr ""
 
+msgctxt "#30215"
+msgid "Delete Bookmark"
+msgstr ""
+
+msgctxt "#30216"
+msgid "Bookmark Deleted"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
