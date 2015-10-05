@@ -24,7 +24,6 @@ import xbmcplugin
 import xbmcgui
 import xbmc
 import xbmcvfs
-import urlresolver
 import json
 import xml.etree.ElementTree as ET
 from Queue import Queue, Empty
@@ -154,6 +153,7 @@ def delete_url(url):
 
 @url_dispatcher.register(MODES.RES_SETTINGS)
 def resolver_settings():
+    import urlresolver
     urlresolver.display_settings()
 
 @url_dispatcher.register(MODES.ADDON_SETTINGS)
@@ -1068,6 +1068,7 @@ def filter_unusable_hosters(hosters):
     filtered_hosters = []
     filter_max = int(kodi.get_setting('filter_unusable'))
     unk_hosts = {}
+    import urlresolver
     for i, hoster in enumerate(hosters):
         if i < filter_max and 'direct' in hoster and hoster['direct'] == False and hoster['host']:
             hmf = urlresolver.HostedMediaFile(host=hoster['host'], media_id='dummy')  # use dummy media_id to force host validation
@@ -1126,6 +1127,7 @@ def play_source(mode, hoster_url, direct, video_type, trakt_id, season='', episo
         log_utils.log('Treating hoster_url as direct: %s' % (hoster_url))
         stream_url = hoster_url
     else:
+        import urlresolver
         hmf = urlresolver.HostedMediaFile(url=hoster_url)
         if not hmf:
             log_utils.log('Indirect hoster_url not supported by urlresolver: %s' % (hoster_url))
