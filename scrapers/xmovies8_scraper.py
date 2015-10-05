@@ -19,18 +19,16 @@ import scraper
 import urllib
 import urlparse
 import re
+import random
 from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import USER_AGENT
 from salts_lib.constants import XHR
 
-BASE_URL = 'https://xmovies8.org'
 VIDEO_URL = '/video_info/html5'
 
 class XMovies8_Scraper(scraper.Scraper):
-    base_url = BASE_URL
-
     def __init__(self, timeout=scraper.DEFAULT_TIMEOUT):
         self.timeout = timeout
         self.base_url = kodi.get_setting('%s-base_url' % (self.get_name()))
@@ -95,5 +93,20 @@ class XMovies8_Scraper(scraper.Scraper):
                     results.append(result)
         return results
 
+    @classmethod
+    def get_settings(cls):
+        settings = super(XMovies8_Scraper, cls).get_settings()
+        settings.append('         <setting id="%s-default_url" type="string" visible="false"/>' % (cls.get_name()))
+        return settings
+
     def _http_get(self, url, cookies=None, data=None, headers=None, allow_redirect=True, cache_limit=8):
         return super(XMovies8_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, headers=headers, allow_redirect=allow_redirect, cache_limit=cache_limit)
+
+# if no default url has been set, then pick one and set it. If one has been set, use it
+default_url = kodi.get_setting('%s-default_url' % (XMovies8_Scraper.get_name()))
+if not default_url:
+    BASE_URL = random.choice(['http://xmovies8.org', 'http://genvideos.com'])
+    XMovies8_Scraper.base_url = BASE_URL
+    kodi.set_setting('%s-default_url' % (XMovies8_Scraper.get_name()), BASE_URL)
+else:
+    XMovies8_Scraper.base_url = default_url

@@ -76,18 +76,15 @@ class Zumvo_Scraper(scraper.Scraper):
                 if match:
                     views = match.group(1)
                 
-                print 'here'
                 match = re.search('data-film-id\s*=\s*"([^"]+)', html)
                 if match:
                     film_id = match.group(1)
-                    print film_id
                     for match in re.finditer('data-episode-id\s*=\s*"([^"]+)', html):
                         episode_id = match.group(1)
                         now = int(time.time() * 1000)
                         ajax_url = self.ajax_url % (episode_id, film_id, now)
                         ajax_html = self._http_get(ajax_url, cache_limit=.5)
                         ajax_html = ajax_html.replace('\\"', '"').replace('\/', '/')
-                        print ajax_html
                         match = re.search('<iframe[^>]+src="([^"]+)', ajax_html)
                         if match:
                             stream_url = match.group(1)
@@ -98,10 +95,8 @@ class Zumvo_Scraper(scraper.Scraper):
                             match = re.search('proxy\.link":\s*"([^"&]+)', html)
                             if match:
                                 proxy_link = match.group(1)
-                                print proxy_link
                                 proxy_link = proxy_link.split('*', 1)[-1]
                                 stream_url = self._gk_decrypt(base64.urlsafe_b64decode('NlFQU1NQSGJrbXJlNzlRampXdHk='), proxy_link)
-                                print stream_url
                                 if self._get_direct_hostname(stream_url) == 'gvideo':
                                     host = self._get_direct_hostname(stream_url)
                                     direct = True
