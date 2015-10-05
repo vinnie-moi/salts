@@ -186,7 +186,7 @@ def make_info(item, show=None, people=None):
     info = {}
     info['title'] = item['title']
     if 'overview' in item: info['plot'] = info['plotoutline'] = item['overview']
-    if 'runtime' in item: info['duration'] = item['runtime'] * 60
+    if 'runtime' in item and item['runtime'] is not None: info['duration'] = item['runtime'] * 60
     if 'certification' in item: info['mpaa'] = item['certification']
     if 'year' in item: info['year'] = item['year']
     if 'season' in item: info['season'] = item['season']  # needs check
@@ -217,7 +217,7 @@ def make_info(item, show=None, people=None):
     # override item params with show info if it exists
     if 'certification' in show: info['mpaa'] = show['certification']
     if 'year' in show: info['year'] = show['year']
-    if 'runtime' in show: info['duration'] = show['runtime'] * 60
+    if 'runtime' in show and show['runtime'] is not None: info['duration'] = show['runtime'] * 60
     if 'title' in show: info['tvshowtitle'] = show['title']
     if 'network' in show: info['studio'] = show['network']
     if 'status' in show: info['status'] = show['status']
