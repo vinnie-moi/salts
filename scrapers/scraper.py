@@ -667,11 +667,12 @@ class Scraper(object):
         return plain_text
     
     def _parse_episode_link(self, link):
-        match = re.match('(.*?)(?:\.|_)S(\d+)E(\d+)(?:E\d+)*.*?(?:(?:_|\.)(\d+)p(?:_|\.))(.*)', link)
+        link = urllib.unquote(link)
+        match = re.match('(.*?)(?:\.|_| )S(\d+)(?:\.|_| )?E(\d+)(?:E\d+)*.*?(?:(?:_|\.)(\d+)p(?:_|\.))(.*)', link, re.I)
         if match:
             return match.groups()
         else:
-            match = re.match('(.*?)(?:\.|_)S(\d+)E(\d+)(?:E\d+)*(.*)', link)
+            match = re.match('(.*?)(?:\.|_| )S(\d+)(?:\.|_| )?E(\d+)(?:E\d+)*(.*)', link, re.I)
             if match:
                 return match.groups()[:-1] + ('480', ) + (match.groups()[-1],)  # assume no height = 480
             else:
