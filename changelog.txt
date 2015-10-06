@@ -1,4 +1,4 @@
-[B]Version 1.0.58[/B]
+[B]Version 1.0.59[/B]
 - Add delete trakt bookmark function
 - Fix trakt resume when 0
 - Improve sezon scraper
@@ -12,8 +12,11 @@
 - Fix 2movies scraper
 - Fix flixanity scraper
 - Fix zumvo scraper
+- Improve moviefarsi scraper
 - Fix/Improve xmovies8  scraper
 - Fix exception when runtime is None
+- Only import urlresolver when needed
+- Fix path building for movies
 
 [B]Version 1.0.57[/B]
 - Add putlocker scraper
