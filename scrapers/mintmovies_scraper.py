@@ -79,9 +79,13 @@ class MintMovies_Scraper(scraper.Scraper):
                 if match:
                     js_html = self._http_get(match.group(1), cache_limit=.5)
                     pattern = "\('#%s'\)\.replaceWith\('([^']+)" % (enigma_id)
-                    match = re.search(pattern, js_html)
-                    if match:
-                        fragment = [match.group(1).decode('unicode_escape')]
+                else:
+                    js_html = html
+                    pattern = "\('#engimadiv[^']+'\)\.replaceWith\('([^']+)"
+                    
+                match = re.search(pattern, js_html)
+                if match:
+                    fragment = [match.group(1).decode('unicode_escape')]
             
             match = re.search('src="([^"]+)', fragment[0])
             if match:
@@ -97,6 +101,7 @@ class MintMovies_Scraper(scraper.Scraper):
                 direct = True
             else:
                 host = urlparse.urlparse(stream_url).hostname
+                if host is None: continue
                 quality = QUALITIES.HIGH
                 direct = False
 
