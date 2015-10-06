@@ -1722,14 +1722,11 @@ def add_to_library(video_type, title, year, trakt_id):
         write_strm(strm_string, final_path, VIDEO_TYPES.MOVIE, title, year, trakt_id, require_source=kodi.get_setting('require_source') == 'true')
 
 def make_path(base_path, video_type, title, year='', season=''):
-    path = base_path
     show_folder = re.sub(r'[^\w\-_\. ]', '_', title)
-    show_folder = '%s (%s)' % (show_folder, year)
+    show_folder = '%s (%s)' % (show_folder, year) if year else show_folder
+    path = os.path.join(base_path, show_folder)
     if video_type == VIDEO_TYPES.TVSHOW:
-        path = os.path.join(base_path, show_folder, 'Season %s' % (season))
-    else:
-        dir_name = show_folder if not year else '%s (%s)' % (show_folder, year)
-        path = os.path.join(base_path, dir_name)
+        path = os.path.join(path, 'Season %s' % (season))
     return path
 
 def write_strm(stream, path, video_type, title, year, trakt_id, season='', episode='', require_source=False):
