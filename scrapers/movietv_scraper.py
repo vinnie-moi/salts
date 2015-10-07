@@ -20,6 +20,7 @@ import re
 import urllib
 import urlparse
 import json
+import random
 from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
@@ -27,6 +28,13 @@ from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://movietv.to'
 LINK_URL = '/series/getLink?id=%s&s=%s&e=%s'
+
+BR_VERS = [
+    ['%s.0' % i for i in xrange(18, 42)],
+    ['41.0.2228.0', '41.0.2227.1', '41.0.2227.0', '41.0.2226.0', '40.0.2214.93', '37.0.2062.124']]
+WIN_VERS = ['Windows NT 6.3', 'Windows NT 6.1', 'Windows NT 6.0', 'Windows NT 5.0', 'Windows 3.1']
+MV_UAS = ['Mozilla/5.0 ({win_ver}; WOW64; rv:{br_ver}) Gecko/20100101 Firefox/{br_ver}',
+          'Mozilla/5.0 ({win_ver}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{br_ver} Safari/537.36']
 
 class MovieTV_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -111,4 +119,7 @@ class MovieTV_Scraper(scraper.Scraper):
         return results
 
     def _http_get(self, url, data=None, headers=None, allow_redirect=True, cache_limit=8):
+        if headers is None: headers = {}
+        index = random.randrange(len(MV_UAS))
+        headers['User-Agent'] = MV_UAS[index].format(win_ver=random.choice(WIN_VERS), br_ver=random.choice(BR_VERS[index]))
         return super(MovieTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, allow_redirect=allow_redirect, cache_limit=cache_limit)
