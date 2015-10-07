@@ -51,13 +51,15 @@ class XMovies8_Scraper(scraper.Scraper):
         source_url = self.get_url(video)
         hosters = []
         if source_url:
-            url = urlparse.urljoin(self.base_url, source_url)
-            html = self._http_get(url, cache_limit=.5)
+            page_url = urlparse.urljoin(self.base_url, source_url)
+            html = self._http_get(page_url, cache_limit=.5)
             match = re.search('video_id\s*=\s*"([^"]+)', html)
             if match:
                 data = {'v': match.group(1)}
                 url = urlparse.urljoin(self.base_url, VIDEO_URL)
-                html = self._http_get(url, data=data, headers=XHR, cache_limit=0)
+                headers = XHR
+                headers['Referer'] = page_url
+                html = self._http_get(url, data=data, headers=headers, cache_limit=0)
                 for match in re.finditer('<source\s+data-res="([^"]+)"\s+src="([^"]+)', html):
                     stream_url = urlparse.urljoin(self.base_url, match.group(2)) + '|User-Agent=%s' % (USER_AGENT)
                     quality = self._height_get_quality(match.group(1))
