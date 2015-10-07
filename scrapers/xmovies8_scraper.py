@@ -71,7 +71,7 @@ class XMovies8_Scraper(scraper.Scraper):
 
     def search(self, video_type, title, year):
         search_url = urlparse.urljoin(self.base_url, '/results?q=%s' % urllib.quote_plus(title))
-        html = self._http_get(search_url, allow_redirect=False, cache_limit=.25)
+        html = self._http_get(search_url, cache_limit=.25)
         results = []
         for result in dom_parser.parse_dom(html, 'div', {'class': 'cell'}):
             match = re.search('class="video_title".*?href="([^"]+)"[^>]*>\s*([^<]+)', result, re.DOTALL)
