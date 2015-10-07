@@ -107,7 +107,7 @@ class XMovies8_Scraper(scraper.Scraper):
 # if no default url has been set, then pick one and set it. If one has been set, use it
 default_url = kodi.get_setting('%s-default_url' % (XMovies8_Scraper.get_name()))
 if not default_url:
-    BASE_URL = random.choice(['http://xmovies8.org', 'http://genvideos.com'])
+    BASE_URL = random.choice(['https://xmovies8.org', 'http://genvideos.com'])
     XMovies8_Scraper.base_url = BASE_URL
     kodi.set_setting('%s-default_url' % (XMovies8_Scraper.get_name()), BASE_URL)
 else:
