@@ -93,12 +93,12 @@ class MovieStorm_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, '/search?=%s' % urllib.quote_plus(title))
             data = {'q': title, 'go': 'Search'}
             html = self._http_get(url, data=data, cache_limit=8)
-            match = re.search('Slow down a little, you can search again in (\d+) seconds', html)
+            match = re.search('you can search again in (\d+) seconds', html, re.I)
             if match:
                 wait = int(match.group(1))
-                if wait > self.timeout - 1: wait = self.timeout - 1
+                if wait > self.timeout: wait = self.timeout
                 time.sleep(wait)
-                html = self._http_get(url, data=data, cache_limit=8)
+                html = self._http_get(url, data=data, cache_limit=0)
                 
             pattern = 'class="movie_box.*?href="([^"]+).*?<h1>([^<]+)'
             items = re.findall(pattern, html, re.DOTALL)
