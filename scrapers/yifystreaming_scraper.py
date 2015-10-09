@@ -54,15 +54,17 @@ class YifyStreaming_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            match = re.search('href="([^"]+)">HTML Player<', html)
+            q_str = ''
+            match = re.search('<h1\s+class="[^"]*entry-title[^"]*[^>]*>([^<]+)', html)
             if match:
-                link = match.group(1)
-                link = link.replace('#038;', '')
-                html = self._http_get(link, cache_limit=.5)
-                for match in re.finditer('<source\s+src="([^"]+)', html):
-                    stream_url = match.group(1)
-                    hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._gv_get_quality(stream_url), 'host': self._get_direct_hostname(stream_url), 'rating': None, 'views': None, 'direct': True}
-                    hosters.append(hoster)
+                q_str = match.group(1)
+                
+            match = re.search('href=[\'"]([^\'"]+)[^>]*>Download Now<', html)
+            if match:
+                stream_url = match.group(1)
+                host = urlparse.urlparse(stream_url).hostname
+                hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._blog_get_quality(video, q_str, host), 'host': host, 'rating': None, 'views': None, 'direct': False}
+                hosters.append(hoster)
         return hosters
 
     def get_url(self, video):
@@ -91,10 +93,11 @@ class YifyStreaming_Scraper(scraper.Scraper):
         return url
 
     def _get_episode_url(self, show_url, video):
-        search_title = '%s Season %d Episode %d' % (video.title, int(video.season), int(video.episode))
+        search_title = '%s S%02dE%02d' % (video.title, int(video.season), int(video.episode))
         results = self.search(video.video_type, search_title, '')
+        print results
         for result in results:
-            if re.search('Season\s+%s[^\d]+Episode\s+%s$' % (video.season, video.episode), result['title'], re.I):
+            if re.search('S%02dE%02d' % (int(video.season), int(video.episode)), result['title'], re.I):
                 return result['url']
     
     def search(self, video_type, title, year):
@@ -102,7 +105,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
             
-        elements = dom_parser.parse_dom(html, 'li', {'class': '[^"]*%s[^"]*' % (CATEGORIES[video_type])})
+        elements = dom_parser.parse_dom(html, 'article', {'class': '[^"]*%s[^"]*' % (CATEGORIES[video_type])})
         results = []
         for element in elements:
             match = re.search('href="([^"]+)[^>]+>\s*([^<]+)', element, re.DOTALL)
