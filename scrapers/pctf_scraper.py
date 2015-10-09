@@ -53,11 +53,12 @@ class PopcornTime_Scraper(scraper.Scraper):
         if source_url:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            match = re.search('<iframe[^>]*src="([^"]+)', html)
+            match = re.search('<source[^>]*src="([^"]+)', html)
             if match:
                 stream_url = match.group(1)
-                host = urlparse.urlparse(stream_url).hostname
-                hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._get_quality(video, host, QUALITIES.HIGH), 'host': host, 'rating': None, 'views': None, 'direct': False}
+                host = self._get_direct_hostname(stream_url)
+                _title, _year, height, _extra = self._parse_movie_link(stream_url)
+                hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._height_get_quality(height), 'host': host, 'rating': None, 'views': None, 'direct': True}
                 hosters.append(hoster)
         return hosters
 
