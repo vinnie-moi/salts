@@ -635,7 +635,6 @@ class Scraper(object):
     def _parse_google(self, link):
         sources = []
         html = self._http_get(link, cache_limit=.5)
-        print html
         i = link.rfind('#')
         if i > -1:
             link_id = link[i + 1:]
