@@ -634,10 +634,11 @@ class Scraper(object):
     
     def _parse_google(self, link):
         sources = []
+        html = self._http_get(link, cache_limit=.5)
+        print html
         i = link.rfind('#')
         if i > -1:
             link_id = link[i + 1:]
-            html = self._http_get(link, cache_limit=.5)
             match = re.search('feedPreload:\s*(.*}]}})},', html, re.DOTALL)
             if match:
                 try:
@@ -650,6 +651,17 @@ class Scraper(object):
                             for media in item['media']['content']:
                                 if media['type'].startswith('video'):
                                     sources.append(media['url'].replace('%3D', '='))
+        else:
+            match = re.search('preload\'?:\s*(.*}})},', html, re.DOTALL)
+            if match:
+                try:
+                    js = json.loads(match.group(1))
+                except ValueError:
+                    log_utils.log('Invalid JSON returned for: %s' % (link), log_utils.LOGWARNING)
+                else:
+                    for media in js['feed']['media']['content']:
+                        if media['type'].startswith('video'):
+                            sources.append(media['url'].replace('%3D', '='))
 
         return sources
 

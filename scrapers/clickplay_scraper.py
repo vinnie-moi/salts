@@ -18,12 +18,15 @@
 import scraper
 import re
 import urlparse
+import base64
+import urllib
 from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://clickplay.to'
+GK_KEY = base64.urlsafe_b64decode('bW5pcUpUcUJVOFozS1FVZWpTb00=')
 
 class ClickPlay_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -70,7 +73,41 @@ class ClickPlay_Scraper(scraper.Scraper):
                 hoster = {'multi-part': False, 'url': src, 'class': self, 'quality': QUALITIES.HIGH, 'host': host, 'rating': None, 'views': None, 'direct': False}
                 hosters.append(hoster)
                 
+            match = re.search('proxy\.link=([^"&]+)', html)
+            if match:
+                proxy_link = match.group(1)
+                proxy_link = proxy_link.split('*', 1)[-1]
+                stream_url = self._gk_decrypt(GK_KEY, proxy_link)
+                if 'vk.com' in stream_url.lower():
+                    hoster = {'multi-part': False, 'host': 'vk.com', 'class': self, 'url': stream_url, 'quality': QUALITIES.HD720, 'views': None, 'rating': None, 'direct': False}
+                    hosters.append(hoster)
+                if 'picasaweb' in stream_url.lower():
+                    for source in self._parse_google(stream_url):
+                        quality = self._gv_get_quality(source)
+                        hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': quality, 'host': self._get_direct_hostname(source), 'rating': None, 'views': None, 'direct': True}
+                        hosters.append(hoster)
+                if 'docs.google' in stream_url.lower():
+                    for source in self.__parse_fmt(stream_url):
+                        quality = self._gv_get_quality(source)
+                        hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': quality, 'host': self._get_direct_hostname(source), 'rating': None, 'views': None, 'direct': True}
+                        hosters.append(hoster)
+                
         return hosters
+
+    def __parse_fmt(self, link):
+        urls = {}
+        html = self._http_get(link, cache_limit=.5)
+        for match in re.finditer('\[\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\]', html):
+            key, value = match.groups()
+            if key == 'fmt_stream_map':
+                items = value.split(',')
+                for item in items:
+                    source_fmt, source_url = item.split('|')
+                    source_url = source_url.replace('\\u003d', '=').replace('\\u0026', '&')
+                    source_url = urllib.unquote(source_url)
+                    urls[source_url] = source_fmt
+                    
+        return urls
 
     def get_url(self, video):
         return super(ClickPlay_Scraper, self)._default_get_url(video)
