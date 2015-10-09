@@ -1,3 +1,11 @@
+[B]Version 1.0.60[/B]
+- Fix xmovies8 scraper
+- Fix movietv.to scraper
+- fix yify-streaming scraper
+- Fix pctf scraper
+- Fix moviestorm.eu scraper
+- Improve clickplay.to scraper
+
 [B]Version 1.0.59[/B]
 - Add delete trakt bookmark function
 - Fix trakt resume when 0
