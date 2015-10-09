@@ -89,11 +89,11 @@ class MovieStorm_Scraper(scraper.Scraper):
             titles = dom_parser.parse_dom(html, 'a', {'class': 'underilne'})
             items = zip(links, titles)
         else:
-            url = urlparse.urljoin(self.base_url, '/search?q=%s&go=Search' % urllib.quote_plus(title))
+            url = urlparse.urljoin(self.base_url, '/search?=%s' % urllib.quote_plus(title))
             data = {'q': title, 'go': 'Search'}
             html = self._http_get(url, data=data, cache_limit=8)
             pattern = 'class="movie_box.*?href="([^"]+).*?<h1>([^<]+)'
-            items = re.findall(pattern, html)
+            items = re.findall(pattern, html, re.DOTALL)
 
         norm_title = self._normalize_title(title)
         for item in items:
