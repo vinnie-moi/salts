@@ -26,7 +26,7 @@ from salts_lib.constants import QUALITIES
 from salts_lib.constants import XHR
 
 BASE_URL = 'http://twomovies.us'
-AJAX_URL = '/Xajax/saveaction/'
+AJAX_URL = '/Xajax/ajaxifyy/'
 
 class TwoMovies_Scraper(scraper.Scraper):
     base_url = BASE_URL
