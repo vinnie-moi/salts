@@ -1,3 +1,14 @@
+[B]Version 1.0.61[/B]
+- Fix 2movies scraper
+- Fix popcorntimefree scraper
+- Fix stream-tv
+- Fix yify.tv
+- Remove GVCenter
+- Remove MegaboxHD
+- Remove VKBox
+- Remove HDMZ
+- Fix movietv.to
+
 [B]Version 1.0.60[/B]
 - Fix xmovies8 scraper
 - Fix movietv.to scraper
