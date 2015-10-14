@@ -46,12 +46,13 @@ class YIFY_Scraper(scraper.Scraper):
     def resolve_link(self, link):
         url = '/player/pk/pk/plugins/player_p2.php'
         url = urlparse.urljoin(self.base_url, url)
-        data = {'url': link}
+        data = {'url': link, 'sou': 'pic', 'fv': '11'}
+        headers = {'Referer': ''}
         html = ''
         stream_url = None
         tries = 1
         while tries <= MAX_TRIES:
-            html = self._http_get(url, data=data, cache_limit=0)
+            html = self._http_get(url, data=data, headers=headers, cache_limit=0)
             log_utils.log('Initial Data (%s): |%s|' % (tries, html), log_utils.LOGDEBUG)
             if html.strip():
                 break
@@ -68,7 +69,7 @@ class YIFY_Scraper(scraper.Scraper):
                     captcha_result = self._do_recaptcha(js_data[0]['k'], tries, MAX_TRIES)
                     data['chall'] = captcha_result['recaptcha_challenge_field']
                     data['res'] = captcha_result['recaptcha_response_field']
-                    html = self._http_get(url, data=data, cache_limit=0)
+                    html = self._http_get(url, data=data, headers=headers, cache_limit=0)
                     log_utils.log('2nd Data (%s): %s' % (tries, html), log_utils.LOGDEBUG)
                     if html:
                         js_data = json.loads(html)
@@ -165,5 +166,5 @@ class YIFY_Scraper(scraper.Scraper):
                     log_utils.log('Invalid JSON in yify.tv: %s' % (fragment), log_utils.LOGWARNING)
         return results
 
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(YIFY_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
+    def _http_get(self, url, data=None, headers=None, cache_limit=8):
+        return super(YIFY_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
