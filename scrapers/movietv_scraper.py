@@ -17,16 +17,20 @@
 """
 import scraper
 import re
-import urllib
 import urlparse
 import json
 import random
+import time
+import urllib
 from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import XHR
+
 
 BASE_URL = 'http://movietv.to'
+SEASON_URL = '/series/season?id=%s&s=%s&_=%s'
 LINK_URL = '/series/getLink?id=%s&s=%s&e=%s'
 
 BR_VERS = [
@@ -62,28 +66,28 @@ class MovieTV_Scraper(scraper.Scraper):
         source_url = self.get_url(video)
         hosters = []
         if source_url:
+            if video.video_type == VIDEO_TYPES.EPISODE:
+                source_url += '&_=%s' % (str(int(time.time()) * 1000))
             url = urlparse.urljoin(self.base_url, source_url)
             headers = {'Referer': self.base_url + '/'}
             html = self._http_get(url, headers=headers, cache_limit=1)
+            sources = {}
             if video.video_type == VIDEO_TYPES.MOVIE:
-                pattern = '<source\s+src="([^"]+)'
-                match = re.search(pattern, html)
-                if match:
-                    html = '{"url":"%s"}' % (match.group(1))
-                else:
-                    return hosters
-                quality = QUALITIES.HD720
+                for match in re.finditer('var\s+(videolink[^\s]*)\s*=\s*"([^"]+)', html):
+                    var_name, stream_url = match.groups()
+                    if 'hd' in var_name:
+                        quality = QUALITIES.HD1080
+                    else:
+                        quality = QUALITIES.HD720
+                    sources[stream_url] = quality
             else:
-                quality = QUALITIES.HIGH
-
-            try:
                 js_data = json.loads(html)
-                if js_data['url']:
-                    stream_url = js_data['url'] + '|referer=%s' % (url)
-                    hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'url': stream_url, 'quality': quality, 'views': None, 'rating': None, 'direct': True}
-                    hosters.append(hoster)
-            except ValueError:
-                pass
+                sources[js_data['url']] = QUALITIES.HD720
+                
+            for source in sources:
+                stream_url = source + '|Referer=%s' % (urllib.quote(url))
+                hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'url': stream_url, 'quality': sources[source], 'views': None, 'rating': None, 'direct': True}
+                hosters.append(hoster)
 
         return hosters
 
@@ -91,28 +95,42 @@ class MovieTV_Scraper(scraper.Scraper):
         return super(MovieTV_Scraper, self)._default_get_url(video)
 
     def _get_episode_url(self, show_url, video):
-        episode_pattern = 'playSeries\((\d+),%s,%s\)' % (video.season, video.episode)
-        title_pattern = ''
-        airdate_pattern = ''
-        result = super(MovieTV_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern, airdate_pattern)
-        return LINK_URL % (result, video.season, video.episode)
-
+        url = urlparse.urljoin(self.base_url, show_url)
+        html = self._http_get(url, cache_limit=1)
+        match = re.search("var\s+id\s*=\s*'?(\d+)'?", html)
+        if match:
+            show_id = match.group(1)
+            season_url = SEASON_URL % (show_id, video.season, str(int(time.time()) * 1000))
+            season_url = urlparse.urljoin(self.base_url, season_url)
+            html = self._http_get(season_url, cache_limit=1)
+            js_data = json.loads(html)
+            force_title = self._force_title(video)
+            if not force_title:
+                for episode in js_data:
+                        if int(episode['episode_number']) == int(video.episode):
+                            return LINK_URL % (show_id, video.season, episode['episode_number'])
+            
+            if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title:
+                norm_title = self._normalize_title(video.ep_title)
+                for episode in js_data:
+                    if norm_title == self._normalize_title(episode['title']):
+                        return LINK_URL % (show_id, video.season, episode['episode_number'])
+        
     def search(self, video_type, title, year):
         results = []
-        url = urlparse.urljoin(self.base_url, '/search?qe=')
-        url += urllib.quote_plus(title)
-        headers = {'Referer': self.base_url + '/'}
-        html = self._http_get(url, headers=headers, cache_limit=0)
+        url = urlparse.urljoin(self.base_url, '/index/loadmovies')
         if video_type == VIDEO_TYPES.MOVIE:
-            url_frag = '/movies/'
+            query_type = 'movie'
         else:
-            url_frag = '/series/'
+            query_type = 'tv'
+        data = {'loadmovies': 'showData', 'page': 1, 'abc': 'All', 'genres': '', 'sortby': 'Popularity', 'quality': 'All', 'type': query_type, 'q': title}
+        html = self._http_get(url, data=data, headers=XHR, cache_limit=0)
 
-        for item in dom_parser.parse_dom(html, 'div', {'class': '[^"]*movie-grid[^"]*'}):
-            match = re.search('href="([^"]+).*?class="movie-grid-title">\s*([^<]+).*?movie-grid-year">(\d+)', item, re.DOTALL)
+        for item in dom_parser.parse_dom(html, 'div', {'class': 'item'}):
+            match = re.search('href="([^"]+).*?class="movie-title">\s*([^<]+).*?movie-date">(\d+)', item, re.DOTALL)
             if match:
                 link, match_title, match_year = match.groups()
-                if url_frag in link and (not year or not match_year or int(year) == int(match_year)):
+                if not year or not match_year or int(year) == int(match_year):
                     result = {'url': link, 'title': match_title, 'year': match_year}
                     results.append(result)
 
