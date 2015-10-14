@@ -61,7 +61,7 @@ class Dizigold_Scraper(scraper.Scraper):
             match = re.search('var\s+view_id\s*=\s*"([^"]+)', html)
             if match:
                 view_data = {'id': match.group(1), 'tip': 'view'}
-                html = self._http_get(self.ajax_url, data=view_data, headers=XHR, cache_limit=0)
+                html = self._http_get(self.ajax_url, data=view_data, headers=XHR, cache_limit=.25)
                 html = re.sub(r'\\n|\\t|\\', '', html)
                 match = re.search('var\s+sources\s*=\s*(\[.*?\])', html)
                 if match:

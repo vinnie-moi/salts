@@ -56,7 +56,7 @@ class AfdahOrg_Scraper(scraper.Scraper):
             if match:
                 video_id = match.group(1)
                 data = {'video_id': video_id}
-                html = self._http_get(INFO_URL, data=data, cache_limit=0)
+                html = self._http_get(INFO_URL, data=data, cache_limit=.5)
                 sources = self.__parse_fmt(html)
                 for width in sources:
                     hoster = {'multi-part': False, 'host': self._get_direct_hostname(sources[width]), 'class': self, 'quality': self._width_get_quality(width), 'views': None, 'rating': None, 'url': sources[width], 'direct': True}

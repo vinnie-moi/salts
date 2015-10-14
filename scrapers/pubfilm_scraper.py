@@ -85,7 +85,7 @@ class PubFilm_Scraper(scraper.Scraper):
         match = re.search('proxy\.link=([^&]+)', html)
         if match:
             data = {'url': match.group(1), 'isslverify': 'true', 'ihttpheader': 'true', 'iheader': 'true', 'iagent': USER_AGENT}
-            html = self._http_get(GK_URL, data=data, cache_limit=0)
+            html = self._http_get(GK_URL, data=data, cache_limit=.5)
 
         for match in re.finditer('file\s*:\s*"([^"]+)"\s*,\s*label\s*:\s*"([^"]+)p', html):
             links[match.group(1)] = match.group(2)

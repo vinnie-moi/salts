@@ -143,12 +143,16 @@ def browse_urls():
     urls = db_connection.get_all_urls(order_matters=True)
     kodi.create_item({'mode': MODES.FLUSH_CACHE}, '***%s***' % (i18n('delete_cache')), thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     for url in urls:
-        kodi.create_item({'mode': MODES.DELETE_URL, 'url': url[0]}, url[0], thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
+        if url[1]:
+            label = '%s (%s)' % (url[0], url[1])
+        else:
+            label = url[0]
+        kodi.create_item({'mode': MODES.DELETE_URL, 'url': url[0], 'data': url[1]}, label, thumb=utils.art('settings.png'), fanart=utils.art('fanart.jpg'))
     kodi.end_of_directory()
 
-@url_dispatcher.register(MODES.DELETE_URL, ['url'])
-def delete_url(url):
-    db_connection.delete_cached_url(url)
+@url_dispatcher.register(MODES.DELETE_URL, ['url'], ['data'])
+def delete_url(url, data=''):
+    db_connection.delete_cached_url(url, data)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.RES_SETTINGS)

@@ -180,7 +180,7 @@ class SRT_Scraper():
         log_utils.log('Fetching Cached URL: %s' % url, log_utils.LOGDEBUG)
         before = time.time()
 
-        _, html = db_connection.get_cached_url(url, cache)
+        _, html = db_connection.get_cached_url(url, cache_limit=cache)
         if html:
             log_utils.log('Returning cached result for: %s' % (url), log_utils.LOGDEBUG)
             return html

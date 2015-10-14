@@ -363,7 +363,7 @@ class Trakt_API():
         if params: url = url + '?' + urllib.urlencode(params)
 
         db_connection = DB_Connection()
-        created, cached_result = db_connection.get_cached_url(url, db_cache_limit)
+        created, cached_result = db_connection.get_cached_url(url, json_data, db_cache_limit)
         if cached_result and (time.time() - created) < (60 * 60 * cache_limit):
             result = cached_result
             log_utils.log('Returning cached result for: %s' % (url), log_utils.LOGDEBUG)
@@ -382,7 +382,7 @@ class Trakt_API():
                         if not data: break
                         result += data
 
-                    db_connection.cache_url(url, result)
+                    db_connection.cache_url(url, result, json_data)
                     break
                 except (ssl.SSLError, socket.timeout) as e:
                     if cached_result:

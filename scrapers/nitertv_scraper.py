@@ -71,7 +71,7 @@ class Niter_Scraper(scraper.Scraper):
                         quality = self._get_quality(video, host, QUALITIES.HD1080)
                     elif stream_url.startswith('pic='):
                         data = {'url': stream_url[4:]}
-                        html = self._http_get(PHP_URL, data=data, auth=False, cache_limit=0)
+                        html = self._http_get(PHP_URL, data=data, auth=False, cache_limit=1)
                         try:
                             js_data = json.loads(html)
                         except ValueError:

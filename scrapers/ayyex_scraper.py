@@ -74,7 +74,7 @@ class Ayyex_Scraper(scraper.Scraper):
         results = []
         search_url = urlparse.urljoin(self.base_url, '/?s=%s')
         search_url = search_url % (urllib.quote_plus(title))
-        html = self._http_get(search_url, cache_limit=0)
+        html = self._http_get(search_url, cache_limit=.5)
         norm_title = self._normalize_title(title)
         for item in dom_parser.parse_dom(html, 'div', {'class': 'item'}):
             match = re.search('href="([^"]+).*?<h2>([^<]+).*?class="year">\s*(\d+)', item, re.DOTALL)

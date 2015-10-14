@@ -77,7 +77,7 @@ class MovieTube_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/index.php?do=search')
         data = {'subaction': 'search', 'story': title, 'do': 'search'}
         headers = {'Referer': search_url}
-        html = self._http_get(search_url, data=data, headers=headers, cache_limit=0)
+        html = self._http_get(search_url, data=data, headers=headers, cache_limit=1)
         fragment = dom_parser.parse_dom(html, 'div', {'id': 'dle-content'})
         if fragment:
             for item in dom_parser.parse_dom(fragment[0], 'div', {'class': 'short-film'}):

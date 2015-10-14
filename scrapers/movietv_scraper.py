@@ -24,6 +24,7 @@ import time
 import urllib
 from salts_lib import kodi
 from salts_lib import dom_parser
+from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
 from salts_lib.constants import XHR
@@ -81,8 +82,12 @@ class MovieTV_Scraper(scraper.Scraper):
                         quality = QUALITIES.HD720
                     sources[stream_url] = quality
             else:
-                js_data = json.loads(html)
-                sources[js_data['url']] = QUALITIES.HD720
+                try:
+                    js_data = json.loads(html)
+                except ValueError:
+                    log_utils.log('Invalid JSON returned: %s: %s' % (url, html), log_utils.LOGWARNING)
+                else:
+                    sources[js_data['url']] = QUALITIES.HD720
                 
             for source in sources:
                 stream_url = source + '|Referer=%s' % (urllib.quote(url))
@@ -103,18 +108,22 @@ class MovieTV_Scraper(scraper.Scraper):
             season_url = SEASON_URL % (show_id, video.season, str(int(time.time()) * 1000))
             season_url = urlparse.urljoin(self.base_url, season_url)
             html = self._http_get(season_url, cache_limit=1)
-            js_data = json.loads(html)
-            force_title = self._force_title(video)
-            if not force_title:
-                for episode in js_data:
-                        if int(episode['episode_number']) == int(video.episode):
+            try:
+                js_data = json.loads(html)
+            except ValueError:
+                log_utils.log('Invalid JSON returned: %s: %s' % (url, html), log_utils.LOGWARNING)
+            else:
+                force_title = self._force_title(video)
+                if not force_title:
+                    for episode in js_data:
+                            if int(episode['episode_number']) == int(video.episode):
+                                return LINK_URL % (show_id, video.season, episode['episode_number'])
+                
+                if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title:
+                    norm_title = self._normalize_title(video.ep_title)
+                    for episode in js_data:
+                        if norm_title == self._normalize_title(episode['title']):
                             return LINK_URL % (show_id, video.season, episode['episode_number'])
-            
-            if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title:
-                norm_title = self._normalize_title(video.ep_title)
-                for episode in js_data:
-                    if norm_title == self._normalize_title(episode['title']):
-                        return LINK_URL % (show_id, video.season, episode['episode_number'])
         
     def search(self, video_type, title, year):
         results = []
@@ -124,7 +133,7 @@ class MovieTV_Scraper(scraper.Scraper):
         else:
             query_type = 'tv'
         data = {'loadmovies': 'showData', 'page': 1, 'abc': 'All', 'genres': '', 'sortby': 'Popularity', 'quality': 'All', 'type': query_type, 'q': title}
-        html = self._http_get(url, data=data, headers=XHR, cache_limit=0)
+        html = self._http_get(url, data=data, headers=XHR, cache_limit=2)
 
         for item in dom_parser.parse_dom(html, 'div', {'class': 'item'}):
             match = re.search('href="([^"]+).*?class="movie-title">\s*([^<]+).*?movie-date">(\d+)', item, re.DOTALL)

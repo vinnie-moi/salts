@@ -58,7 +58,7 @@ class IceFilms_Scraper(scraper.Scraper):
             'Referer': list_url}
         ad_url = urllib.unquote(data['ad_url'][0])
         del data['ad_url']
-        html = self._http_get(url, data=data, headers=headers, cache_limit=0)
+        html = self._http_get(url, data=data, headers=headers, cache_limit=.25)
         match = re.search('url=(.*)', html)
         if match:
             self.__show_ice_ad(ad_url, list_url)

@@ -126,7 +126,6 @@ class IWatchOnline_Scraper(scraper.Scraper):
         else:
             data = {'searchin': '2'}
         data.update({'searchquery': title})
-        search_url += '?' + urllib.urlencode(data)  # add criteria to url to make cache work
         html = self._http_get(search_url, data=data, cache_limit=.25)
 
         results = []

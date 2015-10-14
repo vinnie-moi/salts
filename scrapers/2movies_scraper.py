@@ -80,7 +80,7 @@ class TwoMovies_Scraper(scraper.Scraper):
         xjxr = str(int(time.time() * 1000))
         search_arg = 'S<![CDATA[%s]]>' % (title)
         data = {'xjxfun': 'search_suggest', 'xjxr': xjxr, 'xjxargs[]': [search_arg, 'Stitle']}
-        html = self._http_get(search_url, data=data, headers=XHR, cache_limit=0)
+        html = self._http_get(search_url, data=data, headers=XHR, cache_limit=1)
         if video_type == VIDEO_TYPES.MOVIE:
             marker = '/watch_movie/'
         else:

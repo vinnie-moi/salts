@@ -60,7 +60,7 @@ class Dizimag_Scraper(scraper.Scraper):
                 if match:
                     url = urlparse.urljoin(self.base_url, match.group(1))
                     data = urlparse.parse_qs(match.group(2))
-                    result = self._http_get(url, data=data, headers=XHR, cache_limit=0)
+                    result = self._http_get(url, data=data, headers=XHR, cache_limit=.5)
                     for match in re.finditer('"videolink\d*"\s*:\s*"([^"]+)","videokalite\d*"\s*:\s*"?(\d+)p?', result):
                         stream_url, height = match.groups()
                         stream_url = stream_url.replace('\\/', '/')

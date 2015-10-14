@@ -238,24 +238,24 @@ class Scraper(object):
         if headers is None: headers = {}
         referer = headers['Referer'] if 'Referer' in headers else url
         log_utils.log('Getting Url: %s cookie=|%s| data=|%s| extra headers=|%s|' % (url, cookies, data, headers))
+        if data is not None:
+            if isinstance(data, basestring):
+                data = data
+            else:
+                data = urllib.urlencode(data, True)
+
+        if multipart_data is not None:
+            headers['Content-Type'] = 'multipart/form-data; boundary=X-X-X'
+            data = multipart_data
+
         self.create_db_connection()
-        _, html = self.db_connection.get_cached_url(url, cache_limit)
+        _, html = self.db_connection.get_cached_url(url, data, cache_limit)
         if html:
             log_utils.log('Returning cached result for: %s' % (url), log_utils.LOGDEBUG)
             return html
 
         try:
             self.cj = self._set_cookies(base_url, cookies)
-            if data is not None:
-                if isinstance(data, basestring):
-                    data = data
-                else:
-                    data = urllib.urlencode(data, True)
-
-            if multipart_data is not None:
-                headers['Content-Type'] = 'multipart/form-data; boundary=X-X-X'
-                data = multipart_data
-
             request = urllib2.Request(url, data=data)
             request.add_header('User-Agent', USER_AGENT)
             request.add_unredirected_header('Host', request.get_host())
@@ -300,7 +300,7 @@ class Scraper(object):
             log_utils.log('Error (%s) during scraper http get: %s' % (str(e), url), log_utils.LOGWARNING)
             return ''
 
-        self.db_connection.cache_url(url, html)
+        self.db_connection.cache_url(url, html, data)
         return html
 
     def _set_cookies(self, base_url, cookies):

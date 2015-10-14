@@ -84,7 +84,7 @@ class SezonLukDizi_Scraper(scraper.Scraper):
 
         video_url = urlparse.urljoin(self.base_url, GET_VIDEO_URL)
         data = {'video_id': video_id, 'part_name': part_name, 'page': page}
-        html = self._http_get(video_url, data=data, headers=XHR, cache_limit=0)
+        html = self._http_get(video_url, data=data, headers=XHR, cache_limit=.25)
         try:
             js_result = json.loads(html)
         except ValueError:
