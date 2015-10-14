@@ -22,9 +22,10 @@ import re
 from salts_lib import kodi
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import USER_AGENT
 from salts_lib import dom_parser
 
-BASE_URL = 'http://popcorntimefree.info'
+BASE_URL = 'https://popcorntimefree.info'
 
 class PopcornTime_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -58,6 +59,7 @@ class PopcornTime_Scraper(scraper.Scraper):
                 stream_url = match.group(1)
                 host = self._get_direct_hostname(stream_url)
                 _title, _year, height, _extra = self._parse_movie_link(stream_url)
+                stream_url += '|User-Agent=%s' % (USER_AGENT)
                 hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._height_get_quality(height), 'host': host, 'rating': None, 'views': None, 'direct': True}
                 hosters.append(hoster)
         return hosters
@@ -66,26 +68,20 @@ class PopcornTime_Scraper(scraper.Scraper):
         return super(PopcornTime_Scraper, self)._default_get_url(video)
 
     def search(self, video_type, title, year):
-        search_url = urlparse.urljoin(self.base_url, '/?query=')
+        search_url = urlparse.urljoin(self.base_url, '/?s=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
         results = []
-        info = dom_parser.parse_dom(html, 'div', {'class': 'movie-info'})
-        for item in info:
-            match_title = dom_parser.parse_dom(item, 'span', {'class': 'movie-title'})
-            match_year = dom_parser.parse_dom(item, 'span', {'class': 'movie-year'})
-            if match_title:
-                match_title = self.__strip_link(match_title[0])
-                if match_year:
-                    match_year = self.__strip_link(match_year[0])
-                else:
-                    match_year = ''
-                    
-                match = re.search('href="([^"]+)', item)
+        for item in dom_parser.parse_dom(html, 'h2', {'class': 'entry-title'}):
+            match = re.search('href="([^"]+)[^>]+>([^<]+)', item)
+            if match:
+                url, match_title_year = match.groups()
+                match = re.search('(.*?)\s+\(?(\d{4})\)?', match_title_year)
                 if match:
-                    url = match.group(1)
+                    match_title, match_year = match.groups()
                 else:
-                    continue
+                    match_title = match_title_year
+                    match_year = ''
     
                 if not year or not match_year or year == match_year:
                     result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
