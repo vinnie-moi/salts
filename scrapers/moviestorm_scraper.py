@@ -22,6 +22,7 @@ import urllib
 import time
 from salts_lib import kodi
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 from salts_lib import dom_parser
 
@@ -60,7 +61,7 @@ class MovieStorm_Scraper(scraper.Scraper):
     def get_sources(self, video):
         source_url = self.get_url(video)
         hosters = []
-        if source_url:
+        if source_url and source_url != FORCE_NO_MATCH:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             pattern = 'class="source_td">\s*<img[^>]+>\s*(.*?)\s*-\s*\((\d+) views\).*?class="quality_td">\s*(.*?)\s*<.*?href="([^"]+)'

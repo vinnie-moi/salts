@@ -22,6 +22,7 @@ import xbmc
 import urlparse
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import SORT_KEYS
 
 BASE_URL = ''
@@ -48,7 +49,7 @@ class Local_Scraper(scraper.Scraper):
     def get_sources(self, video):
         source_url = self.get_url(video)
         hosters = []
-        if source_url:
+        if source_url and source_url != FORCE_NO_MATCH:
             params = urlparse.parse_qs(source_url)
             if video.video_type == VIDEO_TYPES.MOVIE:
                 cmd = '{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieDetails", "params": {"movieid": %s, "properties" : ["file", "playcount", "streamdetails"]}, "id": "libMovies"}'

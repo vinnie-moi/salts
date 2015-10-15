@@ -22,6 +22,7 @@ import re
 from salts_lib import kodi
 import base64
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://viooz.ac'
@@ -50,7 +51,7 @@ class VioozAc_Scraper(scraper.Scraper):
     def get_sources(self, video):
         source_url = self.get_url(video)
         hosters = []
-        if source_url:
+        if source_url and source_url != FORCE_NO_MATCH:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
 

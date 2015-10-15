@@ -23,6 +23,7 @@ from salts_lib import kodi
 from salts_lib import pyaes
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 
 BASE_URL = 'http://shush.se'
 PY_URL = 'http://omaha.watchkodi.com/shush_scraper.dat'

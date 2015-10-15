@@ -24,6 +24,7 @@ from salts_lib import log_utils
 from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 
 BASE_URL = 'http://123movies.to'
 
@@ -52,7 +53,7 @@ class One23Movies_Scraper(scraper.Scraper):
     def get_sources(self, video):
         source_url = self.get_url(video)
         hosters = []
-        if source_url:
+        if source_url and source_url != FORCE_NO_MATCH:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             match = re.search('var\s+url_playlist\s*=\s*"([^"]+)', html)

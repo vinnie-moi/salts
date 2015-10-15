@@ -50,6 +50,7 @@ SEARCH_HISTORY = 10
 DEFAULT_EXT = '.mpg'
 CHUNK_SIZE = 512 * 1024
 PROGRESS = __enum(OFF=0, WINDOW=1, BACKGROUND=2)
+FORCE_NO_MATCH = '***FORCE_NO_MATCH***'
 
 # sort keys need to be defined such that "best" have highest values
 # unknown (i.e. None) is always worst

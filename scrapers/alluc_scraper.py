@@ -23,11 +23,11 @@ from salts_lib import kodi
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 from salts_lib.constants import Q_ORDER
 
 Q_LIST = [item[0] for item in sorted(Q_ORDER.items(), key=lambda x:x[1])]
-
 
 BASE_URL = 'http://www.alluc.com'
 SEARCH_URL = '/api/search/%s/?query=%s+lang%%3Aen&count=100&from=0&getmeta=0'
@@ -65,7 +65,7 @@ class Alluc_Scraper(scraper.Scraper):
 
     def get_sources(self, video):
         source_url = self.get_url(video)
-        if source_url:
+        if source_url and source_url != FORCE_NO_MATCH:
             params = urlparse.parse_qs(urlparse.urlparse(source_url).query)
             if video.video_type == VIDEO_TYPES.MOVIE:
                 query = urllib.quote_plus('%s %s' % (params['title'][0], params['year'][0]))

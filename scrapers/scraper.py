@@ -38,6 +38,7 @@ from salts_lib import cloudflare
 from salts_lib import pyaes
 from salts_lib.db_utils import DB_Connection
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import USER_AGENT
 from salts_lib.constants import QUALITIES
 from salts_lib.constants import HOST_Q
@@ -219,16 +220,19 @@ class Scraper(object):
                 url = results[0]['url']
                 self.db_connection.set_related_url(temp_video_type, video.title, video.year, self.get_name(), url)
 
-        if url and video.video_type == VIDEO_TYPES.EPISODE:
-            result = self.db_connection.get_related_url(VIDEO_TYPES.EPISODE, video.title, video.year, self.get_name(), video.season, video.episode)
-            if result:
-                url = result[0][0]
-                log_utils.log('Got local related url: |%s|%s|%s|' % (video, self.get_name(), url))
-            else:
-                show_url = url
-                url = self._get_episode_url(show_url, video)
-                if url:
-                    self.db_connection.set_related_url(VIDEO_TYPES.EPISODE, video.title, video.year, self.get_name(), url, video.season, video.episode)
+        if video.video_type == VIDEO_TYPES.EPISODE:
+            if url == FORCE_NO_MATCH:
+                url = None
+            elif url:
+                result = self.db_connection.get_related_url(VIDEO_TYPES.EPISODE, video.title, video.year, self.get_name(), video.season, video.episode)
+                if result:
+                    url = result[0][0]
+                    log_utils.log('Got local related url: |%s|%s|%s|' % (video, self.get_name(), url))
+                else:
+                    show_url = url
+                    url = self._get_episode_url(show_url, video)
+                    if url:
+                        self.db_connection.set_related_url(VIDEO_TYPES.EPISODE, video.title, video.year, self.get_name(), url, video.season, video.episode)
 
         return url
 

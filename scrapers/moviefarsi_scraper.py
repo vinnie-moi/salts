@@ -22,6 +22,7 @@ import re
 from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 
 BASE_URL = 'http://moviefarsi3.com'
 TVSHOW_URLS = ['http://dl1.moviefarsi.org/serial/', 'http://dl1.moviefarsi.org/serial/best/', 'http://dl2.moviefarsi.org/serial/', 'http://dl3.moviefarsi.org/serial/', 'http://dl5.moviefarsi.org/serial/']
@@ -53,7 +54,7 @@ class MovieFarsi_Scraper(scraper.Scraper):
     def get_sources(self, video):
         source_url = self.get_url(video)
         hosters = []
-        if source_url:
+        if source_url and source_url != FORCE_NO_MATCH:
             if video.video_type == VIDEO_TYPES.EPISODE:
                     sources = self.__get_files(source_url)
                     for source in sources:

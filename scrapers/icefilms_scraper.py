@@ -26,6 +26,7 @@ import random
 import xbmcgui
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
+from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 
 QUALITY_MAP = {'HD 720P': QUALITIES.HD720, 'DVDRIP / STANDARD DEF': QUALITIES.HIGH, 'DVD SCREENER': QUALITIES.HIGH}
@@ -72,7 +73,7 @@ class IceFilms_Scraper(scraper.Scraper):
     def get_sources(self, video):
         source_url = self.get_url(video)
         sources = []
-        if source_url:
+        if source_url and source_url != FORCE_NO_MATCH:
             try:
                 url = urlparse.urljoin(self.base_url, source_url)
                 html = self._http_get(url, cache_limit=.5)

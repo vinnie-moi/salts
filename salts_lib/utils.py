@@ -427,7 +427,11 @@ def parallel_get_url(q, scraper, video):
     url = scraper.get_url(video)
     log_utils.log('%s returned url %s from %s' % (scraper.get_name(), url, worker), log_utils.LOGDEBUG)
     if not url: url = ''
-    related = {'class': scraper, 'url': url, 'name': scraper.get_name(), 'label': '[%s] %s' % (scraper.get_name(), url)}
+    if url == FORCE_NO_MATCH:
+        label = '[%s] [COLOR green]%s[/COLOR]' % (scraper.get_name(), i18n('force_no_match'))
+    else:
+        label = '[%s] %s' % (scraper.get_name(), url)
+    related = {'class': scraper, 'url': url, 'name': scraper.get_name(), 'label': label}
     q.put(related)
 
 def parallel_get_progress(q, trakt_id, cached):
