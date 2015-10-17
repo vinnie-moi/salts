@@ -1364,7 +1364,7 @@ def set_related_url(mode, video_type, title, year, trakt_id, season='', episode=
                 temp_year = year
                 while True:
                     dialog = xbmcgui.Dialog()
-                    choices = [i18n('manual_search'), i18n('force_no_match')]
+                    choices = [i18n('manual_search'), '[COLOR green]%s[/COLOR]' % (i18n('force_no_match'))]
                     try:
                         log_utils.log('Searching for: |%s|%s|' % (temp_title, temp_year), xbmc.LOGDEBUG)
                         results = related_list[index]['class'].search(video_type, temp_title, temp_year)
