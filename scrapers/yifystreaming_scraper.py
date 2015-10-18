@@ -26,6 +26,7 @@ from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib import dom_parser
 
 BASE_URL = 'http://yify-streaming.com'
+BASE_URLS = {VIDEO_TYPES.MOVIE: 'http://yify-streaming.com', VIDEO_TYPES.TVSHOW: 'http://tv.yify-streaming.com', VIDEO_TYPES.EPISODE: 'http://tv.yify-streaming.com'}
 CATEGORIES = {VIDEO_TYPES.MOVIE: 'category-movies', VIDEO_TYPES.EPISODE: 'category-tv-series'}
 
 class YifyStreaming_Scraper(scraper.Scraper):
@@ -53,7 +54,8 @@ class YifyStreaming_Scraper(scraper.Scraper):
         source_url = self.get_url(video)
         hosters = []
         if source_url and source_url != FORCE_NO_MATCH:
-            url = urlparse.urljoin(self.base_url, source_url)
+            base_url = BASE_URLS[video.video_type]
+            url = urlparse.urljoin(base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             q_str = ''
             match = re.search('<h1\s+class="[^"]*entry-title[^"]*[^>]*>([^<]+)', html)
@@ -101,11 +103,12 @@ class YifyStreaming_Scraper(scraper.Scraper):
                 return result['url']
     
     def search(self, video_type, title, year):
-        search_url = urlparse.urljoin(self.base_url, '/?s=')
+        base_url = BASE_URLS[video_type]
+        search_url = urlparse.urljoin(base_url, '/?s=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
             
-        elements = dom_parser.parse_dom(html, 'article', {'class': '[^"]*%s[^"]*' % (CATEGORIES[video_type])})
+        elements = dom_parser.parse_dom(html, 'article')
         results = []
         for element in elements:
             match = re.search('href="([^"]+)[^>]+>\s*([^<]+)', element, re.DOTALL)
@@ -119,7 +122,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
                     match_year = ''
                 
                 if not year or not match_year or year == match_year:
-                    result = {'title': match_title, 'year': match_year, 'url': url.replace('https', 'http').replace(self.base_url, '')}
+                    result = {'title': match_title, 'year': match_year, 'url': url.replace('https', 'http').replace(base_url, '')}
                     results.append(result)
 
         return results
