@@ -17,17 +17,16 @@
 """
 import scraper
 import os
-import base64
 import time
+import urllib2
+import hashlib
 from salts_lib import kodi
+from salts_lib.trans_utils import i18n
 from salts_lib import pyaes
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
-from salts_lib.constants import FORCE_NO_MATCH
 
 BASE_URL = 'http://shush.se'
-PY_URL = 'http://omaha.watchkodi.com/shush_scraper.dat'
-KEY = base64.decodestring('YV9sb25nX2Flc19rZXlfZm9yX3NodXNoX3NjcmFwZXI=')
 IV = '\0' * 16
 
 class Shush_Proxy(scraper.Scraper):
@@ -77,6 +76,14 @@ class Shush_Proxy(scraper.Scraper):
         if self.__scraper is not None:
             return self.__scraper._get_episode_url(show_url, video)
 
+    @classmethod
+    def get_settings(cls):
+        settings = super(Shush_Proxy, cls).get_settings()
+        name = cls.get_name()
+        settings.append('         <setting id="%s-scraper_url" type="text" label="    %s" default="" visible="eq(-6,true)"/>' % (name, i18n('scraper_location')))
+        settings.append('         <setting id="%s-scraper_password" type="text" label="    %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('scraper_key')))
+        return settings
+    
     def _http_get(self, url, cache_limit=8):
         return super(Shush_Proxy, self)._cached_http_get(url, '', self.timeout, cache_limit=cache_limit)
     
@@ -84,10 +91,19 @@ class Shush_Proxy(scraper.Scraper):
         try:
             py_path = os.path.join(kodi.get_path(), 'scrapers', 'shush_scraper.py')
             exists = os.path.exists(py_path)
-            if not exists or (exists and os.path.getmtime(py_path) < time.time() - (4 * 60 * 60)):
-                cipher_text = self._http_get(PY_URL, cache_limit=4)
+            scraper_url = kodi.get_setting('%s-scraper_url' % (self.get_name()))
+            scraper_password = kodi.get_setting('%s-scraper_password' % (self.get_name()))
+            if scraper_url and scraper_password and (not exists or os.path.getmtime(py_path) < time.time() - (4 * 60 * 60)):
+                try:
+                    req = urllib2.urlopen(scraper_url)
+                    cipher_text = req.read()
+                except Exception as e:
+                    log_utils.log('Failure during %s scraper get: %s' % (self.get_name(), e), log_utils.LOGWARNING)
+                    return
+                
                 if cipher_text:
-                    decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(KEY, IV))
+                    scraper_key = hashlib.sha256(scraper_password).hexdigest()
+                    decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(scraper_key, IV))
                     new_py = decrypter.feed(cipher_text)
                     new_py += decrypter.feed()
                     
@@ -96,9 +112,9 @@ class Shush_Proxy(scraper.Scraper):
                         with open(py_path, 'r') as f:
                             old_py = f.read()
                     
-                    log_utils.log('shush path: %s, new_py: %s, match: %s' % (py_path, bool(new_py), new_py == old_py), log_utils.LOGDEBUG)
+                    log_utils.log('%s path: %s, new_py: %s, match: %s' % (self.get_name(), py_path, bool(new_py), new_py == old_py), log_utils.LOGDEBUG)
                     if old_py != new_py:
                         with open(py_path, 'w') as f:
                             f.write(new_py)
         except Exception as e:
-            log_utils.log('Failure during shush scraper update: %s' % (e), log_utils.LOGWARNING)
+            log_utils.log('Failure during %s scraper update: %s' % (self.get_name(), e), log_utils.LOGWARNING)
