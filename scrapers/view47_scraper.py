@@ -71,11 +71,13 @@ class View47_Scraper(scraper.Scraper):
         if source_url and source_url != FORCE_NO_MATCH:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            div = dom_parser.parse_dom(html, 'ul', {'class': 'css_server'})
+            div = dom_parser.parse_dom(html, 'ul', {'class': 'css_server[^"]*'})
             if div:
-                for match in re.finditer('href="([^"]+).*?/>(.*?)</p>', div[0]):
+                div = re.sub('<img[^>]+>', '', div[0])
+                for match in re.finditer('href="([^"]+)">([^<]+)', div):
                     stream_url, host = match.groups()
                     host = host.lower()
+                    host = re.sub('-\d+$', '', host)
                     if host == 'picasa':
                         stream_url = stream_url + '|User-Agent=%s' % (USER_AGENT)
                         direct = True
