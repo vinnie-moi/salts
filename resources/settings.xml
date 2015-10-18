@@ -495,6 +495,8 @@
          <setting id="Shush.se_try" type="number" default="0" visible="false"/>
          <setting id="Shush.se_fail" type="number" default="0" visible="false"/>
          <setting id="Shush.se_check" type="number" default="0" visible="false"/>
+         <setting id="Shush.se-scraper_url" type="text" label="    Scraper Download Url" default="" visible="eq(-6,true)"/>
+         <setting id="Shush.se-scraper_password" type="text" label="    Scraper Decryption Key" option="hidden" default="" visible="eq(-7,true)"/>
          <setting id="SolarMovie-enable" type="bool" label="SolarMovie Enabled" default="true" visible="true"/>
          <setting id="SolarMovie-base_url" type="text" label="    Base Url" default="https://www.solarmovie.is" visible="eq(-1,true)"/>
          <setting id="SolarMovie-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -507,15 +509,15 @@
          <setting id="stream-tv.co_try" type="number" default="0" visible="false"/>
          <setting id="stream-tv.co_fail" type="number" default="0" visible="false"/>
          <setting id="stream-tv.co_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 5">
          <setting id="streamallthis.is-enable" type="bool" label="streamallthis.is Enabled" default="true" visible="true"/>
          <setting id="streamallthis.is-base_url" type="text" label="    Base Url" default="http://streamallthis.is" visible="eq(-1,true)"/>
          <setting id="streamallthis.is-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="streamallthis.is_try" type="number" default="0" visible="false"/>
          <setting id="streamallthis.is_fail" type="number" default="0" visible="false"/>
          <setting id="streamallthis.is_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 5">
          <setting id="tunemovie-enable" type="bool" label="tunemovie Enabled" default="true" visible="true"/>
          <setting id="tunemovie-base_url" type="text" label="    Base Url" default="http://tunemovie.is" visible="eq(-1,true)"/>
          <setting id="tunemovie-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -604,15 +606,15 @@
          <setting id="yify.tv_try" type="number" default="0" visible="false"/>
          <setting id="yify.tv_fail" type="number" default="0" visible="false"/>
          <setting id="yify.tv_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 6">
          <setting id="yshows-enable" type="bool" label="yshows Enabled" default="true" visible="true"/>
          <setting id="yshows-base_url" type="text" label="    Base Url" default="http://yshow.me" visible="eq(-1,true)"/>
          <setting id="yshows-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="yshows_try" type="number" default="0" visible="false"/>
          <setting id="yshows_fail" type="number" default="0" visible="false"/>
          <setting id="yshows_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 6">
          <setting id="zumvo.com-enable" type="bool" label="zumvo.com Enabled" default="true" visible="true"/>
          <setting id="zumvo.com-base_url" type="text" label="    Base Url" default="http://zumvo.so" visible="eq(-1,true)"/>
          <setting id="zumvo.com-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
