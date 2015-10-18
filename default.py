@@ -1701,7 +1701,7 @@ def add_to_library(video_type, title, year, trakt_id):
                     air_date = utils.make_air_date(episode['first_aired'])
                     if exclude_local:
                         ep_url = scraper.get_url(ScraperVideo(VIDEO_TYPES.EPISODE, title, year, trakt_id, season_num, ep_num, episode['title'], air_date))
-                        if not ep_url or ep_url == FORCE_NO_MATCH:
+                        if ep_url and ep_url != FORCE_NO_MATCH:
                             continue
                     
                     if utils.show_requires_source(trakt_id):
@@ -1722,7 +1722,7 @@ def add_to_library(video_type, title, year, trakt_id):
     elif video_type == VIDEO_TYPES.MOVIE:
         if exclude_local:
             movie_url = scraper.get_url(ScraperVideo(video_type, title, year, trakt_id))
-            if not movie_url or movie_url == FORCE_NO_MATCH:
+            if movie_url and movie_url != FORCE_NO_MATCH:
                 raise Exception(i18n('local_exists'))
         
         save_path = kodi.get_setting('movie-folder')
