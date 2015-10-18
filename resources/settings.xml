@@ -446,7 +446,7 @@
          <setting id="pftv_fail" type="number" default="0" visible="false"/>
          <setting id="pftv_check" type="number" default="0" visible="false"/>
          <setting id="popcorntimefree-enable" type="bool" label="popcorntimefree Enabled" default="true" visible="true"/>
-         <setting id="popcorntimefree-base_url" type="text" label="    Base Url" default="https://popcorntimefree.info" visible="eq(-1,true)"/>
+         <setting id="popcorntimefree-base_url" type="text" label="    Base Url" default="https://browserpopcorn.xyz" visible="eq(-1,true)"/>
          <setting id="popcorntimefree-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="popcorntimefree_try" type="number" default="0" visible="false"/>
          <setting id="popcorntimefree_fail" type="number" default="0" visible="false"/>

@@ -19,14 +19,15 @@ import scraper
 import urllib
 import urlparse
 import re
+import json
 from salts_lib import kodi
+from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 from salts_lib.constants import USER_AGENT
-from salts_lib import dom_parser
 
-BASE_URL = 'https://popcorntimefree.info'
+BASE_URL = 'https://browserpopcorn.xyz'
 
 class PopcornTime_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -52,50 +53,38 @@ class PopcornTime_Scraper(scraper.Scraper):
     def get_sources(self, video):
         source_url = self.get_url(video)
         hosters = []
-        if source_url and source_url != FORCE_NO_MATCH:
-            url = urlparse.urljoin(self.base_url, source_url)
-            html = self._http_get(url, cache_limit=.5)
-            match = re.search('<source[^>]*src="([^"]+)', html)
-            if match:
-                stream_url = match.group(1)
-                host = self._get_direct_hostname(stream_url)
-                _title, _year, height, _extra = self._parse_movie_link(stream_url)
-                stream_url += '|User-Agent=%s' % (USER_AGENT)
-                hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._height_get_quality(height), 'host': host, 'rating': None, 'views': None, 'direct': True}
-                hosters.append(hoster)
+        if source_url and source_url != FORCE_NO_MATCH and source_url.startswith('http'):
+            stream_url = source_url
+            host = self._get_direct_hostname(stream_url)
+            _title, _year, height, _extra = self._parse_movie_link(stream_url)
+            stream_url += '|User-Agent=%s' % (USER_AGENT)
+            hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._height_get_quality(height), 'host': host, 'rating': None, 'views': None, 'direct': True}
+            hosters.append(hoster)
         return hosters
 
     def get_url(self, video):
         return super(PopcornTime_Scraper, self)._default_get_url(video)
 
     def search(self, video_type, title, year):
-        search_url = urlparse.urljoin(self.base_url, '/?s=')
+        results = []
+        search_url = urlparse.urljoin(self.base_url, '/api/movies/all/1?query=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
-        results = []
-        for item in dom_parser.parse_dom(html, 'h2', {'class': 'entry-title'}):
-            match = re.search('href="([^"]+)[^>]+>([^<]+)', item)
-            if match:
-                url, match_title_year = match.groups()
-                match = re.search('(.*?)\s+\(?(\d{4})\)?', match_title_year)
-                if match:
-                    match_title, match_year = match.groups()
-                else:
-                    match_title = match_title_year
-                    match_year = ''
-    
+        try:
+            js_result = json.loads(html)
+        except ValueError:
+            log_utils.log('Invalid JSON returned: %s: %s' % (search_url, html), log_utils.LOGWARNING)
+        else:
+            for video in js_result:
+                video = dict((key.lower(), video[key]) for key in video)
+                match_title = video['title']
+                match_year = video['year']
+                url = video['video']
                 if not year or not match_year or year == match_year:
-                    result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
+                    result = {'title': match_title, 'year': match_year, 'url': url}
                     results.append(result)
 
         return results
 
-    def __strip_link(self, html):
-        text = dom_parser.parse_dom(html, 'a')
-        if text:
-            return text[0]
-        else:
-            return html
-    
     def _http_get(self, url, data=None, cache_limit=8):
         return super(PopcornTime_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
