@@ -102,7 +102,7 @@ class Shush_Proxy(scraper.Scraper):
                     return
                 
                 if cipher_text:
-                    scraper_key = hashlib.sha256(scraper_password).hexdigest()
+                    scraper_key = hashlib.sha256(scraper_password).digest()
                     decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(scraper_key, IV))
                     new_py = decrypter.feed(cipher_text)
                     new_py += decrypter.feed()
