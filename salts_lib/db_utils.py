@@ -218,19 +218,19 @@ class DB_Connection():
             if self.__table_exists('rel_url'):
                 f.write(CSV_MARKERS.REL_URL + '\n')
                 for fav in self.get_all_rel_urls():
-                    writer.writerow(fav)
+                    writer.writerow(self.__utf8_encode(fav))
             if self.__table_exists('other_lists'):
                 f.write(CSV_MARKERS.OTHER_LISTS + '\n')
                 for sub in self.get_all_other_lists():
-                    writer.writerow(sub)
+                    writer.writerow(self.__utf8_encode(sub))
             if self.__table_exists('saved_searches'):
                 f.write(CSV_MARKERS.SAVED_SEARCHES + '\n')
                 for sub in self.get_all_searches():
-                    writer.writerow(sub)
+                    writer.writerow(self.__utf8_encode(sub))
             if self.__table_exists('bookmark'):
                 f.write(CSV_MARKERS.BOOKMARKS + '\n')
                 for sub in self.get_bookmarks():
-                    writer.writerow(sub)
+                    writer.writerow(self.__utf8_encode(sub))
 
         log_utils.log('Copying export file from: |%s| to |%s|' % (temp_path, full_path), log_utils.LOGDEBUG)
         if not xbmcvfs.copy(temp_path, full_path):
@@ -239,6 +239,15 @@ class DB_Connection():
         if not xbmcvfs.delete(temp_path):
             raise Exception('Export: Delete of %s failed.' % (temp_path))
 
+    def __utf8_encode(self, items):
+        l = []
+        for i in items:
+            if isinstance(i, basestring):
+                l.append(i.encode('utf-8'))
+            else:
+                l.append(i)
+        return l
+        
     def import_into_db(self, full_path):
         temp_path = os.path.join(xbmc.translatePath("special://profile"), 'temp_import_%s.csv' % (int(time.time())))
         log_utils.log('Copying import file from: |%s| to |%s|' % (full_path, temp_path), log_utils.LOGDEBUG)
@@ -301,7 +310,7 @@ class DB_Connection():
 
         log_utils.log('Building SALTS Database', log_utils.LOGDEBUG)
         if self.db_type == DB_TYPES.MYSQL:
-            self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, data VARCHAR(255) response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url, data))')
+            self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, data VARCHAR(255) NOT NULL, response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url, data))')
             self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255) NOT NULL, value TEXT, PRIMARY KEY(setting))')
             self.__execute('CREATE TABLE IF NOT EXISTS rel_url \
             (video_type VARCHAR(15) NOT NULL, title VARCHAR(255) NOT NULL, year VARCHAR(4) NOT NULL, season VARCHAR(5) NOT NULL, episode VARCHAR(5) NOT NULL, source VARCHAR(50) NOT NULL, rel_url VARCHAR(255), \
