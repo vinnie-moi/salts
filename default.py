@@ -1657,7 +1657,7 @@ def import_db():
         if import_file:
             import_file = xbmc.translatePath(import_file)
             db_connection.import_into_db(import_file)
-            kodi.notify(header=i18n('import_success'), msg=i18n('imported_from'))
+            kodi.notify(header=i18n('import_success'), msg=i18n('imported_from') % (import_file))
     except Exception as e:
         log_utils.log('Import Failed: %s' % (e), xbmc.LOGERROR)
         kodi.notify(header=i18n('import'), msg=i18n('import_failed'))

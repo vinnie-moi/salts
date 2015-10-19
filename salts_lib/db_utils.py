@@ -243,7 +243,10 @@ class DB_Connection():
         l = []
         for i in items:
             if isinstance(i, basestring):
-                l.append(i.encode('utf-8'))
+                try:
+                    l.append(i.encode('utf-8'))
+                except UnicodeDecodeError:
+                    l.append(i)
             else:
                 l.append(i)
         return l
@@ -268,6 +271,7 @@ class DB_Connection():
                     _ = f.readline()  # read header
                     i = 0
                     for line in reader:
+                        line = self.__unicode_encode(line)
                         progress.update(i * 100 / num_lines, line3='Importing %s of %s' % (i, num_lines))
                         if progress.iscanceled():
                             return
@@ -291,6 +295,18 @@ class DB_Connection():
                 raise Exception('Import: Delete of %s failed.' % (temp_path))
             progress.close()
 
+    def __unicode_encode(self, items):
+        l = []
+        for i in items:
+            if isinstance(i, basestring):
+                try:
+                    l.append(unicode(i, 'utf-8'))
+                except UnicodeDecodeError:
+                    l.append(i)
+            else:
+                l.append(i)
+        return l
+        
     def execute_sql(self, sql):
         self.__execute(sql)
 
