@@ -1,4 +1,4 @@
-[B]Version 1.0.62[/B]
+[B]Version 1.0.63[/B]
 - Allow caching of data in url requests
 - Add option to Force No Match
 - Update quality settings for IceFilms
