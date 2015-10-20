@@ -886,6 +886,22 @@ msgctxt "#30217"
 msgid "Force No Match"
 msgstr ""
 
+msgctxt "#30218"
+msgid "Getting Sources"
+msgstr ""
+
+msgctxt "#30219"
+msgid "Requested Sources from: %s"
+msgstr ""
+
+msgctxt "#30220"
+msgid "Received %s Sources from: %s"
+msgstr ""
+
+msgctxt "#30221"
+msgid "Filtering Out Unusable Sources"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
@@ -1493,4 +1509,8 @@ msgstr ""
 
 msgctxt "#30647"
 msgid "Show Trakt On Deck"
+msgstr ""
+
+msgctxt "#30648"
+msgid "Show Custom Progress Dialog from Library"
 msgstr ""
