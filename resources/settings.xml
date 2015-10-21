@@ -269,14 +269,6 @@
          <setting id="IceFilms_try" type="number" default="0" visible="false"/>
          <setting id="IceFilms_fail" type="number" default="0" visible="false"/>
          <setting id="IceFilms_check" type="number" default="0" visible="false"/>
-         <setting id="iStreamHD-enable" type="bool" label="iStreamHD Enabled" default="true" visible="true"/>
-         <setting id="iStreamHD-base_url" type="text" label="    Base Url" default="http://istreamhd.org" visible="eq(-1,true)"/>
-         <setting id="iStreamHD-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
-         <setting id="iStreamHD_try" type="number" default="0" visible="false"/>
-         <setting id="iStreamHD_fail" type="number" default="0" visible="false"/>
-         <setting id="iStreamHD_check" type="number" default="0" visible="false"/>
-         <setting id="iStreamHD-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>
-         <setting id="iStreamHD-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>
          <setting id="iWatchOnline-enable" type="bool" label="iWatchOnline Enabled" default="true" visible="true"/>
          <setting id="iWatchOnline-base_url" type="text" label="    Base Url" default="https://www.iwatchonline.ag" visible="eq(-1,true)"/>
          <setting id="iWatchOnline-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -320,15 +312,15 @@
          <setting id="movie25_try" type="number" default="0" visible="false"/>
          <setting id="movie25_fail" type="number" default="0" visible="false"/>
          <setting id="movie25_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 3">
          <setting id="Movie4K-enable" type="bool" label="Movie4K Enabled" default="true" visible="true"/>
          <setting id="Movie4K-base_url" type="text" label="    Base Url" default="http://www.movie4k.to" visible="eq(-1,true)"/>
          <setting id="Movie4K-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="Movie4K_try" type="number" default="0" visible="false"/>
          <setting id="Movie4K_fail" type="number" default="0" visible="false"/>
          <setting id="Movie4K_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 3">
          <setting id="MovieFarsi-enable" type="bool" label="MovieFarsi Enabled" default="true" visible="true"/>
          <setting id="MovieFarsi-base_url" type="text" label="    Base Url" default="http://moviefarsi3.com" visible="eq(-1,true)"/>
          <setting id="MovieFarsi-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -416,15 +408,15 @@
          <setting id="OneClickWatch_check" type="number" default="0" visible="false"/>
          <setting id="OneClickWatch-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>
          <setting id="OneClickWatch-select" type="enum" label="     Automatically Select" lvalues="30636|30637" default="0" visible="eq(-7,true)"/>
-    </category>
-    
-    <category label="Scrapers 4">
          <setting id="OnlineMoviesIs-enable" type="bool" label="OnlineMoviesIs Enabled" default="true" visible="true"/>
          <setting id="OnlineMoviesIs-base_url" type="text" label="    Base Url" default="http://onlinemovies.is" visible="eq(-1,true)"/>
          <setting id="OnlineMoviesIs-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="OnlineMoviesIs_try" type="number" default="0" visible="false"/>
          <setting id="OnlineMoviesIs_fail" type="number" default="0" visible="false"/>
          <setting id="OnlineMoviesIs_check" type="number" default="0" visible="false"/>
+    </category>
+    
+    <category label="Scrapers 4">
          <setting id="OnlineMoviesPro-enable" type="bool" label="OnlineMoviesPro Enabled" default="true" visible="true"/>
          <setting id="OnlineMoviesPro-base_url" type="text" label="    Base Url" default="http://onlinemovies.pro" visible="eq(-1,true)"/>
          <setting id="OnlineMoviesPro-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -446,12 +438,6 @@
          <setting id="pftv_try" type="number" default="0" visible="false"/>
          <setting id="pftv_fail" type="number" default="0" visible="false"/>
          <setting id="pftv_check" type="number" default="0" visible="false"/>
-         <setting id="popcorntimefree-enable" type="bool" label="popcorntimefree Enabled" default="true" visible="true"/>
-         <setting id="popcorntimefree-base_url" type="text" label="    Base Url" default="https://browserpopcorn.xyz" visible="eq(-1,true)"/>
-         <setting id="popcorntimefree-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
-         <setting id="popcorntimefree_try" type="number" default="0" visible="false"/>
-         <setting id="popcorntimefree_fail" type="number" default="0" visible="false"/>
-         <setting id="popcorntimefree_check" type="number" default="0" visible="false"/>
          <setting id="PrimeWire-enable" type="bool" label="PrimeWire Enabled" default="true" visible="true"/>
          <setting id="PrimeWire-base_url" type="text" label="    Base Url" default="http://www.primewire.ag" visible="eq(-1,true)"/>
          <setting id="PrimeWire-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -510,9 +496,6 @@
          <setting id="stream-tv.co_try" type="number" default="0" visible="false"/>
          <setting id="stream-tv.co_fail" type="number" default="0" visible="false"/>
          <setting id="stream-tv.co_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 5">
          <setting id="streamallthis.is-enable" type="bool" label="streamallthis.is Enabled" default="true" visible="true"/>
          <setting id="streamallthis.is-base_url" type="text" label="    Base Url" default="http://streamallthis.is" visible="eq(-1,true)"/>
          <setting id="streamallthis.is-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -525,6 +508,9 @@
          <setting id="tunemovie_try" type="number" default="0" visible="false"/>
          <setting id="tunemovie_fail" type="number" default="0" visible="false"/>
          <setting id="tunemovie_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 5">
          <setting id="TVRelease.Net-enable" type="bool" label="TVRelease.Net Enabled" default="true" visible="true"/>
          <setting id="TVRelease.Net-base_url" type="text" label="    Base Url" default="http://tv-release.net" visible="eq(-1,true)"/>
          <setting id="TVRelease.Net-sub_check" type="bool" label="    Include in Page Existence checks?" default="false" visible="eq(-2,true)"/>
@@ -607,9 +593,6 @@
          <setting id="yify.tv_try" type="number" default="0" visible="false"/>
          <setting id="yify.tv_fail" type="number" default="0" visible="false"/>
          <setting id="yify.tv_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 6">
          <setting id="yshows-enable" type="bool" label="yshows Enabled" default="true" visible="true"/>
          <setting id="yshows-base_url" type="text" label="    Base Url" default="http://yshow.me" visible="eq(-1,true)"/>
          <setting id="yshows-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
