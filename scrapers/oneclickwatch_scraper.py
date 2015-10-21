@@ -51,8 +51,9 @@ class OneClickWatch_Scraper(scraper.Scraper):
         source_url = self.get_url(video)
         hosters = []
         if source_url and source_url != FORCE_NO_MATCH:
+            headers = {'Referer': self.base_url}
             url = urlparse.urljoin(self.base_url, source_url)
-            html = self._http_get(url, cache_limit=.5)
+            html = self._http_get(url, headers=headers, cache_limit=.5)
 
             q_str = ''
             match = re.search('class="title">([^<]+)', html)
@@ -91,7 +92,6 @@ class OneClickWatch_Scraper(scraper.Scraper):
         search_url += extra
         headers = {'Referer': self.base_url}
         html = self._http_get(search_url, headers=headers, cache_limit=.25)
-        print html
 
         pattern = 'class="title"><a href="(?P<url>[^"]+)[^>]+>(?P<post_title>[^<]+).*?rel="bookmark">(?P<date>[^<]+)'
         date_format = '%B %d, %Y'
