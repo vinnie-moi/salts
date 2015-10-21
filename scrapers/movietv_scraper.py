@@ -91,11 +91,18 @@ class MovieTV_Scraper(scraper.Scraper):
                     sources[js_data['url']] = QUALITIES.HD720
                 
             for source in sources:
-                stream_url = source + '|Referer=%s' % (urllib.quote(url))
+                stream_url = source + '|Referer=%s&Cookie=%s' % (urllib.quote(url), self.__get_stream_cookies())
                 hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'url': stream_url, 'quality': sources[source], 'views': None, 'rating': None, 'direct': True}
                 hosters.append(hoster)
 
         return hosters
+
+    def __get_stream_cookies(self):
+        cj = self._set_cookies(self.base_url, {})
+        cookies = []
+        for cookie in cj:
+            cookies.append('%s=%s' % (cookie.name, cookie.value))
+        return urllib.quote(';'.join(cookies))
 
     def get_url(self, video):
         return super(MovieTV_Scraper, self)._default_get_url(video)
