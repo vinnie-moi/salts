@@ -90,6 +90,9 @@ class MovieTV_Scraper(scraper.Scraper):
                 else:
                     sources[js_data['url']] = QUALITIES.HD720
                 
+            for match in re.finditer('<source[^>]+src=["\']([^\'"]+)[^>]+type=[\'"]video', html):
+                sources[match.group(1)] = QUALITIES.HD720
+                
             for source in sources:
                 stream_url = source + '|Referer=%s&Cookie=%s' % (urllib.quote(url), self.__get_stream_cookies())
                 hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'url': stream_url, 'quality': sources[source], 'views': None, 'rating': None, 'direct': True}
