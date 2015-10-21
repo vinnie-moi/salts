@@ -82,15 +82,16 @@ class OneClickWatch_Scraper(scraper.Scraper):
         return settings
 
     def search(self, video_type, title, year):
-        html = self._http_get(self.base_url, cache_limit=.25)
+        html = self._http_get(self.base_url, cache_limit=0)
         extra = ''
-        for match in re.finditer('<input\s+type="hidden"[^>]+name="([^"]+)"\s+value="([^"]+)', html):
+        for match in re.finditer('<input\s+type=[\'"]hidden[\'"][^>]+name=[\'"]([^\'"]+)[\'"][^>]+value=[\'"]([^\'"]+)', html):
             extra += '&%s=%s' % (match.group(1), urllib.quote(match.group(2)))
             
         search_url = urlparse.urljoin(self.base_url, '/?s=%s' % (urllib.quote_plus(title)))
         search_url += extra
         headers = {'Referer': self.base_url}
         html = self._http_get(search_url, headers=headers, cache_limit=.25)
+        print html
 
         pattern = 'class="title"><a href="(?P<url>[^"]+)[^>]+>(?P<post_title>[^<]+).*?rel="bookmark">(?P<date>[^<]+)'
         date_format = '%B %d, %Y'
