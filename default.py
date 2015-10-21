@@ -1031,7 +1031,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
             hosters = filter_unusable_hosters(hosters)
     
         if not hosters:
-            log_utils.log('No Useable Sources found for: |%s|' % (video))
+            log_utils.log('No Usable Sources found for: |%s|' % (video))
             msg = ' (%s)' % timeout_msg if timeout_msg else ''
             kodi.notify(msg=i18n('no_useable_sources') % (msg), duration=5000)
             return False
