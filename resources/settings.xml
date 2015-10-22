@@ -237,6 +237,14 @@
          <setting id="Dizimag_try" type="number" default="0" visible="false"/>
          <setting id="Dizimag_fail" type="number" default="0" visible="false"/>
          <setting id="Dizimag_check" type="number" default="0" visible="false"/>
+         <setting id="EasyNews-enable" type="bool" label="EasyNews Enabled" default="true" visible="true"/>
+         <setting id="EasyNews-base_url" type="text" label="    Base Url" default="http://members.easynews.com" visible="eq(-1,true)"/>
+         <setting id="EasyNews-sub_check" type="bool" label="    Include in Page Existence checks?" default="false" visible="eq(-2,true)"/>
+         <setting id="EasyNews_try" type="number" default="0" visible="false"/>
+         <setting id="EasyNews_fail" type="number" default="0" visible="false"/>
+         <setting id="EasyNews_check" type="number" default="0" visible="false"/>
+         <setting id="EasyNews-username" type="text" label="     Username" default="" visible="eq(-6,true)"/>
+         <setting id="EasyNews-password" type="text" label="     Password" option="hidden" default="" visible="eq(-7,true)"/>
          <setting id="filmikz.ch-enable" type="bool" label="filmikz.ch Enabled" default="true" visible="true"/>
          <setting id="filmikz.ch-base_url" type="text" label="    Base Url" default="http://filmikz.ch" visible="eq(-1,true)"/>
          <setting id="filmikz.ch-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -312,15 +320,15 @@
          <setting id="movie25_try" type="number" default="0" visible="false"/>
          <setting id="movie25_fail" type="number" default="0" visible="false"/>
          <setting id="movie25_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 3">
          <setting id="Movie4K-enable" type="bool" label="Movie4K Enabled" default="true" visible="true"/>
          <setting id="Movie4K-base_url" type="text" label="    Base Url" default="http://www.movie4k.to" visible="eq(-1,true)"/>
          <setting id="Movie4K-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="Movie4K_try" type="number" default="0" visible="false"/>
          <setting id="Movie4K_fail" type="number" default="0" visible="false"/>
          <setting id="Movie4K_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 3">
          <setting id="MovieFarsi-enable" type="bool" label="MovieFarsi Enabled" default="true" visible="true"/>
          <setting id="MovieFarsi-base_url" type="text" label="    Base Url" default="http://moviefarsi3.com" visible="eq(-1,true)"/>
          <setting id="MovieFarsi-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -408,15 +416,15 @@
          <setting id="OneClickWatch_check" type="number" default="0" visible="false"/>
          <setting id="OneClickWatch-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>
          <setting id="OneClickWatch-select" type="enum" label="     Automatically Select" lvalues="30636|30637" default="0" visible="eq(-7,true)"/>
+    </category>
+    
+    <category label="Scrapers 4">
          <setting id="OnlineMoviesIs-enable" type="bool" label="OnlineMoviesIs Enabled" default="true" visible="true"/>
          <setting id="OnlineMoviesIs-base_url" type="text" label="    Base Url" default="http://onlinemovies.is" visible="eq(-1,true)"/>
          <setting id="OnlineMoviesIs-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="OnlineMoviesIs_try" type="number" default="0" visible="false"/>
          <setting id="OnlineMoviesIs_fail" type="number" default="0" visible="false"/>
          <setting id="OnlineMoviesIs_check" type="number" default="0" visible="false"/>
-    </category>
-    
-    <category label="Scrapers 4">
          <setting id="OnlineMoviesPro-enable" type="bool" label="OnlineMoviesPro Enabled" default="true" visible="true"/>
          <setting id="OnlineMoviesPro-base_url" type="text" label="    Base Url" default="http://onlinemovies.pro" visible="eq(-1,true)"/>
          <setting id="OnlineMoviesPro-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
@@ -502,15 +510,15 @@
          <setting id="streamallthis.is_try" type="number" default="0" visible="false"/>
          <setting id="streamallthis.is_fail" type="number" default="0" visible="false"/>
          <setting id="streamallthis.is_check" type="number" default="0" visible="false"/>
+    </category>
+
+    <category label="Scrapers 5">
          <setting id="tunemovie-enable" type="bool" label="tunemovie Enabled" default="true" visible="true"/>
          <setting id="tunemovie-base_url" type="text" label="    Base Url" default="http://tunemovie.is" visible="eq(-1,true)"/>
          <setting id="tunemovie-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="tunemovie_try" type="number" default="0" visible="false"/>
          <setting id="tunemovie_fail" type="number" default="0" visible="false"/>
          <setting id="tunemovie_check" type="number" default="0" visible="false"/>
-    </category>
-
-    <category label="Scrapers 5">
          <setting id="TVRelease.Net-enable" type="bool" label="TVRelease.Net Enabled" default="true" visible="true"/>
          <setting id="TVRelease.Net-base_url" type="text" label="    Base Url" default="http://tv-release.net" visible="eq(-1,true)"/>
          <setting id="TVRelease.Net-sub_check" type="bool" label="    Include in Page Existence checks?" default="false" visible="eq(-2,true)"/>
@@ -599,12 +607,6 @@
          <setting id="yshows_try" type="number" default="0" visible="false"/>
          <setting id="yshows_fail" type="number" default="0" visible="false"/>
          <setting id="yshows_check" type="number" default="0" visible="false"/>
-         <setting id="zumvo.com-enable" type="bool" label="zumvo.com Enabled" default="true" visible="true"/>
-         <setting id="zumvo.com-base_url" type="text" label="    Base Url" default="http://zumvo.so" visible="eq(-1,true)"/>
-         <setting id="zumvo.com-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
-         <setting id="zumvo.com_try" type="number" default="0" visible="false"/>
-         <setting id="zumvo.com_fail" type="number" default="0" visible="false"/>
-         <setting id="zumvo.com_check" type="number" default="0" visible="false"/>
     </category>
 
     <category label="30634">

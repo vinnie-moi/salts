@@ -701,6 +701,29 @@ class Scraper(object):
         else:
             return ('', '', '480', '')  # make 480p when unknown
     
+    def _title_check(self, video, title):
+        title = self._normalize_title(title)
+        if video.video_type == VIDEO_TYPES.MOVIE:
+            return self._normalize_title(video.title) in title and (not video.year or video.year in title)
+        else:
+            sxe = 'S%02dE%02d' % (int(video.season), int(video.episode))
+            se = '%d%02d' % (int(video.season), int(video.episode))
+            try:
+                air_date = video.ep_airdate.strftime('%Y%m%d')
+            except:
+                air_date = ''
+                
+            if sxe in title:
+                show_title = title.split(sxe)[0]
+            elif air_date and air_date in title:
+                show_title = title.split(air_date)[0]
+            elif se in title:
+                show_title = title.split(se)[0]
+            else:
+                show_title = title
+            #log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), log_utils.LOGDEBUG)
+            return self._normalize_title(video.title) in show_title and (sxe in title or se in title or air_date in title)
+    
     def create_db_connection(self):
         worker_id = threading.current_thread().ident
         # create a connection if we don't have one or it was created in a different worker

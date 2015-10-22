@@ -99,7 +99,7 @@ class Alluc_Scraper(scraper.Scraper):
                             
                             stream_url = result['hosterurls'][0]['url']
                             if stream_url not in seen_urls:
-                                if self.__title_check(video, result['title']):
+                                if self._title_check(video, result['title']):
                                     host = urlparse.urlsplit(stream_url).hostname.lower()
                                     quality = self._get_quality(video, host, self._get_title_quality(result['title']))
                                     hoster = {'multi-part': False, 'class': self, 'views': None, 'url': stream_url, 'rating': None, 'host': host, 'quality': quality, 'direct': False}
@@ -110,29 +110,6 @@ class Alluc_Scraper(scraper.Scraper):
 
         return hosters
         
-    def __title_check(self, video, title):
-        title = self._normalize_title(title)
-        if video.video_type == VIDEO_TYPES.MOVIE:
-            return self._normalize_title(video.title) in title and video.year in title
-        else:
-            sxe = 'S%02dE%02d' % (int(video.season), int(video.episode))
-            se = '%d%02d' % (int(video.season), int(video.episode))
-            try:
-                air_date = video.ep_airdate.strftime('%Y%m%d')
-            except:
-                air_date = ''
-                
-            if sxe in title:
-                show_title = title.split(sxe)[0]
-            elif air_date and air_date in title:
-                show_title = title.split(air_date)[0]
-            elif se in title:
-                show_title = title.split(se)[0]
-            else:
-                show_title = title
-            # log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), log_utils.LOGDEBUG)
-            return self._normalize_title(video.title) in show_title and (sxe in title or se in title or air_date in title)
-    
     def _get_title_quality(self, title):
         post_quality = QUALITIES.HIGH
         title = title.upper()
