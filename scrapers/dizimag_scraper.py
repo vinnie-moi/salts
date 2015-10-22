@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     SALTS XBMC Addon
     Copyright (C) 2014 tknorris
@@ -56,6 +57,10 @@ class Dizimag_Scraper(scraper.Scraper):
         if source_url and source_url != FORCE_NO_MATCH:
             page_url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(page_url, cache_limit=.5)
+            # exit early if trailer
+            if 'Şu an fragman*' in html:
+                return hosters
+            
             for script in re.finditer('<script[^>]*>(.*?)</script>', html, re.DOTALL):
                 match = re.search("var\s+kaynaklar.*?url\s*:\s*\"([^\"]+)\"\s*,\s*data\s*:\s*'([^']+)", script.group(1), re.DOTALL)
                 if match:
