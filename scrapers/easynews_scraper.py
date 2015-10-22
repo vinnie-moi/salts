@@ -61,26 +61,28 @@ class EasyNews_Scraper(scraper.Scraper):
         return label
 
     def get_sources(self, video):
+        hosters = []
         source_url = self.get_url(video)
         if source_url and source_url != FORCE_NO_MATCH:
             params = urlparse.parse_qs(urlparse.urlparse(source_url).query)
-            query = params['title'][0]
-            if video.video_type == VIDEO_TYPES.MOVIE:
-                if 'year' in params: query += ' %s' % (params['year'][0])
-            else:
-                sxe = ''
-                if 'season' in params:
-                    sxe = 'S%02d' % (int(params['season'][0]))
-                if 'episode' in params:
-                    sxe += 'E%02d' % (int(params['episode'][0]))
-                if sxe: query = '%s %s' % (query, sxe)
-            query = urllib.quote_plus(query)
-            query_url = '/search?query=%s' % (query)
-            hosters = self.__get_links(query_url, video)
-            if not hosters and video.video_type == VIDEO_TYPES.EPISODE and params['air_date'][0]:
-                query = urllib.quote_plus('%s %s' % (params['title'][0], params['air_date'][0].replace('-', '.')))
+            if 'title' in params:
+                query = params['title'][0]
+                if video.video_type == VIDEO_TYPES.MOVIE:
+                    if 'year' in params: query += ' %s' % (params['year'][0])
+                else:
+                    sxe = ''
+                    if 'season' in params:
+                        sxe = 'S%02d' % (int(params['season'][0]))
+                    if 'episode' in params:
+                        sxe += 'E%02d' % (int(params['episode'][0]))
+                    if sxe: query = '%s %s' % (query, sxe)
+                query = urllib.quote_plus(query)
                 query_url = '/search?query=%s' % (query)
                 hosters = self.__get_links(query_url, video)
+                if not hosters and video.video_type == VIDEO_TYPES.EPISODE and params['air_date'][0]:
+                    query = urllib.quote_plus('%s %s' % (params['title'][0], params['air_date'][0].replace('-', '.')))
+                    query_url = '/search?query=%s' % (query)
+                    hosters = self.__get_links(query_url, video)
 
         return hosters
     
@@ -146,6 +148,9 @@ class EasyNews_Scraper(scraper.Scraper):
         return settings
 
     def _http_get(self, url, cache_limit=8):
+        if not self.username or not self.password:
+            return ''
+        
         return super(EasyNews_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=self.cookie, cache_limit=cache_limit)
 
     def __get_cookies(self):
