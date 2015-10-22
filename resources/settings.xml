@@ -90,7 +90,7 @@
     <category label="30571">
         <setting id="auto-play" type="bool" label="30572" default="false"/>
         <setting id="source-win" type="labelenum" label="30573" values="Directory|Dialog" default="Dialog"/>
-        <setting id="show_pd" type="bool" label="30648" default="true"/>        
+        <setting id="show_pd" type="bool" label="30648" default="false"/>        
         <setting id="show_download" type="bool" label="30574" default="false"/>
         <setting id="down_progress" type="enum" label="30575" lvalues="30511|30589|30590" default="1" enable="eq(-1,true)"/>
         <setting id="tv-download-folder" type="folder" label="30576"
