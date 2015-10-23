@@ -1,3 +1,13 @@
+[B]Version 1.0.65[/B]
+- Fix ocw scraper
+- Add custom get sources dialog
+- Fix movietv.to scraper
+- Remove popcorntimefree scraper
+- Remove istreamhd.org scraper
+- Add easynews scraper
+- Add torba.se scraper
+- Improve dizimag scraper
+
 [B]Version 1.0.64[/B]
 - Allow caching of data in url requests
 - Add option to Force No Match
