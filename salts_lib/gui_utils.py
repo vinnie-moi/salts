@@ -133,6 +133,12 @@ class ProgressDialog(object):
             self.pd.close()
             del self.pd
     
+    def is_canceled(self):
+        if self.pd is not None:
+            return self.pd.iscanceled()
+        else:
+            return False
+        
     def update(self, percent, line1=None, line2=None, line3=None):
         if self.pd is not None:
             self.pd.update(percent, line1, line2, line3)

@@ -960,10 +960,11 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
         fails = {}
         video = ScraperVideo(video_type, title, year, trakt_id, season, episode, ep_title, ep_airdate)
         active = kodi.get_setting('show_pd') == 'true' or not dialog
-        with gui_utils.ProgressDialog(i18n('getting_sources'), utils.make_progress_msg(video_type, title, year, season, episode), active=active) as pd:
+        with gui_utils.ProgressDialog(i18n('getting_sources'), utils.make_progress_msg(video_type, title, year, season, episode), '', '', active=active) as pd:
             scrapers = utils.relevant_scrapers(video_type)
             total = len(scrapers)
             for cls in scrapers:
+                if xbmc.abortRequested or pd.is_canceled(): return False
                 scraper = cls(max_timeout)
                 worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
                 utils.increment_setting('%s_try' % (cls.get_name()))
@@ -980,6 +981,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 try:
                     log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
                     result = q.get(True, timeout)
+                    if xbmc.abortRequested or pd.is_canceled(): return False
                     log_utils.log('Got %s Source Results' % (len(result['hosters'])), xbmc.LOGDEBUG)
                     worker_count -= 1
                     progress = ((total - worker_count) * 50 / total) + 50
@@ -1021,7 +1023,8 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 
             hosters = utils.filter_exclusions(hosters)
             hosters = utils.filter_quality(video_type, hosters)
-    
+            if xbmc.abortRequested or pd.is_canceled(): return False
+
             if kodi.get_setting('enable_sort') == 'true':
                 if kodi.get_setting('filter-unknown') == 'true':
                     hosters = utils.filter_unknown_hosters(hosters)
