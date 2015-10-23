@@ -19,10 +19,12 @@ import scraper
 import urlparse
 import re
 import string
+import urllib
 from salts_lib import kodi
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import USER_AGENT
 
 BASE_URL = 'http://afdah.tv'
 
@@ -84,6 +86,7 @@ class Afdah_Scraper(scraper.Scraper):
         hosters = []
         for match in re.finditer('file\s*:\s*"([^"]+).*?label\s*:\s*"([^"]+)', html):
             url, resolution = match.groups()
+            url += '|User-Agent=%s&Cookie=%s' % (USER_AGENT, self.__get_stream_cookies())
             hoster = {'multi-part': False, 'url': url, 'host': self._get_direct_hostname(url), 'class': self, 'quality': self._height_get_quality(resolution), 'rating': None, 'views': None, 'direct': True}
             hosters.append(hoster)
         return hosters
@@ -94,6 +97,13 @@ class Afdah_Scraper(scraper.Scraper):
         alphabet = lower + lower.upper()
         shifted = lower_trans + lower_trans.upper()
         return plaintext.translate(string.maketrans(alphabet, shifted))
+
+    def __get_stream_cookies(self):
+        cj = self._set_cookies(self.base_url, {})
+        cookies = []
+        for cookie in cj:
+            cookies.append('%s=%s' % (cookie.name, cookie.value))
+        return urllib.quote(';'.join(cookies))
 
     def get_url(self, video):
         return super(Afdah_Scraper, self)._default_get_url(video)

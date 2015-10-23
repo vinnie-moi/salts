@@ -272,6 +272,8 @@ class Scraper(object):
             else:
                 opener = urllib2.build_opener(urllib2.HTTPRedirectHandler)
                 urllib2.install_opener(opener)
+                opener2 = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cj))
+                urllib2.install_opener(opener2)
 
             response = urllib2.urlopen(request, timeout=timeout)
             self.cj.extract_cookies(response, request)
