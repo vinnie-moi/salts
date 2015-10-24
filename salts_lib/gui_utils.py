@@ -21,6 +21,7 @@ import os
 import kodi
 from trans_utils import i18n
 from trakt_api import Trakt_API
+from salts_lib import log_utils
 
 ICON_PATH = os.path.join(kodi.get_path(), 'icon.png')
 use_https = kodi.get_setting('use_https') == 'true'
@@ -95,7 +96,8 @@ def get_pin():
                     profile = trakt_api.get_user_profile(cached=False)
                     kodi.set_setting('trakt_user', '%s (%s)' % (profile['username'], profile['name']))
                     return True
-                except:
+                except Exception as e:
+                    log_utils.log('Trakt Authorization Failed: %s' % (e), log_utils.LOGDEBUG)
                     return False
             return False
         
