@@ -1516,5 +1516,13 @@ msgid "Show Custom Progress Dialog from Library"
 msgstr ""
 
 msgctxt "#30649"
-msgid "Create nfo for shows/movies with metadata ids?"
+msgid "Create tvshow/movie nfo file for?"
+msgstr ""
+
+msgctxt "#30650"
+msgid "Won't scrape"
+msgstr ""
+
+msgctxt "#30651"
+msgid "All"
 msgstr ""

@@ -1664,6 +1664,8 @@ def add_to_library(video_type, title, year, trakt_id):
     log_utils.log('Creating .strm for |%s|%s|%s|%s|' % (video_type, title, year, trakt_id), xbmc.LOGDEBUG)
     scraper = local_scraper.Local_Scraper()
     exclude_local = kodi.get_setting('exclude_local') == 'true'
+    create_nfo = int(kodi.get_setting('create_nfo'))  # 0 = None | 1 = Won't scrape | 2 = All
+
     if video_type == VIDEO_TYPES.TVSHOW:
         save_path = kodi.get_setting('tvshow-folder')
         save_path = xbmc.translatePath(save_path)
@@ -1675,11 +1677,10 @@ def add_to_library(video_type, title, year, trakt_id):
         if not seasons:
             log_utils.log('No Seasons found for %s (%s)' % (show['title'], show['year']), xbmc.LOGERROR)
         else:
-            show_path = make_path(save_path, video_type, show['title'], show['year'], addseason=False)
-            meta_ids = show.get('ids', None)
-            if ((show['title'] not in show_path) or kodi.get_setting('create_nfo_for_all') == 'true') and meta_ids:
-                # title was altered for path, scrapers won't recognize it. Create nfo.
-                write_nfo(show_path, video_type, meta_ids.get('tvdb', ''), meta_ids.get('tmdb', ''), meta_ids.get('imdb', ''))
+            if create_nfo > 0:
+                show_path = make_path(save_path, video_type, show['title'], show['year'])
+                if ((create_nfo == 1) and (show['title'] not in show_path)) or create_nfo == 2:
+                    write_nfo(show_path, video_type, show['ids'])
 
         for season in seasons:
             season_num = season['number']
@@ -1716,47 +1717,43 @@ def add_to_library(video_type, title, year, trakt_id):
         
         save_path = kodi.get_setting('movie-folder')
         save_path = xbmc.translatePath(save_path)
-        movie_path = make_path(save_path, video_type, title, year, addseason=False)
-        if (title not in movie_path) or (kodi.get_setting('create_nfo_for_all') == 'true'):
-            # title was altered for path, scrapers won't recognize it. Create nfo.
+        if create_nfo > 0:
             movie = trakt_api.get_movie_details(trakt_id)
-            meta_ids = movie.get('ids', None)
-            if meta_ids:
-                write_nfo(movie_path, video_type, meta_ids.get('tvdb', ''), meta_ids.get('tmdb', ''), meta_ids.get('imdb', ''))
+            movie_path = make_path(save_path, video_type, title, year)
+            if ((create_nfo == 1) and (movie['title'] not in movie_path)) or create_nfo == 2:
+                write_nfo(movie_path, video_type, movie['ids'])
         strm_string = kodi.get_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': video_type, 'title': title, 'year': year, 'trakt_id': trakt_id, 'dialog': True})
         filename = utils.filename_from_title(title, VIDEO_TYPES.MOVIE, year)
         final_path = os.path.join(make_path(save_path, video_type, title, year), filename)
         write_strm(strm_string, final_path, VIDEO_TYPES.MOVIE, title, year, trakt_id, require_source=kodi.get_setting('require_source') == 'true')
 
-def make_path(base_path, video_type, title, year='', season='', addseason=True):
+def make_path(base_path, video_type, title, year='', season=''):
     show_folder = re.sub(r'[^\w\-_\. ]', '_', title)
     show_folder = '%s (%s)' % (show_folder, year) if year else show_folder
     path = os.path.join(base_path, show_folder)
-    if (video_type == VIDEO_TYPES.TVSHOW) and addseason:
+    if (video_type == VIDEO_TYPES.TVSHOW) and season:
         path = os.path.join(path, 'Season %s' % (season))
     return path
 
-def nfo_url(video_type, tvdb_id=None, tmdb_id=None, imdb_id=None):
+def nfo_url(video_type, meta_ids):
     tvdb_url = 'http://thetvdb.com/?tab=series&id=%s'
     tmdb_url = 'https://www.themoviedb.org/%s/%s'
     imdb_url = 'http://www.imdb.com/title/%s/'
 
-    if video_type == VIDEO_TYPES.TVSHOW:
-        if tvdb_id:
-            return tvdb_url % str(tvdb_id)
-        elif tmdb_id:
-            return tmdb_url % ('tv', str(tmdb_id))
-        elif imdb_id:
-            return imdb_url % str(imdb_id)
-    elif video_type == VIDEO_TYPES.MOVIE:
-        if tmdb_id:
-            return tmdb_url % ('movie', str(tmdb_id))
-        elif imdb_id:
-            return imdb_url % str(imdb_id)
-    return ''
+    if meta_ids.get('tvdb', ''):
+        return tvdb_url % str(meta_ids['tvdb'])
+    elif meta_ids['tmdb']:
+        media_string = 'movie'
+        if video_type == VIDEO_TYPES.TVSHOW:
+            media_string = 'tv'
+        return tmdb_url % (media_string, str(meta_ids['tmdb']))
+    elif meta_ids['imdb']:
+        return imdb_url % str(meta_ids['imdb'])
+    else:
+        return ''
 
-def write_nfo(path, video_type, tvdb_id=None, tmdb_id=None, imdb_id=None):
-    nfo_string = nfo_url(video_type, tvdb_id, tmdb_id, imdb_id)
+def write_nfo(path, video_type, meta_ids):
+    nfo_string = nfo_url(video_type, meta_ids)
     if nfo_string:
         filename = video_type.lower().replace(' ', '') + '.nfo'
         path = os.path.join(path, filename)
