@@ -1718,9 +1718,9 @@ def add_to_library(video_type, title, year, trakt_id):
         save_path = kodi.get_setting('movie-folder')
         save_path = xbmc.translatePath(save_path)
         if create_nfo > 0:
-            movie = trakt_api.get_movie_details(trakt_id)
             movie_path = make_path(save_path, video_type, title, year)
-            if ((create_nfo == 1) and (movie['title'] not in movie_path)) or create_nfo == 2:
+            if ((create_nfo == 1) and (title not in movie_path)) or create_nfo == 2:
+                movie = trakt_api.get_movie_details(trakt_id)
                 write_nfo(movie_path, video_type, movie['ids'])
         strm_string = kodi.get_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': video_type, 'title': title, 'year': year, 'trakt_id': trakt_id, 'dialog': True})
         filename = utils.filename_from_title(title, VIDEO_TYPES.MOVIE, year)
