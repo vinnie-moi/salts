@@ -1674,6 +1674,12 @@ def add_to_library(video_type, title, year, trakt_id):
 
         if not seasons:
             log_utils.log('No Seasons found for %s (%s)' % (show['title'], show['year']), xbmc.LOGERROR)
+        else:
+            show_path = make_path(save_path, video_type, show['title'], show['year'], addseason=False)
+            meta_ids = show.get('ids', None)
+            if ((show['title'] not in show_path) or kodi.get_setting('create_nfo_for_all') == 'true') and meta_ids:
+                # title was altered for path, scrapers won't recognize it. Create nfo.
+                write_nfo(show_path, video_type, meta_ids.get('tvdb', ''), meta_ids.get('tmdb', ''), meta_ids.get('imdb', ''))
 
         for season in seasons:
             season_num = season['number']
@@ -1710,18 +1716,73 @@ def add_to_library(video_type, title, year, trakt_id):
         
         save_path = kodi.get_setting('movie-folder')
         save_path = xbmc.translatePath(save_path)
+        movie_path = make_path(save_path, video_type, title, year, addseason=False)
+        if (title not in movie_path) or (kodi.get_setting('create_nfo_for_all') == 'true'):
+            # title was altered for path, scrapers won't recognize it. Create nfo.
+            movie = trakt_api.get_movie_details(trakt_id)
+            meta_ids = movie.get('ids', None)
+            if meta_ids:
+                write_nfo(movie_path, video_type, meta_ids.get('tvdb', ''), meta_ids.get('tmdb', ''), meta_ids.get('imdb', ''))
         strm_string = kodi.get_plugin_url({'mode': MODES.GET_SOURCES, 'video_type': video_type, 'title': title, 'year': year, 'trakt_id': trakt_id, 'dialog': True})
         filename = utils.filename_from_title(title, VIDEO_TYPES.MOVIE, year)
         final_path = os.path.join(make_path(save_path, video_type, title, year), filename)
         write_strm(strm_string, final_path, VIDEO_TYPES.MOVIE, title, year, trakt_id, require_source=kodi.get_setting('require_source') == 'true')
 
-def make_path(base_path, video_type, title, year='', season=''):
+def make_path(base_path, video_type, title, year='', season='', addseason=True):
     show_folder = re.sub(r'[^\w\-_\. ]', '_', title)
     show_folder = '%s (%s)' % (show_folder, year) if year else show_folder
     path = os.path.join(base_path, show_folder)
-    if video_type == VIDEO_TYPES.TVSHOW:
+    if (video_type == VIDEO_TYPES.TVSHOW) and addseason:
         path = os.path.join(path, 'Season %s' % (season))
     return path
+
+def nfo_url(video_type, tvdb_id=None, tmdb_id=None, imdb_id=None):
+    tvdb_url = 'http://thetvdb.com/?tab=series&id=%s'
+    tmdb_url = 'https://www.themoviedb.org/%s/%s'
+    imdb_url = 'http://www.imdb.com/title/%s/'
+
+    if video_type == VIDEO_TYPES.TVSHOW:
+        if tvdb_id:
+            return tvdb_url % str(tvdb_id)
+        elif tmdb_id:
+            return tmdb_url % ('tv', str(tmdb_id))
+        elif imdb_id:
+            return imdb_url % str(imdb_id)
+    elif video_type == VIDEO_TYPES.MOVIE:
+        if tmdb_id:
+            return tmdb_url % ('movie', str(tmdb_id))
+        elif imdb_id:
+            return imdb_url % str(imdb_id)
+    return ''
+
+def write_nfo(path, video_type, tvdb_id=None, tmdb_id=None, imdb_id=None):
+    nfo_string = nfo_url(video_type, tvdb_id, tmdb_id, imdb_id)
+    if nfo_string:
+        filename = video_type.lower().replace(' ', '') + '.nfo'
+        path = os.path.join(path, filename)
+        path = xbmc.makeLegalFilename(path)
+        if not xbmcvfs.exists(os.path.dirname(path)):
+            try:
+                try: xbmcvfs.mkdirs(os.path.dirname(path))
+                except: os.mkdir(os.path.dirname(path))
+            except Exception as e:
+                log_utils.log('Failed to create directory %s: %s' % (path, str(e)), xbmc.LOGERROR)
+
+            old_nfo_string = ''
+            try:
+                f = xbmcvfs.File(path, 'r')
+                old_nfo_string = f.read()
+                f.close()
+            except: pass
+
+            if nfo_string != old_nfo_string:
+                try:
+                    log_utils.log('Writing nfo: %s' % nfo_string, xbmc.LOGDEBUG)
+                    file_desc = xbmcvfs.File(path, 'w')
+                    file_desc.write(nfo_string)
+                    file_desc.close()
+                except Exception as e:
+                    log_utils.log('Failed to create .nfo file (%s): %s' % (path, e), xbmc.LOGERROR)
 
 def write_strm(stream, path, video_type, title, year, trakt_id, season='', episode='', require_source=False):
     path = xbmc.makeLegalFilename(path)
@@ -1730,7 +1791,7 @@ def write_strm(stream, path, video_type, title, year, trakt_id, season='', episo
             try: xbmcvfs.mkdirs(os.path.dirname(path))
             except: os.mkdir(os.path.dirname(path))
         except Exception as e:
-            log_utils.log('Failed to create directory %s: %s' % path, xbmc.LOGERROR, str(e))
+            log_utils.log('Failed to create directory %s: %s' % (path, str(e)), xbmc.LOGERROR)
 
     old_strm_string = ''
     try:
@@ -1744,7 +1805,7 @@ def write_strm(stream, path, video_type, title, year, trakt_id, season='', episo
     if stream != old_strm_string:
         try:
             if not require_source or utils.url_exists(ScraperVideo(video_type, title, year, trakt_id, season, episode)):
-                log_utils.log('Writing strm: %s' % stream)
+                log_utils.log('Writing strm: %s' % stream, xbmc.LOGDEBUG)
                 file_desc = xbmcvfs.File(path, 'w')
                 file_desc.write(stream)
                 file_desc.close()

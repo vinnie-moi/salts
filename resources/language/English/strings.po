@@ -1514,3 +1514,7 @@ msgstr ""
 msgctxt "#30648"
 msgid "Show Custom Progress Dialog from Library"
 msgstr ""
+
+msgctxt "#30649"
+msgid "Create nfo for shows/movies with metadata ids?"
+msgstr ""

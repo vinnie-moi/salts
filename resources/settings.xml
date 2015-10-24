@@ -84,6 +84,7 @@
         <setting id="update_subs-notify" type="bool" label="30568" default="false" visible="true"/>
         <setting id="include_movies" type="bool" label="30569" default="false" visible="true"/>
         <setting id="cleanup-subscriptions" type="bool" label="30570" default="false" visible="true"/>
+        <setting id="create_nfo_for_all" type="bool" label="30649" default="false" visible="true"/>
         <setting id="exists_list" type="text" visible="false"/>
     </category>
 
