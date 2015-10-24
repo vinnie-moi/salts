@@ -422,13 +422,16 @@ class Scraper(object):
 
     def _blog_proc_results(self, html, post_pattern, date_format, video_type, title, year):
         results = []
-        match = re.search('(.*?)\s*S\d+E\d+\s*', title)
+        search_date = ''
+        search_sxe = ''
+        match = re.search('(.*?)\s*(S\d+E\d+)\s*', title)
         if match:
-            show_title = match.group(1)
+            show_title, search_sxe = match.groups()
         else:
-            match = re.search('(.*?)\s*\d{4}\.\d{2}\.\d{2}\s*', title)
+            match = re.search('(.*?)\s*(\d{4})[ .]?(\d{2})[ .]?(\d{2})\s*', title)
             if match:
-                show_title = match.group(1)
+                show_title, search_year, search_month, search_day = match.groups()
+                search_date = '%s%s%s' % (search_year, search_month, search_day)
             else:
                 show_title = title
         norm_title = self._normalize_title(show_title)
@@ -449,6 +452,8 @@ class Scraper(object):
 
             match_year = ''
             match_title = ''
+            match_date = ''
+            match_sxe = ''
             post_title = post_title.replace('&#8211;', '-')
             post_title = post_title.replace('&#8217;', "'")
             full_title = post_title
@@ -458,18 +463,22 @@ class Scraper(object):
                     match_title, match_year, extra_title = match.groups()
                     full_title = '%s [%s]' % (match_title, extra_title)
             else:
-                match = re.search('(.*?)\s*S\d+E\d+\s*(.*)', post_title)
+                match = re.search('(.*?)\s*(S\d+E\d+)\s*(.*)', post_title)
                 if match:
-                    match_title, extra_title = match.groups()
+                    match_title, match_sxe, extra_title = match.groups()
                     full_title = '%s [%s]' % (match_title, extra_title)
                 else:
-                    match = re.search('(.*?)\s*\d{4}[ .]?\d{2}[ .]?\d{2}\s*(.*)', post_title)
+                    match = re.search('(.*?)\s*(\d{4})[ .]?(\d{2})[ .]?(\d{2})\s*(.*)', post_title)
                     if match:
-                        match_title, extra_title = match.groups()
+                        match_title, match_year2, match_month, match_day, extra_title = match.groups()
+                        match_date = '%s%s%s' % (match_year2, match_month, match_day)
                         full_title = '%s [%s]' % (match_title, extra_title)
 
             match_norm_title = self._normalize_title(match_title)
-            if (match_norm_title in norm_title or norm_title in match_norm_title) and (not year or not match_year or year == match_year):
+            log_utils.log('Blog Results: |%s|%s| - |%s|%s| - |%s|%s| - |%s|%s|' % (match_norm_title, norm_title, year, match_year, search_date, match_date, search_sxe, match_sxe),
+                          log_utils.LOGDEBUG)
+            if (match_norm_title in norm_title or norm_title in match_norm_title) and (not year or not match_year or year == match_year) \
+                    and (not search_date or (search_date == match_date)) and (not search_sxe or (search_sxe == match_sxe)):
                 result = {'url': post_data['url'].replace(self.base_url, ''), 'title': full_title, 'year': match_year}
                 results.append(result)
         return results
