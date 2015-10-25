@@ -740,7 +740,7 @@ def do_disable_check():
             if success_rate < disable_thresh:
                 if auto_disable == DISABLE_SETTINGS.ON:
                     kodi.set_setting('%s-enable' % (cls.get_name()), 'false')
-                    kodi.notify(msg='[COLOR blue]%s[/COLOR] %s' % (i18n('scraper_disabled')), duration=5000)
+                    kodi.notify(msg='[COLOR blue]%s[/COLOR] %s' % (cls.get_name(), i18n('scraper_disabled')), duration=5000)
                 elif auto_disable == DISABLE_SETTINGS.PROMPT:
                     dialog = xbmcgui.Dialog()
                     line1 = i18n('disable_line1') % (cls.get_name(), 100 - success_rate, tries)
