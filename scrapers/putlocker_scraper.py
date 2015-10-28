@@ -80,7 +80,7 @@ class Putlocker_Scraper(scraper.Scraper):
 
         html = self._http_get(search_url, cache_limit=.25)
         results = []
-        if 'Sorry, we could not find' not in html:
+        if not re.search('Sorry.*?find.*?looking\s+for', html, re.I):
             r = re.search('Search Results For: "(.*?)</table>', html, re.DOTALL)
             if r:
                 fragment = r.group(1)
