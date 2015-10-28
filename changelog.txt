@@ -1,3 +1,12 @@
+[B]Version 1.0.66[/B]
+- Minor settings fix
+- Fix afdah scraper
+- Allow cancelled button in custom progress dialog
+- New function to include nfo files for strm files (thanks smokdpi!)
+- Add trakt auth failure logging
+- Fix slow scraper disable notification
+- Respect progress dialog setting for select & download source
+
 [B]Version 1.0.65[/B]
 - Fix ocw scraper
 - Add custom get sources dialog
