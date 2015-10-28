@@ -104,21 +104,22 @@ class MovieFarsi_Scraper(scraper.Scraper):
             html = self._http_get(search_url, cache_limit=1)
             for article in dom_parser.parse_dom(html, 'article', {'class': 'entry-body'}):
                 link = dom_parser.parse_dom(article, 'a', {'class': 'more-link'}, 'href')
-                item = dom_parser.parse_dom(article, 'div', {'class': 'post-content'})
-                match = re.search('href="([^"]+).*?</a>\s*([^<]+)', item[0], re.DOTALL) if item else ''
-                if match and link:
-                    category, match_title_year = match.groups()
-                    if category.upper().endswith('/MOVIES'):
-                        match = re.search('(.*?)\s+\(?(\d{4})\)?', match_title_year)
-                        if match:
-                            match_title, match_year = match.groups()
-                        else:
-                            match_title = match_title_year
-                            match_year = ''
-                        
-                        if not year or not match_year or year == match_year:
-                            result = {'url': link[0].replace(self.base_url, ''), 'title': match_title, 'year': match_year}
-                            results.append(result)
+                content = dom_parser.parse_dom(article, 'div', {'class': 'post-content'})
+                match = re.search('</a>\s*([^<]+)', content[0]) if content else ''
+                info = dom_parser.parse_dom(article, 'div', {'class': 'post-info'})
+                is_movie = re.search('/category/movies/', info[0]) if info else False
+                if match and link and is_movie:
+                    match_title_year = match.group(1)
+                    match = re.search('(.*?)\s+\(?(\d{4})\)?', match_title_year)
+                    if match:
+                        match_title, match_year = match.groups()
+                    else:
+                        match_title = match_title_year
+                        match_year = ''
+                    
+                    if not year or not match_year or year == match_year:
+                        result = {'url': link[0].replace(self.base_url, ''), 'title': match_title, 'year': match_year}
+                        results.append(result)
         
         return results
 
