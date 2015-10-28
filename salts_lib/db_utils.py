@@ -326,7 +326,7 @@ class DB_Connection():
 
         log_utils.log('Building SALTS Database', log_utils.LOGDEBUG)
         if self.db_type == DB_TYPES.MYSQL:
-            self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, data VARCHAR(255) NOT NULL, response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url, data))')
+            self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, data VARCHAR(512) NOT NULL, response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url, data))')
             self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255) NOT NULL, value TEXT, PRIMARY KEY(setting))')
             self.__execute('CREATE TABLE IF NOT EXISTS rel_url \
             (video_type VARCHAR(15) NOT NULL, title VARCHAR(255) NOT NULL, year VARCHAR(4) NOT NULL, season VARCHAR(5) NOT NULL, episode VARCHAR(5) NOT NULL, source VARCHAR(50) NOT NULL, rel_url VARCHAR(255), \
