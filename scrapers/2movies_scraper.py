@@ -27,7 +27,7 @@ from salts_lib.constants import QUALITIES
 from salts_lib.constants import XHR
 
 BASE_URL = 'http://twomovies.us'
-AJAX_URL = '/Xajax/ajaxifyy/'
+AJAX_URL = '/Xajax/aj0001'
 
 class TwoMovies_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -77,7 +77,14 @@ class TwoMovies_Scraper(scraper.Scraper):
 
     def search(self, video_type, title, year):
         results = []
-        search_url = urlparse.urljoin(self.base_url, AJAX_URL)
+        html = self._http_get(self.base_url, cache_limit=8)
+        match = re.search('xajax.config.requestURI\s*=\s*"([^"]+)', html)
+        if match:
+            ajax_url = match.group(1)
+        else:
+            ajax_url = AJAX_URL
+            
+        search_url = urlparse.urljoin(self.base_url, ajax_url)
         xjxr = str(int(time.time() * 1000))
         search_arg = 'S<![CDATA[%s]]>' % (title)
         data = {'xjxfun': 'search_suggest', 'xjxr': xjxr, 'xjxargs[]': [search_arg, 'Stitle']}
