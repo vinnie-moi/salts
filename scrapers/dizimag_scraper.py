@@ -58,7 +58,7 @@ class Dizimag_Scraper(scraper.Scraper):
             page_url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(page_url, cache_limit=.5)
             # exit early if trailer
-            if 'Şu an fragman*' in html:
+            if re.search('Şu an fragman*', html, re.I):
                 return hosters
             
             for script in re.finditer('<script[^>]*>(.*?)</script>', html, re.DOTALL):
