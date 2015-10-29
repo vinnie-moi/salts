@@ -1041,8 +1041,8 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
             kodi.notify(msg=i18n('no_useable_sources') % (msg), duration=5000)
             return False
 
-        pseudo_tv = xbmcgui.Window(10000).getProperty('PseudoTVRunning')
-        if pseudo_tv == 'True' or (mode == MODES.GET_SOURCES and kodi.get_setting('auto-play') == 'true'):
+        pseudo_tv = xbmcgui.Window(10000).getProperty('PseudoTVRunning').lower()
+        if pseudo_tv == 'true' or (mode == MODES.GET_SOURCES and kodi.get_setting('auto-play') == 'true'):
             auto_play_sources(hosters, video_type, trakt_id, dialog, season, episode)
         else:
             if dialog or (dialog is None and kodi.get_setting('source-win') == 'Dialog'):
@@ -1130,7 +1130,8 @@ def play_source(mode, hoster_url, direct, video_type, trakt_id, dialog, season='
                 return False
 
     resume_point = 0
-    if mode not in [MODES.DOWNLOAD_SOURCE, MODES.DIRECT_DOWNLOAD]:
+    pseudo_tv = xbmcgui.Window(10000).getProperty('PseudoTVRunning').lower()
+    if pseudo_tv != 'true' and mode not in [MODES.DOWNLOAD_SOURCE, MODES.DIRECT_DOWNLOAD]:
         if utils.bookmark_exists(trakt_id, season, episode):
             if utils.get_resume_choice(trakt_id, season, episode):
                 resume_point = utils.get_bookmark(trakt_id, season, episode)
