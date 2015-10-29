@@ -194,6 +194,8 @@ def auto_conf():
         kodi.set_setting('calendar-day', '-1')
         kodi.set_setting('source_timeout', '20')
         kodi.set_setting('enable_sort', 'true')
+        kodi.set_setting('include_watchlist_next', 'true')
+        kodi.set_setting('filter_direct', 'true')
         kodi.set_setting('sort1_field', '2')
         kodi.set_setting('sort2_field', '5')
         kodi.set_setting('sort3_field', '1')

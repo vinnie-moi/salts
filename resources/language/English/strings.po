@@ -206,7 +206,7 @@ msgid "be effective. The following settings will be changed:"
 msgstr ""
 
 msgctxt "#30048"
-msgid "[COLOR red]Scraper Sort Order, Source Sorting, Calendar Start Day, Trakt Timeout, Scraper Timeout[/COLOR]"
+msgid "[COLOR red]Scraper Sort Order, Source Sorting, Calendar Start Day, Trakt Timeout, Scraper Timeout, Watchlist in MNE, Test Direct[/COLOR]"
 msgstr ""
 
 msgctxt "#30049"
