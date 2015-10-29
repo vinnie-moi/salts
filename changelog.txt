@@ -1,3 +1,11 @@
+[B]Version 1.0.67[/B]
+- Fix 2movies scraper
+- Improve putlocker scraper
+- Fix dizimag scraper
+- Fix moviefarsi movie search
+- Fix mvl scraper
+- Increase allowed space for data column
+
 [B]Version 1.0.66[/B]
 - Minor settings fix
 - Fix afdah scraper
