@@ -61,24 +61,23 @@ class Dizimag_Scraper(scraper.Scraper):
             if re.search('Şu an fragman*', html, re.I):
                 return hosters
             
-            for script in re.finditer('<script[^>]*>(.*?)</script>', html, re.DOTALL):
-                match = re.search("var\s+kaynaklar.*?url\s*:\s*\"([^\"]+)\"\s*,\s*data\s*:\s*'([^']+)", script.group(1), re.DOTALL)
-                if match:
-                    url = urlparse.urljoin(self.base_url, match.group(1))
-                    data = urlparse.parse_qs(match.group(2))
-                    result = self._http_get(url, data=data, headers=XHR, cache_limit=.5)
-                    for match in re.finditer('"videolink\d*"\s*:\s*"([^"]+)","videokalite\d*"\s*:\s*"?(\d+)p?', result):
-                        stream_url, height = match.groups()
-                        stream_url = stream_url.replace('\\/', '/')
-                        host = self._get_direct_hostname(stream_url)
-                        if host == 'gvideo':
-                            quality = self._gv_get_quality(stream_url)
-                        else:
-                            quality = self._height_get_quality(height)
-                            stream_url += '|User-Agent=%s&Referer=%s' % (USER_AGENT, urllib.quote(page_url))
+            match = re.search('url\s*:\s*"([^"]+)"\s*,\s*data:\s*["\'](id=\d+)', html)
+            if match:
+                url, data = match.groups()
+                url = urlparse.urljoin(self.base_url, url)
+                result = self._http_get(url, data=data, headers=XHR, cache_limit=.5)
+                for match in re.finditer('"videolink\d*"\s*:\s*"([^"]+)","videokalite\d*"\s*:\s*"?(\d+)p?', result):
+                    stream_url, height = match.groups()
+                    stream_url = stream_url.replace('\\/', '/')
+                    host = self._get_direct_hostname(stream_url)
+                    if host == 'gvideo':
+                        quality = self._gv_get_quality(stream_url)
+                    else:
+                        quality = self._height_get_quality(height)
+                        stream_url += '|User-Agent=%s&Referer=%s' % (USER_AGENT, urllib.quote(page_url))
 
-                        hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
-                        hosters.append(hoster)
+                    hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                    hosters.append(hoster)
     
         return hosters
 
