@@ -31,6 +31,7 @@ DB_TYPES = enum(MYSQL='mysql', SQLITE='sqlite')
 CSV_MARKERS = enum(REL_URL='***REL_URL***', OTHER_LISTS='***OTHER_LISTS***', SAVED_SEARCHES='***SAVED_SEARCHES***', BOOKMARKS='***BOOKMARKS***')
 TRIG_DB_UPG = True
 MAX_TRIES = 5
+MYSQL_DATA_SIZE = 512
 
 class DB_Connection():
     def __init__(self):
@@ -94,17 +95,26 @@ class DB_Connection():
 
     def cache_url(self, url, body, data=''):
         if data is None: data = ''
+        # truncate data if running mysql and greater than col size
+        if self.db_type == DB_TYPES.MYSQL and len(data) > MYSQL_DATA_SIZE:
+            data = data[:MYSQL_DATA_SIZE]
         now = time.time()
         sql = 'REPLACE INTO url_cache (url,data,response,timestamp) VALUES(?, ?, ?, ?)'
         self.__execute(sql, (url, data, body, now))
 
     def delete_cached_url(self, url, data=''):
         if data is None: data = ''
+        # truncate data if running mysql and greater than col size
+        if self.db_type == DB_TYPES.MYSQL and len(data) > MYSQL_DATA_SIZE:
+            data = data[:MYSQL_DATA_SIZE]
         sql = 'DELETE FROM url_cache WHERE url = ? and data= ?'
         self.__execute(sql, (url, data))
 
     def get_cached_url(self, url, data='', cache_limit=8):
         if data is None: data = ''
+        # truncate data if running mysql and greater than col size
+        if self.db_type == DB_TYPES.MYSQL and len(data) > MYSQL_DATA_SIZE:
+            data = data[:MYSQL_DATA_SIZE]
         html = ''
         created = 0
         now = time.time()
@@ -326,7 +336,7 @@ class DB_Connection():
 
         log_utils.log('Building SALTS Database', log_utils.LOGDEBUG)
         if self.db_type == DB_TYPES.MYSQL:
-            self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARCHAR(255) NOT NULL, data VARCHAR(512) NOT NULL, response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url, data))')
+            self.__execute('CREATE TABLE IF NOT EXISTS url_cache (url VARBINARY(255) NOT NULL, data VARBINARY(%s) NOT NULL, response MEDIUMBLOB, timestamp TEXT, PRIMARY KEY(url, data))' % (MYSQL_DATA_SIZE))
             self.__execute('CREATE TABLE IF NOT EXISTS db_info (setting VARCHAR(255) NOT NULL, value TEXT, PRIMARY KEY(setting))')
             self.__execute('CREATE TABLE IF NOT EXISTS rel_url \
             (video_type VARCHAR(15) NOT NULL, title VARCHAR(255) NOT NULL, year VARCHAR(4) NOT NULL, season VARCHAR(5) NOT NULL, episode VARCHAR(5) NOT NULL, source VARCHAR(50) NOT NULL, rel_url VARCHAR(255), \
