@@ -1738,20 +1738,20 @@ def make_path(base_path, video_type, title, year='', season=''):
         path = os.path.join(path, 'Season %s' % (season))
     return path
 
-def nfo_url(video_type, meta_ids):
+def nfo_url(video_type, ids):
     tvdb_url = 'http://thetvdb.com/?tab=series&id=%s'
     tmdb_url = 'https://www.themoviedb.org/%s/%s'
     imdb_url = 'http://www.imdb.com/title/%s/'
 
-    if meta_ids.get('tvdb', ''):
-        return tvdb_url % str(meta_ids['tvdb'])
-    elif meta_ids['tmdb']:
+    if 'tvdb' in ids:
+        return tvdb_url % (str(ids['tvdb']))
+    elif 'tmdb' in ids:
         media_string = 'movie'
         if video_type == VIDEO_TYPES.TVSHOW:
             media_string = 'tv'
-        return tmdb_url % (media_string, str(meta_ids['tmdb']))
-    elif meta_ids['imdb']:
-        return imdb_url % str(meta_ids['imdb'])
+        return tmdb_url % (media_string, str(ids['tmdb']))
+    elif 'imdb' in ids:
+        return imdb_url % (str(ids['imdb']))
     else:
         return ''
 
