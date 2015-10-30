@@ -1746,9 +1746,10 @@ def nfo_url(video_type, ids):
     if 'tvdb' in ids:
         return tvdb_url % (str(ids['tvdb']))
     elif 'tmdb' in ids:
-        media_string = 'movie'
         if video_type == VIDEO_TYPES.TVSHOW:
             media_string = 'tv'
+        else:
+            media_string = 'movie'
         return tmdb_url % (media_string, str(ids['tmdb']))
     elif 'imdb' in ids:
         return imdb_url % (str(ids['imdb']))
