@@ -145,7 +145,7 @@ class NoobRoom_Scraper(scraper.Scraper):
         settings.append('         <setting id="%s-include_premium" type="bool" label="     %s" default="false" visible="eq(-8,true)"/>' % (name, i18n('include_premium')))
         return settings
 
-    def _http_get(self, url, data=None, cache_limit=8):
+    def _http_get(self, url, data=None, cache_limit=8, headers=None):
         # return all uncached blank pages if no user or pass
         if not self.username or not self.password:
             return ''
