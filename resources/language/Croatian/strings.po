@@ -1,0 +1,394 @@
+# Addon Name: SALTS
+# Addon id: plugin.video.salts
+# Addon Provider: TV Addons
+# Translators:
+# Natko <natko_maniac@hotmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: SALTS\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2015-10-29 09:43+0000\n"
+"Last-Translator: tknorris\n"
+"Language-Team: Croatian (http://www.transifex.com/tv-addons/salts/language/hr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hr\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+msgctxt "#30000"
+msgid "Movies"
+msgstr "Filmovi"
+
+msgctxt "#30001"
+msgid "TV Shows"
+msgstr "TV Serije"
+
+msgctxt "#30002"
+msgid "Movie"
+msgstr "Film"
+
+msgctxt "#30003"
+msgid "TV Show"
+msgstr "TV Serija"
+
+msgctxt "#30004"
+msgid "Settings"
+msgstr "Postavke"
+
+msgctxt "#30005"
+msgid "Scraper Sort Order"
+msgstr "Redoslijed izvora"
+
+msgctxt "#30006"
+msgid "Url Resolver Settings"
+msgstr "Url Resolver postavke"
+
+msgctxt "#30007"
+msgid "Add-on Settings"
+msgstr "Postavke dodatka"
+
+msgctxt "#30008"
+msgid "Auto-Configure SALTS"
+msgstr "Auto-konfiguriraj SALTS"
+
+msgctxt "#30009"
+msgid "Authorize SALTS to access my trakt.tv account"
+msgstr "Autoriziraj SALTS za pristup mojem trakt.tv računu"
+
+msgctxt "#30010"
+msgid "Set Default Views"
+msgstr "Postavi zadane preglede"
+
+msgctxt "#30011"
+msgid "Remove Cached Url(s)"
+msgstr "Ukloni izvore iz cache memorije"
+
+msgctxt "#30012"
+msgid "Trending %s"
+msgstr "U porastu - %s"
+
+msgctxt "#30013"
+msgid "Popular %s"
+msgstr "Popularno - %s"
+
+msgctxt "#30014"
+msgid "Recently Updated %s"
+msgstr "Nedavno dodano - %s"
+
+msgctxt "#30015"
+msgid "Recommended %s"
+msgstr "Preporučeno - %s"
+
+msgctxt "#30016"
+msgid "My %s Collection"
+msgstr "Moja  %s Kolekcija"
+
+msgctxt "#30017"
+msgid "My Favorites"
+msgstr "Moji omiljeni"
+
+msgctxt "#30018"
+msgid "My Subscriptions"
+msgstr "Moje pretplate"
+
+msgctxt "#30019"
+msgid "My Watchlist"
+msgstr "Moja Watchlista"
+
+msgctxt "#30020"
+msgid "My Lists"
+msgstr "Moji popisi"
+
+msgctxt "#30021"
+msgid "Other Lists"
+msgstr "Ostali popisi"
+
+msgctxt "#30022"
+msgid "My Next Episodes"
+msgstr "Moje sljedeće epizode"
+
+msgctxt "#30023"
+msgid "My Calendar"
+msgstr "Moj Kalendar"
+
+msgctxt "#30024"
+msgid "General Calendar"
+msgstr "Opći Kalendar"
+
+msgctxt "#30025"
+msgid "Premiere Calendar"
+msgstr "Kalendar premijera"
+
+msgctxt "#30026"
+msgid "Search"
+msgstr "Pretraga"
+
+msgctxt "#30027"
+msgid "Recent Searches"
+msgstr "Nedavne pretrage"
+
+msgctxt "#30028"
+msgid "Saved Searches"
+msgstr "Spremljene pretrage"
+
+msgctxt "#30029"
+msgid "Force Refresh"
+msgstr "Forsiraj osvježenje"
+
+msgctxt "#30030"
+msgid "Clear All %s"
+msgstr "Očisti sve - %s"
+
+msgctxt "#30031"
+msgid "Forcing Refresh"
+msgstr "Forsiram osvježenje"
+
+msgctxt "#30032"
+msgid "Force Refresh Complete"
+msgstr "Forsirano osvježenje završeno"
+
+msgctxt "#30033"
+msgid "Enable All Scrapers"
+msgstr "Omogući sve izvore"
+
+msgctxt "#30034"
+msgid "Disable All Scrapers"
+msgstr "Onemogući sve izvore"
+
+msgctxt "#30035"
+msgid "Enable Scraper"
+msgstr "Omogući izvor"
+
+msgctxt "#30036"
+msgid "Disable Scraper"
+msgstr "Onemogući izvor"
+
+msgctxt "#30037"
+msgid "Move Up"
+msgstr "Pomakni gore"
+
+msgctxt "#30038"
+msgid "Move Down"
+msgstr "Pomakni dolje"
+
+msgctxt "#30039"
+msgid "Move To..."
+msgstr "Pomakni na..."
+
+msgctxt "#30040"
+msgid "Enter New Position (1 - %s)"
+msgstr "Upiši novu poziciju (1 - %s)"
+
+msgctxt "#30041"
+msgid "Set Default %s View"
+msgstr "Postavi zadani pregled - %s"
+
+msgctxt "#30042"
+msgid "Set a view then select this item to set the default %s view"
+msgstr "Postavi pregled, a zatim označi ovu stavku za postavljanje zadanog pregleda - %s"
+
+msgctxt "#30043"
+msgid "Import"
+msgstr "Uvezi"
+
+msgctxt "#30044"
+msgid "%s View Set to: %s"
+msgstr "%s - pregled postavljen na: %s"
+
+msgctxt "#30045"
+msgid "Delete [B][COLOR red]ENTIRE[/COLOR][/B] Url Cache"
+msgstr "Izbriši [B][COLOR]CIJELI[/COLOR][/B] Url Cache "
+
+msgctxt "#30046"
+msgid "This will set some settings to values that have been found to"
+msgstr "Ovo će postaviti neke postavke na vrijednosti koje su se pokazale"
+
+msgctxt "#30047"
+msgid "be effective. The following settings will be changed:"
+msgstr "efektivnima. Ove će postavke biti promijenjene:"
+
+msgctxt "#30049"
+msgid "Go Back"
+msgstr "Povratak"
+
+msgctxt "#30050"
+msgid "Continue"
+msgstr "Nastavi"
+
+msgctxt "#30051"
+msgid "Auto-configure Complete"
+msgstr "Auto-konfiguracija završena"
+
+msgctxt "#30052"
+msgid "Set as Favorites List"
+msgstr "Postavi kao popis Omiljenih"
+
+msgctxt "#30053"
+msgid "Set as Subscription List"
+msgstr "Postavi kao popis za pretplate"
+
+msgctxt "#30054"
+msgid "Import from Collection"
+msgstr "Uvezi iz Kolekcije"
+
+msgctxt "#30055"
+msgid "Add another user's list"
+msgstr "Dodaj tuđu listu"
+
+msgctxt "#30056"
+msgid "Copy to My List"
+msgstr "Kopiraj u Moje Liste"
+
+msgctxt "#30057"
+msgid "Add more from %s"
+msgstr "Dodaj više iz %s"
+
+msgctxt "#30058"
+msgid "Remove List"
+msgstr "Ukloni listu"
+
+msgctxt "#30059"
+msgid "Rename List"
+msgstr "Preimenuj listu"
+
+msgctxt "#30060"
+msgid "Enter the new name (blank to reset)"
+msgstr "Unesi novo ime (prazno za reset)"
+
+msgctxt "#30061"
+msgid "Enter username of list owner"
+msgstr "Unesi username vlasnika liste"
+
+msgctxt "#30062"
+msgid "List Does Not Exist: %s"
+msgstr "Lista ne postoji: %s"
+
+msgctxt "#30063"
+msgid "Progress Timeouts: %s/%s"
+msgstr "Timeout napredka: %s/%s"
+
+msgctxt "#30064"
+msgid "Browse Seasons"
+msgstr "Pretraži sezone"
+
+msgctxt "#30065"
+msgid "Update Subscriptions: (Next Run: [COLOR %s]%s[/COLOR])"
+msgstr "Osvježi pretplate: (Sljedeće pokretanje [COLOR %s]%s[/COLOR])"
+
+msgctxt "#30066"
+msgid "Clean-Up Subscriptions"
+msgstr "Očisti pretplate"
+
+msgctxt "#30067"
+msgid "Pick a list to use for Subscriptions"
+msgstr "Odeberi listu za pretplate"
+
+msgctxt "#30068"
+msgid "Pick a list to use for Favorites"
+msgstr "Odaberi listu za Omiljene"
+
+msgctxt "#30069"
+msgid "Blank Searches are not allowed"
+msgstr "Prazna pretraživanja nisu dopuštena"
+
+msgctxt "#30070"
+msgid "Save Search"
+msgstr "Spremi pretraživanje"
+
+msgctxt "#30071"
+msgid "Remove from Recent"
+msgstr "Ukloni iz nedavnih"
+
+msgctxt "#30072"
+msgid "Delete Search"
+msgstr "Ukloni pretragu"
+
+msgctxt "#30073"
+msgid "Recent %s Searches Cleared"
+msgstr "Nedavne pretrage očišćene - %s"
+
+msgctxt "#30074"
+msgid "Saved %s Searches Cleared"
+msgstr "Spremljene pretrage očišćene - %s"
+
+msgctxt "#30075"
+msgid "Scraper Timeouts: %s/%s"
+msgstr "Timeout izvora: %s/%s"
+
+msgctxt "#30076"
+msgid "No Useable Sources Found%s"
+msgstr "Nema pronađenih izvora"
+
+msgctxt "#30077"
+msgid "Choose a subtitle to download"
+msgstr "Odaberite podnapis za preuzimanje"
+
+msgctxt "#30078"
+msgid "Link Resolve Failed: %s"
+msgstr "Pogreška pri obradi linka: %s"
+
+msgctxt "#30079"
+msgid "All sources failed to play"
+msgstr "Nijedan izvor nije uspješno reproduciran"
+
+msgctxt "#30080"
+msgid "Choose your stream"
+msgstr "Odaberite svoj izvor"
+
+msgctxt "#30081"
+msgid "Set Related Url"
+msgstr "Postavi povezani Url"
+
+msgctxt "#30082"
+msgid "Received result from: %s"
+msgstr "Prihvati rezultate s: %s"
+
+msgctxt "#30083"
+msgid "Url To Change (%s)"
+msgstr "Url za promjenu(%s)"
+
+msgctxt "#30084"
+msgid "Related %s url at %s"
+msgstr "Povezani %s url na %s"
+
+msgctxt "#30085"
+msgid "[COLOR blue]%s[/COLOR] Related Url Set"
+msgstr "[COLOR blue]%s[/COLOR] Povezani Url postavljen"
+
+msgctxt "#30086"
+msgid "Manual Search"
+msgstr "Ručna pretraga"
+
+msgctxt "#30087"
+msgid "Select Related"
+msgstr "Odaberite povezano"
+
+msgctxt "#30088"
+msgid "Enter Search"
+msgstr "Unesi pretraživanje"
+
+msgctxt "#30089"
+msgid "Scraper does not support searching"
+msgstr "Izvor ne podržava pretragu"
+
+msgctxt "#30090"
+msgid "Enter Rating (unrate, or 1-10)"
+msgstr "Unesite ocjenu (ukloni, ili 1-10)"
+
+msgctxt "#30091"
+msgid "Input TVShow ID"
+msgstr "Unesite ID TV Serije"
+
+msgctxt "#30092"
+msgid "Item Added to Collection"
+msgstr "Stavka dodana u Kolekciju"
+
+msgctxt "#30093"
+msgid "Item Removed from Collection"
+msgstr "Stavka uklonjena iz Kolekcije"
+
+msgctxt "#30094"
+msgid "Item Added to List"
+msgstr "Stavka dodana na Popis"
+
