@@ -1,3 +1,10 @@
+[B]Version 1.0.68[/B]
+- Add dizist scraper
+- Fix mysql data length
+- Stop prompting for resume points when PTVL running
+- Fix torba.se scraper audio
+- Add current translations for alternate languages
+
 [B]Version 1.0.67[/B]
 - Fix 2movies scraper
 - Improve putlocker scraper
