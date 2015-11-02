@@ -1632,7 +1632,7 @@ def export_db():
                 export_filename = keyboard.getText()
                 export_file = export_path + export_filename
                 db_connection.export_from_db(export_file)
-                kodi.notify(header=i18n('export_successful'), msg=i18n('exported_to'))
+                kodi.notify(header=i18n('export_successful'), msg=i18n('exported_to') % (export_file), duration=5000)
     except Exception as e:
         log_utils.log('Export Failed: %s' % (e), xbmc.LOGERROR)
         kodi.notify(header=i18n('export'), msg=i18n('export_failed'))
