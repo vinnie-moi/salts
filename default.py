@@ -2090,11 +2090,6 @@ def make_item(section_params, show, menu_items=None):
     liz.setProperty('trakt_id', str(trakt_id))
     people = trakt_api.get_people(section_params['section'], trakt_id) if kodi.get_setting('include_people') == 'true' else None
     info = utils.make_info(show, people=people)
-    liz.setProperty('IsPlayable', 'false')
-#     if not section_params['folder']:
-#         liz.setProperty('IsPlayable', 'true')
-#     else:
-#         liz.setProperty('IsPlayable', 'false')
 
     if 'TotalEpisodes' in info:
         liz.setProperty('TotalEpisodes', str(info['TotalEpisodes']))

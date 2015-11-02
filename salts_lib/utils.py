@@ -156,6 +156,7 @@ def make_list_item(label, meta):
     art = make_art(meta)
     listitem = xbmcgui.ListItem(label, iconImage=art['thumb'], thumbnailImage=art['thumb'])
     listitem.setProperty('fanart_image', art['fanart'])
+    listitem.setProperty('IsPlayable', 'false')
     try: listitem.setArt(art)
     except: pass
     if 'ids' in meta and 'imdb' in meta['ids']: listitem.setProperty('imdb_id', str(meta['ids']['imdb']))
