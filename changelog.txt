@@ -1,3 +1,8 @@
+[B]Version 1.0.70[/B]
+- Add vacuum at strategy places to reduce SQLITE DB size
+- Attempt #1 at "Stream Failed to Play" bug.
+- Code Cleanup
+
 [B]Version 1.0.69[/B]
 - Add dizist scraper
 - Fix mysql data length
