@@ -1,4 +1,4 @@
-[B]Version 1.0.68[/B]
+[B]Version 1.0.69[/B]
 - Add dizist scraper
 - Fix mysql data length
 - Stop prompting for resume points when PTVL running
