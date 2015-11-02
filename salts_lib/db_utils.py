@@ -65,6 +65,8 @@ class DB_Connection():
     def flush_cache(self):
         sql = 'DELETE FROM url_cache'
         self.__execute(sql)
+        if self.db_type == DB_TYPES.SQLITE:
+            self.__execute('VACUUM')
 
     def get_bookmark(self, trakt_id, season='', episode=''):
         if not trakt_id: return None
@@ -304,6 +306,8 @@ class DB_Connection():
             if not xbmcvfs.delete(temp_path):
                 raise Exception('Import: Delete of %s failed.' % (temp_path))
             progress.close()
+            if self.db_type == DB_TYPES.SQLITE:
+                self.__execute('VACUUM')
 
     def __unicode_encode(self, items):
         l = []
