@@ -110,7 +110,6 @@ class UFlix_Scraper(scraper.Scraper):
                         else:
                             strip = ''
                         strip += '//' + pieces.netloc
-                        print strip, url
                         result = {'title': res_title, 'url': url.replace(strip, ''), 'year': res_year}
                         results.append(result)
             except Exception as e:
