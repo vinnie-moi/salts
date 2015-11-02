@@ -104,13 +104,7 @@ class UFlix_Scraper(scraper.Scraper):
                 for match in re.finditer(pattern2, fragment):
                     res_title, url, res_year = match.groups('')
                     if not year or not res_year or year == res_year:
-                        pieces = urlparse.urlparse(url)
-                        if pieces.scheme:
-                            strip = pieces.scheme + ':'
-                        else:
-                            strip = ''
-                        strip += '//' + pieces.netloc
-                        result = {'title': res_title, 'url': url.replace(strip, ''), 'year': res_year}
+                        result = {'title': res_title, 'url': self._pathify_url(url), 'year': res_year}
                         results.append(result)
             except Exception as e:
                 log_utils.log('Failure during %s search: |%s|%s|%s| (%s)' % (self.get_name(), video_type, title, year, str(e)), log_utils.LOGWARNING)

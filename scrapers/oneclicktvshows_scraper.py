@@ -88,7 +88,7 @@ class OCTV_Scraper(scraper.Scraper):
         results = []
         for match in re.finditer('<div\s+class="home_post_box"\s+onClick="location\.href=\'([^\']+).*?<h3>([^<]+)', html, re.DOTALL):
             url, match_title = match.groups()
-            result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': ''}
+            result = {'url': self._pathify_url(url), 'title': match_title, 'year': ''}
             results.append(result)
 
         return results

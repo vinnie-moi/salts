@@ -386,8 +386,7 @@ class Scraper(object):
             if not force_title:
                 match = re.search(episode_pattern, html, re.DOTALL)
                 if match:
-                    url = match.group(1)
-                    return url.replace(self.base_url, '')
+                    return self._pathify_url(match.group(1))
 
                 if kodi.get_setting('airdate-fallback') == 'true' and airdate_pattern and video.ep_airdate:
                     airdate_pattern = airdate_pattern.replace('{year}', str(video.ep_airdate.year))
@@ -401,8 +400,7 @@ class Scraper(object):
 
                     match = re.search(airdate_pattern, html, re.DOTALL | re.I)
                     if match:
-                        url = match.group(1)
-                        return url.replace(self.base_url, '')
+                        return self._pathify_url(match.group(1))
             else:
                 log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), log_utils.LOGDEBUG)
 
@@ -411,7 +409,7 @@ class Scraper(object):
                 for match in re.finditer(title_pattern, html, re.DOTALL | re.I):
                     url, title = match.groups()
                     if norm_title == self._normalize_title(title):
-                        return url.replace(self.base_url, '')
+                        return self._pathify_url(url)
 
     def _force_title(self, video):
             trakt_str = kodi.get_setting('force_title_match')
@@ -483,7 +481,7 @@ class Scraper(object):
                           log_utils.LOGDEBUG)
             if (match_norm_title in norm_title or norm_title in match_norm_title) and (not year or not match_year or year == match_year) \
                     and (not search_date or (search_date == match_date)) and (not search_sxe or (search_sxe == match_sxe)):
-                result = {'url': post_data['url'].replace(self.base_url, ''), 'title': full_title, 'year': match_year}
+                result = {'url': self._pathify_url(post_data['url']), 'title': full_title, 'year': match_year}
                 results.append(result)
         return results
     
@@ -736,8 +734,21 @@ class Scraper(object):
                 show_title = title.split(se)[0]
             else:
                 show_title = title
-            #log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), log_utils.LOGDEBUG)
+            # log_utils.log('%s - %s - %s - %s - %s' % (self._normalize_title(video.title), show_title, title, sxe, air_date), log_utils.LOGDEBUG)
             return self._normalize_title(video.title) in show_title and (sxe in title or se in title or air_date in title)
+    
+    def _pathify_url(self, url):
+        url = url.replace('\/', '/')
+        pieces = urlparse.urlparse(url)
+        if pieces.scheme:
+            strip = pieces.scheme + ':'
+        else:
+            strip = ''
+        strip += '//' + pieces.netloc
+        url = url.replace(strip, '')
+        if not url.startswith('/'): url = '/' + url
+        url = url.replace('/./', '/')
+        return url
     
     def create_db_connection(self):
         worker_id = threading.current_thread().ident

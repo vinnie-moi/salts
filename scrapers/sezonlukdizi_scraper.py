@@ -148,7 +148,7 @@ class SezonLukDizi_Scraper(scraper.Scraper):
         else:
             if js_result:
                 for item in js_result:
-                    result = {'url': item['url'].replace('\/', '/').replace(self.base_url, ''), 'title': item['name'], 'year': ''}
+                    result = {'url': self._pathify_url(item['url']), 'title': item['name'], 'year': ''}
                     results.append(result)
 
         return results

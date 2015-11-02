@@ -93,7 +93,7 @@ class WS_Scraper(scraper.Scraper):
                 title = title_year
                 res_year = ''
             if not year or year == res_year:
-                result = {'url': url, 'title': title, 'year': res_year}
+                result = {'url': self._pathify_url(url), 'title': title, 'year': res_year}
                 results.append(result)
         return results
 

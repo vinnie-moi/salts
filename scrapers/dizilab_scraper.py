@@ -96,7 +96,7 @@ class Dizilab_Scraper(scraper.Scraper):
                 match_title = ''
             
             if url and match_title and (not year or not match_year or year == match_year):
-                result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': ''}
+                result = {'url': self._pathify_url(url), 'title': match_title, 'year': ''}
                 results.append(result)
 
         return results

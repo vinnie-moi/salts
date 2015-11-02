@@ -117,7 +117,7 @@ class Flixanity_Scraper(scraper.Scraper):
             else:
                 for item in js_data:
                     if item['meta'].upper().startswith(media_type):
-                        result = {'title': item['title'], 'url': item['permalink'].replace(self.base_url, ''), 'year': ''}
+                        result = {'title': item['title'], 'url': self._pathify_url(item['permalink']), 'year': ''}
                         results.append(result)
 
         return results

@@ -98,7 +98,7 @@ class CouchTunerV1_Scraper(scraper.Scraper):
                 url, match_title = match.groups()
                 match_title = match_title.replace('<strong>', '').replace('</strong>', '')
                 if norm_title in self._normalize_title(match_title):
-                    result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': ''}
+                    result = {'url': self._pathify_url(url), 'title': match_title, 'year': ''}
                     results.append(result)
 
         return results

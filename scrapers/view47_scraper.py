@@ -114,6 +114,6 @@ class View47_Scraper(scraper.Scraper):
                         match_title = match_title_year
                         match_year = ''
                     
-                    result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
+                    result = {'title': match_title, 'year': match_year, 'url': self._pathify_url(url)}
                     results.append(result)
         return results

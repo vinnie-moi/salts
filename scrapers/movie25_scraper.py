@@ -93,6 +93,6 @@ class Movie25_Scraper(scraper.Scraper):
         results = []
         for match in re.finditer(pattern, html, re.DOTALL):
             url, title, year = match.groups('')
-            result = {'url': url, 'title': title, 'year': year}
+            result = {'url': self._pathify_url(url), 'title': title, 'year': year}
             results.append(result)
         return results

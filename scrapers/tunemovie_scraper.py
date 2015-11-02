@@ -121,6 +121,6 @@ class TuneMovie_Scraper(scraper.Scraper):
             if match:
                 match_title, url = match.groups()
                 if not year or not match_year or year == match_year:
-                    result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
+                    result = {'url': self._pathify_url(url), 'title': match_title, 'year': match_year}
                     results.append(result)
         return results

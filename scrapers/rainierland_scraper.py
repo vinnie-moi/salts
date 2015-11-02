@@ -115,8 +115,7 @@ class Rainierland_Scraper(scraper.Scraper):
                 match_year = ''
             
             if norm_title in self._normalize_title(match_title) and (not year or not match_year or year == match_year):
-                if '/./' in url: url = url.replace('/./', '/')
-                result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
+                result = {'title': match_title, 'year': match_year, 'url': self._pathify_url(url)}
                 results.append(result)
 
         return results

@@ -151,7 +151,7 @@ class DirectDownload_Scraper(scraper.Scraper):
                 
                 for match in js_result:
                     url = search_url + '&quality=%s' % match['quality']
-                    result = {'url': url.replace(self.base_url, ''), 'title': match['release'], 'quality': match['quality'], 'year': ''}
+                    result = {'url': self._pathify_url(url), 'title': match['release'], 'quality': match['quality'], 'year': ''}
                     results.append(result)
         return results
 

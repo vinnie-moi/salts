@@ -86,9 +86,7 @@ class MO7_Scraper(scraper.Scraper):
             url = dom_parser.parse_dom(cell, 'a', ret='href')
             match_title = dom_parser.parse_dom(cell, 'h3', {'class': 'title_grid'})
             if url and match_title:
-                url = url[0].replace(self.base_url, '')
-                if not url.startswith('/'): url = '/' + url
-                result = {'url': url, 'title': match_title[0], 'year': ''}
+                result = {'url': self._pathify_url(url[0]), 'title': match_title[0], 'year': ''}
                 results.append(result)
 
         return results

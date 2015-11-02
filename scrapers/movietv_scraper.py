@@ -151,7 +151,7 @@ class MovieTV_Scraper(scraper.Scraper):
             if match:
                 link, match_title, match_year = match.groups()
                 if not year or not match_year or int(year) == int(match_year):
-                    result = {'url': link, 'title': match_title, 'year': match_year}
+                    result = {'url': self._pathify_url(link), 'title': match_title, 'year': match_year}
                     results.append(result)
 
         return results

@@ -122,7 +122,7 @@ class PW_Scraper(scraper.Scraper):
             for match in re.finditer(pattern, html):
                 result = {}
                 url, title, year = match.groups('')
-                result['url'] = url
+                result['url'] = self._pathify_url(url)
                 result['title'] = title
                 result['year'] = year
                 results.append(result)

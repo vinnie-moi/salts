@@ -91,7 +91,7 @@ class Watch8Now_Scraper(scraper.Scraper):
             match = re.search('href="([^"]+)">([^<]+)', item)
             if match:
                 url, match_title = match.groups()
-                result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': ''}
+                result = {'url': self._pathify_url(url), 'title': match_title, 'year': ''}
                 results.append(result)
 
         return results

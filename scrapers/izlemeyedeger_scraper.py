@@ -88,7 +88,7 @@ class IzlemeyeDeger_Scraper(scraper.Scraper):
                 url, match_year, match_title = match.groups('')
                 match_title = match_title.strip()
                 if not year or not match_year or year == match_year:
-                    result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
+                    result = {'url': self._pathify_url(url), 'title': match_title, 'year': match_year}
                     results.append(result)
         
         return results

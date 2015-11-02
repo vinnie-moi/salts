@@ -98,9 +98,7 @@ class Movie4K_Scraper(scraper.Scraper):
                 match_year = ''
 
             if not year or not match_year or year == match_year:
-                url = url.replace(self.base_url, '')
-                if not url.startswith('/'): url = '/' + url
-                result = {'url': url, 'title': title, 'year': match_year}
+                result = {'url': self._pathify_url(url), 'title': title, 'year': match_year}
                 results.append(result)
         return results
 
@@ -114,7 +112,4 @@ class Movie4K_Scraper(scraper.Scraper):
                 pattern = 'value="([^"]+)">Episode %s<' % (video.episode)
                 match = re.search(pattern, fragment)
                 if match:
-                    url = match.group(1)
-                    url = url.replace(self.base_url, '')
-                    if not url.startswith('/'): url = '/' + url
-                    return url
+                    return self._pathify_url(match.group(1))

@@ -70,7 +70,7 @@ class StreamTV_Scraper(scraper.Scraper):
         title_pattern = 'href="([^"]+)"\s+rel="nofollow.*</a>([^<]+)'
         ep_url = super(StreamTV_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern)
         if ep_url:
-            return ep_url.replace(BASE_EP_URL, '')
+            return self._pathify_url(ep_url)
 
     def search(self, video_type, title, year):
         url = self.base_url
@@ -82,7 +82,7 @@ class StreamTV_Scraper(scraper.Scraper):
         for match in re.finditer(pattern, html):
             url, match_title = match.groups()
             if norm_title in self._normalize_title(match_title):
-                result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': ''}
+                result = {'url': self._pathify_url(url), 'title': match_title, 'year': ''}
                 results.append(result)
 
         return results

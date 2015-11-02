@@ -92,7 +92,7 @@ class OnlineMoviesIs_Scraper(scraper.Scraper):
         
         test_url = urlparse.urljoin(self.base_url, test_url)
         if self._http_get(test_url, cache_limit=1):
-            result = {'title': title, 'year': year, 'url': test_url.replace(self.base_url, '')}
+            result = {'title': title, 'year': year, 'url': self._pathify_url(test_url)}
             results.append(result)
 
         return results

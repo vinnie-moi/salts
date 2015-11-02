@@ -92,7 +92,7 @@ class MovieNight_Scraper(scraper.Scraper):
                 match_year = ''
 
             if not year or not match_year or year == match_year:
-                result = {'url': link.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
+                result = {'url': self._pathify_url(link), 'title': match_title, 'year': match_year}
                 results.append(result)
 
         return results

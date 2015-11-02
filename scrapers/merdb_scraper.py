@@ -123,7 +123,7 @@ class MerDB_Scraper(scraper.Scraper):
                     match_year = ''
                 
                 if not year or not match_year or year == match_year:
-                    result = {'url': urlparse.urljoin('/', url), 'title': match_title, 'year': match_year}
+                    result = {'url': self._pathify_url(url), 'title': match_title, 'year': match_year}
                     results.append(result)
         return results
 

@@ -113,7 +113,7 @@ class Funtastic_Scraper(scraper.Scraper):
         
         for result in temp_results:
             if not year or not result['year'] or year == result['year']:
-                result['url'] = result['url'].replace(self.base_url, '')
+                result['url'] = self._pathify_url(result['url'])
                 results.append(result)
 
         return results

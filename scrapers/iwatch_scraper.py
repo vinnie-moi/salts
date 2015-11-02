@@ -76,7 +76,7 @@ class IWatchOnline_Scraper(scraper.Scraper):
                     quality = quality.upper()
                     if age > max_age: max_age = age
                     if age < min_age: min_age = age
-                    hoster = {'multi-part': False, 'class': self, 'url': url.replace(self.base_url, ''), 'host': host.lower(), 'age': age, 'views': None, 'rating': None, 'direct': False}
+                    hoster = {'multi-part': False, 'class': self, 'url': self._pathify_url(url), 'host': host.lower(), 'age': age, 'views': None, 'rating': None, 'direct': False}
                     hoster['quality'] = self._get_quality(video, host.lower(), QUALITY_MAP.get(quality, QUALITIES.HIGH))
                     hosters.append(hoster)
 
@@ -135,7 +135,7 @@ class IWatchOnline_Scraper(scraper.Scraper):
             url, title, match_year = match.groups('')
             if not year or not match_year or year == match_year:
                 url = url.replace('/episode/', '/tv-shows/')  # fix wrong url returned from search results
-                result = {'url': url.replace(self.base_url, ''), 'title': title, 'year': match_year}
+                result = {'url': self._pathify_url(url), 'title': title, 'year': match_year}
                 results.append(result)
         return results
 

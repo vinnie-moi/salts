@@ -90,6 +90,6 @@ class MoviesHD_Scraper(scraper.Scraper):
             for match in re.finditer(pattern, html):
                 url, title, match_year = match.groups('')
                 if not year or not match_year or year == match_year:
-                    result = {'url': url.replace(self.base_url, ''), 'title': title, 'year': match_year}
+                    result = {'url': self._pathify_url(url), 'title': title, 'year': match_year}
                     results.append(result)
         return results

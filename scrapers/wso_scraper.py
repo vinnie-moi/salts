@@ -91,7 +91,7 @@ class WSO_Scraper(scraper.Scraper):
             for match in re.finditer(pattern, list_frag):
                 url, match_title = match.groups('')
                 if norm_title in self._normalize_title(match_title):
-                    result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': ''}
+                    result = {'url': self._pathify_url(url), 'title': match_title, 'year': ''}
                     results.append(result)
 
         return results

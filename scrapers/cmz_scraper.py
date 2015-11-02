@@ -80,7 +80,7 @@ class CMZ_Scraper(scraper.Scraper):
         for match in re.finditer(pattern, html, re.DOTALL):
             url, match_title, match_year = match.groups()
             if not year or not match_year or year == match_year:
-                result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
+                result = {'title': match_title, 'year': match_year, 'url': self._pathify_url(url)}
                 results.append(result)
         
         return results

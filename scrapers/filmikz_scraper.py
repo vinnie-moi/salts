@@ -92,6 +92,6 @@ class Filmikz_Scraper(scraper.Scraper):
             if match:
                 url = match.group(1)
                 if url != 'movies.php':
-                    result = {'url': url.replace(self.base_url, ''), 'title': title, 'year': year}
+                    result = {'url': self._pathify_url(url), 'title': title, 'year': year}
                     results.append(result)
         return results

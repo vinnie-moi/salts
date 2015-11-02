@@ -122,7 +122,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
                     match_year = ''
                 
                 if not year or not match_year or year == match_year:
-                    result = {'title': match_title, 'year': match_year, 'url': url.replace('https', 'http').replace(base_url, '')}
+                    result = {'title': match_title, 'year': match_year, 'url': self._pathify_url(url)}
                     results.append(result)
 
         return results

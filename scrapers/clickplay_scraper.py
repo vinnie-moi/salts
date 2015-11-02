@@ -136,7 +136,7 @@ class ClickPlay_Scraper(scraper.Scraper):
                 match_year = ''
 
             if norm_title in self._normalize_title(match_title) and (not year or not match_year or year == match_year):
-                result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': match_year}
+                result = {'url': self._pathify_url(url), 'title': match_title, 'year': match_year}
                 results.append(result)
 
         return results

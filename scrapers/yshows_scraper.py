@@ -90,6 +90,6 @@ class YShows_Scraper(scraper.Scraper):
         results = []
         for match in re.finditer('class="list-group-item"\s+href="([^"]+)">([^<]+)', html):
             url, match_title = match.groups()
-            result = {'url': url.replace(self.base_url, ''), 'title': match_title, 'year': ''}
+            result = {'url': self._pathify_url(url), 'title': match_title, 'year': ''}
             results.append(result)
         return results
