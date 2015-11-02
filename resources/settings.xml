@@ -541,7 +541,7 @@
          <setting id="TVRelease.Net-filter" type="slider" range="0,180" option="int" label="     Filter results older than (0=No Filter) (days)" default="30" visible="eq(-6,true)"/>
          <setting id="TVRelease.Net-select" type="enum" label="     Automatically Select" lvalues="30636|30637" default="0" visible="eq(-7,true)"/>
          <setting id="UFlix.org-enable" type="bool" label="UFlix.org Enabled" default="true" visible="true"/>
-         <setting id="UFlix.org-base_url" type="text" label="    Base Url" default="http://uflix.me" visible="eq(-1,true)"/>
+         <setting id="UFlix.org-base_url" type="text" label="    Base Url" default="http://uflix.is" visible="eq(-1,true)"/>
          <setting id="UFlix.org-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="UFlix.org_try" type="number" default="0" visible="false"/>
          <setting id="UFlix.org_fail" type="number" default="0" visible="false"/>
@@ -589,7 +589,7 @@
          <setting id="wmo.ch_fail" type="number" default="0" visible="false"/>
          <setting id="wmo.ch_check" type="number" default="0" visible="false"/>
          <setting id="wso.ch-enable" type="bool" label="wso.ch Enabled" default="true" visible="true"/>
-         <setting id="wso.ch-base_url" type="text" label="    Base Url" default="http://watchseries-online.ch" visible="eq(-1,true)"/>
+         <setting id="wso.ch-base_url" type="text" label="    Base Url" default="http://watchseries-online.li" visible="eq(-1,true)"/>
          <setting id="wso.ch-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="wso.ch_try" type="number" default="0" visible="false"/>
          <setting id="wso.ch_fail" type="number" default="0" visible="false"/>
