@@ -84,9 +84,6 @@ class Shush_Proxy(scraper.Scraper):
         settings.append('         <setting id="%s-scraper_password" type="text" label="    %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('scraper_key')))
         return settings
     
-    def _http_get(self, url, cache_limit=8):
-        return super(Shush_Proxy, self)._cached_http_get(url, '', self.timeout, cache_limit=cache_limit)
-    
     def __update_scraper_py(self):
         try:
             py_path = os.path.join(kodi.get_path(), 'scrapers', 'shush_scraper.py')

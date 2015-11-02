@@ -105,6 +105,3 @@ class Vidics_Scraper(scraper.Scraper):
         title_pattern = 'class="episode"\s+href="([^"]+).*?class="episode_title">\s*-\s*(.*?) \('
         airdate_pattern = 'class="episode"\s+(?:style="[^"]+")?\s+href="([^"]+)(?:[^>]+>){2}[^<]+\s+\({year} {month_name} {p_day}\)'
         return super(Vidics_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern, airdate_pattern)
-
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(Vidics_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

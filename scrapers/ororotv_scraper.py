@@ -115,16 +115,16 @@ class OroroTV_Scraper(scraper.Scraper):
         settings.append('         <setting id="%s-include_premium" type="bool" label="     %s" default="false" visible="eq(-8,true)"/>' % (name, i18n('include_premium')))
         return settings
 
-    def _http_get(self, url, auth=True, cookies=None, data=None, allow_redirect=True, cache_limit=8):
+    def _http_get(self, url, auth=True, cookies=None, data=None, headers=None, allow_redirect=True, cache_limit=8):
         # return all uncached blank pages if no user or pass
         if not self.username or not self.password:
             return ''
 
-        html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, allow_redirect=allow_redirect, cache_limit=cache_limit)
+        html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, headers=headers, allow_redirect=allow_redirect, cache_limit=cache_limit)
         if auth and (not html or LOGIN_URL in html):
             log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login()
-            html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=0)
+            html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=0)
 
         return html
 

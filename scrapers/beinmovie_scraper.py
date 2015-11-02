@@ -113,6 +113,3 @@ class BeinMovie_Scraper(scraper.Scraper):
                     result = {'url': DETAIL_URL % (match.group(1)), 'title': title[0], 'year': ''}
                     results.append(result)
         return results
-
-    def _http_get(self, url, cache_limit=8):
-        return super(BeinMovie_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

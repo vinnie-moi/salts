@@ -97,6 +97,6 @@ class OnlineMoviesIs_Scraper(scraper.Scraper):
 
         return results
 
-    def _http_get(self, url, data=None, headers=None, cache_limit=8):
+    def _http_get(self, url, data=None, cache_limit=8):
         headers = {'Referer': url}
         return super(OnlineMoviesIs_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)

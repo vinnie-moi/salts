@@ -164,9 +164,6 @@ class IceFilms_Scraper(scraper.Scraper):
         title_pattern = 'class=star>\s*<a href=([^>]+)>(?:\d+x\d+\s+)+([^<]+)'
         return super(IceFilms_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern)
 
-    def _http_get(self, url, data=None, headers=None, cache_limit=8):
-        return super(IceFilms_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)
-
     def __show_ice_ad(self, ad_url, ice_referer):
         if not ad_url: return
         try:

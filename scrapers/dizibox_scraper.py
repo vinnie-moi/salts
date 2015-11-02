@@ -114,6 +114,3 @@ class Dizibox_Scraper(scraper.Scraper):
                     results.append(result)
 
         return results
-
-    def _http_get(self, url, data=None, headers=None, cache_limit=8):
-        return super(Dizibox_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)

@@ -143,6 +143,3 @@ class IWatchOnline_Scraper(scraper.Scraper):
         episode_pattern = 'href="([^"]+-s%02de%02d)"' % (int(video.season), int(video.episode))
         title_pattern = 'href="([^"]+)"><i class="icon-play-circle">.*?<td>([^<]+)</td>'
         return super(IWatchOnline_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern)
-
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(IWatchOnline_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

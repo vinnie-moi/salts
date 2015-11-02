@@ -96,6 +96,3 @@ class OneClickWatch_Scraper(scraper.Scraper):
         pattern = 'class="title"><a href="(?P<url>[^"]+)[^>]+>(?P<post_title>[^<]+).*?rel="bookmark">(?P<date>[^<]+)'
         date_format = '%B %d, %Y'
         return self._blog_proc_results(html, pattern, date_format, video_type, title, year)
-
-    def _http_get(self, url, headers=None, cache_limit=8):
-        return super(OneClickWatch_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, headers=headers, cache_limit=cache_limit)

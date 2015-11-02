@@ -95,6 +95,3 @@ class Filmikz_Scraper(scraper.Scraper):
                     result = {'url': url.replace(self.base_url, ''), 'title': title, 'year': year}
                     results.append(result)
         return results
-
-    def _http_get(self, url, cache_limit=8):
-        return super(Filmikz_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

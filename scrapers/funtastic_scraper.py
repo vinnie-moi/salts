@@ -140,6 +140,3 @@ class Funtastic_Scraper(scraper.Scraper):
                 result = {'title': match_title[0], 'year': match.group(1), 'url': url[0]}
                 results.append(result)
         return results
-        
-    def _http_get(self, url, data=None, headers=None, cache_limit=8):
-        return super(Funtastic_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)

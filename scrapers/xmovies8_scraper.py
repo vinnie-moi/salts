@@ -102,9 +102,6 @@ class XMovies8_Scraper(scraper.Scraper):
         settings.append('         <setting id="%s-default_url" type="string" visible="false"/>' % (cls.get_name()))
         return settings
 
-    def _http_get(self, url, cookies=None, data=None, headers=None, allow_redirect=True, cache_limit=8):
-        return super(XMovies8_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, headers=headers, allow_redirect=allow_redirect, cache_limit=cache_limit)
-
 # if no default url has been set, then pick one and set it. If one has been set, use it
 default_url = kodi.get_setting('%s-default_url' % (XMovies8_Scraper.get_name()))
 if not default_url:

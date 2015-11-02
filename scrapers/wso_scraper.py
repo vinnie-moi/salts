@@ -24,7 +24,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://watchseries-online.ch'
+BASE_URL = 'http://watchseries-online.li'
 
 class WSO_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -113,6 +113,3 @@ class WSO_Scraper(scraper.Scraper):
             ep_url = super(WSO_Scraper, self)._default_get_episode_url(url, video, episode_pattern, title_pattern, airdate_pattern)
             if ep_url is not None:
                 return ep_url
-
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(WSO_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

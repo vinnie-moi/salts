@@ -92,6 +92,3 @@ class IzlemeyeDeger_Scraper(scraper.Scraper):
                     results.append(result)
         
         return results
-
-    def _http_get(self, url, cache_limit=8):
-        return super(IzlemeyeDeger_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

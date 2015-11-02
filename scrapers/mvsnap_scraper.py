@@ -102,6 +102,3 @@ class Mvsnap_Scraper(scraper.Scraper):
                         except KeyError:
                             pass
         return results
-
-    def _http_get(self, url, data=None, allow_redirect=True, cache_limit=8):
-        return super(Mvsnap_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, allow_redirect=allow_redirect, cache_limit=cache_limit)

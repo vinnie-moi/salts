@@ -97,6 +97,3 @@ class WatchFree_Scraper(scraper.Scraper):
         title_pattern = 'class="tv_episode_item".*?href="([^"]+).*?class="tv_episode_name">\s+([^<]+)'
         airdate_pattern = 'class="tv_episode_item">\s*<a\s+href="([^"]+)(?:[^<]+<){5}span\s+class="tv_num_versions">{month_name} {day} {year}'
         return super(WatchFree_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern, airdate_pattern)
-
-    def _http_get(self, url, cache_limit=8):
-        return super(WatchFree_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

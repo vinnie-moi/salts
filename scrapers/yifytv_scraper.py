@@ -166,6 +166,3 @@ class YIFY_Scraper(scraper.Scraper):
                 except ValueError:
                     log_utils.log('Invalid JSON in yify.tv: %s' % (fragment), log_utils.LOGWARNING)
         return results
-
-    def _http_get(self, url, data=None, headers=None, cache_limit=8):
-        return super(YIFY_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=cache_limit)

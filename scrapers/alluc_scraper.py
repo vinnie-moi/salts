@@ -147,9 +147,6 @@ class Alluc_Scraper(scraper.Scraper):
         settings.append('         <setting id="%s-password" type="text" label="     %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('password')))
         return settings
 
-    def _http_get(self, url, cache_limit=8):
-        return super(Alluc_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
-
     def __translate_search(self, url, search_type):
         query = urlparse.parse_qs(urlparse.urlparse(url).query)
         url = urlparse.urljoin(self.base_url, SEARCH_URL % (search_type, urllib.quote_plus(query['query'][0])))

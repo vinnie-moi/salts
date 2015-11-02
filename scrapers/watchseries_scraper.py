@@ -103,9 +103,6 @@ class WS_Scraper(scraper.Scraper):
         airdate_pattern = 'href="(/episode/[^"]+)(?:[^>]+>){4}\s+{p_day}/{p_month}/{year}'
         return super(WS_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern, title_pattern, airdate_pattern)
 
-    def _http_get(self, url, cache_limit=8):
-        return super(WS_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)
-
     @classmethod
     def get_settings(cls):
         settings = super(WS_Scraper, cls).get_settings()

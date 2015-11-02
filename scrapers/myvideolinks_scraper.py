@@ -119,6 +119,3 @@ class MyVidLinks_Scraper(scraper.Scraper):
         pattern = '<h\d+>.*?<a\s+href="(?P<url>[^"]*/(?P<date>\d{4}/\d{2}/\d{2})/[^"]*)"\s+rel="bookmark"\s+title="(?P<post_title>[^"]+)'
         date_format = '%Y/%m/%d'
         return self._blog_proc_results(html, pattern, date_format, video_type, title, year)
-
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(MyVidLinks_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

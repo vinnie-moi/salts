@@ -95,6 +95,3 @@ class Watch8Now_Scraper(scraper.Scraper):
                 results.append(result)
 
         return results
-
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(Watch8Now_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

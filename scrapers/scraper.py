@@ -236,6 +236,10 @@ class Scraper(object):
 
         return url
 
+    def _http_get(self, url, cookies=None, data=None, multipart_data=None, headers=None, allow_redirect=True, cache_limit=8):
+        return self._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, multipart_data=multipart_data,
+                                     headers=headers, allow_redirect=allow_redirect, cache_limit=cache_limit)
+    
     def _cached_http_get(self, url, base_url, timeout, cookies=None, data=None, multipart_data=None, headers=None, allow_redirect=True, cache_limit=8):
         if cookies is None: cookies = {}
         if timeout == 0: timeout = None

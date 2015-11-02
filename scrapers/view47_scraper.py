@@ -117,6 +117,3 @@ class View47_Scraper(scraper.Scraper):
                     result = {'title': match_title, 'year': match_year, 'url': url.replace(self.base_url, '')}
                     results.append(result)
         return results
-
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(View47_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)

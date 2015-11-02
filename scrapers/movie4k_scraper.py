@@ -118,6 +118,3 @@ class Movie4K_Scraper(scraper.Scraper):
                     url = url.replace(self.base_url, '')
                     if not url.startswith('/'): url = '/' + url
                     return url
-
-    def _http_get(self, url, cookies=None, data=None, cache_limit=8):
-        return super(Movie4K_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookies, data=data, cache_limit=cache_limit)

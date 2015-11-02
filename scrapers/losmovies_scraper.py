@@ -98,6 +98,3 @@ class LosMovies_Scraper(scraper.Scraper):
 
     def _get_episode_url(self, show_url, video):
         return show_url
-
-    def _http_get(self, url, cache_limit=8):
-        return super(LosMovies_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cache_limit=cache_limit)

@@ -89,6 +89,3 @@ class RLSSource_Scraper(scraper.Scraper):
         pattern = 'href="(?P<url>[^"]+)[^>]+rel="bookmark">(?P<post_title>[^<]+).*?class="entry-date">(?P<date>\d+/\d+/\d+)'
         date_format = '%m/%d/%Y'
         return self._blog_proc_results(html, pattern, date_format, video_type, title, year)
-
-    def _http_get(self, url, data=None, cache_limit=8):
-        return super(RLSSource_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
