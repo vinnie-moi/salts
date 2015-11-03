@@ -1033,7 +1033,8 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 SORT_KEYS['source'] = utils.make_source_sort_key()
                 hosters.sort(key=utils.get_sort_key)
     
-            hosters = filter_unusable_hosters(hosters)
+            if kodi.get_setting('filter_unusable') == 'true':
+                hosters = apply_urlresolver(hosters)
     
         if not hosters:
             log_utils.log('No Usable Sources found for: |%s|' % (video))
@@ -1053,19 +1054,52 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
     finally:
         utils.reap_workers(workers, None)
 
-def filter_unusable_hosters(hosters):
+def apply_urlresolver(hosters):
+    import urlresolver.plugnplay
+    resolvers = urlresolver.plugnplay.man.implementors(urlresolver.UrlResolver)
+    debrid_resolvers = [resolver for resolver in resolvers if resolver.isUniversal()]
     filtered_hosters = []
-    filter_max = int(kodi.get_setting('filter_unusable'))
+    debrid_hosts = {}
     unk_hosts = {}
-    import urlresolver
-    for i, hoster in enumerate(hosters):
-        if i < filter_max and 'direct' in hoster and hoster['direct'] == False and hoster['host']:
-            hmf = urlresolver.HostedMediaFile(host=hoster['host'], media_id='dummy')  # use dummy media_id to force host validation
-            if not hmf:
-                log_utils.log('Unusable source %s (%s) from %s' % (hoster['url'], hoster['host'], hoster['class'].get_name()), xbmc.LOGINFO)
-                unk_hosts[hoster['host']] = unk_hosts.get(hoster['host'], 0) + 1
+    known_hosts = {}
+    for hoster in hosters:
+        if 'direct' in hoster and hoster['direct'] == False and hoster['host']:
+            host = hoster['host']
+            if host in unk_hosts:
+                log_utils.log('Unknown Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+                unk_hosts[host] += 1
                 continue
-        filtered_hosters.append(hoster)
+            elif host in known_hosts:
+                known_hosts[host] += 1
+                log_utils.log('Known Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+                filtered_hosters.append(hoster)
+            else:
+                hmf = urlresolver.HostedMediaFile(host=host, media_id='dummy')  # use dummy media_id to force host validation
+                if hmf:
+                    known_hosts[host] = known_hosts.get(host, 0) + 1
+                    log_utils.log('Known Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+                    filtered_hosters.append(hoster)
+                else:
+                    unk_hosts[host] = unk_hosts.get(host, 0) + 1
+                    log_utils.log('Unknown Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+                    continue
+            
+            if host in debrid_hosts:
+                log_utils.log('Debrid cache found for %s: %s' % (host, debrid_hosts[host]), log_utils.LOGDEBUG)
+                hoster['debrid'] = debrid_hosts[host]
+            else:
+                temp_resolvers = []
+                for resolver in debrid_resolvers:
+                    if resolver.valid_url('', host):
+                        temp_resolvers.append(resolver.name)
+    
+                debrid_hosts[host] = temp_resolvers
+                log_utils.log('%s supported by: %s' % (host, temp_resolvers), log_utils.LOGDEBUG)
+                if temp_resolvers:
+                    hoster['debrid'] = temp_resolvers
+        else:
+            filtered_hosters.append(hoster)
+            
     log_utils.log('Discarded Hosts: %s' % (sorted(unk_hosts.items(), key=lambda x: x[1], reverse=True)), xbmc.LOGDEBUG)
     return filtered_hosters
 
@@ -1230,6 +1264,8 @@ def pick_source_dialog(hosters):
 
         label = item['class'].format_source_label(item)
         label = '[%s] %s' % (item['class'].get_name(), label)
+        if 'debrid' in item and item['debrid']:
+            label = '[COLOR green]%s[/COLOR] (%s)' % (label, ', '.join(item['debrid']))
         item['label'] = label
 
     dialog = xbmcgui.Dialog()
