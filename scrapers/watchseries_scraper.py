@@ -18,7 +18,6 @@
 import scraper
 import urllib
 import urlparse
-import re
 import base64
 import hashlib
 import json
