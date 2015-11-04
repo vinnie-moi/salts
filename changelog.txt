@@ -1,3 +1,9 @@
+[B]Version 1.0.71[/B]
+- Improve watchseries scraper
+- Show indicator on debrid sources
+- Add debrid sort key
+- Add new settings to auto-conf
+
 [B]Version 1.0.70[/B]
 - Add vacuum at strategy places to reduce SQLITE DB size
 - Attempt #1 at "Stream Failed to Play" bug.
