@@ -1091,7 +1091,7 @@ def apply_urlresolver(hosters):
                 temp_resolvers = []
                 for resolver in debrid_resolvers:
                     if resolver.valid_url('', host):
-                        temp_resolvers.append(resolver.name)
+                        temp_resolvers.append(resolver.name[:3].upper())
     
                 debrid_hosts[host] = temp_resolvers
                 log_utils.log('%s supported by: %s' % (host, temp_resolvers), log_utils.LOGDEBUG)
@@ -1298,6 +1298,8 @@ def pick_source_dir(mode, hosters, video_type, trakt_id, season='', episode=''):
 
         label = item['class'].format_source_label(item)
         label = '[%s] %s' % (item['class'].get_name(), label)
+        if 'debrid' in item and item['debrid']:
+            label = '[COLOR green]%s[/COLOR] (%s)' % (label, ', '.join(item['debrid']))
         item['label'] = label
 
         # log_utils.log(item, xbmc.LOGDEBUG)
