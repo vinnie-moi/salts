@@ -81,9 +81,7 @@ class Local_Scraper(scraper.Scraper):
         "limits": { "start" : 0, "end": 25 }, "properties" : ["title", "season", "episode", "file", "streamdetails"], "sort": { "order": "ascending", "method": "label", "ignorearticle": true }}, "id": "libTvShows"}'
         base_url = 'video_type=%s&id=%s'
         episodes = []
-
         force_title = self._force_title(video)
-
         if not force_title:
             run = cmd % (params['id'][0], video.season, 'episode', video.episode)
             meta = xbmc.executeJSONRPC(run)
@@ -94,7 +92,7 @@ class Local_Scraper(scraper.Scraper):
         else:
             log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), log_utils.LOGDEBUG)
 
-        if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title:
+        if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title and not episodes:
             run = cmd % (params['id'][0], video.season, 'title', video.ep_title)
             meta = xbmc.executeJSONRPC(run)
             meta = json.loads(meta)
