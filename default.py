@@ -1033,8 +1033,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 SORT_KEYS['source'] = utils.make_source_sort_key()
                 hosters.sort(key=utils.get_sort_key)
     
-            if kodi.get_setting('filter_unusable') == 'true':
-                hosters = apply_urlresolver(hosters)
+            hosters = apply_urlresolver(hosters)
     
         if not hosters:
             log_utils.log('No Usable Sources found for: |%s|' % (video))
@@ -1062,27 +1061,35 @@ def apply_urlresolver(hosters):
     debrid_hosts = {}
     unk_hosts = {}
     known_hosts = {}
+    filter_unusable = kodi.get_setting('filter_unusable') == 'true'
+    show_debrid = kodi.get_setting('show_debrid') == 'true'
+    if not filter_unusable and not show_debrid:
+        return hosters
+    
     for hoster in hosters:
         if 'direct' in hoster and hoster['direct'] == False and hoster['host']:
             host = hoster['host']
-            if host in unk_hosts:
-                log_utils.log('Unknown Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
-                unk_hosts[host] += 1
-                continue
-            elif host in known_hosts:
-                known_hosts[host] += 1
-                log_utils.log('Known Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
-                filtered_hosters.append(hoster)
-            else:
-                hmf = urlresolver.HostedMediaFile(host=host, media_id='dummy')  # use dummy media_id to force host validation
-                if hmf:
-                    known_hosts[host] = known_hosts.get(host, 0) + 1
-                    log_utils.log('Known Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+            if filter_unusable:
+                if host in unk_hosts:
+                    log_utils.log('Unknown Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+                    unk_hosts[host] += 1
+                    continue
+                elif host in known_hosts:
+                    known_hosts[host] += 1
+                    log_utils.log('Known Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
                     filtered_hosters.append(hoster)
                 else:
-                    unk_hosts[host] = unk_hosts.get(host, 0) + 1
-                    log_utils.log('Unknown Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
-                    continue
+                    hmf = urlresolver.HostedMediaFile(host=host, media_id='dummy')  # use dummy media_id to force host validation
+                    if hmf:
+                        known_hosts[host] = known_hosts.get(host, 0) + 1
+                        log_utils.log('Known Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+                        filtered_hosters.append(hoster)
+                    else:
+                        unk_hosts[host] = unk_hosts.get(host, 0) + 1
+                        log_utils.log('Unknown Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+                        continue
+            else:
+                filtered_hosters.append(hoster)
             
             if host in debrid_hosts:
                 log_utils.log('Debrid cache found for %s: %s' % (host, debrid_hosts[host]), log_utils.LOGDEBUG)
@@ -1258,13 +1265,14 @@ def auto_play_sources(hosters, video_type, trakt_id, dialog, season, episode):
         kodi.notify(msg=msg, duration=5000)
 
 def pick_source_dialog(hosters):
+    show_debrid = kodi.get_setting('show_debrid') == 'true'
     for item in hosters:
         if item['multi-part']:
             continue
 
         label = item['class'].format_source_label(item)
         label = '[%s] %s' % (item['class'].get_name(), label)
-        if 'debrid' in item and item['debrid']:
+        if show_debrid and 'debrid' in item and item['debrid']:
             label = '[COLOR green]%s[/COLOR] (%s)' % (label, ', '.join(item['debrid']))
         item['label'] = label
 
@@ -1292,13 +1300,14 @@ def pick_source_dir(mode, hosters, video_type, trakt_id, season='', episode=''):
         playable = 'true'
 
     hosters_len = len(hosters)
+    show_debrid = kodi.get_setting('show_debrid') == 'true'
     for item in hosters:
         if item['multi-part']:
             continue
 
         label = item['class'].format_source_label(item)
         label = '[%s] %s' % (item['class'].get_name(), label)
-        if 'debrid' in item and item['debrid']:
+        if show_debrid and 'debrid' in item and item['debrid']:
             label = '[COLOR green]%s[/COLOR] (%s)' % (label, ', '.join(item['debrid']))
         item['label'] = label
 
