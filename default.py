@@ -1027,13 +1027,13 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
             hosters = utils.filter_quality(video_type, hosters)
             if xbmc.abortRequested or pd.is_canceled(): return False
 
+            hosters = apply_urlresolver(hosters)
+
             if kodi.get_setting('enable_sort') == 'true':
                 if kodi.get_setting('filter-unknown') == 'true':
                     hosters = utils.filter_unknown_hosters(hosters)
                 SORT_KEYS['source'] = utils.make_source_sort_key()
                 hosters.sort(key=utils.get_sort_key)
-    
-            hosters = apply_urlresolver(hosters)
     
         if not hosters:
             log_utils.log('No Usable Sources found for: |%s|' % (video))
@@ -1071,28 +1071,28 @@ def apply_urlresolver(hosters):
             host = hoster['host']
             if filter_unusable:
                 if host in unk_hosts:
-                    log_utils.log('Unknown Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
+                    # log_utils.log('Unknown Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
                     unk_hosts[host] += 1
                     continue
                 elif host in known_hosts:
+                    # log_utils.log('Known Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
                     known_hosts[host] += 1
-                    log_utils.log('Known Hit: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
                     filtered_hosters.append(hoster)
                 else:
                     hmf = urlresolver.HostedMediaFile(host=host, media_id='dummy')  # use dummy media_id to force host validation
                     if hmf:
+                        # log_utils.log('Known Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
                         known_hosts[host] = known_hosts.get(host, 0) + 1
-                        log_utils.log('Known Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
                         filtered_hosters.append(hoster)
                     else:
+                        # log_utils.log('Unknown Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
                         unk_hosts[host] = unk_hosts.get(host, 0) + 1
-                        log_utils.log('Unknown Miss: %s from %s' % (host, hoster['class'].get_name()), log_utils.LOGDEBUG)
                         continue
             else:
                 filtered_hosters.append(hoster)
             
             if host in debrid_hosts:
-                log_utils.log('Debrid cache found for %s: %s' % (host, debrid_hosts[host]), log_utils.LOGDEBUG)
+                # log_utils.log('Debrid cache found for %s: %s' % (host, debrid_hosts[host]), log_utils.LOGDEBUG)
                 hoster['debrid'] = debrid_hosts[host]
             else:
                 temp_resolvers = []
@@ -1100,8 +1100,8 @@ def apply_urlresolver(hosters):
                     if resolver.valid_url('', host):
                         temp_resolvers.append(resolver.name[:3].upper())
     
+                # log_utils.log('%s supported by: %s' % (host, temp_resolvers), log_utils.LOGDEBUG)
                 debrid_hosts[host] = temp_resolvers
-                log_utils.log('%s supported by: %s' % (host, temp_resolvers), log_utils.LOGDEBUG)
                 if temp_resolvers:
                     hoster['debrid'] = temp_resolvers
         else:

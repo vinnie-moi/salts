@@ -45,7 +45,8 @@ SORT_FIELDS = [
     (SORT_LIST[int(kodi.get_setting('sort2_field'))], SORT_SIGNS[kodi.get_setting('sort2_order')]),
     (SORT_LIST[int(kodi.get_setting('sort3_field'))], SORT_SIGNS[kodi.get_setting('sort3_order')]),
     (SORT_LIST[int(kodi.get_setting('sort4_field'))], SORT_SIGNS[kodi.get_setting('sort4_order')]),
-    (SORT_LIST[int(kodi.get_setting('sort5_field'))], SORT_SIGNS[kodi.get_setting('sort5_order')])]
+    (SORT_LIST[int(kodi.get_setting('sort5_field'))], SORT_SIGNS[kodi.get_setting('sort5_order')]),
+    (SORT_LIST[int(kodi.get_setting('sort6_field'))], SORT_SIGNS[kodi.get_setting('sort6_order')])]
 
 last_check = datetime.datetime.fromtimestamp(0)
 
@@ -347,6 +348,11 @@ def get_sort_key(item):
             if value in SORT_KEYS[field]:
                 item_sort_key.append(sign * int(SORT_KEYS[field][value]))
             else:  # assume all unlisted values sort as worst
+                item_sort_key.append(sign * -1)
+        elif field == 'debrid':
+            if field in item:
+                item_sort_key.append(sign * len(item[field]))
+            else:
                 item_sort_key.append(sign * -1)
         else:
             if item[field] is None:

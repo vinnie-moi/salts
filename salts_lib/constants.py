@@ -56,7 +56,7 @@ FORCE_NO_MATCH = '***FORCE_NO_MATCH***'
 # unknown (i.e. None) is always worst
 SORT_KEYS = {}
 SORT_KEYS['quality'] = {None: 0, QUALITIES.LOW: 1, QUALITIES.MEDIUM: 2, QUALITIES.HIGH: 3, QUALITIES.HD720: 4, QUALITIES.HD1080: 5}
-SORT_LIST = ['none', 'source', 'quality', 'views', 'rating', 'direct']
+SORT_LIST = ['none', 'source', 'quality', 'views', 'rating', 'direct', 'debrid']
 SORT_SIGNS = {'0': -1, '1': 1}  # 0 = Best to Worst; 1 = Worst to Best
 
 HOURS_LIST = {}
