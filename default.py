@@ -196,6 +196,8 @@ def auto_conf():
         kodi.set_setting('enable_sort', 'true')
         kodi.set_setting('include_watchlist_next', 'true')
         kodi.set_setting('filter_direct', 'true')
+        kodi.set_setting('filter_unusable', 'true')
+        kodi.set_setting('show_debrid', 'true')
         kodi.set_setting('sort1_field', '2')
         kodi.set_setting('sort2_field', '5')
         kodi.set_setting('sort3_field', '6')
