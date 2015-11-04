@@ -198,9 +198,10 @@ def auto_conf():
         kodi.set_setting('filter_direct', 'true')
         kodi.set_setting('sort1_field', '2')
         kodi.set_setting('sort2_field', '5')
-        kodi.set_setting('sort3_field', '1')
-        kodi.set_setting('sort4_field', '3')
-        kodi.set_setting('sort5_field', '4')
+        kodi.set_setting('sort3_field', '6')
+        kodi.set_setting('sort4_field', '1')
+        kodi.set_setting('sort5_field', '3')
+        kodi.set_setting('sort6_field', '4')
         sso = [
             'Local', 'EasyNews', 'DirectDownload.tv', 'NoobRoom', 'OneClickTVShows', '123Movies', 'yify-streaming', 'stream-tv.co', 'streamallthis.is', 'SezonLukDizi', 'Dizimag', 'Dizilab',
             'Dizist', 'MovieFarsi', 'Shush.se', 'Dizigold', 'torba.se', 'IzlemeyeDeger', 'Rainierland', 'funtastic-vids', 'clickplay.to', 'IceFilms', 'ororo.tv', 'afdah.org', 'xmovies8', 'OnlineMoviesIs',
