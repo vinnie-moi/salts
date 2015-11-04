@@ -1265,16 +1265,10 @@ def auto_play_sources(hosters, video_type, trakt_id, dialog, season, episode):
         kodi.notify(msg=msg, duration=5000)
 
 def pick_source_dialog(hosters):
-    show_debrid = kodi.get_setting('show_debrid') == 'true'
     for item in hosters:
         if item['multi-part']:
             continue
-
-        label = item['class'].format_source_label(item)
-        label = '[%s] %s' % (item['class'].get_name(), label)
-        if show_debrid and 'debrid' in item and item['debrid']:
-            label = '[COLOR green]%s[/COLOR] (%s)' % (label, ', '.join(item['debrid']))
-        item['label'] = label
+        item['label'] = utils.format_source_label(item)
 
     dialog = xbmcgui.Dialog()
     index = dialog.select(i18n('choose_stream'), [item['label'] for item in hosters if 'label' in item])
@@ -1300,17 +1294,11 @@ def pick_source_dir(mode, hosters, video_type, trakt_id, season='', episode=''):
         playable = 'true'
 
     hosters_len = len(hosters)
-    show_debrid = kodi.get_setting('show_debrid') == 'true'
     for item in hosters:
         if item['multi-part']:
             continue
 
-        label = item['class'].format_source_label(item)
-        label = '[%s] %s' % (item['class'].get_name(), label)
-        if show_debrid and 'debrid' in item and item['debrid']:
-            label = '[COLOR green]%s[/COLOR] (%s)' % (label, ', '.join(item['debrid']))
-        item['label'] = label
-
+        item['label'] = utils.format_source_label(item)
         # log_utils.log(item, xbmc.LOGDEBUG)
         queries = {'mode': next_mode, 'class_url': item['url'], 'direct': item['direct'], 'video_type': video_type, 'trakt_id': trakt_id,
                    'season': season, 'episode': episode, 'class_name': item['class'].get_name(), 'rand': time.time()}

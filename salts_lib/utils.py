@@ -351,7 +351,7 @@ def get_sort_key(item):
                 item_sort_key.append(sign * -1)
         elif field == 'debrid':
             if field in item:
-                item_sort_key.append(sign * len(item[field]))
+                item_sort_key.append(sign * bool(item[field]))
             else:
                 item_sort_key.append(sign * -1)
         else:
@@ -665,6 +665,16 @@ def format_sub_label(sub):
     label = '[COLOR %s]%s[/COLOR]' % (color, label)
     return label
 
+def format_source_label(item):
+    label = item['class'].format_source_label(item)
+    label = '[%s] %s' % (item['class'].get_name(), label)
+    if kodi.get_setting('show_debrid') == 'true' and 'debrid' in item and item['debrid']:
+        label = '[COLOR green]%s[/COLOR]' % (label)
+    if 'debrid' in item and item['debrid']:
+        label += ' (%s)' % (', '.join(item['debrid']))
+    item['label'] = label
+    return label
+    
 def srt_indicators_enabled():
     return (kodi.get_setting('enable-subtitles') == 'true' and (kodi.get_setting('subtitle-indicator') == 'true'))
 
