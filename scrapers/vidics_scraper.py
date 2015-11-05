@@ -87,7 +87,6 @@ class Vidics_Scraper(scraper.Scraper):
 
         results = []
         for result in dom_parser.parse_dom(html, 'div', {'class': 'searchResult'}):
-            print result
             url = dom_parser.parse_dom(result, 'a', {'itemprop': 'url'}, ret='href')
             match_title = dom_parser.parse_dom(result, 'span', {'itemprop': 'name'})
             match_year = dom_parser.parse_dom(result, 'span', {'itemprop': 'copyrightYear'})
