@@ -82,11 +82,12 @@ class Vidics_Scraper(scraper.Scraper):
             search_url = urlparse.urljoin(self.base_url, '/Category-Movies/Genre-Any/Letter-Any/ByPopularity/1/Search-')
         else:
             search_url = urlparse.urljoin(self.base_url, '/Category-TvShows/Genre-Any/Letter-Any/ByPopularity/1/Search-')
-        search_url += '%s.html' % (urllib.quote_plus(title))
+        search_url += '%s.htm' % (urllib.quote_plus(title))
         html = self._http_get(search_url, cache_limit=.25)
 
         results = []
         for result in dom_parser.parse_dom(html, 'div', {'class': 'searchResult'}):
+            print result
             url = dom_parser.parse_dom(result, 'a', {'itemprop': 'url'}, ret='href')
             match_title = dom_parser.parse_dom(result, 'span', {'itemprop': 'name'})
             match_year = dom_parser.parse_dom(result, 'span', {'itemprop': 'copyrightYear'})
