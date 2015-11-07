@@ -605,6 +605,7 @@ class Scraper(object):
         return quality
 
     def _gv_get_quality(self, stream_url):
+        stream_url = urllib.unquote(stream_url)
         if 'itag=18' in stream_url or '=m18' in stream_url:
             return QUALITIES.MEDIUM
         elif 'itag=22' in stream_url or '=m22' in stream_url:
