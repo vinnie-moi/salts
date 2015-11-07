@@ -159,6 +159,6 @@ class DDLValley_Scraper(scraper.Scraper):
                     if today - post_date > filter_days:
                         return True
                 except ValueError:
-                    return True
+                    return False
         
         return False
