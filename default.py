@@ -206,12 +206,12 @@ def auto_conf():
         kodi.set_setting('sort6_field', '4')
         sso = [
             'Local', 'EasyNews', 'DirectDownload.tv', 'NoobRoom', 'OneClickTVShows', '123Movies', 'yify-streaming', 'stream-tv.co', 'streamallthis.is', 'SezonLukDizi', 'Dizimag', 'Dizilab',
-            'Dizist', 'MovieFarsi', 'Shush.se', 'Dizigold', 'torba.se', 'IzlemeyeDeger', 'Rainierland', 'funtastic-vids', 'clickplay.to', 'IceFilms', 'ororo.tv', 'afdah.org', 'xmovies8', 'OnlineMoviesIs',
-            'OnlineMoviesPro', 'Flixanity', 'hdmz', 'niter.tv', 'yify.tv', 'pubfilm', 'movietv.to', 'beinmovie', 'popcorntimefree', 'tunemovie', 'MintMovies', 'MovieNight', 'cmz', 'Putlocker',
-            'viooz.ac', 'view47', 'MoviesHD', 'OnlineMovies', 'MoviesOnline7', 'wmo.ch', 'zumvo.com', 'mvsnap', 'Dizibox', 'alluc.com', 'DDLValley', 'MyVideoLinks.eu', 'OneClickWatch',
-            'RLSSource.net', 'TVRelease.Net', 'FilmStreaming.in', 'PrimeWire', 'WatchFree.to', 'CouchTunerV2', 'CouchTunerV1', 'Watch8Now', 'yshows', 'pftv', 'wso.ch', 'WatchSeries',
-            'SolarMovie', 'UFlix.org', 'ch131', 'MovieTube', 'ayyex', 'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies', 'iStreamHD', 'afdah',
-            'filmikz.ch', 'movie25']
+            'Dizist', 'MovieFarsi', 'Shush.se', 'Dizigold', 'torba.se', 'IzlemeyeDeger', 'ReleaseBB', 'DDLValley', 'Rainierland', 'funtastic-vids', 'clickplay.to', 'IceFilms', 'ororo.tv', 'afdah.org',
+            'xmovies8', 'OnlineMoviesIs', 'OnlineMoviesPro', 'Flixanity', 'hdmz', 'niter.tv', 'yify.tv', 'pubfilm', 'movietv.to', 'beinmovie', 'popcorntimefree', 'tunemovie', 'MintMovies',
+            'MovieNight', 'cmz', 'Putlocker', 'viooz.ac', 'view47', 'MoviesHD', 'OnlineMovies', 'MoviesOnline7', 'wmo.ch', 'zumvo.com', 'mvsnap', 'Dizibox', 'alluc.com', 'MyVideoLinks.eu',
+            'OneClickWatch', 'RLSSource.net', 'TVRelease.Net', 'FilmStreaming.in', 'PrimeWire', 'WatchFree.to', 'CouchTunerV2', 'CouchTunerV1', 'Watch8Now', 'yshows', 'pftv', 'wso.ch',
+            'WatchSeries', 'SolarMovie', 'UFlix.org', 'ch131', 'MovieTube', 'ayyex', 'moviestorm.eu', 'vidics.ch', 'Movie4K', 'LosMovies', 'MerDB', 'iWatchOnline', '2movies', 'iStreamHD',
+            'afdah', 'filmikz.ch', 'movie25']
         kodi.set_setting('source_sort_order', '|'.join(sso))
         kodi.notify(msg=i18n('auto_conf_complete'))
     
