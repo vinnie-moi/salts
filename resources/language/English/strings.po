@@ -902,6 +902,10 @@ msgctxt "#30221"
 msgid "Filtering Out Unusable Sources"
 msgstr ""
 
+msgctxt "#30222"
+msgid "Include Links from Comments"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""

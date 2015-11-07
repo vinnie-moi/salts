@@ -446,7 +446,7 @@ class Scraper(object):
             if 'quality' in post_data:
                 post_title += '- [%s]' % (post_data['quality'])
 
-            if filter_days:
+            if filter_days and date_format and 'date' in post_data:
                 try: post_date = datetime.datetime.strptime(post_data['date'], date_format).date()
                 except TypeError: post_date = datetime.datetime(*(time.strptime(post_data['date'], date_format)[0:6])).date()
                 if today - post_date > filter_days:
