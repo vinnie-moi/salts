@@ -249,6 +249,13 @@ class Trakt_API():
         params = {'extended': 'full,images'} if full else None
         return self.__call_trakt(url, params=params, cached=cached)
 
+    def get_history(self, section, full=False, page=None, cached=True):
+        url = '/users/me/history/%s' % (TRAKT_SECTIONS[section])
+        params = {'limit': self.list_size}
+        if full: params.update({'extended': 'full,images'})
+        if page: params['page'] = page
+        return self.__call_trakt(url, params=params, cache_limit=.25, cached=cached)
+
     def get_show_progress(self, show_id, full=False, hidden=False, specials=False, cached=True):
         url = '/shows/%s/progress/watched' % (show_id)
         params = {}

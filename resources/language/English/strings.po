@@ -906,6 +906,10 @@ msgctxt "#30222"
 msgid "Include Links from Comments"
 msgstr ""
 
+msgctxt "#30223"
+msgid "My Watched History"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
@@ -1545,5 +1549,9 @@ msgstr ""
 
 msgctxt "#30655"
 msgid "Debrid"
+msgstr ""
+
+msgctxt "#30656"
+msgid "Show My Watched History"
 msgstr ""
 

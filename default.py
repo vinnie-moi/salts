@@ -229,6 +229,7 @@ def browse_menu(section):
         if utils.menu_on('on_deck'): kodi.create_item({'mode': MODES.SHOW_BOOKMARKS, 'section': section}, i18n('trakt_on_deck'), thumb=utils.art('on_deck.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('recommended'): kodi.create_item({'mode': MODES.RECOMMEND, 'section': section}, i18n('recommended') % (section_label), thumb=utils.art('recommended.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('collection'): add_refresh_item({'mode': MODES.SHOW_COLLECTION, 'section': section}, i18n('my_collection') % (section_label2), utils.art('collection.png'), utils.art('fanart.jpg'))
+        if utils.menu_on('history'): kodi.create_item({'mode': MODES.SHOW_HISTORY, 'section': section}, i18n('watched_history'), thumb=utils.art('on_deck.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('favorites'): kodi.create_item({'mode': MODES.SHOW_FAVORITES, 'section': section}, i18n('my_favorites'), thumb=utils.art('my_favorites.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('subscriptions'): kodi.create_item({'mode': MODES.MANAGE_SUBS, 'section': section}, i18n('my_subscriptions'), thumb=utils.art('my_subscriptions.png'), fanart=utils.art('fanart.jpg'))
         if utils.menu_on('watchlist'): kodi.create_item({'mode': MODES.SHOW_WATCHLIST, 'section': section}, i18n('my_watchlist'), thumb=utils.art('my_watchlist.png'), fanart=utils.art('fanart.jpg'))
@@ -448,6 +449,36 @@ def browse_recent(section, page=1):
 def browse_recommendations(section):
     list_data = trakt_api.get_recommendations(section)
     make_dir_from_list(section, list_data)
+
+@url_dispatcher.register(MODES.SHOW_HISTORY, ['section'], ['page'])
+def show_history(section, page=1):
+    section_params = utils.get_section_params(section)
+    folder = kodi.get_setting('source-win') == 'Directory' and kodi.get_setting('auto-play') == 'false'
+    cached_watched = kodi.get_setting('cache_watched') == 'true'
+    history = trakt_api.get_history(section, full=True, page=page, cached=cached_watched)
+    totalItems = len(history)
+    for item in history:
+        if section == SECTIONS.MOVIES:
+            liz, liz_url = make_item(section_params, item['movie'])
+        else:
+            liz, liz_url = make_episode_item(item['show'], item['episode'])
+            label = liz.getLabel()
+            label = '%s - %s' % (item['show']['title'], label.decode('utf-8', 'replace'))
+            liz.setLabel(label)
+            
+        label = liz.getLabel()
+        watched_at = time.strftime('%Y-%m-%d', time.localtime(utils.iso_2_utc(item['watched_at'])))
+        header = '[COLOR blue]%s[/COLOR] %s [COLOR deeppink]%s[/COLOR]' % (item['action'], i18n('on'), watched_at)
+        label = '[%s] %s' % (header, label.decode('utf-8', 'ignore'))
+        liz.setLabel(label)
+        
+        xbmcplugin.addDirectoryItem(int(sys.argv[1]), liz_url, liz, isFolder=folder, totalItems=totalItems)
+    if page and totalItems >= int(kodi.get_setting('list_size')):
+        query = {'mode': MODES.SHOW_HISTORY, 'section': section, 'page': int(page) + 1}
+        label = '%s >>' % (i18n('next_page'))
+        kodi.create_item(query, label, thumb=utils.art('nextpage.png'), fanart=utils.art('fanart.jpg'), is_folder=True)
+
+    kodi.end_of_directory()
 
 @url_dispatcher.register(MODES.MY_CAL, ['mode'], ['start_date'])
 @url_dispatcher.register(MODES.CAL, ['mode'], ['start_date'])

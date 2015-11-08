@@ -30,6 +30,7 @@
         <setting id="show_collection" type="bool" label="30528" default="true"/>
         <setting id="show_favorites" type="bool" label="30529" default="true"/>
         <setting id="show_subscriptions" type="bool" label="30530" default="true"/>
+        <setting id="show_history" type="bool" label="30656" default="true"/>
         <setting id="show_watchlist" type="bool" label="30531" default="true"/>
         <setting id="show_my_lists" type="bool" label="30532" default="true"/>
         <setting id="show_liked_lists" type="bool" label="30640" default="true"/>
