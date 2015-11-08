@@ -35,6 +35,7 @@ SEASON_URL = '/posts/dizigonder.php?action=sezongets'
 VK_URL = '/vkjson.php?oid=%s&video_id=%s&embed_hash=%s'
 OK_URL = '/okrujson.php?v=%s'
 OK_META_URL = 'http://ok.ru/dk?cmd=videoPlayerMetadata&mid=%s'
+OK_REFERER = 'http://st.mycdn.me/static/MegaPlayer/10-2-20/vp11.swf'
 OK_QUALITIES = {'MOBILE': QUALITIES.LOW, 'LOWEST': QUALITIES.MEDIUM, 'LOW': QUALITIES.MEDIUM, 'SD': QUALITIES.HIGH, 'HD': QUALITIES.HD720}
 
 class Dizist_Scraper(scraper.Scraper):
@@ -88,7 +89,7 @@ class Dizist_Scraper(scraper.Scraper):
                 if match:
                     source_url = OK_URL % (match.group(1))
                     source_url = urlparse.urljoin(self.base_url, source_url)
-                    html = self._http_get(source_url, headers=XHR, cache_limit=.5)
+                    html = self._http_get(source_url, headers=XHR, cache_limit=0)
                     sources = self.__parse_format(html)
             elif 'ok.ru/videoembed/' in iframe_url:
                 sources = self.__get_ok_links(iframe_url)
@@ -102,7 +103,7 @@ class Dizist_Scraper(scraper.Scraper):
                     sources = self.__parse_format2(html)
         
         for source in sources:
-            stream_url = source + '|User-Agent=%s' % (USER_AGENT)
+            stream_url = source + '|User-Agent=%s&Referer=%s' % (USER_AGENT, OK_REFERER)
             hoster = {'multi-part': False, 'host': self._get_direct_hostname(source), 'class': self, 'quality': sources[source], 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
             hosters.append(hoster)
         return hosters
@@ -114,7 +115,7 @@ class Dizist_Scraper(scraper.Scraper):
             meta_url = OK_META_URL % (match.group(1))
             headers = XHR
             headers['Referer'] = embed_url
-            html = self._http_get(meta_url, headers=headers, cache_limit=.5)
+            html = self._http_get(meta_url, headers=headers, cache_limit=0)
             if html:
                 try:
                     js_result = json.loads(html)
@@ -124,6 +125,7 @@ class Dizist_Scraper(scraper.Scraper):
                     if 'videos' in js_result:
                         for video in js_result['videos']:
                             quality = OK_QUALITIES.get(video['name'].upper(), QUALITIES.HIGH)
+                            print video['url']
                             sources[video['url']] = quality
         return sources
 
