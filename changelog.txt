@@ -1,3 +1,10 @@
+[B]Version 1.0.72[/B]
+- Fix vidics scraper
+- Add ddlvaley scraper
+- Add rlsbb scraper
+- Add Watch History menu item
+- Improvements to Local, Dizist, and Dizibox scrapers
+
 [B]Version 1.0.71[/B]
 - Improve watchseries scraper
 - Show indicator on debrid sources
