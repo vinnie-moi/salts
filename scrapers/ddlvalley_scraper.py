@@ -89,7 +89,7 @@ class DDLValley_Scraper(scraper.Scraper):
         
         page_url = [show_url]
         too_old = False
-        while page_url:
+        while page_url and not too_old:
             url = urlparse.urljoin(self.base_url, page_url[0])
             html = self._http_get(url, cache_limit=1)
             headings = re.findall('<h2>\s*<a\s+href="([^"]+)[^>]+>(.*?)</a>', html)
@@ -109,7 +109,6 @@ class DDLValley_Scraper(scraper.Scraper):
                             if match and norm_title == self._normalize_title(match.group(1)):
                                 return self._pathify_url(url)
                 
-            if too_old: break
             page_url = dom_parser.parse_dom(html, 'a', {'class': 'nextpostslink'}, ret='href')
     
     def search(self, video_type, title, year):
