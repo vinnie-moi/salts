@@ -27,12 +27,15 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import USER_AGENT
 from salts_lib.constants import XHR
+from salts_lib.constants import QUALITIES
 from salts_lib import kodi
 
 BASE_URL = 'http://dizist.net'
 SEASON_URL = '/posts/dizigonder.php?action=sezongets'
 VK_URL = '/vkjson.php?oid=%s&video_id=%s&embed_hash=%s'
 OK_URL = '/okrujson.php?v=%s'
+OK_META_URL = 'http://ok.ru/dk?cmd=videoPlayerMetadata&mid=%s'
+OK_QUALITIES = {'MOBILE': QUALITIES.LOW, 'LOWEST': QUALITIES.MEDIUM, 'LOW': QUALITIES.MEDIUM, 'SD': QUALITIES.HIGH, 'HD': QUALITIES.HD720}
 
 class Dizist_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -78,7 +81,7 @@ class Dizist_Scraper(scraper.Scraper):
     def __get_links(self, url):
         sources = {}
         hosters = []
-        html = self._http_get(url, cache_limit=.5)
+        html = self._http_get(url, cache_limit=0)
         for iframe_url in dom_parser.parse_dom(html, 'iframe', ret='src'):
             if 'okru' in iframe_url:
                 match = re.search("v=([^&]+)", iframe_url)
@@ -87,6 +90,8 @@ class Dizist_Scraper(scraper.Scraper):
                     source_url = urlparse.urljoin(self.base_url, source_url)
                     html = self._http_get(source_url, headers=XHR, cache_limit=.5)
                     sources = self.__parse_format(html)
+            elif 'ok.ru/videoembed/' in iframe_url:
+                sources = self.__get_ok_links(iframe_url)
             elif 'video_ext' in iframe_url:
                 match = re.search('video_ext\.php\?oid=([^&]+)&id=([^&]+)&hash=([^&]+)', iframe_url)
                 if match:
@@ -97,11 +102,31 @@ class Dizist_Scraper(scraper.Scraper):
                     sources = self.__parse_format2(html)
         
         for source in sources:
-            stream_url = source + '|User-Agent=%s&Referer=%s' % (USER_AGENT, urllib.quote(url))
+            stream_url = source + '|User-Agent=%s' % (USER_AGENT)
             hoster = {'multi-part': False, 'host': self._get_direct_hostname(source), 'class': self, 'quality': sources[source], 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
             hosters.append(hoster)
         return hosters
     
+    def __get_ok_links(self, embed_url):
+        sources = {}
+        match = re.search('videoembed/(.*)', embed_url)
+        if match:
+            meta_url = OK_META_URL % (match.group(1))
+            headers = XHR
+            headers['Referer'] = embed_url
+            html = self._http_get(meta_url, headers=headers, cache_limit=.5)
+            if html:
+                try:
+                    js_result = json.loads(html)
+                except ValueError:
+                    log_utils.log('Invalid JSON returned: %s: %s' % (meta_url, html), log_utils.LOGWARNING)
+                else:
+                    if 'videos' in js_result:
+                        for video in js_result['videos']:
+                            quality = OK_QUALITIES.get(video['name'].upper(), QUALITIES.HIGH)
+                            sources[video['url']] = quality
+        return sources
+
     def __parse_format(self, html):
         sources = {}
         if html:
