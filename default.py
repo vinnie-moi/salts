@@ -1316,12 +1316,13 @@ def pick_source_dialog(hosters):
     index = dialog.select(i18n('choose_stream'), [item['label'] for item in hosters if 'label' in item])
     if index > -1:
         try:
-            if hosters[index]['url']:
-                hoster_url = hosters[index]['class'].resolve_link(hosters[index]['url'])
-                log_utils.log('Attempting to play url: %s as direct: %s from: %s' % (hoster_url, hosters[index]['direct'], hosters[index]['class'].get_name()))
+            hoster = hosters[index]
+            if hoster['url']:
+                hoster_url = hoster['class'].resolve_link(hoster['url'])
+                log_utils.log('Attempting to play url: %s as direct: %s from: %s' % (hoster_url, hoster['direct'], hoster['class'].get_name()))
                 return hoster_url, hosters[index]['direct']
         except Exception as e:
-            log_utils.log('Error (%s) while trying to resolve %s' % (str(e), hosters[index]['url']), xbmc.LOGERROR)
+            log_utils.log('Error (%s) while trying to resolve %s' % (str(e), hoster['url']), xbmc.LOGERROR)
 
     return None, None
 
