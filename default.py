@@ -459,16 +459,23 @@ def show_history(section, page=1):
     totalItems = len(history)
     for item in history:
         if section == SECTIONS.MOVIES:
+            item['movie']['watched'] = True
             liz, liz_url = make_item(section_params, item['movie'])
         else:
-            liz, liz_url = make_episode_item(item['show'], item['episode'])
+            show = item['show']
+            fanart = show['images']['fanart']['full']
+            item['episode']['watched'] = True
+            menu_items = []
+            queries = {'mode': MODES.SEASONS, 'trakt_id': show['ids']['trakt'], 'fanart': fanart}
+            menu_items.append((i18n('browse_seasons'), 'Container.Update(%s)' % (kodi.get_plugin_url(queries))),)
+            liz, liz_url = make_episode_item(show, item['episode'], menu_items=menu_items)
             label = liz.getLabel()
-            label = '%s - %s' % (item['show']['title'], label.decode('utf-8', 'replace'))
+            label = '%s - %s' % (show['title'], label.decode('utf-8', 'replace'))
             liz.setLabel(label)
             
         label = liz.getLabel()
         watched_at = time.strftime('%Y-%m-%d', time.localtime(utils.iso_2_utc(item['watched_at'])))
-        header = '[COLOR blue]%s[/COLOR] %s [COLOR deeppink]%s[/COLOR]' % (item['action'], i18n('on'), watched_at)
+        header = '[COLOR deeppink]%s[/COLOR]' % (watched_at)
         label = '[%s] %s' % (header, label.decode('utf-8', 'ignore'))
         liz.setLabel(label)
         
