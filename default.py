@@ -1318,7 +1318,7 @@ def pick_source_dialog(hosters):
         try:
             if hosters[index]['url']:
                 hoster_url = hosters[index]['class'].resolve_link(hosters[index]['url'])
-                log_utils.log('Attempting to play url: %s as direct: %s' % (hoster_url, hosters[index]['direct']))
+                log_utils.log('Attempting to play url: %s as direct: %s from: %s' % (hoster_url, hosters[index]['direct'], hosters[index]['class'].get_name()))
                 return hoster_url, hosters[index]['direct']
         except Exception as e:
             log_utils.log('Error (%s) while trying to resolve %s' % (str(e), hosters[index]['url']), xbmc.LOGERROR)
