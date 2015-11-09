@@ -1,3 +1,9 @@
+[B]Version 1.0.73[/B]
+- Improve DDLValley scraper
+- Fix menu items in Watched History
+- Add Auto-Play progress dialog is custom dialogs are on
+- Remove non-working scrapers
+
 [B]Version 1.0.72[/B]
 - Fix vidics scraper
 - Add ddlvaley scraper
