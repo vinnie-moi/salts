@@ -1238,7 +1238,6 @@ def play_source(mode, hoster_url, direct, video_type, trakt_id, dialog, season='
         show_meta = {}
         if video_type == VIDEO_TYPES.EPISODE:
             path = kodi.get_setting('tv-download-folder')
-            # TODO: Find better filename if trakt metadata calls fail
             file_name = utils.filename_from_title(trakt_id, VIDEO_TYPES.TVSHOW)
             file_name = file_name % ('%02d' % int(season), '%02d' % int(episode))
 
@@ -1257,7 +1256,6 @@ def play_source(mode, hoster_url, direct, video_type, trakt_id, dialog, season='
             file_name = file_name % ('%02d' % int(season), '%02d' % int(episode))
         else:
             path = kodi.get_setting('movie-download-folder')
-            # TODO: Find better filename if trakt metadata calls fail
             file_name = utils.filename_from_title(trakt_id, video_type)
 
             movie_meta = trakt_api.get_movie_details(trakt_id)
