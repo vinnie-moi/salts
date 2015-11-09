@@ -910,6 +910,18 @@ msgctxt "#30223"
 msgid "My Watched History"
 msgstr ""
 
+msgctxt "#30224"
+msgid "Trying Sources for Auto-Play"
+msgstr ""
+
+msgctxt "#30225"
+msgid "Trying: [%s] %s from %s"
+msgstr ""
+
+msgctxt "#30226"
+msgid "Failed: [%s] %s from %s"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""

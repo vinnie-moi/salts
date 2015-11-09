@@ -1008,7 +1008,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
             scrapers = utils.relevant_scrapers(video_type)
             total = len(scrapers)
             for cls in scrapers:
-                if xbmc.abortRequested or pd.is_canceled(): return False
+                if pd.is_canceled(): return False
                 scraper = cls(max_timeout)
                 worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
                 utils.increment_setting('%s_try' % (cls.get_name()))
@@ -1025,7 +1025,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 try:
                     log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
                     result = q.get(True, timeout)
-                    if xbmc.abortRequested or pd.is_canceled(): return False
+                    if pd.is_canceled(): return False
                     log_utils.log('Got %s Source Results' % (len(result['hosters'])), xbmc.LOGDEBUG)
                     worker_count -= 1
                     progress = ((total - worker_count) * 50 / total) + 50
@@ -1067,7 +1067,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 
             hosters = utils.filter_exclusions(hosters)
             hosters = utils.filter_quality(video_type, hosters)
-            if xbmc.abortRequested or pd.is_canceled(): return False
+            if pd.is_canceled(): return False
 
             hosters = apply_urlresolver(hosters)
 
@@ -1076,6 +1076,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                     hosters = utils.filter_unknown_hosters(hosters)
                 SORT_KEYS['source'] = utils.make_source_sort_key()
                 hosters.sort(key=utils.get_sort_key)
+            if pd.is_canceled(): return False
     
         if not hosters:
             log_utils.log('No Usable Sources found for: |%s|' % (video))
@@ -1293,18 +1294,28 @@ def play_source(mode, hoster_url, direct, video_type, trakt_id, dialog, season='
     return True
 
 def auto_play_sources(hosters, video_type, trakt_id, dialog, season, episode):
-    for item in hosters:
-        if item['multi-part']:
-            continue
-
-        hoster_url = item['class'].resolve_link(item['url'])
-        log_utils.log('Auto Playing: %s' % (hoster_url), xbmc.LOGDEBUG)
-        if play_source(MODES.GET_SOURCES, hoster_url, item['direct'], video_type, trakt_id, dialog, season, episode):
-            return True
-    else:
-        msg = i18n('all_sources_failed')
-        log_utils.log(msg, xbmc.LOGERROR)
-        kodi.notify(msg=msg, duration=5000)
+    active = kodi.get_setting('show_pd') == 'true' or not dialog
+    total_hosters = len(hosters)
+    with gui_utils.ProgressDialog(i18n('trying_autoplay'), line1=' ', line2=' ', active=active) as pd:
+        prev = ''
+        for i, item in enumerate(hosters):
+            if item['multi-part']:
+                continue
+    
+            percent = i * 100 / total_hosters
+            current = i18n('trying_source') % (item['quality'], item['host'], item['class'].get_name())
+            pd.update(percent, current, prev)
+            if pd.is_canceled(): return False
+            hoster_url = item['class'].resolve_link(item['url'])
+            log_utils.log('Auto Playing: %s' % (hoster_url), xbmc.LOGDEBUG)
+            if play_source(MODES.GET_SOURCES, hoster_url, item['direct'], video_type, trakt_id, dialog, season, episode):
+                return True
+            if pd.is_canceled(): return False
+            prev = i18n('failed_source') % (item['quality'], item['host'], item['class'].get_name())
+        else:
+            msg = i18n('all_sources_failed')
+            log_utils.log(msg, xbmc.LOGERROR)
+            kodi.notify(msg=msg, duration=5000)
 
 def pick_source_dialog(hosters):
     for item in hosters:
