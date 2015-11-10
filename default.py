@@ -207,7 +207,7 @@ def auto_conf():
         kodi.set_setting('sort6_field', '4')
         tiers = ['Local', 'EasyNews', 'DirectDownload.tv', 'NoobRoom',
                  ['alluc.com', 'OneClickTVShows', '123Movies', 'niter.tv', 'ororo.tv', 'movietv.to'],
-                 ['tunemovie', 'afdah.org', 'xmovies8', 'beinmovie', 'torba.se', 'IzlemeyeDeger', 'Rainierland', 'zumvo.com', 'mvsnap'],
+                 ['tunemovie', 'afdah.org', 'xmovies8', 'beinmovie', 'torba.se', 'IzlemeyeDeger', 'Rainierland', 'zumvo.com'],
                  ['SezonLukDizi', 'Dizimag', 'Dizilab', 'Dizigold', 'Shush.se', 'MovieFarsi'],
                  ['DDLValley', 'ReleaseBB', 'MyVideoLinks.eu', 'OneClickWatch', 'RLSSource.net', 'TVRelease.Net'],
                  ['IceFilms', 'PrimeWire', 'Flixanity', 'wso.ch', 'WatchSeries', 'UFlix.org', 'Putlocker'],
@@ -216,7 +216,7 @@ def auto_conf():
                  ['OnlineMoviesIs', 'OnlineMoviesPro', 'movie25', 'viooz.ac', 'view47', 'MoviesHD', 'wmo.ch', 'ayyex'],
                  ['stream-tv.co', 'clickplay.to', 'MintMovies', 'MovieNight', 'cmz', 'ch131', 'filmikz.ch'],
                  ['MovieTube', 'LosMovies', 'FilmStreaming.in', 'moviestorm.eu', 'MerDB'],
-                 'MoviesOnline7', 'yify.tv']
+                 'mvsnap', 'MoviesOnline7', 'yify.tv']
 
         sso = []
         random_sso = kodi.get_setting('random_sso') == 'true'
