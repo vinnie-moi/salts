@@ -113,6 +113,7 @@
         <setting id="auto-disable" type="enum" label="30586" lvalues="30511|30638|30639" default="1"/>
         <setting id="disable-freq" type="slider" label="30587" default="100" range="100,50,1000" option="int" enable="!eq(-1,0)"/>
         <setting id="disable-thresh" type="slider" label="30588" default="50" range="0,100" option="int" enable="!eq(-2,0)"/>
+        <setting id='random_sso' type="bool" visible="false" default="true"/>
     </category>
     
     <category label="30591">
