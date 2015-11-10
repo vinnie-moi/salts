@@ -58,7 +58,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
             url = urlparse.urljoin(base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             q_str = ''
-            match = re.search('<h1\s+class="[^"]*entry-title[^"]*[^>]*>([^<]+)', html)
+            match = re.search('<h2>([^<]+)', html)
             if match:
                 q_str = match.group(1)
                 
@@ -108,15 +108,16 @@ class YifyStreaming_Scraper(scraper.Scraper):
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
             
-        elements = dom_parser.parse_dom(html, 'article')
+        elements = dom_parser.parse_dom(html, 'li', {'class': '[^"]*post-\d+[^"]*'})
         results = []
         for element in elements:
             match = re.search('href="([^"]+)[^>]+>\s*([^<]+)', element, re.DOTALL)
             if match:
                 url, match_title_year = match.groups()
-                match = re.search('(.*?)(?:\s+\(?(\d{4})\)?)', match_title_year)
+                match = re.search('(.*?)(?:\s+\(?(\d{4})\)?)\s*(.*)', match_title_year)
                 if match:
-                    match_title, match_year = match.groups()
+                    match_title, match_year, extra_title = match.groups()
+                    match_title += ' [%s]' % (extra_title)
                 else:
                     match_title = match_title_year
                     match_year = ''
