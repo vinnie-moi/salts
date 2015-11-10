@@ -19,14 +19,19 @@ import scraper
 import urllib
 import urlparse
 import re
+import json
 import xml.etree.ElementTree as ET
 from salts_lib import log_utils
 from salts_lib import kodi
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
+from salts_lib.constants import QUALITIES
 
 BASE_URL = 'http://123movies.to'
+PLAYLIST_URL1 = 'movie/loadEmbed/%s'
+PLAYLIST_URL2 = 'movie/loadepisoderss/%s/%s/3/%s'
+Q_MAP = {'TS': QUALITIES.LOW, 'CAM': QUALITIES.LOW, 'HDTS': QUALITIES.LOW, 'HD-720P': QUALITIES.HD720}
 
 class One23Movies_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -56,22 +61,50 @@ class One23Movies_Scraper(scraper.Scraper):
         if source_url and source_url != FORCE_NO_MATCH:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
-            match = re.search('var\s+url_playlist\s*=\s*"([^"]+)', html)
-            if match:
-                playlist_url = match.group(1)
-                for match in re.finditer('changeServer\(\s*(\d+)\s*,', html):
-                    url = playlist_url + '/' + match.group(1)
+            sources = {}
+            for match in re.finditer('changeServer\(\s*(\d+)\s*,\s*(\d+)\s*\).*?class="btn-eps[^>]*>([^<]+)', html, re.DOTALL):
+                link_type, link_id, q_str = match.groups()
+                if link_type in ['12', '13', '14']:
+                    url = urlparse.urljoin(self.base_url, PLAYLIST_URL1 % (link_id))
+                    sources.update(self.__get_link_from_json(url, q_str))
+                else:
+                    url = urlparse.urljoin(self.base_url, self.__get_ep_pl_url(link_type, html))
                     xml = self._http_get(url, cache_limit=.5)
-                    sources = self.__get_links_from_xml(xml, video)
-                    for source in sources:
-                        hoster = {'multi-part': False, 'host': self._get_direct_hostname(source), 'class': self, 'quality': sources[source], 'views': None, 'rating': None, 'url': source, 'direct': True}
-                        hosters.append(hoster)
+                    sources.update(self.__get_links_from_xml(xml, video))
+                
+            for source in sources:
+                if sources[source]['direct']:
+                    host = self._get_direct_hostname(source)
+                else:
+                    host = urlparse.urlparse(source).hostname
+                hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': sources[source]['quality'], 'views': None, 'rating': None, 'url': source, 'direct': sources[source]['direct']}
+                hosters.append(hoster)
         return hosters
 
+    def __get_ep_pl_url(self, link_id, html):
+        movie_id = dom_parser.parse_dom(html, 'div', {'id': '123movies-player'}, 'movie-id')
+        player_token = dom_parser.parse_dom(html, 'div', {'id': '123movies-player'}, 'player-token')
+        if movie_id and player_token:
+            return PLAYLIST_URL2 % (movie_id[0], player_token[0], link_id)
+    
+    def __get_link_from_json(self, url, q_str):
+        sources = {}
+        html = self._http_get(url, cache_limit=.5)
+        if html:
+            try:
+                js_result = json.loads(html)
+            except ValueError:
+                log_utils.log('Invalid JSON returned: %s: %s' % (html), log_utils.LOGWARNING)
+            else:
+                if 'embed_url' in js_result:
+                    quality = Q_MAP.get(q_str.upper(), QUALITIES.HIGH)
+                    sources[js_result['embed_url']] = {'quality': quality, 'direct': False}
+        return sources
+    
     def __get_links_from_xml(self, xml, video):
+        sources = {}
         root = ET.fromstring(xml)
         ns = {'jwplayer': 'http://rss.jwpcdn.com/'}
-        sources = {}
         for item in root.findall('.//item'):
             title = item.find('title').text
             for source in item.findall('jwplayer:source', ns):
@@ -83,7 +116,7 @@ class One23Movies_Scraper(scraper.Scraper):
                     quality = self._height_get_quality(label)
                 else:
                     quality = self._blog_get_quality(video, title, '')
-                sources[stream_url] = quality
+                sources[stream_url] = {'quality': quality, 'direct': True}
                 log_utils.log('Adding stream: %s Quality: %s' % (stream_url, quality), log_utils.LOGDEBUG)
         return sources
     
