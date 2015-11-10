@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     SALTS XBMC Addon
     Copyright (C) 2014 tknorris
@@ -72,13 +73,6 @@ class WSO_Scraper(scraper.Scraper):
     def get_url(self, video):
         return super(WSO_Scraper, self)._default_get_url(video)
 
-    @classmethod
-    def get_settings(cls):
-        settings = super(WSO_Scraper, cls).get_settings()
-        name = cls.get_name()
-        settings.append('         <setting id="%s-max_pages" type="slider" range="1,50" option="int" label="     %s" default="1" visible="eq(-6,true)"/>' % (name, i18n('max_pages')))
-        return settings
-
     def search(self, video_type, title, year):
         url = urlparse.urljoin(self.base_url, '/index')
         html = self._http_get(url, cache_limit=24)
@@ -97,19 +91,5 @@ class WSO_Scraper(scraper.Scraper):
         return results
 
     def _get_episode_url(self, show_url, video):
-        episode_pattern = '<h2>\s*<a\s+href="([^"]+)[^>]+title="[^"]+[Ss]%02d[Ee]%02d[ "]' % (int(video.season), int(video.episode))
-        title_pattern = ''
-        airdate_pattern = '<h2>\s*<a\s+href="([^"]+)[^>]+title="[^"]+{year} {p_month} {p_day}[ \)"]'
-
-        for page in xrange(1, self.max_pages + 1):
-            url = show_url
-            if page > 1: url += '%s/page/%s' % (show_url, page)
-            # if page is blank, don't continue getting pages
-            url = urlparse.urljoin(self.base_url, url)
-            html = self._http_get(url, cache_limit=2)
-            if not html:
-                return
-
-            ep_url = super(WSO_Scraper, self)._default_get_episode_url(url, video, episode_pattern, title_pattern, airdate_pattern)
-            if ep_url is not None:
-                return ep_url
+        episode_pattern = "href='([^']+)'>(?:[^<]*(?:[Ss]%02d[Ee]%02d |-\s*%s(?:[×xX]|&#215;)%s\s*-))" % (int(video.season), int(video.episode), video.season, video.episode)
+        return super(WSO_Scraper, self)._default_get_episode_url(show_url, video, episode_pattern)
