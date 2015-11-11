@@ -235,5 +235,6 @@ STRINGS = {
     'watched_history': 30223,
     'trying_autoplay': 30224,
     'trying_source': 30225,
-    'failed_source': 30226
+    'failed_source': 30226,
+    'scraper_timeout_list': 30227
 }

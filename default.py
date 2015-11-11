@@ -1066,7 +1066,12 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
             utils.record_counts(counts)
             workers = utils.reap_workers(workers)
             timeouts = len(fails)
-            timeout_msg = i18n('scraper_timeout') % (timeouts, len(workers)) if timeouts else ''
+            if timeouts > 5:
+                timeout_msg = i18n('scraper_timeout') % (timeouts, len(workers))
+            elif timeouts > 0:
+                timeout_msg = i18n('scraper_timeout_list') % (', '.join([name for name in fails]))
+            else:
+                timeout_msg = ''
             if not hosters:
                 log_utils.log('No Sources found for: |%s|' % (video))
                 msg = i18n('no_sources')
