@@ -19,11 +19,9 @@
 import scraper
 import re
 import urlparse
-import urllib
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
-from salts_lib.constants import USER_AGENT
 from salts_lib.constants import XHR
 from salts_lib import kodi
 
