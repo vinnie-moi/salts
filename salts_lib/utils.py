@@ -740,7 +740,8 @@ def do_disable_check():
     disable_limit = int(kodi.get_setting('disable-limit'))
     for cls in relevant_scrapers():
         setting = '%s_last_results' % (cls.get_name())
-        fails = int(kodi.get_setting(setting))
+        fails = kodi.get_setting(setting)
+        fails = int(fails) if fails else 0
         if fails >= disable_limit:
             if auto_disable == DISABLE_SETTINGS.ON:
                 kodi.set_setting('%s-enable' % (cls.get_name()), 'false')
