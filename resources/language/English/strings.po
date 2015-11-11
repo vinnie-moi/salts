@@ -926,6 +926,10 @@ msgctxt "#30227"
 msgid "Scraper Timeouts: [COLOR blue]%s[/COLOR]"
 msgstr ""
 
+msgctxt "#30228"
+msgid "Reset Failures"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""

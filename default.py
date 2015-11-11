@@ -363,7 +363,9 @@ def scraper_settings():
             toggle_label = i18n('enable_scraper')
         else:
             toggle_label = i18n('disable_scraper')
-        label = '%s. %s (%s Failures)' % (i + 1, label, kodi.get_setting('%s_last_results' % (cls.get_name())))
+        failures = kodi.get_setting('%s_last_results' % (cls.get_name()))
+        if failures == '-1': failures = 'N/A'
+        label = '%s. %s (Failures: %s)' % (i + 1, label, failures)
 
         menu_items = []
         if i > 0:
@@ -374,6 +376,8 @@ def scraper_settings():
             menu_items.append((i18n('move_down'), 'RunPlugin(%s)' % (kodi.get_plugin_url(queries))),)
         queries = {'mode': MODES.MOVE_TO, 'name': cls.get_name()}
         menu_items.append((i18n('move_to'), 'RunPlugin(%s)' % (kodi.get_plugin_url(queries))),)
+        queries = {'mode': MODES.RESET_FAILS, 'name': cls.get_name()}
+        menu_items.append((i18n('reset_fails'), 'RunPlugin(%s)' % (kodi.get_plugin_url(queries))),)
         queries = {'mode': MODES.TOGGLE_SCRAPER, 'name': cls.get_name()}
         menu_items.append((toggle_label, 'RunPlugin(%s)' % (kodi.get_plugin_url(queries))),)
 
@@ -381,6 +385,12 @@ def scraper_settings():
         kodi.create_item(queries, label, thumb=utils.art('scraper.png'), fanart=utils.art('fanart.jpg'), is_folder=False,
                          is_playable=False, menu_items=menu_items, replace_menu=True)
     kodi.end_of_directory()
+
+
+@url_dispatcher.register(MODES.RESET_FAILS, ['name'])
+def reset_fails(name):
+    kodi.set_setting('%s_last_results' % (name), '0')
+    xbmc.executebuiltin("XBMC.Container.Refresh")
 
 @url_dispatcher.register(MODES.MOVE_TO, ['name'])
 def move_to(name):

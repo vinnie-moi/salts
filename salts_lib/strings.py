@@ -236,5 +236,6 @@ STRINGS = {
     'trying_autoplay': 30224,
     'trying_source': 30225,
     'failed_source': 30226,
-    'scraper_timeout_list': 30227
+    'scraper_timeout_list': 30227,
+    'reset_fails': 30228
 }
