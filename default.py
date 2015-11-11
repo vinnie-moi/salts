@@ -1065,23 +1065,23 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 except Empty:
                     log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
                     break
-        
+
                 if max_results > 0 and len(hosters) >= max_results:
                     log_utils.log('Exceeded max results: %s/%s' % (max_results, len(hosters)))
                     break
-        
+
             else:
                 log_utils.log('All source results received')
     
             utils.record_counts(counts)
-            workers = utils.reap_workers(workers)
             timeouts = len(fails)
-            if timeouts > 5:
+            if timeouts > 4:
                 timeout_msg = i18n('scraper_timeout') % (timeouts, len(workers))
             elif timeouts > 0:
-                timeout_msg = i18n('scraper_timeout_list') % (', '.join([name for name in fails]))
+                timeout_msg = i18n('scraper_timeout_list') % ('/'.join([name for name in fails]))
             else:
                 timeout_msg = ''
+            workers = utils.reap_workers(workers)
             if not hosters:
                 log_utils.log('No Sources found for: |%s|' % (video))
                 msg = i18n('no_sources')
@@ -1090,7 +1090,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 return False
     
             if timeout_msg:
-                kodi.notify(msg=timeout_msg, duration=5000)
+                kodi.notify(msg=timeout_msg, duration=7500)
             
             pd.update(100, line2='Filtering Out Unusable Sources')
                 
