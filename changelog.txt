@@ -1,3 +1,12 @@
+[B]Version 1.0.74[/B]
+- Fix yify-streaming scraper
+- Fix 123movies scraper
+- Fix wso scraper
+- Fix ocw scraper
+- Semi-randomize auto-configure scraper sort order
+- Replace old disable check with simpler version
+- Show scraper name on get sources when <=5 scraper timeouts
+
 [B]Version 1.0.73[/B]
 - Improve DDLValley scraper
 - Fix menu items in Watched History
