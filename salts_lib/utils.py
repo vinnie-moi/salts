@@ -726,46 +726,37 @@ def get_force_title_list():
     filter_list = filter_str.split('|') if filter_str else []
     return filter_list
 
-def calculate_success(name):
-    tries = kodi.get_setting('%s_try' % (name))
-    fail = kodi.get_setting('%s_fail' % (name))
-    tries = int(tries) if tries else 0
-    fail = int(fail) if fail else 0
-    rate = int(round((fail * 100.0) / tries)) if tries > 0 else 0
-    rate = 100 - rate
-    return rate
-
-def record_timeouts(fails):
-    for key in fails:
-        if fails[key] == True:
-            log_utils.log('Recording Timeout of %s' % (key), log_utils.LOGWARNING)
-            increment_setting('%s_fail' % key)
+def record_counts(counts):
+    for name in counts:
+        setting = '%s_last_results' % (name)
+        if counts[name]:
+            kodi.set_setting(setting, '0')
+        else:
+            if int(kodi.get_setting(setting)) > -1:
+                increment_setting(setting)
 
 def do_disable_check():
-    scrapers = relevant_scrapers()
     auto_disable = kodi.get_setting('auto-disable')
-    check_freq = int(kodi.get_setting('disable-freq'))
-    disable_thresh = int(kodi.get_setting('disable-thresh'))
-    for cls in scrapers:
-        last_check = db_connection.get_setting('%s_check' % (cls.get_name()))
-        last_check = int(last_check) if last_check else 0
-        tries = kodi.get_setting('%s_try' % (cls.get_name()))
-        tries = int(tries) if tries else 0
-        if tries > 0 and tries / check_freq > last_check / check_freq:
-            kodi.set_setting('%s_check' % (cls.get_name()), str(tries))
-            success_rate = calculate_success(cls.get_name())
-            if success_rate < disable_thresh:
-                if auto_disable == DISABLE_SETTINGS.ON:
+    disable_limit = int(kodi.get_setting('disable-limit'))
+    for cls in relevant_scrapers():
+        setting = '%s_last_results' % (cls.get_name())
+        fails = int(kodi.get_setting(setting))
+        if fails >= disable_limit:
+            if auto_disable == DISABLE_SETTINGS.ON:
+                kodi.set_setting('%s-enable' % (cls.get_name()), 'false')
+                kodi.notify(msg='[COLOR blue]%s[/COLOR] %s' % (cls.get_name(), i18n('scraper_disabled')), duration=5000)
+                kodi.set_setting(setting, '0')
+            elif auto_disable == DISABLE_SETTINGS.PROMPT:
+                dialog = xbmcgui.Dialog()
+                line1 = i18n('disable_line1') % (cls.get_name(), fails)
+                line2 = i18n('disable_line2')
+                line3 = i18n('disable_line3')
+                ret = dialog.yesno('SALTS', line1, line2, line3, i18n('keep_enabled'), i18n('disable_it'))
+                if ret:
                     kodi.set_setting('%s-enable' % (cls.get_name()), 'false')
-                    kodi.notify(msg='[COLOR blue]%s[/COLOR] %s' % (cls.get_name(), i18n('scraper_disabled')), duration=5000)
-                elif auto_disable == DISABLE_SETTINGS.PROMPT:
-                    dialog = xbmcgui.Dialog()
-                    line1 = i18n('disable_line1') % (cls.get_name(), 100 - success_rate, tries)
-                    line2 = i18n('disable_line2')
-                    line3 = i18n('disable_line3')
-                    ret = dialog.yesno('SALTS', line1, line2, line3, i18n('keep_enabled'), i18n('disable_it'))
-                    if ret:
-                        kodi.set_setting('%s-enable' % (cls.get_name()), 'false')
+                    kodi.set_setting(setting, '0')
+                else:
+                    kodi.set_setting(setting, '-1')
 
 def menu_on(menu):
     return kodi.get_setting('show_%s' % (menu)) == 'true'

@@ -193,9 +193,8 @@ class Scraper(object):
             '         <setting id="%s-enable" type="bool" label="%s %s" default="true" visible="true"/>' % (name, name, i18n('enabled')),
             '         <setting id="%s-base_url" type="text" label="    %s" default="%s" visible="eq(-1,true)"/>' % (name, i18n('base_url'), cls.base_url),
             '         <setting id="%s-sub_check" type="bool" label="    %s" default="true" visible="eq(-2,true)"/>' % (name, i18n('page_existence')),
-            '         <setting id="%s_try" type="number" default="0" visible="false"/>' % (name),
-            '         <setting id="%s_fail" type="number" default="0" visible="false"/>' % (name),
-            '         <setting id="%s_check" type="number" default="0" visible="false"/>' % (name), ]
+            '         <setting id="%s_last_results" type="number" default="0" visible="false"/>' % (name),
+        ]
 
     @classmethod
     def _disable_sub_check(cls, settings):

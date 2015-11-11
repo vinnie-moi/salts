@@ -110,7 +110,7 @@ class Local_Scraper(scraper.Scraper):
     def get_settings(cls):
         settings = super(Local_Scraper, cls).get_settings()
         name = cls.get_name()
-        settings.append('         <setting id="%s-def-quality" type="enum" label="     Default Quality" values="None|Low|Medium|High|HD720|HD1080" default="0" visible="eq(-6,true)"/>' % (name))
+        settings.append('         <setting id="%s-def-quality" type="enum" label="     Default Quality" values="None|Low|Medium|High|HD720|HD1080" default="0" visible="eq(-4,true)"/>' % (name))
         return settings
 
     def search(self, video_type, title, year):

@@ -80,8 +80,8 @@ class Shush_Proxy(scraper.Scraper):
     def get_settings(cls):
         settings = super(Shush_Proxy, cls).get_settings()
         name = cls.get_name()
-        settings.append('         <setting id="%s-scraper_url" type="text" label="    %s" default="" visible="eq(-6,true)"/>' % (name, i18n('scraper_location')))
-        settings.append('         <setting id="%s-scraper_password" type="text" label="    %s" option="hidden" default="" visible="eq(-7,true)"/>' % (name, i18n('scraper_key')))
+        settings.append('         <setting id="%s-scraper_url" type="text" label="    %s" default="" visible="eq(-4,true)"/>' % (name, i18n('scraper_location')))
+        settings.append('         <setting id="%s-scraper_password" type="text" label="    %s" option="hidden" default="" visible="eq(-5,true)"/>' % (name, i18n('scraper_key')))
         return settings
     
     def __update_scraper_py(self):

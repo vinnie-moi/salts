@@ -363,7 +363,7 @@ def scraper_settings():
             toggle_label = i18n('enable_scraper')
         else:
             toggle_label = i18n('disable_scraper')
-        label = '%s. %s (Success: %s%%)' % (i + 1, label, utils.calculate_success(cls.get_name()))
+        label = '%s. %s (%s Failures)' % (i + 1, label, kodi.get_setting('%s_last_results' % (cls.get_name())))
 
         menu_items = []
         if i > 0:
@@ -1018,6 +1018,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
         q = Queue()
         begin = time.time()
         fails = {}
+        counts = {}
         video = ScraperVideo(video_type, title, year, trakt_id, season, episode, ep_title, ep_airdate)
         active = kodi.get_setting('show_pd') == 'true' or not dialog
         with gui_utils.ProgressDialog(i18n('getting_sources'), utils.make_progress_msg(video_type, title, year, season, episode), '', '', active=active) as pd:
@@ -1027,20 +1028,20 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 if pd.is_canceled(): return False
                 scraper = cls(max_timeout)
                 worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
-                utils.increment_setting('%s_try' % (cls.get_name()))
                 worker_count += 1
                 progress = worker_count * 50 / total
                 pd.update(progress, line2=i18n('requested_sources_from') % (cls.get_name()))
                 workers.append(worker)
                 fails[cls.get_name()] = True
+                counts[cls.get_name()] = 0
         
             # collect results from workers
             hosters = []
-            got_timeouts = False
             while worker_count > 0:
                 try:
                     log_utils.log('Calling get with timeout: %s' % (timeout), xbmc.LOGDEBUG)
                     result = q.get(True, timeout)
+                    counts[result['name']] = len(result['hosters'])
                     if pd.is_canceled(): return False
                     log_utils.log('Got %s Source Results' % (len(result['hosters'])), xbmc.LOGDEBUG)
                     worker_count -= 1
@@ -1053,8 +1054,6 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                         if timeout < 0: timeout = 0
                 except Empty:
                     log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
-                    utils.record_timeouts(fails)
-                    got_timeouts = True
                     break
         
                 if max_results > 0 and len(hosters) >= max_results:
@@ -1062,13 +1061,12 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                     break
         
             else:
-                got_timeouts = False
                 log_utils.log('All source results received')
     
-            total = len(workers)
-            timeouts = len(fails)
+            utils.record_counts(counts)
             workers = utils.reap_workers(workers)
-            timeout_msg = i18n('scraper_timeout') % (timeouts, total) if got_timeouts and timeouts else ''
+            timeouts = len(fails)
+            timeout_msg = i18n('scraper_timeout') % (timeouts, len(workers)) if timeouts else ''
             if not hosters:
                 log_utils.log('No Sources found for: |%s|' % (video))
                 msg = i18n('no_sources')
@@ -1394,7 +1392,6 @@ def set_related_url(mode, video_type, title, year, trakt_id, season='', episode=
         for cls in scrapers:
             scraper = cls(max_timeout)
             worker = utils.start_worker(q, utils.parallel_get_url, [scraper, video])
-            utils.increment_setting('%s_try' % (cls.get_name()))
             related_list.append({'class': scraper, 'url': '', 'name': cls.get_name(), 'label': '[%s]' % (cls.get_name())})
             worker_count += 1
             progress = worker_count * 50 / total
@@ -1422,14 +1419,12 @@ def set_related_url(mode, video_type, title, year, trakt_id, season='', episode=
                     if timeout < 0: timeout = 0
             except Empty:
                 log_utils.log('Get Url Timeout', xbmc.LOGWARNING)
-                utils.record_timeouts(fails)
                 break
         else:
             log_utils.log('All source results received')
 
-    total = len(workers)
     timeouts = len(fails)
-    timeout_msg = i18n('scraper_timeout') % (timeouts, total) if timeouts else ''
+    timeout_msg = i18n('scraper_timeout') % (timeouts, len(workers)) if timeouts else ''
     if timeout_msg:
         kodi.notify(msg=timeout_msg, duration=5000)
         for related in related_list:

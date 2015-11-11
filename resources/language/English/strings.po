@@ -607,15 +607,15 @@ msgid "Scraper Automatically Disabled"
 msgstr ""
 
 msgctxt "#30148"
-msgid "The [COLOR blue]%s[/COLOR] scraper timed out on [COLOR red]%s%%[/COLOR] of %s requests"
+msgid "[COLOR blue]%s[/COLOR] returned no results %s times in a row."
 msgstr ""
 
 msgctxt "#30149"
-msgid "Each timeout wastes system resources and time."
+msgid "This wastes system resources and time."
 msgstr ""
 
 msgctxt "#30150"
-msgid "([I]If you keep it enabled, consider increasing the scraper timeout.[/I])"
+msgid "([I]If you keep it enabled, consider increasing your scraper timeout.[/I])"
 msgstr ""
 
 msgctxt "#30151"
@@ -1276,7 +1276,7 @@ msgid "Match episode title when season & episode fails"
 msgstr ""
 
 msgctxt "#30586"
-msgid "Automatically disable slow scrapers"
+msgid "Automatically disable ineffective scrapers"
 msgstr ""
 
 #. Keep 4 spaces at the beginning of string 
@@ -1565,5 +1565,10 @@ msgstr ""
 
 msgctxt "#30656"
 msgid "Show My Watched History"
+msgstr ""
+
+#. Keep 4 spaces at the beginning of string 
+msgctxt "#30657"
+msgid "    Limit of Consecutive No Results"
 msgstr ""
 
