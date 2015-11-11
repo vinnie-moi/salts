@@ -213,8 +213,8 @@ def auto_conf():
                  ['IceFilms', 'PrimeWire', 'Flixanity', 'wso.ch', 'WatchSeries', 'UFlix.org', 'Putlocker'],
                  ['funtastic-vids', 'WatchFree.to', 'pftv', 'streamallthis.is', 'Movie4K', 'afdah', 'SolarMovie', 'yify-streaming'],
                  ['CouchTunerV2', 'CouchTunerV1', 'Watch8Now', 'yshows', '2movies', 'iWatchOnline', 'vidics.ch', 'pubfilm'],
-                 ['OnlineMoviesIs', 'OnlineMoviesPro', 'movie25', 'viooz.ac', 'view47', 'MoviesHD', 'wmo.ch', 'ayyex'],
-                 ['stream-tv.co', 'clickplay.to', 'MintMovies', 'MovieNight', 'cmz', 'ch131', 'filmikz.ch'],
+                 ['OnlineMoviesIs', 'OnlineMoviesPro', 'ViewMovies', 'movie25', 'viooz.ac', 'view47', 'MoviesHD', 'wmo.ch'],
+                 ['ayyex', 'stream-tv.co', 'clickplay.to', 'MintMovies', 'MovieNight', 'cmz', 'ch131', 'filmikz.ch'],
                  ['MovieTube', 'LosMovies', 'FilmStreaming.in', 'moviestorm.eu', 'MerDB'],
                  'mvsnap', 'MoviesOnline7', 'yify.tv']
 
