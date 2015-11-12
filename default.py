@@ -1064,6 +1064,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                         if timeout < 0: timeout = 0
                 except Empty:
                     log_utils.log('Get Sources Process Timeout', xbmc.LOGWARNING)
+                    log_utils.log('Scraper Timeouts: %s' % (', '.join([name for name in fails])), log_utils.LOGWARNING)
                     break
 
                 if max_results > 0 and len(hosters) >= max_results:
