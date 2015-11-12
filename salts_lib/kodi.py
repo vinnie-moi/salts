@@ -39,7 +39,8 @@ def get_profile():
     return addon.getAddonInfo('profile')
 
 def set_setting(id, value):
-    addon.setSetting(id, str(value))
+    if not isinstance(value, basestring): value = str(value)
+    addon.setSetting(id, value)
 
 def get_version():
     return addon.getAddonInfo('version')
