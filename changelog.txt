@@ -1,3 +1,8 @@
+[B]Version 1.0.75[/B]
+- Add diziay scraper
+- Add viewmovies scraper
+- Fix timeout notification
+
 [B]Version 1.0.74[/B]
 - Fix yify-streaming scraper
 - Fix 123movies scraper
