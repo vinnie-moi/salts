@@ -1094,12 +1094,13 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
             
             pd.update(100, line2='Filtering Out Unusable Sources')
                 
+            if pd.is_canceled(): return False
             hosters = utils.filter_exclusions(hosters)
             hosters = utils.filter_quality(video_type, hosters)
+
             if pd.is_canceled(): return False
-
             hosters = apply_urlresolver(hosters)
-
+            
             if kodi.get_setting('enable_sort') == 'true':
                 if kodi.get_setting('filter-unknown') == 'true':
                     hosters = utils.filter_unknown_hosters(hosters)
@@ -1126,6 +1127,11 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
         utils.reap_workers(workers, None)
 
 def apply_urlresolver(hosters):
+    filter_unusable = kodi.get_setting('filter_unusable') == 'true'
+    show_debrid = kodi.get_setting('show_debrid') == 'true'
+    if not filter_unusable and not show_debrid:
+        return hosters
+    
     import urlresolver.plugnplay
     resolvers = urlresolver.plugnplay.man.implementors(urlresolver.UrlResolver)
     debrid_resolvers = [resolver for resolver in resolvers if resolver.isUniversal()]
@@ -1133,11 +1139,6 @@ def apply_urlresolver(hosters):
     debrid_hosts = {}
     unk_hosts = {}
     known_hosts = {}
-    filter_unusable = kodi.get_setting('filter_unusable') == 'true'
-    show_debrid = kodi.get_setting('show_debrid') == 'true'
-    if not filter_unusable and not show_debrid:
-        return hosters
-    
     for hoster in hosters:
         if 'direct' in hoster and hoster['direct'] == False and hoster['host']:
             host = hoster['host']
