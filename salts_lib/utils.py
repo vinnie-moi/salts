@@ -726,14 +726,22 @@ def get_force_title_list():
     filter_list = filter_str.split('|') if filter_str else []
     return filter_list
 
-def record_counts(counts):
+def record_failures(fails, counts=None):
+    if counts is None: counts = {}
+
+    for name in fails:
+        setting = '%s_last_results' % (name)
+        # remove timeouts from counts so they aren't double counted
+        if name in counts: del counts[name]
+        if int(kodi.get_setting(setting)) > -1:
+            accumulate_setting(setting, 5)
+    
     for name in counts:
         setting = '%s_last_results' % (name)
         if counts[name]:
             kodi.set_setting(setting, '0')
-        else:
-            if int(kodi.get_setting(setting)) > -1:
-                increment_setting(setting)
+        elif int(kodi.get_setting(setting)) > -1:
+            accumulate_setting(setting)
 
 def do_disable_check():
     auto_disable = kodi.get_setting('auto-disable')
@@ -762,10 +770,10 @@ def do_disable_check():
 def menu_on(menu):
     return kodi.get_setting('show_%s' % (menu)) == 'true'
 
-def increment_setting(setting):
+def accumulate_setting(setting, addend=1):
     cur_value = kodi.get_setting(setting)
     cur_value = int(cur_value) if cur_value else 0
-    kodi.set_setting(setting, cur_value + 1)
+    kodi.set_setting(setting, cur_value + addend)
 
 def show_requires_source(trakt_id):
     show_str = kodi.get_setting('exists_list')

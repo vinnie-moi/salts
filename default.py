@@ -365,7 +365,7 @@ def scraper_settings():
             toggle_label = i18n('disable_scraper')
         failures = kodi.get_setting('%s_last_results' % (cls.get_name()))
         if failures == '-1': failures = 'N/A'
-        label = '%s. %s (Failures: %s)' % (i + 1, label, failures)
+        label = '%s. %s [FL: %s]' % (i + 1, label, failures)
 
         menu_items = []
         if i > 0:
@@ -1073,7 +1073,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
             else:
                 log_utils.log('All source results received')
     
-            utils.record_counts(counts)
+            utils.record_failures(fails, counts)
             timeouts = len(fails)
             if timeouts > 4:
                 timeout_msg = i18n('scraper_timeout') % (timeouts, len(workers))
@@ -1439,6 +1439,7 @@ def set_related_url(mode, video_type, title, year, trakt_id, season='', episode=
         else:
             log_utils.log('All source results received')
 
+    utils.record_failures(fails)
     timeouts = len(fails)
     timeout_msg = i18n('scraper_timeout') % (timeouts, len(workers)) if timeouts else ''
     if timeout_msg:

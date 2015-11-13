@@ -1577,6 +1577,6 @@ msgstr ""
 
 #. Keep 4 spaces at the beginning of string 
 msgctxt "#30657"
-msgid "    Limit of Consecutive No Results"
+msgid "    Consecutive Failure Level Limit"
 msgstr ""
 

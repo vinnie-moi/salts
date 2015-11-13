@@ -111,7 +111,7 @@
         <setting id="title-fallback" type="bool" label="30585" default="true"/>
         <setting id="last_check" type="number" default="0" visible="false"/>
         <setting id="auto-disable" type="enum" label="30586" lvalues="30511|30638|30639" default="1"/>
-        <setting id="disable-limit" type="slider" label="30657" default="50" range="25,25,250" option="int" enable="!eq(-1,0)"/>
+        <setting id="disable-limit" type="slider" label="30657" default="150" range="100,25,250" option="int" enable="!eq(-1,0)"/>
         <setting id='random_sso' type="bool" visible="false" default="true"/>
     </category>
     
