@@ -112,10 +112,10 @@ class MerDB_Scraper(scraper.Scraper):
         html = self._http_get(search_url, cache_limit=.25)
         results = []
         for element in dom_parser.parse_dom(html, 'div', {'class': 'list_box_title'}):
-            match = re.search('href="([^"]+)"\s+title="Watch ([^"]+)', element)
+            match = re.search('href="([^"]+)"\s+title="(?:Watch )?([^"]+)', element)
             if match:
                 url, match_title_year = match.groups()
-                match = re.search('(.*?)(?:\s+\(?(\d{4})\)?)', match_title_year)
+                match = re.search('(.*?)(?:\s+\(?\s*(\d{4})\s*\)?)', match_title_year)
                 if match:
                     match_title, match_year = match.groups()
                 else:
