@@ -205,7 +205,7 @@ def auto_conf():
         kodi.set_setting('sort4_field', '1')
         kodi.set_setting('sort5_field', '3')
         kodi.set_setting('sort6_field', '4')
-        tiers = ['Local', 'EasyNews', 'DirectDownload.tv', 'NoobRoom',
+        tiers = ['Local', 'Furk.net', 'EasyNews', 'DirectDownload.tv', 'NoobRoom',
                  ['alluc.com', 'OneClickTVShows', '123Movies', 'niter.tv', 'ororo.tv', 'movietv.to'],
                  ['tunemovie', 'afdah.org', 'xmovies8', 'beinmovie', 'torba.se', 'IzlemeyeDeger', 'Rainierland', 'zumvo.com'],
                  ['SezonLukDizi', 'Dizimag', 'Dizilab', 'Dizigold', 'Diziay', 'Shush.se', 'MovieFarsi'],
