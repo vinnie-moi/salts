@@ -930,6 +930,10 @@ msgctxt "#30228"
 msgid "Reset Failures"
 msgstr ""
 
+msgctxt "#30229"
+msgid "Maximum Source Results"
+msgstr ""
+
 msgctxt "#30500"
 msgid "Addon Theme"
 msgstr ""
