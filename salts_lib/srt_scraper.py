@@ -57,18 +57,19 @@ class SRT_Scraper():
         site_matches = []
         for item in regex.finditer(html):
             tvshow_id, site_title = item.groups()
-            site_year = None
 
             # strip year off title and assign it to year if it exists
             r = re.search('(\s*\((\d{4})\))$', site_title)
             if r:
                 site_title = site_title.replace(r.group(1), '')
                 site_year = r.group(2)
+            else:
+                site_year = None
 
             # print 'show: |%s|%s|%s|' % (tvshow_id, site_title, site_year)
             if match_title == site_title.lower():
                 if year is None or year == site_year:
-                    db_connection.set_tvshow_id(title, year, tvshow_id)
+                    db_connection.set_related_url(VIDEO_TYPES.TVSHOW, title, year, SRT_SOURCE, tvshow_id)
                     return tvshow_id
 
                 site_matches.append((tvshow_id, site_title, site_year))
