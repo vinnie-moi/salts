@@ -1584,3 +1584,7 @@ msgctxt "#30657"
 msgid "    Consecutive Failure Level Limit"
 msgstr ""
 
+msgctxt "#30658"
+msgid "Mute Notifications"
+msgstr ""
+
