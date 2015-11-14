@@ -79,6 +79,7 @@ class MiraDetodo_Scraper(scraper.Scraper):
             match = re.search('href="([^"]+).*?alt="([^"]+)', item)
             if match:
                 url, match_title_year = match.groups()
+                if re.search('\d+\s*x\s*\d+', match_title_year): continue  # exclude episodes
                 match = re.search('(.*?)\s+\((\d{4})\)', match_title_year)
                 if match:
                     match_title, match_year = match.groups()
