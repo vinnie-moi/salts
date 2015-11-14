@@ -48,7 +48,7 @@ class DirectDownload_Scraper(scraper.Scraper):
 
     @classmethod
     def get_name(cls):
-        return 'dd.tv'
+        return 'DD.tv'
 
     def resolve_link(self, link):
         return link
