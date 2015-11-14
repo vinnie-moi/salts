@@ -188,7 +188,6 @@ class Furk_Scraper(scraper.Scraper):
                         js_result = self._http_get(url, data=data, retry=False, cache_limit=0)
                     else:
                         log_utils.log('Error received from furk.net (%s)' % (js_result['error']), log_utils.LOGWARNING)
-                        js_result = {}
             
             return js_result
         
