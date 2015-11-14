@@ -1,3 +1,14 @@
+[B]Version 1.0.76[/B]
+- Fix unicode in username
+- Improve urlresolver filter
+- Change disable algorithm (timeout = 5, 0 results = 1)
+- Add furk.net scraper
+- Fix srt scraper
+- Add option to mute notifications
+- Add miradetodo scraper
+- Rename directdownload.tv to dd.tv
+- Fix iwatchonline scraper
+
 [B]Version 1.0.75[/B]
 - Add diziay scraper
 - Add viewmovies scraper
