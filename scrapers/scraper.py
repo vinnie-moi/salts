@@ -284,8 +284,12 @@ class Scraper(object):
                 log_utils.log('Response Cookies: %s - %s' % (url, self.cookies_as_str(self.cj)), log_utils.LOGDEBUG)
             self.__fix_bad_cookies()
             self.cj.save(ignore_discard=True)
-            if not allow_redirect and response.getcode() in [301, 302, 303, 307]:
-                return response.info().getheader('Location')
+            if not allow_redirect and (response.getcode() in [301, 302, 303, 307] or response.info().getheader('Refresh')):
+                if response.info().getheader('Refresh') is not None:
+                    refresh = response.info().getheader('Refresh')
+                    return refresh.split(';')[-1].split('url=')[-1]
+                else:
+                    return response.info().getheader('Location')
             
             content_length = response.info().getheader('Content-Length', 0)
             if int(content_length) > MAX_RESPONSE:

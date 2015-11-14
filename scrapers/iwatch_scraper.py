@@ -45,10 +45,13 @@ class IWatchOnline_Scraper(scraper.Scraper):
 
     def resolve_link(self, link):
         url = urlparse.urljoin(self.base_url, link)
-        html = self._http_get(url, cache_limit=.5)
-        match = re.search('<iframe name="frame" class="frame" src="([^"]+)', html)
-        if match:
-            return match.group(1)
+        html = self._http_get(url, allow_redirect=False, cache_limit=.5)
+        if html.startswith('http'):
+            return html
+        else:
+            match = re.search('<iframe name="frame" class="frame" src="([^"]+)', html)
+            if match:
+                return match.group(1)
 
     def format_source_label(self, item):
         label = '[%s] %s (%s/100)' % (item['quality'], item['host'], item['rating'])
