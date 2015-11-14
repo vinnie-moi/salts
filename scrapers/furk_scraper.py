@@ -28,7 +28,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://api.furk.net'
+BASE_URL = 'http://www.furk.net'
 SEARCH_URL = '/api/plugins/metasearch'
 LOGIN_URL = '/api/login/login'
 
