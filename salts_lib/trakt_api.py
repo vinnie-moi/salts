@@ -32,6 +32,9 @@ from constants import SECTIONS
 class TraktError(Exception):
     pass
 
+class TraktAuthError(Exception):
+    pass
+
 class TraktNotFoundError(Exception):
     pass
 
@@ -411,7 +414,7 @@ class Trakt_API():
                                 self.token = None
                                 kodi.set_setting('trakt_oauth_token', '')
                                 kodi.set_setting('trakt_refresh_token', '')
-                                raise TraktError('Trakt Call Authentication Failed (%s)' % (e.code))
+                                raise TraktAuthError('Trakt Call Authentication Failed (%s)' % (e.code))
                             else:
                                 result = self.get_token()
                                 self.token = result['access_token']

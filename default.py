@@ -31,7 +31,7 @@ from Queue import Queue, Empty
 from salts_lib.db_utils import DB_Connection
 from salts_lib.url_dispatcher import URL_Dispatcher
 from salts_lib.srt_scraper import SRT_Scraper
-from salts_lib.trakt_api import Trakt_API, TransientTraktError, TraktNotFoundError, TraktError
+from salts_lib.trakt_api import Trakt_API, TransientTraktError, TraktNotFoundError, TraktError, TraktAuthError
 from salts_lib import utils
 from salts_lib.trans_utils import i18n
 from salts_lib import log_utils
@@ -589,7 +589,7 @@ def add_other_list_item(mode, section, other_list, total_items=0):
         else:
             auth = False
         header = trakt_api.get_list_header(other_list[1], other_list[0], auth)
-    except TraktNotFoundError:
+    except (TraktNotFoundError, TraktAuthError):
         header = None
 
     if header:
