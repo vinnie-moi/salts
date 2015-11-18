@@ -34,7 +34,7 @@ MODES = __enum(
     DIRECT_DOWNLOAD='direct_download', POPULAR='popular', RECENT='recent', DELETE_RECENT='delete_recent', CLEAR_RECENT='clear_recent', GET_PIN='get_pin',
     AUTO_CONF='auto_config', CLEAR_SAVED='clear_saved', RESET_BASE_URL='reset_base_url', TOGGLE_TO_MENU='toggle_to_menu', LIKED_LISTS='liked_lists', MOSTS='mosts',
     PLAYED='played', WATCHED='watched', COLLECTED='collected', SHOW_BOOKMARKS='show_bookmarks', DELETE_BOOKMARK='delete_bookmark', SHOW_HISTORY='show_history',
-    RESET_FAILS='reset_failures')
+    RESET_FAILS='reset_failures', MANAGE_PROGRESS='toggle_progress')
 SECTIONS = __enum(TV='TV', MOVIES='Movies')
 VIDEO_TYPES = __enum(TVSHOW='TV Show', MOVIE='Movie', EPISODE='Episode', SEASON='Season')
 CONTENT_TYPES = __enum(TVSHOWS='tvshows', MOVIES='movies', SEASONS='seasons', EPISODES='episodes')
@@ -53,6 +53,7 @@ CHUNK_SIZE = 512 * 1024
 PROGRESS = __enum(OFF=0, WINDOW=1, BACKGROUND=2)
 FORCE_NO_MATCH = '***FORCE_NO_MATCH***'
 SHORT_MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+ACTIONS = __enum(ADD='add', REMOVE='remove')
 
 # sort keys need to be defined such that "best" have highest values
 # unknown (i.e. None) is always worst

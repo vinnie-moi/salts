@@ -136,6 +136,8 @@
         <setting id="sort6_order" type="enum" label="30654" lvalues="30610|30611" default="0"
                 visible="eq(-13,true) + !eq(-1,0) + !eq(-3,0) + !eq(-5,0) + !eq(-7,0) + !eq(-9,0) + !eq(-11,0)"/>
         <setting id="force_title_match" type="text" label="Shows forced to match only on title" enable="false" visible="false"/>
+        <setting id="progress_skip_cache" type="text" label="Shows to skip in get_progress" enable="false" visible="false"/>
+        <setting id="force_include_progress" type="text" label="Ended shows forced into get_progress" enable="false" visible="false"/>
         <setting id="toggle_enable" type="bool" label="Enable/Disable Check" default="false" enable="false" visible="false"/>
     </category>
     

@@ -752,21 +752,30 @@ def get_progress(cache_override=False):
         progress_list += watchlist
 
     hidden = dict.fromkeys([item['show']['ids']['trakt'] for item in trakt_api.get_hidden_progress(cached=cached)])
+    filter_list = dict.fromkeys(utils.get_progress_skip_list())
+    force_list = dict.fromkeys(utils.get_force_progress_list())
     worker_count = 0
     workers = []
     shows = {}
     q = Queue()
     begin = time.time()
     for show in progress_list:
-        if show['show']['ids']['trakt'] in hidden:
+        trakt_id = str(show['show']['ids']['trakt'])
+        # skip hidden shows
+        if int(trakt_id) in hidden:
             continue
         
-        worker = utils.start_worker(q, utils.parallel_get_progress, [show['show']['ids']['trakt'], cached])
+        # skip cached ended 100% shows
+        if trakt_id in filter_list and trakt_id not in force_list:
+            log_utils.log('Skipping %s (%s) as cached MNE ended exclusion' % (trakt_id, show['show']['title']), log_utils.LOGDEBUG)
+            continue
+        
+        worker = utils.start_worker(q, utils.parallel_get_progress, [trakt_id, cached])
         worker_count += 1
         workers.append(worker)
         # create a shows dictionary to be used during progress building
-        shows[show['show']['ids']['trakt']] = show['show']
-        shows[show['show']['ids']['trakt']]['last_watched_at'] = show['last_watched_at']
+        shows[trakt_id] = show['show']
+        shows[trakt_id]['last_watched_at'] = show['last_watched_at']
 
     episodes = []
     while worker_count > 0:
@@ -782,6 +791,11 @@ def get_progress(cache_override=False):
                 episode['percent_completed'] = (progress['completed'] * 100) / progress['aired'] if progress['aired'] > 0 else 0
                 episode['completed'] = progress['completed']
                 episodes.append(episode)
+            else:
+                trakt_id = str(progress['trakt'])
+                show = shows[trakt_id]
+                if show['status'].upper() == 'ENDED' and progress['completed'] == progress['aired'] and trakt_id not in filter_list and trakt_id not in force_list:
+                    manage_progress_cache(ACTIONS.ADD, progress['trakt'])
 
             if max_timeout > 0:
                 timeout = max_timeout - (time.time() - begin)
@@ -1619,6 +1633,27 @@ def toggle_title(trakt_id):
     kodi.set_setting('force_title_match', filter_str)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
+@url_dispatcher.register(MODES.MANAGE_PROGRESS, ['action', 'trakt_id'])
+def manage_progress_cache(action, trakt_id):
+    trakt_id = str(trakt_id)
+    filter_list = utils.get_progress_skip_list()
+    force_list = utils.get_force_progress_list()
+    filtered = trakt_id in filter_list
+    forced = trakt_id in force_list
+    
+    if action == ACTIONS.REMOVE and filtered:
+        del filter_list[filter_list.index(trakt_id)]
+        force_list.append(trakt_id)
+    elif action == ACTIONS.ADD and not filtered and not forced:
+        filter_list.append(trakt_id)
+
+    filter_str = '|'.join(filter_list)
+    kodi.set_setting('progress_skip_cache', filter_str)
+    force_str = '|'.join(force_list)
+    kodi.set_setting('force_include_progress', force_str)
+    if action == ACTIONS.REMOVE:
+        xbmc.executebuiltin("XBMC.Container.Refresh")
+
 @url_dispatcher.register(MODES.TOGGLE_WATCHED, ['section', 'id_type', 'show_id'], ['watched', 'season', 'episode'])
 def toggle_watched(section, id_type, show_id, watched=True, season='', episode=''):
     log_utils.log('In Watched: |%s|%s|%s|%s|%s|%s|' % (section, id_type, show_id, season, episode, watched), xbmc.LOGDEBUG)
@@ -2281,13 +2316,18 @@ def make_item(section_params, show, menu_items=None):
         menu_items.append((i18n('set_addicted_tvshowid'), runstring,))
 
     if section_params['section'] == SECTIONS.TV:
-        if str(trakt_id) in utils.get_force_title_list():
-            label = i18n('use_def_ep_matching')
+        if str(trakt_id) in utils.get_progress_skip_list():
+            queries = {'mode': MODES.MANAGE_PROGRESS, 'action': ACTIONS.REMOVE, 'trakt_id': trakt_id}
+            runstring = 'RunPlugin(%s)' % kodi.get_plugin_url(queries)
+            menu_items.append((i18n('include_in_mne'), runstring,))
         else:
-            label = i18n('use_ep_title_match')
-        queries = {'mode': MODES.TOGGLE_TITLE, 'trakt_id': trakt_id}
-        runstring = 'RunPlugin(%s)' % kodi.get_plugin_url(queries)
-        menu_items.append((label, runstring,))
+            if str(trakt_id) in utils.get_force_title_list():
+                label = i18n('use_def_ep_matching')
+            else:
+                label = i18n('use_ep_title_match')
+            queries = {'mode': MODES.TOGGLE_TITLE, 'trakt_id': trakt_id}
+            runstring = 'RunPlugin(%s)' % kodi.get_plugin_url(queries)
+            menu_items.append((label, runstring,))
 
     queries = {'mode': MODES.SET_URL_SEARCH, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'trakt_id': trakt_id}
     menu_items.append((i18n('set_rel_url_search'), 'RunPlugin(%s)' % (kodi.get_plugin_url(queries))),)

@@ -728,6 +728,16 @@ def get_force_title_list():
     filter_list = filter_str.split('|') if filter_str else []
     return filter_list
 
+def get_progress_skip_list():
+    filter_str = kodi.get_setting('progress_skip_cache')
+    filter_list = filter_str.split('|') if filter_str else []
+    return filter_list
+
+def get_force_progress_list():
+    filter_str = kodi.get_setting('force_include_progress')
+    filter_list = filter_str.split('|') if filter_str else []
+    return filter_list
+
 def record_failures(fails, counts=None):
     if counts is None: counts = {}
 

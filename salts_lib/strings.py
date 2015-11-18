@@ -238,5 +238,6 @@ STRINGS = {
     'failed_source': 30226,
     'scraper_timeout_list': 30227,
     'reset_fails': 30228,
-    'result_limit': 30229
+    'result_limit': 30229,
+    'include_in_mne': 30230
 }
