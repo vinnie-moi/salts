@@ -1592,3 +1592,7 @@ msgctxt "#30658"
 msgid "Mute Notifications"
 msgstr ""
 
+msgctxt "#30659"
+msgid "Exclude Completed, Ended Shows from My Next Episodes"
+msgstr ""
+

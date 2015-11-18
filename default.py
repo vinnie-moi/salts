@@ -754,6 +754,7 @@ def get_progress(cache_override=False):
     hidden = dict.fromkeys([item['show']['ids']['trakt'] for item in trakt_api.get_hidden_progress(cached=cached)])
     filter_list = dict.fromkeys(utils.get_progress_skip_list())
     force_list = dict.fromkeys(utils.get_force_progress_list())
+    use_exclusion = kodi.get_setting('use_cached_exclusion') == 'true'
     worker_count = 0
     workers = []
     shows = {}
@@ -766,7 +767,7 @@ def get_progress(cache_override=False):
             continue
         
         # skip cached ended 100% shows
-        if trakt_id in filter_list and trakt_id not in force_list:
+        if use_exclusion and trakt_id in filter_list and trakt_id not in force_list:
             log_utils.log('Skipping %s (%s) as cached MNE ended exclusion' % (trakt_id, show['show']['title']), log_utils.LOGDEBUG)
             continue
         
@@ -795,6 +796,7 @@ def get_progress(cache_override=False):
                 trakt_id = str(progress['trakt'])
                 show = shows[trakt_id]
                 if show['status'].upper() == 'ENDED' and progress['completed'] == progress['aired'] and trakt_id not in filter_list and trakt_id not in force_list:
+                    log_utils.log('Adding %s (%s) (%s - %s) to MNE exclusion list' % (trakt_id, show['title'], progress['completed'], progress['aired']), log_utils.LOGDEBUG)
                     manage_progress_cache(ACTIONS.ADD, progress['trakt'])
 
             if max_timeout > 0:

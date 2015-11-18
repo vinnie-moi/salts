@@ -8,6 +8,7 @@
         <setting id="sort_progress" type="enum" label="30505" lvalues="30518|30519|30520|30521|30522|30523" default="0"/>
         <setting id="sort_watchlist" type="enum" label="30642" lvalues="30643|30644|30516|30517" default="0"/>
         <setting id="include_watchlist_next" type="bool" label="30646" default="false"/>
+        <setting id="use_cached_exclusion" type="bool" label="30659" default="true"/>
         <setting id="show_unaired_next" type="bool" label="30506" default="false"/>
         <setting id="show_season0" type="bool" label="30507" default="true"/>
         <setting id="show_unaired" type="bool" label="30508" default="true"/>
