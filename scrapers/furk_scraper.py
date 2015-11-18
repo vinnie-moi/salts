@@ -95,7 +95,7 @@ class Furk_Scraper(scraper.Scraper):
         hosters = []
         search_url = urlparse.urljoin(self.base_url, SEARCH_URL)
         query = self.__translate_search(url)
-        result = self._http_get(search_url, data=query, cache_limit=.5)
+        result = self._http_get(search_url, data=query, allow_redirect=False, cache_limit=.5)
         if 'files' in result:
             for item in result['files']:
                 checks = [False] * 6
@@ -103,7 +103,7 @@ class Furk_Scraper(scraper.Scraper):
                 if 'is_ready' in item and item['is_ready'] != '1': checks[1] = True
                 if 'av_result' in item and item['av_result'] in ['warning', 'infected']: checks[2] = True
                 if 'video_info' not in item: checks[3] = True
-                if 'video_info' in item and item['video_info'] and not re.search('#0:(?:1|0)(?:\(eng\)|\(und\))?:\s*Audio:', item['video_info']): checks[4] = True
+                if 'video_info' in item and item['video_info'] and not re.search('#0:(?:0|1)(?:\(eng\)|\(und\))?:\s*Audio:', item['video_info']): checks[4] = True
                 if video.video_type == VIDEO_TYPES.EPISODE:
                     sxe = '[. ][Ss]%02d[Ee]%02d[. ]' % (int(video.season), int(video.episode))
                     if not re.search(sxe, item['name']):
@@ -169,23 +169,28 @@ class Furk_Scraper(scraper.Scraper):
         settings.append('         <setting id="%s-result_limit" label="     %s" type="slider" default="10" range="10,100" option="int" visible="eq(-6,true)"/>' % (name, i18n('result_limit')))
         return settings
 
-    def _http_get(self, url, data=None, retry=True, cache_limit=8):
+    def _http_get(self, url, data=None, retry=True, allow_redirect=True, cache_limit=8):
         if not self.username or not self.password:
             return {}
         
-        result = super(Furk_Scraper, self)._http_get(url, data=data, cache_limit=cache_limit)
+        result = super(Furk_Scraper, self)._http_get(url, data=data, allow_redirect=allow_redirect, cache_limit=cache_limit)
         if result:
             try:
                 js_result = json.loads(result)
             except ValueError:
-                log_utils.log('Invalid JSON returned: %s: %s' % (url, result), log_utils.LOGWARNING)
-                js_result = {}
+                if 'msg_key=session_invalid' in result:
+                    log_utils.log('Logging in for url (%s) (Session Expired)' % (url), log_utils.LOGDEBUG)
+                    self.__login()
+                    js_result = self._http_get(url, data=data, retry=False, allow_redirect=allow_redirect, cache_limit=0)
+                else:
+                    log_utils.log('Invalid JSON returned: %s: %s' % (url, result), log_utils.LOGWARNING)
+                    js_result = {}
             else:
                 if js_result['status'] == 'error':
                     if retry and js_result['error'] == 'access denied':
                         log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
                         self.__login()
-                        js_result = self._http_get(url, data=data, retry=False, cache_limit=0)
+                        js_result = self._http_get(url, data=data, retry=False, allow_redirect=allow_redirect, cache_limit=0)
                     else:
                         log_utils.log('Error received from furk.net (%s)' % (js_result['error']), log_utils.LOGWARNING)
             
