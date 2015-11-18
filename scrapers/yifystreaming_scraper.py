@@ -26,7 +26,6 @@ from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib import dom_parser
 
 BASE_URL = 'http://yify-streaming.com'
-BASE_URLS = {VIDEO_TYPES.MOVIE: 'http://yify-streaming.com', VIDEO_TYPES.TVSHOW: 'http://tv.yify-streaming.com', VIDEO_TYPES.EPISODE: 'http://tv.yify-streaming.com'}
 CATEGORIES = {VIDEO_TYPES.MOVIE: 'category-movies', VIDEO_TYPES.EPISODE: 'category-tv-series'}
 
 class YifyStreaming_Scraper(scraper.Scraper):
@@ -54,8 +53,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
         source_url = self.get_url(video)
         hosters = []
         if source_url and source_url != FORCE_NO_MATCH:
-            base_url = BASE_URLS[video.video_type]
-            url = urlparse.urljoin(base_url, source_url)
+            url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             q_str = ''
             match = re.search('<h2>([^<]+)', html)
@@ -103,8 +101,7 @@ class YifyStreaming_Scraper(scraper.Scraper):
                 return result['url']
     
     def search(self, video_type, title, year):
-        base_url = BASE_URLS[video_type]
-        search_url = urlparse.urljoin(base_url, '/?s=')
+        search_url = urlparse.urljoin(self.base_url, '/?s=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=.25)
             
