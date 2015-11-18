@@ -1,3 +1,10 @@
+[B]Version 1.0.77[/B]
+- Furk scraper fixes (session timeouts; invalid login)
+- Improve moviestorm scraper
+- Handle liked list removal
+- Add progress exclusion cache
+- Fix MVL scraper
+
 [B]Version 1.0.76[/B]
 - Fix unicode in username
 - Improve urlresolver filter
