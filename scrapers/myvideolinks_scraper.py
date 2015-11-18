@@ -116,6 +116,6 @@ class MyVidLinks_Scraper(scraper.Scraper):
         search_url = urlparse.urljoin(self.base_url, '/?s=')
         search_url += urllib.quote_plus(title)
         html = self._http_get(search_url, cache_limit=1)
-        pattern = '<h\d+>.*?<a\s+href="(?P<url>[^"]*/(?P<date>\d{4}/\d{2}/\d{2})/[^"]*)"\s+rel="bookmark"\s+title="(?P<post_title>[^"]+)'
+        pattern = '<h\d+>.*?<a\s+href="(?P<url>[^"]*/(?P<date>\d{4}/\d{2}/\d{2})/[^"]*)"\s+rel="bookmark"\s+title="(?:Permanent Link to )?(?P<post_title>[^"]+)'
         date_format = '%Y/%m/%d'
         return self._blog_proc_results(html, pattern, date_format, video_type, title, year)
