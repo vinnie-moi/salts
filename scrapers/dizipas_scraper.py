@@ -68,7 +68,6 @@ class Dizilab_Scraper(scraper.Scraper):
                     except ValueError:
                         log_utils.log('Invalid JSON returned: %s: %s' % (post_url, html), log_utils.LOGWARNING)
                     else:
-                        print js_result
                         for key in js_result:
                             stream_url = js_result[key]
                             host = self._get_direct_hostname(stream_url)

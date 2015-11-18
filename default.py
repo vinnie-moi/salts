@@ -210,7 +210,7 @@ def auto_conf():
                  ['tunemovie', 'afdah.org', 'xmovies8', 'beinmovie', 'torba.se', 'IzlemeyeDeger', 'Rainierland', 'zumvo.com', 'MiraDeTodo'],
                  ['SezonLukDizi', 'Dizimag', 'Dizilab', 'Dizigold', 'Diziay', 'Dizipas', 'Shush.se', 'MovieFarsi'],
                  ['DDLValley', 'ReleaseBB', 'MyVideoLinks.eu', 'OneClickWatch', 'RLSSource.net', 'TVRelease.Net'],
-                 ['IceFilms', 'PrimeWire', 'Flixanity', 'wso.ch', 'WatchSeries', 'UFlix.org', 'Putlocker'],
+                 ['IceFilms', 'PrimeWire', 'Flixanity', 'wso.ch', 'WatchSeries', 'UFlix.org', 'Putlocker', 'MovieHut'],
                  ['funtastic-vids', 'WatchFree.to', 'pftv', 'streamallthis.is', 'Movie4K', 'afdah', 'SolarMovie', 'yify-streaming'],
                  ['CouchTunerV2', 'CouchTunerV1', 'Watch8Now', 'yshows', '2movies', 'iWatchOnline', 'vidics.ch', 'pubfilm'],
                  ['OnlineMoviesIs', 'OnlineMoviesPro', 'ViewMovies', 'movie25', 'viooz.ac', 'view47', 'MoviesHD', 'wmo.ch'],
