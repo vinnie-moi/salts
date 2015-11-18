@@ -68,9 +68,11 @@ class One23Movies_Scraper(scraper.Scraper):
                     url = urlparse.urljoin(self.base_url, PLAYLIST_URL1 % (link_id))
                     sources.update(self.__get_link_from_json(url, q_str))
                 else:
-                    url = urlparse.urljoin(self.base_url, self.__get_ep_pl_url(link_type, html))
-                    xml = self._http_get(url, cache_limit=.5)
-                    sources.update(self.__get_links_from_xml(xml, video))
+                    media_url = self.__get_ep_pl_url(link_type, html)
+                    if media_url:
+                        url = urlparse.urljoin(self.base_url, media_url)
+                        xml = self._http_get(url, cache_limit=.5)
+                        sources.update(self.__get_links_from_xml(xml, video))
                 
             for source in sources:
                 if sources[source]['direct']:
@@ -82,8 +84,8 @@ class One23Movies_Scraper(scraper.Scraper):
         return hosters
 
     def __get_ep_pl_url(self, link_id, html):
-        movie_id = dom_parser.parse_dom(html, 'div', {'id': '123movies-player'}, 'movie-id')
-        player_token = dom_parser.parse_dom(html, 'div', {'id': '123movies-player'}, 'player-token')
+        movie_id = dom_parser.parse_dom(html, 'div', {'id': 'media-player'}, 'movie-id')
+        player_token = dom_parser.parse_dom(html, 'div', {'id': 'media-player'}, 'player-token')
         if movie_id and player_token:
             return PLAYLIST_URL2 % (movie_id[0], player_token[0], link_id)
     
