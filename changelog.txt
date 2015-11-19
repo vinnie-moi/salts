@@ -1,3 +1,13 @@
+[B]Version 1.0.78[/B]
+- Add dizipas scraper
+- Add moviehut scraper
+- Fix 2movies scraper
+- Fix mvl movie matching
+- Fix yify-streaming scraper
+- Fix filmstreaming.in scraper
+- Fix 123movies scraper
+- Improve couchtuner and watch8now scraper
+
 [B]Version 1.0.77[/B]
 - Furk scraper fixes (session timeouts; invalid login)
 - Improve moviestorm scraper
