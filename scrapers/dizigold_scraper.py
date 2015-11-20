@@ -56,29 +56,55 @@ class Dizigold_Scraper(scraper.Scraper):
     def get_sources(self, video):
         source_url = self.get_url(video)
         hosters = []
+        sources = []
         if source_url and source_url != FORCE_NO_MATCH:
             page_url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(page_url, cache_limit=.25)
             match = re.search('var\s+view_id\s*=\s*"([^"]+)', html)
             if match:
-                view_data = {'id': match.group(1), 'tip': 'view'}
+                view_data = {'id': match.group(1), 'tip': 'view', 'dil': 'or'}
                 html = self._http_get(self.ajax_url, data=view_data, headers=XHR, cache_limit=.25)
-                html = re.sub(r'\\n|\\t|\\', '', html)
+                html = html.strip()
+                html = re.sub(r'\\n|\\t', '', html)
                 match = re.search('var\s+sources\s*=\s*(\[.*?\])', html)
                 if match:
+                    raw_data = match.group(1)
+                    raw_data = raw_data.replace('\\', '')
+                else:
+                    raw_data = html
+                
+                if raw_data:
                     try:
-                        js_data = json.loads(match.group(1))
+                        js_data = json.loads(raw_data)
                     except ValueError:
                         log_utils.log('Invalid JSON returned: %s: %s' % (view_data, html), log_utils.LOGWARNING)
                     else:
-                        for source in js_data:
+                        if 'data' in js_data:
+                            src = dom_parser.parse_dom(js_data['data'], 'iframe', ret='src')
+                            if src:
+                                html = self._http_get(src[0], cache_limit=.25)
+                                match = re.search('url=([^"]+)', html)
+                                if match:
+                                    stream_url = match.group(1).replace('&gt;', '')
+                                    sources.append({'label': '720p', 'file': stream_url})
+                                    direct = False
+                        else:
+                            sources = js_data
+                            direct = True
+
+                        for source in sources:
                             stream_url = source['file'] + '|User-Agent=%s' % (USER_AGENT)
-                            if self._get_direct_hostname(stream_url) == 'gvideo':
-                                quality = self._gv_get_quality(stream_url)
+                            if direct:
+                                host = self._get_direct_hostname(stream_url)
+                                if host == 'gvideo':
+                                    quality = self._gv_get_quality(stream_url)
+                                else:
+                                    quality = self._height_get_quality(source['label'])
                             else:
+                                host = urlparse.urlparse(stream_url).hostname
                                 quality = self._height_get_quality(source['label'])
                         
-                            hoster = {'multi-part': False, 'host': self._get_direct_hostname(stream_url), 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': True}
+                            hoster = {'multi-part': False, 'host': host, 'class': self, 'quality': quality, 'views': None, 'rating': None, 'url': stream_url, 'direct': direct}
                             hosters.append(hoster)
     
         return hosters
