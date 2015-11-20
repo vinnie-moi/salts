@@ -67,7 +67,7 @@ class MyVidLinks_Scraper(scraper.Scraper):
         return hosters
 
     def __get_movie_links(self, video, views, html):
-        pattern = '<h1>[^>]*>([^<]+)'
+        pattern = '<h4>([^<]+)'
         match = re.search(pattern, html)
         q_str = ''
         if match:
