@@ -93,7 +93,7 @@ class Local_Scraper(scraper.Scraper):
             log_utils.log('Skipping S&E matching as title search is forced on: %s' % (video.trakt_id), log_utils.LOGDEBUG)
 
         if (force_title or kodi.get_setting('title-fallback') == 'true') and video.ep_title and not episodes:
-            run = cmd % (params['id'][0], video.season, 'title', video.ep_title)
+            run = cmd % (params['id'][0], video.season, 'title', video.ep_title.encode('utf-8'))
             meta = xbmc.executeJSONRPC(run)
             meta = json.loads(meta)
             log_utils.log('Episode Title Meta: %s' % (meta), log_utils.LOGDEBUG)
