@@ -89,7 +89,6 @@ class Flixanity_Scraper(scraper.Scraper):
                         direct = True
                         quality = self._gv_get_quality(url)
                     else:
-                        print url
                         if 'vk.com' in url and url.endswith('oid='): continue  # skip bad vk.com links
                         direct = False
                         host = urlparse.urlparse(url).hostname
