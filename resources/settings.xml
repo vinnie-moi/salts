@@ -240,7 +240,7 @@
 
     <category label="Scrapers 2">
          <setting id="Flixanity-enable" type="bool" label="Flixanity Enabled" default="true" visible="true"/>
-         <setting id="Flixanity-base_url" type="text" label="    Base Url" default="http://www.flixanity.tv" visible="eq(-1,true)"/>
+         <setting id="Flixanity-base_url" type="text" label="    Base Url" default="http://www.flixanity.is" visible="eq(-1,true)"/>
          <setting id="Flixanity-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="Flixanity_last_results" type="number" default="0" visible="false"/>
          <setting id="Flixanity-username" type="text" label="     Username" default="" visible="eq(-4,true)"/>
