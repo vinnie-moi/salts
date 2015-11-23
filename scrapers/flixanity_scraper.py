@@ -76,9 +76,10 @@ class Flixanity_Scraper(scraper.Scraper):
                 elid = urllib.quote(base64.encodestring(str(int(time.time()))).strip())
                 data = {'action': action, 'idEl': match.group(1), 'token': self.__token, 'elid': elid}
                 ajax_url = urlparse.urljoin(self.base_url, EMBED_URL)
-                html = self._http_get(ajax_url, data=data, headers=XHR, cache_limit=0)
+                headers = XHR
+                headers['Authorization'] = 'Bearer %s' % (self.__get_bearer())
+                html = self._http_get(ajax_url, data=data, headers=headers, cache_limit=0)
                 html = html.replace('\\"', '"').replace('\\/', '/')
-                print html
                  
                 pattern = '<IFRAME\s+SRC="([^"]+)'
                 for match in re.finditer(pattern, html, re.DOTALL | re.I):
@@ -88,6 +89,8 @@ class Flixanity_Scraper(scraper.Scraper):
                         direct = True
                         quality = self._gv_get_quality(url)
                     else:
+                        print url
+                        if 'vk.com' in url and url.endswith('oid='): continue  # skip bad vk.com links
                         direct = False
                         host = urlparse.urlparse(url).hostname
                         quality = self._get_quality(video, host, QUALITIES.HD720)
@@ -165,7 +168,7 @@ class Flixanity_Scraper(scraper.Scraper):
                 log_utils.log('Unable to locate Flixanity token', log_utils.LOGWARNING)
     
     def __get_t(self, html=''):
-        if self.__t is None:
+        if not self.__t:
             if not html:
                 html = super(Flixanity_Scraper, self)._cached_http_get(self.base_url, self.base_url, self.timeout, cache_limit=0)
                 
@@ -182,5 +185,10 @@ class Flixanity_Scraper(scraper.Scraper):
         self.__get_t()
         data = {'username': self.username, 'password': self.password, 'action': 'login', 'token': self.__token, 't': self.__t}
         html = super(Flixanity_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=XHR, cache_limit=0)
-        if html != '0':
-            raise Exception('flixanity login failed')
+        if html != '0': raise Exception('flixanity login failed')
+
+    def __get_bearer(self):
+        cj = self._set_cookies(self.base_url, {})
+        for cookie in cj:
+            if cookie.name == '__utmx':
+                return cookie.value
