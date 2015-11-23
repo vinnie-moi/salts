@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SALTS\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2015-11-01 01:33+0000\n"
+"PO-Revision-Date: 2015-11-23 00:21+0000\n"
 "Last-Translator: tknorris\n"
 "Language-Team: English (United States) (http://www.transifex.com/tv-addons/salts/language/en_US/)\n"
 "MIME-Version: 1.0\n"
@@ -609,16 +609,16 @@ msgid "Scraper Automatically Disabled"
 msgstr "Scraper Automatically Disabled"
 
 msgctxt "#30148"
-msgid ""
-msgstr "The [COLOR blue]%s[/COLOR] scraper timed out on [COLOR red]%s%%[/COLOR] of %s requests"
+msgid "[COLOR blue]%s[/COLOR] returned no results %s times in a row."
+msgstr "[COLOR blue]%s[/COLOR] returned no results %s times in a row."
 
 msgctxt "#30149"
-msgid "Each timeout wastes system resources and time."
-msgstr "Each timeout wastes system resources and time."
+msgid "This wastes system resources and time."
+msgstr "This wastes system resources and time."
 
 msgctxt "#30150"
 msgid ""
-msgstr "([I]If you keep it enabled, consider increasing the scraper timeout.[/I])"
+msgstr "([I]If you keep it enabled, consider increasing your scraper timeout.[/I])"
 
 msgctxt "#30151"
 msgid "Keep Enabled"
@@ -903,6 +903,42 @@ msgstr "Received %s Sources from: %s"
 msgctxt "#30221"
 msgid "Filtering Out Unusable Sources"
 msgstr "Filtering Out Unusable Sources"
+
+msgctxt "#30222"
+msgid "Include Links from Comments"
+msgstr "Include Links from Comments"
+
+msgctxt "#30223"
+msgid "My Watched History"
+msgstr "My Watched History"
+
+msgctxt "#30224"
+msgid "Trying Sources for Auto-Play"
+msgstr "Trying Sources for Auto-Play"
+
+msgctxt "#30225"
+msgid "Trying: [%s] %s from %s"
+msgstr "Trying: [%s] %s from %s"
+
+msgctxt "#30226"
+msgid "Failed: [%s] %s from %s"
+msgstr "Failed: [%s] %s from %s"
+
+msgctxt "#30227"
+msgid "Scraper Timeouts: [COLOR blue]%s[/COLOR]"
+msgstr "Scraper Timeouts: [COLOR blue]%s[/COLOR]"
+
+msgctxt "#30228"
+msgid "Reset Failures"
+msgstr "Reset Failures"
+
+msgctxt "#30229"
+msgid "Maximum Source Results"
+msgstr "Maximum Source Results"
+
+msgctxt "#30230"
+msgid "Include in My Next Episodes"
+msgstr "Include in My Next Episodes"
 
 msgctxt "#30500"
 msgid "Addon Theme"
@@ -1225,8 +1261,8 @@ msgid "Maximum Source Results (0=No Limit)"
 msgstr "Maximum Source Results (0=No Limit)"
 
 msgctxt "#30580"
-msgid "Filter Top Unusable Sources (0=None)"
-msgstr "Filter Top Unusable Sources (0=None)"
+msgid "Filter Out Unusable Sources"
+msgstr "Filter Out Unusable Sources"
 
 msgctxt "#30581"
 msgid "Source Exclusion List"
@@ -1249,8 +1285,8 @@ msgid "Match episode title when season & episode fails"
 msgstr "Match episode title when season & episode fails"
 
 msgctxt "#30586"
-msgid "Automatically disable slow scrapers"
-msgstr "Automatically disable slow scrapers"
+msgid "Automatically disable ineffective scrapers"
+msgstr "Automatically disable ineffective scrapers"
 
 msgctxt "#30587"
 msgid "    Check Frequency (requests)"
@@ -1511,4 +1547,36 @@ msgstr "Won't scrape"
 msgctxt "#30651"
 msgid "All"
 msgstr "All"
+
+msgctxt "#30652"
+msgid "Show Debrid Supported Sources in Green"
+msgstr "Show Debrid Supported Sources in Green"
+
+msgctxt "#30653"
+msgid "6th Sort Key"
+msgstr "6th Sort Key"
+
+msgctxt "#30654"
+msgid "6th Sort Key Order"
+msgstr "6th Sort Key Order"
+
+msgctxt "#30655"
+msgid "Debrid"
+msgstr "Debrid"
+
+msgctxt "#30656"
+msgid "Show My Watched History"
+msgstr "Show My Watched History"
+
+msgctxt "#30657"
+msgid "    Consecutive Failure Level Limit"
+msgstr "    Consecutive Failure Level Limit"
+
+msgctxt "#30658"
+msgid "Mute Notifications"
+msgstr "Mute Notifications"
+
+msgctxt "#30659"
+msgid "Exclude Completed, Ended Shows from My Next Episodes"
+msgstr "Exclude Completed, Ended Shows from My Next Episodes"
 
