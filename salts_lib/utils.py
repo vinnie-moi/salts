@@ -424,7 +424,9 @@ def parallel_get_sources(q, scraper, video):
     if hosters is None: hosters = []
     if kodi.get_setting('filter_direct') == 'true':
         hosters = [hoster for hoster in hosters if not hoster['direct'] or test_stream(hoster)]
-    for hoster in hosters: hoster['host'] = hoster['host'].lower().strip()
+    for hoster in hosters:
+        if not hoster['direct']:
+            hoster['host'] = hoster['host'].lower().strip()
     log_utils.log('%s returned %s sources from %s' % (scraper.get_name(), len(hosters), worker), log_utils.LOGDEBUG)
     result = {'name': scraper.get_name(), 'hosters': hosters}
     q.put(result)
