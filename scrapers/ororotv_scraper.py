@@ -18,6 +18,7 @@
 import scraper
 import re
 import urlparse
+import xbmc
 from salts_lib import kodi
 from salts_lib import log_utils
 from salts_lib.trans_utils import i18n
@@ -31,6 +32,7 @@ LANDING_URL = '/nl'
 LOGIN_URL = '/en/users/sign_in'
 MAX_REDIRECT = 10
 CATEGORIES = {VIDEO_TYPES.TVSHOW: '2,3', VIDEO_TYPES.MOVIE: '1,3,4'}
+ORORO_WAIT = 1000
 
 class OroroTV_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -124,6 +126,7 @@ class OroroTV_Scraper(scraper.Scraper):
         if auth and (not html or LOGIN_URL in html):
             log_utils.log('Logging in for url (%s)' % (url), log_utils.LOGDEBUG)
             self.__login()
+            xbmc.sleep(ORORO_WAIT)
             html = super(OroroTV_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, headers=headers, cache_limit=0)
 
         return html
@@ -141,6 +144,7 @@ class OroroTV_Scraper(scraper.Scraper):
         
         data = {'user[email]': self.username, 'user[password]': self.password, 'user[remember_me]': 1}
         url = urlparse.urljoin(self.base_url, LOGIN_URL)
+        xbmc.sleep(ORORO_WAIT)
         html = self._http_get(url, auth=False, data=data, allow_redirect=False, cache_limit=0)
         if html != 'http://ororo.tv/en':
             raise Exception('ororo.tv login failed: %s' % (html))
