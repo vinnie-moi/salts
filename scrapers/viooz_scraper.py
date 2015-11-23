@@ -86,7 +86,7 @@ class VioozAc_Scraper(scraper.Scraper):
                     continue
 
                 try:
-                    host = urlparse.urlsplit(stream_url).hostname.lower()
+                    host = urlparse.urlsplit(stream_url).hostname
                 except AttributeError:
                     pass
                 else:

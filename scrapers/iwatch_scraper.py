@@ -79,8 +79,8 @@ class IWatchOnline_Scraper(scraper.Scraper):
                     quality = quality.upper()
                     if age > max_age: max_age = age
                     if age < min_age: min_age = age
-                    hoster = {'multi-part': False, 'class': self, 'url': self._pathify_url(url), 'host': host.lower(), 'age': age, 'views': None, 'rating': None, 'direct': False}
-                    hoster['quality'] = self._get_quality(video, host.lower(), QUALITY_MAP.get(quality, QUALITIES.HIGH))
+                    hoster = {'multi-part': False, 'class': self, 'url': self._pathify_url(url), 'host': host, 'age': age, 'views': None, 'rating': None, 'direct': False}
+                    hoster['quality'] = self._get_quality(video, host, QUALITY_MAP.get(quality, QUALITIES.HIGH))
                     hosters.append(hoster)
 
                 unit = (max_age - min_age) / 100

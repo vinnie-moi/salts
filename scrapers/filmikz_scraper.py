@@ -66,7 +66,7 @@ class Filmikz_Scraper(scraper.Scraper):
                 else:
                     quality = QUALITIES.HD720
                     seen_hosts[hoster['host']] = True
-                hoster['quality'] = self._get_quality(video, hoster['host'].lower(), quality)
+                hoster['quality'] = self._get_quality(video, hoster['host'], quality)
                 hosters.append(hoster)
         return hosters
 

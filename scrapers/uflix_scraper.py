@@ -65,7 +65,7 @@ class UFlix_Scraper(scraper.Scraper):
             for match in re.finditer(pattern, html, re.DOTALL | re.I):
                 url, host, up, down = match.groups()
                 url = url.decode('base-64')
-                host = host.decode('base-64').lower()
+                host = host.decode('base-64')
 
                 # skip ad match
                 if host.upper() == 'HDSTREAM':
@@ -73,7 +73,7 @@ class UFlix_Scraper(scraper.Scraper):
 
                 up = int(up)
                 down = int(down)
-                source = {'multi-part': False, 'url': url, 'host': host.lower(), 'class': self, 'quality': self._get_quality(video, host.lower(), quality), 'up': up, 'down': down, 'direct': False}
+                source = {'multi-part': False, 'url': url, 'host': host, 'class': self, 'quality': self._get_quality(video, host, quality), 'up': up, 'down': down, 'direct': False}
                 rating = up * 100 / (up + down) if (up > 0 or down > 0) else None
                 source['rating'] = rating
                 source['views'] = up + down

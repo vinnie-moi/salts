@@ -100,7 +100,7 @@ class Alluc_Scraper(scraper.Scraper):
                             stream_url = result['hosterurls'][0]['url']
                             if stream_url not in seen_urls:
                                 if self._title_check(video, result['title']):
-                                    host = urlparse.urlsplit(stream_url).hostname.lower()
+                                    host = urlparse.urlsplit(stream_url).hostname
                                     quality = self._get_quality(video, host, self._get_title_quality(result['title']))
                                     hoster = {'multi-part': False, 'class': self, 'views': None, 'url': stream_url, 'rating': None, 'host': host, 'quality': quality, 'direct': False}
                                     hosters.append(hoster)

@@ -71,7 +71,7 @@ class PW_Scraper(scraper.Scraper):
 
                     if host == 'ZnJhbWVndGZv': continue  # filter out promo hosts
 
-                    item = {'host': host.decode('base-64').lower(), 'url': url.decode('base-64')}
+                    item = {'host': host.decode('base-64'), 'url': url.decode('base-64')}
                     item['verified'] = source.group(0).find('star.gif') > -1
                     item['quality'] = self._get_quality(video, item['host'], QUALITY_MAP.get(qual.upper()))
                     item['views'] = int(views)

@@ -115,8 +115,7 @@ class IceFilms_Scraper(scraper.Scraper):
                     for match in re.finditer(pattern, fragment):
                         link_id, label, host_fragment = match.groups()
                         source = {'multi-part': False, 'quality': quality, 'class': self, 'label': label, 'rating': None, 'views': None, 'direct': False}
-                        host = re.sub('(<[^>]+>|</span>)', '', host_fragment)
-                        source['host'] = host.lower()
+                        source['host'] = re.sub('(<[^>]+>|</span>)', '', host_fragment)
                         s = s_start + random.randint(3, 1000)
                         m = m_start + random.randint(21, 1000)
                         url = AJAX_URL % (link_id, s, m, secret, t, ad_url)

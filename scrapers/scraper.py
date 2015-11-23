@@ -553,6 +553,7 @@ class Scraper(object):
         return self._get_quality(video, host, post_quality)
 
     def _get_quality(self, video, host, base_quality=None):
+        host = host.lower()
         # Assume movies are low quality, tv shows are high quality
         if base_quality is None:
             if video.video_type == VIDEO_TYPES.MOVIE:
@@ -564,9 +565,8 @@ class Scraper(object):
 
         host_quality = None
         if host:
-            hl = host.lower()
             for key in HOST_Q:
-                if any(hostname in hl for hostname in HOST_Q[key]):
+                if any(hostname in host for hostname in HOST_Q[key]):
                     host_quality = key
                     break
 

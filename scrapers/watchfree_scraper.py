@@ -59,7 +59,7 @@ class WatchFree_Scraper(scraper.Scraper):
             for match in re.finditer(pattern, html, re.DOTALL | re.I):
                 url, link_name = match.groups()
                 url = url.decode('base-64')
-                host = urlparse.urlsplit(url).hostname.lower()
+                host = urlparse.urlsplit(url).hostname
                 match = re.search('Part\s+(\d+)', link_name)
                 if match:
                     if match.group(1) == '2':

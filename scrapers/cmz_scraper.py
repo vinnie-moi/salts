@@ -63,7 +63,7 @@ class CMZ_Scraper(scraper.Scraper):
             pattern = 'href="[^"]+/rd\.html\?url=([^"]+)'
             for match in re.finditer(pattern, html):
                 url = match.group(1)
-                host = urlparse.urlsplit(url).hostname.lower()
+                host = urlparse.urlsplit(url).hostname
                 hoster = {'multi-part': False, 'host': host, 'url': url, 'class': self, 'rating': None, 'views': views, 'quality': self._get_quality(video, host, QUALITIES.HIGH), 'direct': False}
                 hosters.append(hoster)
 

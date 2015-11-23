@@ -69,7 +69,7 @@ class MovieNight_Scraper(scraper.Scraper):
                     
             if match:
                 url = match.group(1)
-                host = urlparse.urlsplit(url).hostname.lower()
+                host = urlparse.urlsplit(url).hostname
                 hoster = {'multi-part': False, 'host': host, 'url': url, 'class': self, 'rating': None, 'views': None, 'quality': self._get_quality(video, host, page_quality), 'direct': False}
                 hosters.append(hoster)
 

@@ -76,7 +76,7 @@ class TuneMovie_Scraper(scraper.Scraper):
             
             for item in zip(hosts, links):
                 host, link_text = item
-                host = host.lower().replace('server', '').strip()
+                host = host.replace('server', '').strip()
                 match = re.search('href="([^"]+)', link_text)
                 if match:
                     link = match.group(1)
