@@ -1,3 +1,11 @@
+[B]Version 1.0.79[/B]
+- Improve dizigold scraper
+- Add xmovies8.v2 scraper
+- Fix unicode error that sometimes occured during sub update
+- Translation updates
+- Fix flixanity scraper
+- Fix ororo.tv login 
+
 [B]Version 1.0.78[/B]
 - Add dizipas scraper
 - Add moviehut scraper
