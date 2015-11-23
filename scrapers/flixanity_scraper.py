@@ -29,7 +29,7 @@ from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 from salts_lib.constants import XHR
 
-BASE_URL = 'http://www.flixanity.tv'
+BASE_URL = 'http://www.flixanity.is'
 EMBED_URL = '/ajax/embeds.php'
 
 class Flixanity_Scraper(scraper.Scraper):
