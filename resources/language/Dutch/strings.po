@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SALTS\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2015-11-18 20:38+0000\n"
+"PO-Revision-Date: 2015-11-27 10:16+0000\n"
 "Last-Translator: Mike Bike\n"
 "Language-Team: Dutch (http://www.transifex.com/tv-addons/salts/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -52,15 +52,15 @@ msgstr "Add-on Instellingen"
 
 msgctxt "#30008"
 msgid "Auto-Configure SALTS"
-msgstr "Auto Configureer SALTS"
+msgstr "Configureer Automatich SALTS"
 
 msgctxt "#30009"
 msgid "Authorize SALTS to access my trakt.tv account"
-msgstr "Authoriseer SALTS om mijn trakt.tv account te raadplegen"
+msgstr "Authoriseer SALTS om mijn trakt.tv account te gebruiken"
 
 msgctxt "#30010"
 msgid "Set Default Views"
-msgstr "Zet Standaard Uitzicht"
+msgstr "Standaard Weergave Instellen"
 
 msgctxt "#30011"
 msgid "Remove Cached Url(s)"
@@ -68,7 +68,7 @@ msgstr "Verwijder gecachete URL(s)"
 
 msgctxt "#30012"
 msgid "Trending %s"
-msgstr "Trendende %s"
+msgstr "Uitgelichte %s"
 
 msgctxt "#30013"
 msgid "Popular %s"
@@ -136,7 +136,7 @@ msgstr "Bewaarde Opzoekingen"
 
 msgctxt "#30029"
 msgid "Force Refresh"
-msgstr "Forceer Een Ververs"
+msgstr "Forceer Verversen"
 
 msgctxt "#30030"
 msgid "Clear All %s"
@@ -184,11 +184,11 @@ msgstr "Geef Nieuwe Positie in (1 - %s)"
 
 msgctxt "#30041"
 msgid "Set Default %s View"
-msgstr "Zet Standaard %s Uitzicht"
+msgstr "%s Weergave Instellen"
 
 msgctxt "#30042"
 msgid "Set a view then select this item to set the default %s view"
-msgstr "Kies een uitzicht en selecteer dit item om het standaard %s uitzicht te zetten"
+msgstr "Kies een weergave en selecteer dit item om deze %s weergave te gebruiken"
 
 msgctxt "#30043"
 msgid "Import"
@@ -196,7 +196,7 @@ msgstr "Importeer"
 
 msgctxt "#30044"
 msgid "%s View Set to: %s"
-msgstr "%s Uitzicht Gezet naar: %s"
+msgstr "%s Weergave Ingesteld naar: %s"
 
 msgctxt "#30045"
 msgid "Delete [B][COLOR red]ENTIRE[/COLOR][/B] Url Cache"
@@ -380,7 +380,7 @@ msgstr "Zoeken wordt niet ondersteund door Scraper"
 
 msgctxt "#30090"
 msgid "Enter Rating (unrate, or 1-10)"
-msgstr "Geef Beoordeeling in: (unrate, of 1-10)"
+msgstr "Geef Beoordeeling in: (verwijder, of 1-10)"
 
 msgctxt "#30091"
 msgid "Input TVShow ID"
@@ -528,7 +528,7 @@ msgstr "Markeren als Bekeken"
 
 msgctxt "#30127"
 msgid "Rate on trakt.tv"
-msgstr "Wardeer op trakt.tv"
+msgstr "Beoordeel op trakt.tv"
 
 msgctxt "#30128"
 msgid "Set as Season View"
@@ -632,15 +632,15 @@ msgstr "Desactiveer Het"
 
 msgctxt "#30153"
 msgid "Trakt Bookmark Exists"
-msgstr "Trakt Bladwijzer bestaat al"
+msgstr "Trakt Bestand Bestaat al"
 
 msgctxt "#30154"
 msgid "Local Bookmark Exists"
-msgstr "Lokale Bladwijzer bestaat al"
+msgstr "Lokaal Bestand Bestaat al"
 
 msgctxt "#30155"
 msgid "Resume from %s"
-msgstr "Herneem vanaf %s"
+msgstr "Doorgaan vanaf %s"
 
 msgctxt "#30156"
 msgid "Start from beginning"
@@ -648,7 +648,7 @@ msgstr "Start vanaf begin"
 
 msgctxt "#30157"
 msgid "Resume"
-msgstr "Herneem"
+msgstr "Doorgaan"
 
 msgctxt "#30158"
 msgid "Downloading: %s..."
@@ -788,7 +788,7 @@ msgstr "Kan geen bestand schrijven"
 
 msgctxt "#30192"
 msgid "Reset All Scraper Base Urls to Default"
-msgstr "Reset Alle Scraper Basis Urls naar Standaard"
+msgstr "Reset Alle Scraper Urls naar Standaard Waarden"
 
 msgctxt "#30193"
 msgid "Base Url Reset Complete"
@@ -896,7 +896,7 @@ msgstr "Bronnen Ophalen"
 
 msgctxt "#30219"
 msgid "Requested Sources from: %s"
-msgstr "Aanvragen Bronnen van: %s"
+msgstr "Ophalen Bronnen van: %s"
 
 msgctxt "#30220"
 msgid "Received %s Sources from: %s"
@@ -1068,7 +1068,7 @@ msgstr "Toon Mijn Abonementen"
 
 msgctxt "#30531"
 msgid "Show My Watchlist"
-msgstr "Toon Mijn Watchlist"
+msgstr "Toon Mijn Volglijst"
 
 msgctxt "#30532"
 msgid "Show My Lists"
@@ -1400,7 +1400,7 @@ msgstr "Invoegen in bestaande pagina controlles?"
 
 msgctxt "#30614"
 msgid "Subtitles work only for TV Shows currently"
-msgstr "Ondertiteling werkt aleen voor Series tijdelijk "
+msgstr "Ondertiteling werkt aleen tijdelijk voor Series"
 
 msgctxt "#30615"
 msgid "Enable Subtitles"
@@ -1512,7 +1512,7 @@ msgstr "Toon Meeste"
 
 msgctxt "#30642"
 msgid "Watchlist Sort Order"
-msgstr "Watchlist Sorteer Orde"
+msgstr "Volglijst Sorteer Orde"
 
 msgctxt "#30643"
 msgid "Recently Added"
@@ -1528,7 +1528,7 @@ msgstr "Films/series overslaan die locaal bestaan"
 
 msgctxt "#30646"
 msgid "Include Watchlist in My Next Episodes"
-msgstr "Watchlist Gebruiken in Mijn Volgende Afleveringen"
+msgstr "Volglijst Gebruiken in Mijn Volgende Afleveringen"
 
 msgctxt "#30647"
 msgid "Show Trakt On Deck"
