@@ -21,6 +21,7 @@ import urlparse
 import base64
 import hashlib
 import json
+import re
 from salts_lib import kodi
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
@@ -79,7 +80,7 @@ class WS_Scraper(scraper.Scraper):
 
     def search(self, video_type, title, year):
         results = []
-        search_url = '/search/' + urllib.quote_plus(title)
+        search_url = '/search/%s/page/1' % (urllib.quote_plus(title))
         html = self._http_get(search_url, cache_limit=.25)
         if html:
             try:
@@ -155,7 +156,9 @@ class WS_Scraper(scraper.Scraper):
     def _http_get(self, url, cache_limit=8):
         url = self.__translate_url(url)
         headers = {'User-Agent': WS_USER_AGENT}
-        return super(WS_Scraper, self)._http_get(url, headers=headers, cache_limit=cache_limit)
+        result = super(WS_Scraper, self)._http_get(url, headers=headers, cache_limit=cache_limit)
+        result = re.sub('<script.*?</script>', '', result)
+        return result
     
     def __translate_url(self, url):
         if not url.startswith('/json'):
