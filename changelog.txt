@@ -1,3 +1,9 @@
+[B]Version 1.0.80[/B]
+- Fix 123movies search
+- Fix playback failed message (maybe)
+- Fix watchseries scraper
+- Add discrete max quality filter
+
 [B]Version 1.0.79[/B]
 - Improve dizigold scraper
 - Add xmovies8.v2 scraper
