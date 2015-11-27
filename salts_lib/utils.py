@@ -323,15 +323,11 @@ def filter_exclusions(hosters):
     return filtered_hosters
 
 def filter_quality(video_type, hosters):
-    qual_filter = int(kodi.get_setting('%s_quality' % video_type))
-    if qual_filter == 0:
+    qual_filter = 5 - int(kodi.get_setting('%s_quality' % video_type))  # subtract to match Q_ORDER
+    if qual_filter == 5:
         return hosters
-    elif qual_filter == 1:
-        keep_qual = [QUALITIES.HD720, QUALITIES.HD1080]
     else:
-        keep_qual = [QUALITIES.LOW, QUALITIES.MEDIUM, QUALITIES.HIGH]
-
-    return [hoster for hoster in hosters if hoster['quality'] in keep_qual]
+        return [hoster for hoster in hosters if Q_ORDER[hoster['quality']] <= qual_filter]
 
 def get_sort_key(item):
     item_sort_key = []

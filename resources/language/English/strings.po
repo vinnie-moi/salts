@@ -1276,11 +1276,11 @@ msgid "Source Exclusion List"
 msgstr ""
 
 msgctxt "#30582"
-msgid "Allowed TV Show Quality"
+msgid "Maximum Allowed TV Show Quality"
 msgstr ""
 
 msgctxt "#30583"
-msgid "Allowed Movie Quality"
+msgid "Maximum Allowed Movie Quality"
 msgstr ""
 
 msgctxt "#30584"
@@ -1594,5 +1594,25 @@ msgstr ""
 
 msgctxt "#30659"
 msgid "Exclude Completed, Ended Shows from My Next Episodes"
+msgstr ""
+
+msgctxt "#30660"
+msgid "HD1080"
+msgstr ""
+
+msgctxt "#30661"
+msgid "HD720"
+msgstr ""
+
+msgctxt "#30662"
+msgid "High"
+msgstr ""
+
+msgctxt "#30663"
+msgid "Medium"
+msgstr ""
+
+msgctxt "#30664"
+msgid "Low"
 msgstr ""
 

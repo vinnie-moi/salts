@@ -107,8 +107,8 @@
         <setting id="show_debrid" type="bool" label="30652" default="true"/>
         <setting id="filter_direct" type="bool" label="30551" default="false"/>
         <setting id="excl_list" type="text" label="30581" default=""/>
-        <setting id="Episode_quality" type="enum" label="30582" values="HD &amp; SD|HD Only|SD Only" default="0" visible="true"/>
-        <setting id="Movie_quality" type="enum" label="30583" values="HD &amp; SD|HD Only|SD Only" default="0" visible="true"/>
+        <setting id="Episode_quality" type="enum" label="30582" lvalues="30660|30661|30662|30663|30664" default="0" visible="true"/>
+        <setting id="Movie_quality" type="enum" label="30583" lvalues="30660|30661|30662|30663|30664" default="0" visible="true"/>
         <setting id="airdate-fallback" type="bool" label="30584" default="true"/>
         <setting id="title-fallback" type="bool" label="30585" default="true"/>
         <setting id="last_check" type="number" default="0" visible="false"/>
