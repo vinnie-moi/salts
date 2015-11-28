@@ -2178,7 +2178,7 @@ def make_episode_item(show, episode, show_subs=True, menu_items=None):
         queries = {'mode': MODES.SELECT_SOURCE, 'video_type': VIDEO_TYPES.EPISODE, 'title': show['title'], 'year': show['year'], 'season': episode['season'], 'episode': episode['number'],
                    'ep_title': episode['title'], 'ep_airdate': air_date, 'trakt_id': show['ids']['trakt']}
         if kodi.get_setting('source-win') == 'Dialog':
-            runstring = 'PlayMedia(%s)' % kodi.get_plugin_url(queries)
+            runstring = 'RunPlugin(%s)' % kodi.get_plugin_url(queries)
         else:
             runstring = 'Container.Update(%s)' % kodi.get_plugin_url(queries)
         menu_items.insert(0, (i18n('select_source'), runstring),)
@@ -2260,7 +2260,7 @@ def make_item(section_params, show, menu_items=None):
     if section_params['next_mode'] == MODES.GET_SOURCES and kodi.get_setting('auto-play') == 'true':
         queries = {'mode': MODES.SELECT_SOURCE, 'video_type': section_params['video_type'], 'title': show['title'], 'year': show['year'], 'trakt_id': trakt_id}
         if kodi.get_setting('source-win') == 'Dialog':
-            runstring = 'PlayMedia(%s)' % kodi.get_plugin_url(queries)
+            runstring = 'RunPlugin(%s)' % kodi.get_plugin_url(queries)
         else:
             runstring = 'Container.Update(%s)' % kodi.get_plugin_url(queries)
         menu_items.insert(0, (i18n('select_source'), runstring),)
