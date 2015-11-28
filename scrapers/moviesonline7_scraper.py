@@ -20,6 +20,7 @@ import urllib
 import urlparse
 import re
 from salts_lib import kodi
+from salts_lib import log_utils
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
@@ -65,6 +66,7 @@ class MO7_Scraper(scraper.Scraper):
         if source_url and source_url != FORCE_NO_MATCH:
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
+            log_utils.log(type(html))
             fragment = dom_parser.parse_dom(html, 'div', {'class': 'list-wrap'})
             if fragment:
                 for stream_url in dom_parser.parse_dom(fragment[0], 'iframe', ret='src'):

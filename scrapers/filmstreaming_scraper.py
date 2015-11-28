@@ -56,7 +56,6 @@ class FilmStreaming_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             q_str = dom_parser.parse_dom(html, 'span', {'class': 'calidad\d*'})
-            log_utils.log(q_str)
             if q_str:
                 if q_str[0].upper() == 'COMING SOON':
                     return hosters
