@@ -26,9 +26,10 @@ from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import USER_AGENT
+from salts_lib.constants import XHR
 
 BASE_URL = 'http://movie.pubfilmno1.com'
-GK_URL = 'http://player.pubfilm.com/smplayer/plugins/gkplugins_picasaweb/plugins/plugins_player.php'
+GK_URL = 'http://player.pubfilm.com/smplayer/plugins/gkphp/plugins/gkpluginsphp.php'
 
 class PubFilm_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -83,20 +84,24 @@ class PubFilm_Scraper(scraper.Scraper):
         links = {}
         url = url.replace('&#038;', '&')
         html = self._http_get(url, cache_limit=.5)
-        match = re.search('proxy\.link=([^&]+)', html)
-        if match:
-            data = {'url': match.group(1), 'isslverify': 'true', 'ihttpheader': 'true', 'iheader': 'true', 'iagent': USER_AGENT}
-            html = self._http_get(GK_URL, data=data, cache_limit=.5)
-
-        for match in re.finditer('file\s*:\s*"([^"]+)"\s*,\s*label\s*:\s*"([^"]+)p', html):
-            links[match.group(1)] = match.group(2)
-        
-        for match in re.finditer('"url":"([^"]+)","height":(\d+),"width":\d+,"type":"video', html):
-            links[match.group(1)] = match.group(2)
-
-        for match in re.finditer('<source\s+src=\'([^\']+)[^>]*data-res="([^"]+)P', html):
-            links[match.group(1)] = match.group(2)
-        
+        log_utils.log(html)
+        if 'gkpluginsphp' in html:
+            match = re.search('link\s*:\s*"([^"]+)', html)
+            if match:
+                data = {'link': match.group(1)}
+                headers = XHR
+                headers['Referer'] = url
+                html = self._http_get(GK_URL, data=data, headers=headers, cache_limit=.25)
+                if html:
+                    try:
+                        js_result = json.loads(html)
+                    except ValueError:
+                        log_utils.log('Invalid JSON returned: %s: %s' % (url, html), log_utils.LOGWARNING)
+                    else:
+                        if 'link' in js_result:
+                            for link in js_result['link']:
+                                links[link['link']] = link['label']
+                
         return links
 
     def get_url(self, video):
@@ -139,10 +144,10 @@ class PubFilm_Scraper(scraper.Scraper):
                                         results.append(result)
         return results
 
-    def _http_get(self, url, data=None, cache_limit=8):
+    def _http_get(self, url, data=None, headers=None, cache_limit=8):
         html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, data=data, cache_limit=cache_limit)
         cookie = self._get_sucuri_cookie(html)
         if cookie:
             log_utils.log('Setting Pubfilm cookie: %s' % (cookie), log_utils.LOGDEBUG)
-            html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookie, data=data, cache_limit=0)
+            html = super(PubFilm_Scraper, self)._cached_http_get(url, self.base_url, self.timeout, cookies=cookie, data=data, headers=headers, cache_limit=0)
         return html
