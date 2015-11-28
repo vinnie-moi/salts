@@ -9,7 +9,7 @@ from salts_lib.constants import FORCE_NO_MATCH
 from . import scraper  # just to avoid editor warning
 
 __all__ = ['scraper', 'local_scraper', 'pw_scraper', 'uflix_scraper', 'watchseries_scraper', 'movie25_scraper', 'merdb_scraper', '2movies_scraper', 'icefilms_scraper',
-           'movieshd_scraper', 'yifytv_scraper', 'viooz_scraper', 'filmstreaming_scraper', 'myvideolinks_scraper', 'filmikz_scraper', 'clickplay_scraper', 'nitertv_scraper',
+           'movieshd_scraper', 'viooz_scraper', 'filmstreaming_scraper', 'myvideolinks_scraper', 'filmikz_scraper', 'clickplay_scraper', 'nitertv_scraper',
            'iwatch_scraper', 'ororotv_scraper', 'view47_scraper', 'vidics_scraper', 'oneclickwatch_scraper', 'losmovies_scraper', 'movie4k_scraper', 'easynews_scraper',
            'noobroom_scraper', 'solar_scraper', 'directdl_scraper', 'movietv_scraper', 'moviesonline7_scraper', 'streamallthis_scraper', 'afdah_scraper', 'torbase_scraper',
            'streamtv_scraper', 'moviestorm_scraper', 'wmo_scraper', 'zumvo_scraper', 'wso_scraper', 'tvrelease_scraper', 'ch131_scraper', 'watchfree_scraper',
