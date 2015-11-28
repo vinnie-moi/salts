@@ -216,7 +216,7 @@ def auto_conf():
                  ['OnlineMoviesIs', 'OnlineMoviesPro', 'ViewMovies', 'movie25', 'viooz.ac', 'view47', 'MoviesHD', 'wmo.ch'],
                  ['ayyex', 'stream-tv.co', 'clickplay.to', 'MintMovies', 'MovieNight', 'cmz', 'ch131', 'filmikz.ch'],
                  ['MovieTube', 'LosMovies', 'FilmStreaming.in', 'moviestorm.eu', 'MerDB'],
-                 'mvsnap', 'MoviesOnline7', 'yify.tv']
+                 'MoviesOnline7']
 
         sso = []
         random_sso = kodi.get_setting('random_sso') == 'true'
