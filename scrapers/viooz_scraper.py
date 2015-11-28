@@ -19,13 +19,16 @@ import scraper
 import urllib
 import urlparse
 import re
+import json
 from salts_lib import kodi
-import base64
+from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
+from salts_lib.constants import XHR
 
 BASE_URL = 'http://viooz.ac'
+GK_URL = '/p7/plugins/gkpluginsphp.php'
 
 class VioozAc_Scraper(scraper.Scraper):
     base_url = BASE_URL
@@ -59,39 +62,30 @@ class VioozAc_Scraper(scraper.Scraper):
                 quality = QUALITIES.LOW
             else:
                 quality = QUALITIES.HIGH
-
-            pattern = '<div id="cont(.*?)</div>'
-            for match in re.finditer(pattern, html, re.DOTALL):
-                link_fragment = match.group(1)
-                stream_url = ''
-                match = re.search('<iframe.*?src="([^"]+)', link_fragment)
-                if match:
-                    stream_url = match.group(1)
-                    direct = False
-                else:
-                    match = re.search('href="([^"]+)"', link_fragment)
-                    if match:
-                        stream_url = match.group(1)
-                        direct = False
+            
+            for match in re.finditer('gkpluginsphp.*?link\s*:\s*"([^"]+)', html):
+                data = {'link': match.group(1)}
+                headers = XHR
+                headers['Referer'] = url
+                gk_url = urlparse.urljoin(self.base_url, GK_URL)
+                html = self._http_get(gk_url, data=data, headers=headers, cache_limit=.25)
+                if html:
+                    try:
+                        js_result = json.loads(html)
+                    except ValueError:
+                        log_utils.log('Invalid JSON returned: %s: %s' % (url, html), log_utils.LOGWARNING)
                     else:
-                        match = re.search('proxy\.link=([^"&]+)', link_fragment)
-                        if match:
-                            proxy_link = match.group(1)
-                            proxy_link = proxy_link.split('*', 1)[-1]
-                            stream_url = self._gk_decrypt(base64.urlsafe_b64decode('Y0t3RERKc1ZpQ3NtWndET2p6UlU='), proxy_link)
-                            direct = False
-
-                # skip these for now till I work out how to extract them
-                if not stream_url or 'hqq.tv' in stream_url:
-                    continue
-
-                try:
-                    host = urlparse.urlsplit(stream_url).hostname
-                except AttributeError:
-                    pass
-                else:
-                    hoster = {'multi-part': False, 'url': stream_url, 'class': self, 'quality': self._get_quality(video, host, quality), 'host': host, 'rating': None, 'views': None, 'direct': direct}
-                    hosters.append(hoster)
+                        log_utils.log(js_result)
+                        if 'link' in js_result and 'func' not in js_result:
+                            if isinstance(js_result['link'], list):
+                                sources = dict((link['link'], self._height_get_quality(link['label'])) for link in js_result['link'])
+                            else:
+                                sources = {js_result['link']: quality}
+                            
+                            for source in sources:
+                                host = self._get_direct_hostname(source)
+                                hoster = {'multi-part': False, 'url': source, 'class': self, 'quality': sources[source], 'host': host, 'rating': None, 'views': None, 'direct': True}
+                                hosters.append(hoster)
         return hosters
 
     def get_url(self, video):
