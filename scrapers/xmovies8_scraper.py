@@ -21,6 +21,7 @@ import urlparse
 import re
 import random
 from salts_lib import kodi
+from salts_lib import log_utils
 from salts_lib import dom_parser
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
@@ -43,7 +44,12 @@ class XMovies8_Scraper(scraper.Scraper):
         return 'xmovies8'
 
     def resolve_link(self, link):
-        return link
+        link = link.split('|', 1)[0]
+        html = self._http_get(link, allow_redirect=False, cache_limit=0)
+        if html.startswith('http'):
+            return html
+        else:
+            return link
 
     def format_source_label(self, item):
         return '[%s] %s' % (item['quality'], item['host'])
