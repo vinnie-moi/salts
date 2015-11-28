@@ -228,6 +228,7 @@ def auto_conf():
                     random.shuffle(tier)
                 sso += tier
                 
+        log_utils.log(sorted(sso, key=lambda x: x.upper()))
         kodi.set_setting('source_sort_order', '|'.join(sso))
         kodi.notify(msg=i18n('auto_conf_complete'))
     
