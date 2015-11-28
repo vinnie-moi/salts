@@ -1,3 +1,9 @@
+[B]Version 1.0.82[/B]
+- Fix CouchTunerV1 scraper
+- Fix filmstreaming.in scraper
+- Update MoviesOnline7 scraper
+- Fix occasional kodi freeze using Select Source
+
 [B]Version 1.0.81[/B]
 - Fix LosMovies scraper
 - Fix Flixanity scraper
