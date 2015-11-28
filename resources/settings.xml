@@ -186,7 +186,7 @@
          <setting id="cmz-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="cmz_last_results" type="number" default="0" visible="false"/>
          <setting id="CouchTunerV1-enable" type="bool" label="CouchTunerV1 Enabled" default="true" visible="true"/>
-         <setting id="CouchTunerV1-base_url" type="text" label="    Base Url" default="http://www.couchtuner.la" visible="eq(-1,true)"/>
+         <setting id="CouchTunerV1-base_url" type="text" label="    Base Url" default="http://www.couchtuner.ch" visible="eq(-1,true)"/>
          <setting id="CouchTunerV1-sub_check" type="bool" label="    Include in Page Existence checks?" default="true" visible="eq(-2,true)"/>
          <setting id="CouchTunerV1_last_results" type="number" default="0" visible="false"/>
          <setting id="CouchTunerV2-enable" type="bool" label="CouchTunerV2 Enabled" default="true" visible="true"/>
