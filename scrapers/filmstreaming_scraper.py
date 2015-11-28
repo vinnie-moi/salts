@@ -20,6 +20,7 @@ import urllib
 import urlparse
 import re
 from salts_lib import kodi
+from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
@@ -55,8 +56,15 @@ class FilmStreaming_Scraper(scraper.Scraper):
             url = urlparse.urljoin(self.base_url, source_url)
             html = self._http_get(url, cache_limit=.5)
             q_str = dom_parser.parse_dom(html, 'span', {'class': 'calidad\d*'})
+            log_utils.log(q_str)
             if q_str:
-                quality = self._height_get_quality(q_str[0])
+                if q_str[0].upper() == 'COMING SOON':
+                    return hosters
+                
+                try:
+                    quality = self._height_get_quality(q_str[0])
+                except:
+                    quality = QUALITIES.HIGH
             else:
                 quality = QUALITIES.HIGH
             fragment = dom_parser.parse_dom(html, 'div', {'id': 'player\d+'})
