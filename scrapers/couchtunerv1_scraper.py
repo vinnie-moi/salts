@@ -24,7 +24,7 @@ from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from salts_lib.constants import QUALITIES
 
-BASE_URL = 'http://www.couchtuner.la'
+BASE_URL = 'http://www.couchtuner.ch'
 
 class CouchTunerV1_Scraper(scraper.Scraper):
     base_url = BASE_URL
