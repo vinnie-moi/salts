@@ -1,3 +1,11 @@
+[B]Version 1.0.81[/B]
+- Fix LosMovies scraper
+- Fix Flixanity scraper
+- Fix uflix scraper
+- Fix pubfilm scraper
+- Fix viooz scraper
+- Remove scrapers for sites that have gone offline
+
 [B]Version 1.0.80[/B]
 - Fix 123movies search
 - Fix playback failed message (maybe)
