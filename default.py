@@ -1040,6 +1040,7 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
     max_results = int(kodi.get_setting('source_results'))
     worker_count = 0
     workers = []
+    slow_device = bool(kodi.get_setting('slow_device'))
     try:
         q = Queue()
         begin = time.time()
@@ -1056,11 +1057,12 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                 worker = utils.start_worker(q, utils.parallel_get_sources, [scraper, video])
                 worker_count += 1
                 progress = worker_count * 50 / total
-                pd.update(progress, line2=i18n('requested_sources_from') % (cls.get_name()))
+                if not slow_device:
+                    pd.update(progress, line2=i18n('requested_sources_from') % (cls.get_name()))
                 workers.append(worker)
                 fails[cls.get_name()] = True
                 counts[cls.get_name()] = 0
-        
+
             # collect results from workers
             hosters = []
             while worker_count > 0:
@@ -1072,7 +1074,8 @@ def get_sources(mode, video_type, title, year, trakt_id, season='', episode='', 
                     log_utils.log('Got %s Source Results' % (len(result['hosters'])), xbmc.LOGDEBUG)
                     worker_count -= 1
                     progress = ((total - worker_count) * 50 / total) + 50
-                    pd.update(progress, line2=i18n('received_sources_from') % (len(result['hosters']), result['name']))
+                    if not slow_device:
+                        pd.update(progress, line2=i18n('received_sources_from') % (len(result['hosters']), result['name']))
                     hosters += result['hosters']
                     del fails[result['name']]
                     if max_timeout > 0:

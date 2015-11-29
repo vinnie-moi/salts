@@ -1616,3 +1616,7 @@ msgctxt "#30664"
 msgid "Low"
 msgstr ""
 
+msgctxt "#30665"
+msgid "Slow device"
+msgstr ""
+
